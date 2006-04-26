@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * db: fix get_connection parameter order
+
 2006-04-25  --  0.15.1
     * db: add missing port handling to get_connection function and
 	  dbapimodule.connect methods

@@ -506,8 +506,8 @@ def get_dbapi_compliant_module(driver, prefered_drivers = None, quiet = False,
     mod.adv_func_helper = get_adv_func_helper(driver)
     return mod
 
-def get_connection(driver='postgres', host='', database='', user='', port='',
-                  password='', quiet=False, drivers=PREFERED_DRIVERS,
+def get_connection(driver='postgres', host='', database='', user='', 
+                  password='', port='', quiet=False, drivers=PREFERED_DRIVERS,
                   pywrap=False):
     """return a db connexion according to given arguments"""
     module, modname = _import_driver_module(driver, drivers, ['connect'])
