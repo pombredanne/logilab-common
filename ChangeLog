@@ -2,8 +2,11 @@ ChangeLog for logilab.common
 ============================
 
  --
-    * db: fix get_connection parameter order
+    * db: fix get_connection parameter order and host/port handling
+    * configuration: enhanced to handle default value in help and man pages
+      generation (require python >= 2.4)
 
+	
 2006-04-25  --  0.15.1
     * db: add missing port handling to get_connection function and
 	  dbapimodule.connect methods

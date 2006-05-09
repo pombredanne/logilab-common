@@ -29,21 +29,25 @@ It also defines three new types for optik/optparse command line parser :
 """
 
 __revision__ = '$Id: optik_ext.py,v 1.16 2006-03-28 10:34:54 syt Exp $'
-
-try:
-    # python >= 2.3
-    from optparse import OptionParser as BaseParser, Option as BaseOption, \
-         OptionGroup, OptionValueError, OptionError, Values, HelpFormatter
-except Exception, ex:
-    # python < 2.3
-    from optik import OptionParser as BaseParser, Option as BaseOption, \
-         OptionGroup, OptionValueError, OptionError, Values, HelpFormatter
     
 import re
 import sys
 import time
 from copy import copy
 from os.path import exists
+
+try:
+    # python >= 2.3
+    from optparse import OptionParser as BaseParser, Option as BaseOption, \
+         OptionGroup, OptionValueError, OptionError, Values, HelpFormatter, \
+         NO_DEFAULT
+except Exception, ex:
+    # python < 2.3
+    from optik import OptionParser as BaseParser, Option as BaseOption, \
+         OptionGroup, OptionValueError, OptionError, Values, HelpFormatter, \
+         NO_DEFAULT
+
+OPTPARSE_FORMAT_DEFAULT = sys.version_info >= (2, 4)
 
 from logilab.common.textutils import get_csv
 
@@ -160,6 +164,7 @@ class OptionParser(BaseParser):
     """
     def __init__(self, option_class=Option, *args, **kwargs):
         BaseParser.__init__(self, option_class=Option, *args, **kwargs)
+
 
 class ManHelpFormatter(HelpFormatter):
     """Format help using man pages ROFF format"""
