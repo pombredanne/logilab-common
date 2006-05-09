@@ -520,7 +520,7 @@ def get_connection(driver='postgres', host='', database='', user='',
         adapted_module = DBAPIAdapter(module, pywrap)
     else:
         adapted_module = adapter(module, pywrap)
-    if not port:
+    if host and not port:
         try:
             host, port = host.split(':', 1)
         except ValueError:

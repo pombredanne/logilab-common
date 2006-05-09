@@ -1,4 +1,4 @@
-# Copyright (c) 2003-2005 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -24,7 +24,7 @@ in the `optik_ext` module)
 
 
 Quick start: simplest usage
-```````````````````````````````
+```````````````````````````
 
 import sys
 from logilab.common.configuration import Configuration
@@ -67,7 +67,7 @@ config.generate_config()
 
 :version:   $Revision: 1.40 $  
 :author:    Logilab
-:copyright: 2003-2005 LOGILAB S.A. (Paris, FRANCE)
+:copyright: 2003-2006 LOGILAB S.A. (Paris, FRANCE)
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 """
 
@@ -77,17 +77,18 @@ __all__ = ('OptionsManagerMixIn', 'OptionsProviderMixIn',
            'ConfigurationMixIn', 'Configuration',
            'OptionsManager2ConfigurationAdapter')
 
-
+import os
 import sys
 import re
 from os.path import exists
 from copy import copy
 from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 
-from logilab.common.optik_ext import OptionParser, OptionGroup, Values, \
-     OptionValueError, OptionError, check_yn, check_csv, check_file, \
-     check_color, check_named, generate_manpage
 from logilab.common.textutils import normalize_text, unquote
+from logilab.common.optik_ext import OptionParser, OptionGroup, Values, \
+     OptionValueError, OptionError, HelpFormatter, generate_manpage, \
+     check_yn, check_csv, check_file, check_color, check_named, \
+     NO_DEFAULT, OPTPARSE_FORMAT_DEFAULT
 
 class UnsupportedAction(Exception):
     """raised by set_option when it doesn't know what to do for an action"""
@@ -150,6 +151,28 @@ VALIDATORS = {'string' : unquote,
               'multiple_choice': multiple_choice_validator,
               }
 
+def expand_default(self, option):
+    """monkey patch OptionParser.expand_default since we have a particular
+    way to handle defaults to avoid overriding values in the configuration
+    file
+    """
+    if self.parser is None or not self.default_tag:
+        return option.help
+    optname = option._long_opts[0][2:]
+    try:
+        provider = self.parser.options_manager._all_options[optname]
+    except KeyError:
+        value = None
+    else:
+        optdict = provider.get_option_def(optname)
+        optname = provider.option_name(optname, optdict)
+        value = getattr(provider.config, optname, optdict)
+        value = format_option_value(optdict, value)
+    if value is NO_DEFAULT or not value:
+        value = self.NO_DEFAULT_VALUE
+    return option.help.replace(self.default_tag, str(value))
+HelpFormatter.expand_default = expand_default
+
 def convert(value, opt_dict, name=''):
     """return a validated value for an option according to its type
     
@@ -176,38 +199,55 @@ def convert(value, opt_dict, name=''):
 def comment(string):
     """return string as a comment"""
     lines = [line.strip() for line in string.splitlines()]
-    return '# ' + '\n# '.join(lines)
+    return '# ' + ('%s# ' % os.linesep).join(lines)
 
-## def split_value(value):
-##     if len(value) > 79:
-##         sp_index = len(value)
-##         while
-        
-def format_section(stream, section, options, doc=None):
+def format_option_value(optdict, value):
+    """return the user input's value from a 'compiled' value"""
+    if type(value) in (type(()), type([])):
+        value = ','.join(value)
+    elif hasattr(value, 'match'): # optdict.get('type') == 'regexp'
+        # compiled regexp
+        value = value.pattern
+    elif optdict.get('type') == 'yn':
+        value = value and 'yes' or 'no'
+    elif isinstance(value, (str, unicode)) and value.isspace():
+        value = "'%s'" % value
+    return value
+
+def ini_format_section(stream, section, options, doc=None):
     """format an options section using the INI format"""
     if doc:
         print >> stream, comment(doc)
     print >> stream, '[%s]' % section.upper()
     section = {}
-    for opt_name, value, opt_dict in options:
-        if type(value) in (type(()), type([])):
-            value = ','.join(value)
-        elif hasattr(value, 'match'):
-            # compiled regexp
-            value = value.pattern
-        elif opt_dict.get('type') == 'yn':
-            value = value and 'yes' or 'no'
-        elif isinstance(value, (str, unicode)) and value.isspace():
-            value = "'%s'" % value
-        #else:
-        #    value = repr(value)
-        help_msg = opt_dict.get('help')
-        if help_msg:
+    for optname, optdict, value in options:
+        if value is None:
+            continue
+        value = format_option_value(optdict, value)
+        help = optdict.get('help')
+        if help:
             print >> stream
-            print >> stream, normalize_text(help_msg, line_len=79, indent='# ')
+            print >> stream, normalize_text(help, line_len=79, indent='# ')
         else:
             print >> stream
-        print >> stream, '%s=%s' % (opt_name, str(value).strip())
+        print >> stream, '%s=%s' % (optname, str(value).strip())
+        
+format_section = ini_format_section
+
+def rest_format_section(stream, section, options, doc=None):
+    """format an options section using the INI format"""
+    if section:
+        print >> stream, '%s\n%s' % (section, "'"*len(section))
+    if doc:
+        print >> stream, normalize_text(doc, line_len=79, indent='')
+        print >> stream
+    for optname, optdict, value in options:
+        help = optdict.get('help')
+        print >> stream, ':%s:' % optname
+        if help:
+            print >> stream, normalize_text(help, line_len=79, indent='  ')
+        if value:
+            print >> stream, '  Default: %s' % format_option_value(optdict, value)
 
 
 class OptionsManagerMixIn:
@@ -221,6 +261,7 @@ class OptionsManagerMixIn:
         self._config_parser = ConfigParser()
         # command line parser
         self._optik_parser = OptionParser(usage=usage, version=version)
+        self._optik_parser.options_manager = self
         # list of registered options providers
         self.options_providers = []
         # dictionary assocating option name to checker
@@ -264,10 +305,10 @@ class OptionsManagerMixIn:
         # add section to the config file
         self._config_parser.add_section(group_name)
         # add option group to the command line parser
-        group = OptionGroup(self._optik_parser,
-                            title=group_name.capitalize(),
-                            description=doc)
-        self._optik_parser.add_option_group(group)
+        if options:
+            group = OptionGroup(self._optik_parser,
+                                title=group_name.capitalize())
+            self._optik_parser.add_option_group(group)
         # add provider's specific options
         for opt_name, opt_dict in options:
             args, opt_dict = self.optik_option(provider, opt_name, opt_dict)
@@ -287,6 +328,9 @@ class OptionsManagerMixIn:
         for specific in ('default', 'group'):
             if opt_dict.has_key(specific):
                 del opt_dict[specific]
+                if (OPTPARSE_FORMAT_DEFAULT
+                    and specific == 'default' and opt_dict.has_key('help')):
+                    opt_dict['help'] += ' [current: %default]'
         args = ['--' + opt_name]
         if opt_dict.has_key('short'):
             self._short_options[opt_dict['short']] = opt_name
@@ -296,10 +340,11 @@ class OptionsManagerMixIn:
             
     def cb_set_provider_option(self, option, opt_name, value, parser):
         """optik callback for option setting"""
-        # remove --
         if opt_name.startswith('--'):
+            # remove -- on long option
             opt_name = opt_name[2:]
-        else: # short version
+        else:
+            # short option, get its long equivalent
             opt_name = self._short_options[opt_name[1:]]
         # trick since we can't set action='store_true' on options
         if value is None:
@@ -315,36 +360,22 @@ class OptionsManagerMixIn:
         into the given stream or stdout
         """
         stream = stream or sys.stdout
-        printed = 0
+        printed = False
         for provider in self.options_providers:
             default_options = []
             sections = {}
-            for opt_name, opt_dict in provider.options:
-                if opt_dict.get('type') is None:
-                    continue                
-                attr = provider.option_name(opt_name)
-                try:
-                    value = getattr(provider.config, attr)
-                except AttributeError:
-                    continue
-                if value is None:
-                    continue
-                if opt_dict.get('group'):
-                    sections.setdefault(opt_dict['group'], []).append(
-                        (opt_name, value, opt_dict))
+            for section, options in provider.options_by_section():
+                options = [(n, d, v) for (n, d, v) in options
+                           if d.get('type') is not None and v is not None]
+                if section is None:
+                    section = provider.name
+                    doc = provider.__doc__
                 else:
-                    default_options.append((opt_name, value, opt_dict))
-            if default_options:
+                    doc = None
                 if printed:
                     print >> stream, '\n'
-                format_section(stream, provider.name, default_options,
-                               provider.__doc__)
-                printed = 1
-            for section, options in sections.items():
-                if printed:
-                    print >> stream, '\n'
-                format_section(stream, section, options)
-                printed = 1
+                format_section(stream, section, options, doc)
+                printed = True
 
     def generate_manpage(self, pkginfo, section=1, stream=None):
         """write a man page for the current configuration into the given
@@ -462,6 +493,10 @@ class OptionsProviderMixIn:
         if opt_dict is None:
             opt_dict = self.get_option_def(opt_name)
         return opt_dict.get('dest', opt_name.replace('-', '_'))
+    
+    def option_value(self, opt_name):
+        """get the current value for the given option"""
+        return getattr(self.config, self.option_name(opt_name), None)
         
     def set_option(self, opt_name, value, action=None, opt_dict=None):
         """method called to set an option (registered in the options list)
@@ -473,13 +508,13 @@ class OptionsProviderMixIn:
         if action is None:
             action = opt_dict.get('action', 'store')
         if action == 'store':
-            setattr(self.config, self.option_name(opt_name), value)
+            setattr(self.config, self.option_name(opt_name, opt_dict), value)
         elif action in ('store_true', 'count'):
-            setattr(self.config, self.option_name(opt_name), 0)
+            setattr(self.config, self.option_name(opt_name, opt_dict), 0)
         elif action == 'store_false':
-            setattr(self.config, self.option_name(opt_name), 1)
+            setattr(self.config, self.option_name(opt_name, opt_dict), 1)
         elif action == 'append':
-            opt_name = self.option_name(opt_name)
+            opt_name = self.option_name(opt_name, opt_dict)
             _list = getattr(self.config, opt_name, None)
             if _list is None:
                 if type(value) in (type(()), type([])):
@@ -501,6 +536,20 @@ class OptionsProviderMixIn:
             if opt[0] == opt_name:
                 return opt[1]
         raise OptionError('no such option in section %r' % self.name, opt_name)
+
+    def options_by_section(self):
+        """return an iterator on options grouped by section
+        
+        (section, [list of (optname, optdict, optvalue)])
+        """
+        sections = {}
+        for optname, optdict in self.options:
+            sections.setdefault(optdict.get('group'), []).append(
+                (optname, optdict, self.option_value(optname)))
+        if None in sections:
+            yield None, sections.pop(None)
+        for section, options in sections.items():
+            yield section, options
        
 
 class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
