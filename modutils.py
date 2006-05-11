@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 # Copyright (c) 2003-2005 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
