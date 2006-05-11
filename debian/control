@@ -1,0 +1,29 @@
+Source: logilab-common
+Section: python
+Priority: optional
+Maintainer: Alexandre Fayolle <afayolle@debian.org> 
+Build-Depends: debhelper (>= 4.0.0), python-dev
+Standards-Version: 3.6.2
+
+Package: python-logilab-common
+Architecture: all
+Depends: python, python-xml
+Provides: python2.2-logilab-common, python2.3-logilab-common, python2.4-logilab-common
+Conflicts: python2.2-logilab-common, python2.3-logilab-common, python2.4-logilab-common, python2.4-constraint ( << 0.3.0-4), python2.3-constraint ( << 0.3.0-4), python-constraint ( << 0.3.0-4), python-logilab-astng ( << 0.14.0-2), python2.3-logilab-astng ( << 0.14.0-2), python2.4-logilab-astng ( << 0.14.0-2), python2.2-pylint ( << 0.9.0-2), python2.3-pylint ( << 0.9.0-2), python2.4-pylint ( << 0.9.0-2), python-pylint ( << 0.9.0-2), 
+Replaces: python2.2-logilab-common, python2.3-logilab-common, python2.4-logilab-common
+Description: useful miscellaneous modules used by Logilab projects
+ logilab-common is a collection of low-level Python packages and modules,
+ designed to ease:
+  * handling command line options and configuration files
+  * writing interactive command line tools
+  * manipulation files and character strings
+  * interfacing to OmniORB
+  * generating of SQL queries
+  * running unit tests
+  * manipulating tree structures
+  * accessing RDBMS (currently postgreSQL and mysql)
+  * generating text and HTML reports
+  * logging
+ .
+ Homepage: http://www.logilab.org/projects/common
+

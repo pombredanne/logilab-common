@@ -1,0 +1,3 @@
+version=2
+ftp://ftp.logilab.org/pub/common/common-(.*)\.tar\.gz debian uupdate
+
