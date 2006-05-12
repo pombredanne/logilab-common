@@ -45,7 +45,4 @@ def html_traceback(info, exception,
             string = escape(repr(stackentry[3])[1:-1])#.encode(encoding)
             strings.append('&nbsp;&nbsp;%s<br/>\n' % string)
     strings.append('</div>')
-    tbstr = '\n'.join(strings)
-    #if encoding != 'unicode':
-    #    tbstr = tbstr.encode(encoding)
-    return tbstr
+    return '\n'.join(strings)
