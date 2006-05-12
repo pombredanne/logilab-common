@@ -60,7 +60,7 @@ class CompatTCMixIn:
 class Py23CompatTC(CompatTCMixIn, unittest.TestCase):
     BUILTINS = ('enumerate', 'sum')
     MODNAMES = {
-        'sets' : ('Set',),
+        'sets' : ('Set', 'ImmutableSet'),
         'itertools' : ('izip', 'chain'),
         }
 
@@ -87,9 +87,34 @@ class Py23CompatTC(CompatTCMixIn, unittest.TestCase):
         self.assertEquals(len(s), 3)
         self.assertRaises(KeyError, s.remove, 'd')
 
+    def test_basic_set(self):
+        from logilab.common.compat import set
+        s = set('abc')
+        self.assertEquals(len(s), 3)
+        s.remove('a')
+        self.assertEquals(len(s), 2)
+        s.add('a')
+        self.assertEquals(len(s), 3)
+        s.add('a')
+        self.assertEquals(len(s), 3)
+        self.assertRaises(KeyError, s.remove, 'd')
+        self.assertRaises(TypeError, dict, [(s, 'foo')])
+
+
+    def test_frozenset(self):
+        from logilab.common.compat import frozenset
+        s = frozenset('abc')
+        self.assertEquals(len(s), 3)
+        self.assertRaises(AttributeError, getattr, s, 'remove')
+        self.assertRaises(AttributeError, getattr, s, 'add')
+        d = {s : 'foo'} # frozenset should be hashable
+        d[s] = 'bar'
+        self.assertEquals(len(d), 1)
+        self.assertEquals(d[s], 'bar')
+        
 
 class Py24CompatTC(CompatTCMixIn, unittest.TestCase):
-    BUILTINS = ('reversed', 'sorted', 'set',)
+    BUILTINS = ('reversed', 'sorted', 'set', 'frozenset',)
     
     def test_sorted(self):
         from logilab.common.compat import sorted
@@ -113,6 +138,7 @@ class Py24CompatTC(CompatTCMixIn, unittest.TestCase):
         self.assertEquals(len(s1), 5)
         self.assertEquals(s1 & s2, set([2, 3, 4]))
         self.assertEquals(s1 | s2, set(range(6)))
+
 
 
 if __name__ == '__main__':

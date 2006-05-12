@@ -29,41 +29,32 @@ try:
     set = set    
 except NameError:
     try:
-        from sets import Set as set
+        from sets import Set as set, ImmutableSet as frozenset
     except ImportError:
-        class set:
+        class _baseset(object):
             def __init__(self, values=()):
                 self._data = {}
                 warn("This implementation of Set is not complete !",
                      stacklevel=2)
                 for v in values:
                     self._data[v] = 1
-            
-            def add(self, value):
-                self._data[value] = 1
-
-            def remove(self, element):
-                del self._data[element]
-
-            def pop(self):
-                return self._data.popitem()[0]
 
             def __or__(self, other):
-                result = set(self._data.keys())
+                result = self.__class__(self._data.keys())
                 for val in other:
                     result.add(val)
                 return result
             __add__ = __or__
             
             def __and__(self, other):
-                result = set()
+                result = self.__class__()
                 for val in other:
                     if val in self._data:
                         result.add(val)
                 return result
             
             def __sub__(self, other):
-                result = set(self._data.keys())
+                result = self.__class__(self._data.keys())
                 for val in other:
                     if val in self._data:
                         result.remove(val)
@@ -81,11 +72,55 @@ except NameError:
 
             def __repr__(self):
                 elements = self._data.keys()
-                return 'lcc.set(%r)' % (elements)
+                return 'lcc.%s(%r)' % (self.__class__.__name__, elements)
             __str__ = __repr__
 
             def __iter__(self):
                 return iter(self._data)
+
+        class frozenset(_baseset):
+            """immutable set (can be set in dictionnaries)"""
+            def __init__(self, values=()):
+                super(frozenset, self).__init__(values)
+                self._hashcode = None
+                
+            def _compute_hash(self):
+                """taken from python stdlib (sets.py)"""
+                # Calculate hash code for a set by xor'ing the hash codes of
+                # the elements.  This ensures that the hash code does not depend
+                # on the order in which elements are added to the set.  This is
+                # not called __hash__ because a BaseSet should not be hashable;
+                # only an ImmutableSet is hashable.
+                result = 0
+                for elt in self:
+                    result ^= hash(elt)
+                return result
+            
+            def __hash__(self):
+                """taken from python stdlib (sets.py)"""
+                if self._hashcode is None:
+                    self._hashcode = self._compute_hash()
+                return self._hashcode
+
+            
+        class set(_baseset):
+            """mutable set"""
+            def add(self, value):
+                self._data[value] = 1
+
+            def remove(self, element):
+                """removes <element> from set"""
+                del self._data[element]
+
+            def pop(self):
+                """pops an arbitrary element from set"""
+                return self._data.popitem()[0]
+
+            def __hash__(self):
+                """mutable et cannot be hashed."""
+                raise TypeError("set objects are not hashable")
+
+        del _baseset # don't explicity provide this class
 
 Set = class_renamed('Set', set, 'logilab.common.compat.Set is deprecated, '
                     'use logilab.common.compat.set instead')
@@ -94,7 +129,7 @@ try:
     from itertools import izip, chain, imap
 except ImportError:
     # from itertools documentation ###
-    def izip(*iterables): 
+    def izip(*iterables):
         iterables = map(iter, iterables)
         while iterables:
             result = [i.next() for i in iterables]
