@@ -195,6 +195,11 @@ class _PsycopgAdapter(DBAPIAdapter):
         return self._wrap_if_needed(cnx)
     
 
+class _Psycopg2Adapter(_PsycopgAdapter):
+    """Simple Psycopg2 Adapter to DBAPI (cnx_string differs from classical ones)
+    """
+    BOOLEAN = 16 # XXX
+    
 
 class _PgsqlAdapter(DBAPIAdapter):
     """Simple pyPgSQL Adapter to DBAPI
@@ -425,7 +430,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 
 
 PREFERED_DRIVERS = {
-    "postgres" : [ 'psycopg', 'pgdb', 'pyPgSQL.PgSQL', ],
+    "postgres" : [ 'psycopg', 'psycopg2', 'pgdb', 'pyPgSQL.PgSQL', ],
     "mysql" : [ 'MySQLdb', ], # 'pyMySQL.MySQL, ],
     "sqlite" : [ 'pysqlite2.dbapi2', 'sqlite', ],
     }
@@ -433,6 +438,7 @@ PREFERED_DRIVERS = {
 _ADAPTERS = {
     'postgres' : { 'pgdb' : _PgdbAdapter,
                    'psycopg' : _PsycopgAdapter,
+                   'psycopg2' : _Psycopg2Adapter,
                    'pyPgSQL.PgSQL' : _PgsqlAdapter,
                    },
     'mysql' : { 'MySQLdb' : _MySqlDBAdapter, },
