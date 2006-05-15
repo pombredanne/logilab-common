@@ -26,7 +26,8 @@ from logilab.common import class_renamed
 from warnings import warn
 
 try:
-    set = set    
+    set = set
+    frozenset = frozenset
 except NameError:
     try:
         from sets import Set as set, ImmutableSet as frozenset
