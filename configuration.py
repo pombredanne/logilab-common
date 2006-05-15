@@ -171,7 +171,7 @@ def expand_default(self, option):
     if value is NO_DEFAULT or not value:
         value = self.NO_DEFAULT_VALUE
     return option.help.replace(self.default_tag, str(value))
-HelpFormatter.expand_default = expand_default
+
 
 def convert(value, opt_dict, name=''):
     """return a validated value for an option according to its type
@@ -435,19 +435,31 @@ class OptionsManagerMixIn:
 
         return additional arguments
         """
-        if args is None:
-            args = sys.argv[1:]
-        else:
-            args = list(args)
-        (options, args) = self._optik_parser.parse_args(args=args)
-        for provider in self._nocallback_options.keys():
-            config = provider.config
-            for attr in config.__dict__.keys():
-                value = getattr(options, attr, None)
-                if value is None:
-                    continue
-                setattr(config, attr, value)
-        return args
+        # monkey patch optparse to deal with our default values
+        try:
+            expand_default_backup = HelpFormatter.expand_default
+            HelpFormatter.expand_default = expand_default
+        except AttributeError:
+            # python < 2.4: nothing to be done
+            pass
+        try:
+            if args is None:
+                args = sys.argv[1:]
+            else:
+                args = list(args)
+            (options, args) = self._optik_parser.parse_args(args=args)
+            for provider in self._nocallback_options.keys():
+                config = provider.config
+                for attr in config.__dict__.keys():
+                    value = getattr(options, attr, None)
+                    if value is None:
+                        continue
+                    setattr(config, attr, value)
+            return args
+        finally:
+            if hasattr(HelpFormatter, 'expand_default'):
+                # unpatch optparse to avoid side effects
+                HelpFormatter.expand_default = expand_default_backup
 
 
     # help methods ############################################################
