@@ -20,6 +20,13 @@ class MockTestCase(testlib.TestCase):
     def fail(self, msg):
         raise AssertionError(msg)
 
+class UtilTC(testlib.TestCase):
+
+    def test_mockobject(self):
+        obj = testlib.mock_object(foo='bar', baz='bam')
+        self.assertEquals(obj.foo, 'bar')
+        self.assertEquals(obj.baz, 'bam')
+
 class TestlibTC(testlib.TestCase):
 
     def setUp(self):

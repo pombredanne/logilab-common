@@ -626,3 +626,13 @@ class MockConnection:
 
 MockConnexion = class_renamed('MockConnexion', MockConnection)
 
+def mock_object(**params):
+    """creates an object using params to set attributes
+    >>> option = mock_object(verbose=False, index=range(5))
+    >>> option.verbose
+    False
+    >>> option.index
+    [0, 1, 2, 3, 4]
+    """
+    return type('Mock', (), params)()
+
