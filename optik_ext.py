@@ -41,11 +41,14 @@ try:
     from optparse import OptionParser as BaseParser, Option as BaseOption, \
          OptionGroup, OptionValueError, OptionError, Values, HelpFormatter, \
          NO_DEFAULT
-except Exception, ex:
+except ImportError:
     # python < 2.3
     from optik import OptionParser as BaseParser, Option as BaseOption, \
-         OptionGroup, OptionValueError, OptionError, Values, HelpFormatter, \
-         NO_DEFAULT
+         OptionGroup, OptionValueError, OptionError, Values, HelpFormatter
+    try:
+        from optik import NO_DEFAULT
+    except:
+        NO_DEFAULT = []
 
 OPTPARSE_FORMAT_DEFAULT = sys.version_info >= (2, 4)
 
