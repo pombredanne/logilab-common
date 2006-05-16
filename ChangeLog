@@ -2,7 +2,9 @@ ChangeLog for logilab.common
 ============================
 
  --
-    * db: fix get_connection parameter order and host/port handling
+    * db: 
+	- fix get_connection parameter order and host/port handling
+	- added .sql_temporary_table method to advanced func helpers
     * configuration: enhanced to handle default value in help and man pages
       generation (require python >= 2.4)
 
