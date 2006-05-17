@@ -176,6 +176,15 @@ class _PgdbAdapter(DBAPIAdapter):
                                              'int8', 'float4', 'float8',
                                              'numeric', 'bool', 'money')
         
+    def connect(self, host='', database='', user='', password='', port=''):
+        """Wraps the native module connect method"""
+        if port:
+            warn("pgdb doesn't support 'port' parameter in connect()", UserWarning)
+        kwargs = {'host' : host, 'database' : database,
+                  'user' : user, 'password' : password}
+        cnx = self._native_module.connect(**kwargs)
+        return self._wrap_if_needed(cnx)
+
 
 class _PsycopgAdapter(DBAPIAdapter):
     """Simple Psycopg Adapter to DBAPI (cnx_string differs from classical ones)
@@ -204,7 +213,7 @@ class _Psycopg2Adapter(_PsycopgAdapter):
 class _PgsqlAdapter(DBAPIAdapter):
     """Simple pyPgSQL Adapter to DBAPI
     """
-    def connect(self, host='', database='', user='', password=''):
+    def connect(self, host='', database='', user='', password='', port=''):
         """Handles psycopg connexion format"""
         kwargs = {'host' : host, 'port': port, 'database' : database,
                   'user' : user, 'password' : password or None}
@@ -218,7 +227,7 @@ class _PgsqlAdapter(DBAPIAdapter):
     
     def __getattr__(self, attrname):
         # __import__('pyPgSQL.PgSQL', ...) imports the toplevel package
-        return getattr(self._native_module.PgSQL, attrname)
+        return getattr(self._native_module, attrname)
 
 
 # Sqlite #############################################################

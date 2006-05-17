@@ -219,7 +219,7 @@ def run_test(test, verbose, runner=None):
 #        m = __import__(test, globals(), locals(), sys.path)
         try:
             suite = m.suite
-            if hasattr(suite, 'func_code'):
+            if callable(suite): # hasattr(suite, 'func_code'):
                 suite = suite()
         except AttributeError:
             loader = unittest.TestLoader()
@@ -313,7 +313,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
             if self.exitfirst:
                 self.shouldStop = True
             unittest._TextTestResult.addError(self, test, err)
-        self._create_pdb(self.getDescription(test))
+            self._create_pdb(self.getDescription(test))
 
     def addFailure(self, test, err):
         if self.exitfirst:

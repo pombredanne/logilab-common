@@ -33,13 +33,17 @@ class PreferedDriverTC(TestCase):
             self.assertEquals(exc.args[0], 'Unknown module baz for pg')
 
     def testGlobalVar(self):
+        # XXX: Is this test supposed to be useful ? Is it supposed to test
+        #      set_prefered_driver ?
         old_drivers = PREFERED_DRIVERS['postgres'][:]
         expected = old_drivers[:]
-        expected.insert(0, expected.pop(1))
-        set_prefered_driver('postgres','pgdb')
+        expected.insert(0, expected.pop(expected.index('pgdb')))
+        set_prefered_driver('postgres', 'pgdb')
         self.assertEquals(PREFERED_DRIVERS['postgres'], expected)
-        set_prefered_driver('postgres','psycopg')
-        self.assertEquals(PREFERED_DRIVERS['postgres'], old_drivers)
+        set_prefered_driver('postgres', 'psycopg')
+        # self.assertEquals(PREFERED_DRIVERS['postgres'], old_drivers)
+        expected.insert(0, expected.pop(expected.index('psycopg')))
+        self.assertEquals(PREFERED_DRIVERS['postgres'], expected)
 
 
 class getCnxTC(TestCase):
@@ -163,6 +167,7 @@ class DBAPIAdaptersTC(TestCase):
         try:
             binary = module.BINARY
         except AttributeError, err:
+            raise
             self.fail(str(err))        
 
     def test_adv_func_helper(self):
