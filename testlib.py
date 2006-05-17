@@ -33,6 +33,7 @@ import traceback
 import unittest
 import difflib
 from warnings import warn
+from compiler.consts import CO_GENERATOR
 
 try:
     from test import test_support
@@ -219,7 +220,7 @@ def run_test(test, verbose, runner=None):
 #        m = __import__(test, globals(), locals(), sys.path)
         try:
             suite = m.suite
-            if callable(suite): # hasattr(suite, 'func_code'):
+            if callable(suite):
                 suite = suite()
         except AttributeError:
             loader = unittest.TestLoader()
@@ -416,11 +417,75 @@ def unittest_main():
 
 class TestSkipped(Exception):
     """raised when a test is skipped"""
-    
+
+
+def is_generator(function):
+    flags = function.func_code.co_flags
+    return flags & CO_GENERATOR
+
 class TestCase(unittest.TestCase):
     """unittest.TestCase with some additional methods"""
 
+    def __call__(self, result=None):
+        """rewrite TestCase.__call__ to support generative tests"""
+        if result is None: result = self.defaultTestResult()
+        result.startTest(self)
+        testMethod = getattr(self, self.__testMethodName)
+        try:
+            try:
+                self.setUp()
+            except KeyboardInterrupt:
+                raise
+            except:
+                result.addError(self, self.__exc_info())
+                return
+            # generative tests
+            if is_generator(testMethod.im_func):
+                result.testsRun -= 1
+                for params in testMethod():
+                    func = params[0]
+                    args = params[1:]
+                    # increment test counter manually
+                    result.testsRun += 1
+                    success = self._proceed(result, func, args)
+                    # XXX: how should tearDown errors be handled here ?
+                    if success:
+                        result.addSuccess(self)
+                    elif result.shouldStop:
+                        break
+            else:
+                success = self._proceed(result, testMethod)
+            try:
+                self.tearDown()
+            except KeyboardInterrupt:
+                raise
+            except:
+                result.addError(self, self.__exc_info())
+                success = False
+            if success:
+                result.addSuccess(self)
+        finally:
+            result.stopTest(self)
 
+    def _proceed(self, result, testfunc, args=()):
+        """proceed the actual test
+        returns True on sucess, False on error or failure
+        """
+        try:
+            testfunc(*args)
+        except self.failureException:
+            result.addFailure(self, self.__exc_info())
+            return False
+        except KeyboardInterrupt:
+            raise
+        except TestSkipped:
+            exc_type, exc, tcbk = self.__exc_info()
+            result.addSkipped(self, exc)
+        except:
+            result.addError(self, self.__exc_info())
+            return False
+        return True
+            
     def defaultTestResult(self):
         return SkipAwareTestResult()
 
