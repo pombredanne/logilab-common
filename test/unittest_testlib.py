@@ -4,15 +4,18 @@ __revision__ = '$Id: unittest_testlib.py,v 1.5 2006-02-09 22:37:46 nico Exp $'
 
 import unittest
 from os.path import join, dirname
+from cStringIO import StringIO
+
 try:
     __file__
 except NameError:
     import sys
     __file__ = sys.argv[0]
     
-from logilab.common import testlib
+from logilab.common.testlib import TestCase, unittest_main, SkipAwareTextTestRunner
+from logilab.common.testlib import mock_object
 
-class MockTestCase(testlib.TestCase):
+class MockTestCase(TestCase):
     def __init__(self):
         # Do not call unittest.TestCase's __init__
         pass
@@ -20,14 +23,14 @@ class MockTestCase(testlib.TestCase):
     def fail(self, msg):
         raise AssertionError(msg)
 
-class UtilTC(testlib.TestCase):
+class UtilTC(TestCase):
 
     def test_mockobject(self):
-        obj = testlib.mock_object(foo='bar', baz='bam')
+        obj = mock_object(foo='bar', baz='bam')
         self.assertEquals(obj.foo, 'bar')
         self.assertEquals(obj.baz, 'bam')
 
-class TestlibTC(testlib.TestCase):
+class TestlibTC(TestCase):
 
     def setUp(self):
         self.tc = MockTestCase()
@@ -126,7 +129,92 @@ class TestlibTC(testlib.TestCase):
         self.tc.assertTextEqual(text1, text1)
         text2 = file(spam).read()
         self.assertRaises(AssertionError, self.tc.assertTextEqual, text1, text2)
+
+
+class GenerativeTestsTC(TestCase):
+    
+    def setUp(self):
+        output = StringIO()
+        self.runner = SkipAwareTextTestRunner(stream=output)
+
+    def test_generative_ok(self):
+        class FooTC(TestCase):
+            def test_generative(self):
+                for i in xrange(10):
+                    yield self.assertEquals, i, i
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 10)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 0)
+
+
+    def test_generative_half_bad(self):
+        class FooTC(TestCase):
+            def test_generative(self):
+                for i in xrange(10):
+                    yield self.assertEquals, i%2, 0
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 10)
+        self.assertEquals(len(result.failures), 5)
+        self.assertEquals(len(result.errors), 0)
+
+
+    def test_generative_error(self):
+        class FooTC(TestCase):
+            def test_generative(self):
+                for i in xrange(10):
+                    if i == 5:
+                        raise ValueError('STOP !')
+                    yield self.assertEquals, i, i
+                    
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 5)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 1)
+
+
+    def test_generative_setup(self):
+        class FooTC(TestCase):
+            def setUp(self):
+                raise ValueError('STOP !')
+            def test_generative(self):
+                for i in xrange(10):
+                    yield self.assertEquals, i, i
+                    
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 1)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 1)
+
+
+class ExitFirstTC(TestCase):
+    def setUp(self):
+        output = StringIO()
+        self.runner = SkipAwareTextTestRunner(stream=output, exitfirst=True)
+
+    def test_simple_exit_first(self):
+        class FooTC(TestCase):
+            def test_1(self):
+                assert False
+            def test_2(self):
+                assert False
+        tests = [FooTC('test_1'), FooTC('test_2')]
+        result = self.runner.run(unittest.TestSuite(tests))
+        self.assertEquals(result.testsRun, 1)
+        self.assertEquals(len(result.failures), 1)
+        self.assertEquals(len(result.errors), 0)
+        
+    def test_generative_exit_first(self):
+        class FooTC(TestCase):
+            def test_generative(self):
+                for i in xrange(10):
+                    yield self.assert_, False
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 1)
+        self.assertEquals(len(result.failures), 1)
+        self.assertEquals(len(result.errors), 0)
+        
     
 if __name__ == '__main__':
-    testlib.unittest_main()
+    unittest_main()
 

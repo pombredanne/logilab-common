@@ -4,14 +4,15 @@ Unittests for table management
 
 __revision__ = '$Id: unittest_table.py,v 1.13 2006-04-09 22:30:53 nico Exp $'
 
-import unittest
 import sys
+from cStringIO import StringIO
+
+from logilab.common.testib import TestCase, unittest_main
 from logilab.common.table import Table, TableStyleSheet, DocbookTableWriter, \
      DocbookRenderer, TableStyle, TableWriter, TableCellRenderer
 from logilab.common.compat import set
-from cStringIO import StringIO
 
-class TableTC(unittest.TestCase):
+class TableTC(TestCase):
     """Table TestCase class"""
 
     def setUp(self):
@@ -190,7 +191,7 @@ class TableTC(unittest.TestCase):
         str(self.table)
 
 
-class GroupByTC(unittest.TestCase):
+class GroupByTC(TestCase):
     """specific test suite for groupby()"""
     def setUp(self):
         t = Table()
@@ -244,7 +245,7 @@ class GroupByTC(unittest.TestCase):
             ('date1', 'ing1', 'task3', 0.3),
             ])
 
-class TableStyleSheetTC(unittest.TestCase):
+class TableStyleSheetTC(TestCase):
     """The Stylesheet test case
     """
     def setUp(self):
@@ -326,7 +327,7 @@ class TableStyleSheetTC(unittest.TestCase):
 
 
 
-class TableStyleTC(unittest.TestCase):
+class TableStyleTC(TestCase):
     """Test suite for TableSuite"""
     def setUp(self):
         self.table = Table()
@@ -364,7 +365,7 @@ class TableStyleTC(unittest.TestCase):
             self.assertEquals(igetter(1), 'FOO')
         
 
-class RendererTC(unittest.TestCase):
+class RendererTC(TestCase):
     """Test suite for DocbookRenderer"""
     def setUp(self):
         self.renderer = DocbookRenderer(alignment = True)
@@ -403,8 +404,7 @@ class RendererTC(unittest.TestCase):
         self.assertEquals(cell_content, '12 EUR')
 
 
-from logilab.common import testlib
-class DocbookTableWriterTC(testlib.TestCase):
+class DocbookTableWriterTC(TestCase):
     """TestCase for table's writer"""
     def setUp(self):
         self.stream = StringIO()
@@ -425,4 +425,4 @@ class DocbookTableWriterTC(testlib.TestCase):
     
     
 if __name__ == '__main__':
-    testlib.unittest_main()
+    unittest_main()

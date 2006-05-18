@@ -342,8 +342,8 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
 class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
-    def __init__(self, verbosity=1, exitfirst=False):
-        unittest.TextTestRunner.__init__(self, verbosity=verbosity)
+    def __init__(self, stream=sys.stderr, verbosity=1, exitfirst=False):
+        unittest.TextTestRunner.__init__(self, stream=stream, verbosity=verbosity)
         self.exitfirst = exitfirst
 
     def _makeResult(self):
@@ -427,7 +427,10 @@ class TestCase(unittest.TestCase):
     """unittest.TestCase with some additional methods"""
 
     def __call__(self, result=None):
-        """rewrite TestCase.__call__ to support generative tests"""
+        """rewrite TestCase.__call__ to support generative tests
+        This is mostly a copy/paste from unittest.py (i.e same
+        variable names, same logic, except for the generative tests part)
+        """
         if result is None: result = self.defaultTestResult()
         result.startTest(self)
         testMethod = getattr(self, self.__testMethodName)
@@ -441,18 +444,7 @@ class TestCase(unittest.TestCase):
                 return
             # generative tests
             if is_generator(testMethod.im_func):
-                result.testsRun -= 1
-                for params in testMethod():
-                    func = params[0]
-                    args = params[1:]
-                    # increment test counter manually
-                    result.testsRun += 1
-                    success = self._proceed(result, func, args)
-                    # XXX: how should tearDown errors be handled here ?
-                    if success:
-                        result.addSuccess(self)
-                    elif result.shouldStop:
-                        break
+                success = self._proceed_generative(result, testMethod)
             else:
                 success = self._proceed(result, testMethod)
             try:
@@ -467,7 +459,28 @@ class TestCase(unittest.TestCase):
         finally:
             result.stopTest(self)
 
-    def _proceed(self, result, testfunc, args=()):
+    def _proceed_generative(self, result, testfunc, args=()):
+        # cancel startTest()'s increment
+        result.testsRun -= 1
+        try:
+            for params in testfunc():
+                func = params[0]
+                args = params[1:]
+                # increment test counter manually
+                result.testsRun += 1
+                success = self._proceed(result, func, args, stop_on_error=True)
+                # XXX: how should tearDown errors be handled here ?
+                if success:
+                    result.addSuccess(self)
+                elif result.shouldStop:
+                    break
+        except:
+            # if an error occurs between two yield
+            result.addError(self, self.__exc_info())
+            success = False
+        return success
+
+    def _proceed(self, result, testfunc, args=(), stop_on_error=False):
         """proceed the actual test
         returns True on sucess, False on error or failure
         """
@@ -478,11 +491,12 @@ class TestCase(unittest.TestCase):
             return False
         except KeyboardInterrupt:
             raise
-        except TestSkipped:
-            exc_type, exc, tcbk = self.__exc_info()
-            result.addSkipped(self, exc)
+##         except TestSkipped:
+##             exc_type, exc, tcbk = self.__exc_info()
+##             result.addSkipped(self, exc)
         except:
             result.addError(self, self.__exc_info())
+            result.shouldStop = stop_on_error
             return False
         return True
             

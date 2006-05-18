@@ -154,8 +154,8 @@ class DBAPIAdaptersTC(TestCase):
                         'int8', 'float4', 'float8', 
                         'numeric', 'bool', 'money')
         for num_type in number_types:
-            self.assertEquals(num_type, module.NUMBER)
-        self.assertNotEquals('char', module.NUMBER)
+            yield self.assertEquals, num_type, module.NUMBER
+        yield self.assertNotEquals, 'char', module.NUMBER
 
     def test_pypgsql_getattr(self):
         """Tests the getattr() delegation for pyPgSQL"""
