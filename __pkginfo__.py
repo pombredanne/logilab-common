@@ -18,7 +18,7 @@
 __revision__ = "$Id: __pkginfo__.py,v 1.58 2006-04-25 12:08:52 syt Exp $"
 
 modname = 'common'
-numversion = (0, 15, 1)
+numversion = (0, 16, 0)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'

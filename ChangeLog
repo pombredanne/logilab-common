@@ -1,12 +1,12 @@
 ChangeLog for logilab.common
 ============================
 
- --
+2006-05-19  --  0.16.0
     * testlib:
 	 - added a set of command line options (PYDEBUG is deprecated,
        use the -i/--pdb option, and added -x/--exitfirst option)
      - added support for generative tests
-   * db: 
+    * db:
 	- fix get_connection parameter order and host/port handling
 	- added .sql_temporary_table method to advanced func helpers
 	- started a psycopg2 adapter
