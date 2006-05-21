@@ -351,6 +351,15 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                                    self.verbosity, self.exitfirst)
 
 
+class keywords(dict):
+    """keyword args (**kwargs) support for generative tests"""
+
+class starargs(tuple):
+    """variable arguments (*args) for generative tests"""
+    def __new__(cls, *args):
+        return tuple.__new__(cls, args)
+
+
 class SkipAwareTestProgram(unittest.TestProgram):
     # XXX: don't try to stay close to unittest.py, use optparse
     USAGE = """\
@@ -412,16 +421,41 @@ Examples:
         sys.exit(not result.wasSuccessful())
 
 def unittest_main():
-    """use this functon if you want to have the same functionality as unittest.main"""
+    """use this functon if you want to have the same functionality
+    as unittest.main"""
     SkipAwareTestProgram()
 
 class TestSkipped(Exception):
     """raised when a test is skipped"""
 
-
 def is_generator(function):
     flags = function.func_code.co_flags
     return flags & CO_GENERATOR
+
+
+def parse_generative_args(params):
+    args = []
+    varargs = ()
+    kwargs = {}
+    flags = 0 # 2 <=> starargs, 4 <=> kwargs
+    for param in params:
+        if isinstance(param, starargs):
+            varargs = param
+            if flags:
+                raise TypeError('found starargs after keywords !')
+            flags |= 2
+            args += list(varargs)
+        elif isinstance(param, keywords):
+            kwargs = param
+            if flags & 4:
+                raise TypeError('got multiple keywords parameters')
+            flags |= 4
+        elif flags & 2 or flags & 4:
+            raise TypeError('found parameters after kwargs or args')
+        else:
+            args.append(param)
+
+    return args, kwargs
 
 class TestCase(unittest.TestCase):
     """unittest.TestCase with some additional methods"""
@@ -465,10 +499,10 @@ class TestCase(unittest.TestCase):
         try:
             for params in testfunc():
                 func = params[0]
-                args = params[1:]
+                args, kwargs = parse_generative_args(params[1:])
                 # increment test counter manually
                 result.testsRun += 1
-                success = self._proceed(result, func, args, stop_on_error=True)
+                success = self._proceed(result, func, args, kwargs, stop_on_error=True)
                 # XXX: how should tearDown errors be handled here ?
                 if success:
                     result.addSuccess(self)
@@ -480,12 +514,13 @@ class TestCase(unittest.TestCase):
             success = False
         return success
 
-    def _proceed(self, result, testfunc, args=(), stop_on_error=False):
+    def _proceed(self, result, testfunc, args=(), kwargs=None, stop_on_error=False):
         """proceed the actual test
         returns True on sucess, False on error or failure
         """
+        kwargs = kwargs or {}
         try:
-            testfunc(*args)
+            testfunc(*args, **kwargs)
         except self.failureException:
             result.addFailure(self, self.__exc_info())
             return False
