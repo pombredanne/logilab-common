@@ -418,7 +418,9 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
     
     def sql_temporary_table(self, table_name, table_schema):
         return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
-                                                                   table_schema)
+                                                                   table_schema)    
+    def sql_current_date(self):
+        return 'TODAY'
     
 
 class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
