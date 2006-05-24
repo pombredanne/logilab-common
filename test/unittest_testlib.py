@@ -13,7 +13,7 @@ except NameError:
     __file__ = sys.argv[0]
     
 from logilab.common.testlib import TestCase, unittest_main, SkipAwareTextTestRunner
-from logilab.common.testlib import mock_object
+from logilab.common.testlib import mock_object, NonStrictTestLoader
 
 class MockTestCase(TestCase):
     def __init__(self):
@@ -214,7 +214,52 @@ class ExitFirstTC(TestCase):
         self.assertEquals(result.testsRun, 1)
         self.assertEquals(len(result.failures), 1)
         self.assertEquals(len(result.errors), 0)
+
+
+class TestLoaderTC(TestCase):
+    ## internal classes for test purposes ########
+    class FooTC(TestCase):
+        def test_foo1(self): pass
+        def test_foo2(self): pass
+        def test_bar1(self): pass
+
+    class BarTC(TestCase):
+        def test_bar2(self): pass
+    ##############################################
+
+    def setUp(self):
+        self.loader = NonStrictTestLoader()
+        self.module = TestLoaderTC # mock_object(FooTC=TestLoaderTC.FooTC, BarTC=TestLoaderTC.BarTC)
+    
+    def test_collect_everything(self):
+        """make sure we don't change the default behaviour
+        for loadTestsFromModule() and loadTestsFromTestCase
+        """
+        testsuite = self.loader.loadTestsFromModule(self.module)
+        self.assertEquals(len(testsuite._tests), 2)
+        suite1, suite2 = testsuite._tests
+        self.assertEquals(len(suite1._tests) + len(suite2._tests), 4)
+
+    def test_collect_with_classname(self):
+        collected = self.loader.loadTestsFromName('FooTC', self.module)
+        self.assertEquals(len(collected), 3)
+        collected = self.loader.loadTestsFromName('BarTC', self.module)
+        self.assertEquals(len(collected), 1)
+
+    def test_collect_with_classname_and_pattern(self):
+        collected = self.loader.loadTestsFromName('FooTC.test_foo1', self.module)
+        self.assertEquals(len(collected), 1)
+        collected = self.loader.loadTestsFromName('FooTC.test_foo', self.module)
+        self.assertEquals(len(collected), 2)
         
+    def test_collect_with_pattern(self):
+        collected = self.loader.loadTestsFromName('test_foo1', self.module)
+        self.assertEquals(len(collected), 1)
+        collected = self.loader.loadTestsFromName('test_foo', self.module)
+        self.assertEquals(len(collected), 2)
+        collected = self.loader.loadTestsFromName('test_bar', self.module)
+        self.assertEquals(len(collected), 2)
+
     
 if __name__ == '__main__':
     unittest_main()
