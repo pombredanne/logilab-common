@@ -259,6 +259,12 @@ class TestLoaderTC(TestCase):
         self.assertEquals(len(collected), 2)
         collected = self.loader.loadTestsFromName('test_bar', self.module)
         self.assertEquals(len(collected), 2)
+        collected = self.loader.loadTestsFromName('foo1', self.module)
+        self.assertEquals(len(collected), 1)
+        collected = self.loader.loadTestsFromName('foo', self.module)
+        self.assertEquals(len(collected), 2)
+        collected = self.loader.loadTestsFromName('bar', self.module)
+        self.assertEquals(len(collected), 2)
 
     
 if __name__ == '__main__':
