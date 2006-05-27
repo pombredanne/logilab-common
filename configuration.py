@@ -483,7 +483,7 @@ class OptionsProviderMixIn:
     """Mixin to provide options to an OptionsManager
     """
     
-    # those attributes should be overriden
+    # those attributes should be overridden
     priority = -1
     name = 'default'
     options = ()

@@ -796,7 +796,7 @@ class TableCellRenderer:
         Rendering properties will be searched using the
         *table_style.get_xxx_by_index(col_index)' methods
 
-        **This method should be overriden in the derived renderer classes.**
+        **This method should be overridden in the derived renderer classes.**
         """
         return content
 

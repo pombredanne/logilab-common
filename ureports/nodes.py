@@ -49,7 +49,7 @@ class BaseLayout(BaseComponent):
                 self.add_text(child)
 
     def append(self, child):
-        """overriden to detect problems easily"""
+        """overridden to detect problems easily"""
         assert child not in self.parents()
         VNode.append(self, child)
         

@@ -118,7 +118,7 @@ class PrintLogger(AbstractLogger):
         self.encoding = encoding
         
     def _writelog(self, priority, message):
-        """overriden from AbstractLogger"""
+        """overridden from AbstractLogger"""
         if isinstance(message, unicode):
             message = message.encode(self.encoding, 'replace')
         if self.sid is not None:
@@ -144,7 +144,7 @@ class SysLogger(AbstractLogger):
         syslog.openlog(sid, syslog.LOG_PID)
         
     def _writelog(self, priority, message):
-        """overriden from AbstractLogger"""
+        """overridden from AbstractLogger"""
         import syslog
         if isinstance(message, unicode):
             message = message.encode(self.encoding, 'replace')
