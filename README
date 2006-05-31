@@ -33,10 +33,6 @@ Here is a brief description of the available modules :
 * astutils:
   Some utilities function to manipulate Python's AST.
 
-* astng :
-  Python Abstract Syntax Tree New Generation. Provides an higher
-  level representation of ast objects.
-
 * bind.py :
   Provides a way to optimize globals in certain functions by binding
   their names to values provided in a dictionnary.
