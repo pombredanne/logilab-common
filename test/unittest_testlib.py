@@ -247,24 +247,21 @@ class TestLoaderTC(TestCase):
         self.assertEquals(len(collected), 1)
 
     def test_collect_with_classname_and_pattern(self):
-        collected = self.loader.loadTestsFromName('FooTC.test_foo1', self.module)
-        self.assertEquals(len(collected), 1)
-        collected = self.loader.loadTestsFromName('FooTC.test_foo', self.module)
-        self.assertEquals(len(collected), 2)
+        data = [('FooTC.test_foo1', 1), ('FooTC.test_foo', 2), ('FooTC.test_fo', 2),
+                ('FooTC.foo1', 1), ('FooTC.foo', 2), ('FooTC.whatever', 0)
+                ]
+        for pattern, expected_count in data:
+            collected = self.loader.loadTestsFromName(pattern, self.module)
+            yield self.assertEquals, len(collected), expected_count
         
     def test_collect_with_pattern(self):
-        collected = self.loader.loadTestsFromName('test_foo1', self.module)
-        self.assertEquals(len(collected), 1)
-        collected = self.loader.loadTestsFromName('test_foo', self.module)
-        self.assertEquals(len(collected), 2)
-        collected = self.loader.loadTestsFromName('test_bar', self.module)
-        self.assertEquals(len(collected), 2)
-        collected = self.loader.loadTestsFromName('foo1', self.module)
-        self.assertEquals(len(collected), 1)
-        collected = self.loader.loadTestsFromName('foo', self.module)
-        self.assertEquals(len(collected), 2)
-        collected = self.loader.loadTestsFromName('bar', self.module)
-        self.assertEquals(len(collected), 2)
+        data = [('test_foo1', 1), ('test_foo', 2), ('test_bar', 2),
+                ('foo1', 1), ('foo', 2), ('bar', 2), ('ba', 2),
+                ('test', 4), ('ab', 0),
+                ]
+        for pattern, expected_count in data:
+            collected = self.loader.loadTestsFromName(pattern, self.module)
+            yield self.assertEquals, len(collected), expected_count
 
     
 if __name__ == '__main__':

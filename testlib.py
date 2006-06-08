@@ -447,15 +447,7 @@ class NonStrictTestLoader(unittest.TestLoader):
         >>> self._test_should_be_collected('test_foobar', 'testfoo')
         False
         """
-        prefix = self.testMethodPrefix
-        # case where testname="test_some" and methodname="test_something"
-        if pattern.startswith(prefix):
-            return methodname.startswith(pattern)
-        # case where pattern="foo" and methodname="testfoo" or "test_foo"
-        if methodname.startswith(prefix + pattern) or \
-               methodname.startswith(prefix + '_' + pattern):
-            return True
-        return False
+        return pattern in methodname
 
 class SkipAwareTestProgram(unittest.TestProgram):
     # XXX: don't try to stay close to unittest.py, use optparse
