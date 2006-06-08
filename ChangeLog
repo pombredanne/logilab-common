@@ -1,10 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
-  --
+2006-06-08  --  0.16.1
     * testlib: improved test collections
     * compat: added cmp argument to sorted
-	
+
 2006-05-19  --  0.16.0
     * testlib:
 	 - added a set of command line options (PYDEBUG is deprecated,
