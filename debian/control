@@ -2,15 +2,15 @@ Source: logilab-common
 Section: python
 Priority: optional
 Maintainer: Alexandre Fayolle <afayolle@debian.org> 
-Build-Depends: debhelper (>= 4.0.0), python-dev
+Build-Depends: debhelper (>= 5.0.37.1), python-dev (>=2.3.5-7), python (>=2.3.5-7), python-central
+XS-Python-Version: all
 Standards-Version: 3.7.2
 
 Package: python-logilab-common
 Architecture: all
-Depends: python, python-xml
-Provides: python2.2-logilab-common, python2.3-logilab-common, python2.4-logilab-common
-Conflicts: python2.2-logilab-common, python2.3-logilab-common, python2.4-logilab-common, python2.4-constraint ( << 0.3.0-4), python2.3-constraint ( << 0.3.0-4), python-constraint ( << 0.3.0-4), python-logilab-astng ( << 0.14.0-2), python2.3-logilab-astng ( << 0.14.0-2), python2.4-logilab-astng ( << 0.14.0-2), python2.2-pylint ( << 0.9.0-2), python2.3-pylint ( << 0.9.0-2), python2.4-pylint ( << 0.9.0-2), python-pylint ( << 0.9.0-2), 
-Replaces: python2.2-logilab-common, python2.3-logilab-common, python2.4-logilab-common
+Depends: ${python:Depends}, python-xml
+Conflicts: python-constraint ( <= 0.3.0-4), python-logilab-astng ( <= 0.16.0-1), pylint ( << 0.11.0-1), devtools ( <= 0.9.0-1), logilab-doctools ( <= 0.1.6-4), python-logilab-aspects ( <= 0.1.4-2)
+XB-Python-Version: ${python:Versions}
 Description: useful miscellaneous modules used by Logilab projects
  logilab-common is a collection of low-level Python packages and modules,
  designed to ease:

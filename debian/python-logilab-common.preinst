@@ -3,18 +3,6 @@
 
 set -e
 
-if [[ "$1" = "upgrade" ]] ;
-then 
-    if dpkg --compare-versions "$2" lt 0.13.1-4 ;
-    then
-        rm -f /usr/lib/python2.?/site-packages/logilab/__init__.py* ;
-        for d in /usr/lib/python2.?/site-packages/logilab ;
-        do
-            rmdir $d && true ;
-        done ;
-    fi ;
-fi
-
 #DEBHELPER#
 
 exit 0
