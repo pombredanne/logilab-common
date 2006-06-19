@@ -170,11 +170,20 @@ try:
     sorted = sorted
     reversed = reversed
 except NameError:
-    def sorted(l, cmp=None):
-        l2 = list(l)
+    
+    def sorted(iterable, cmp=None, key=None, reverse=False):
+        original = list(iterable)
+        if key:
+            l2 = [(key(elt), index) for index, elt in enumerate(original)]
+        else:
+            l2 = original
         l2.sort(cmp)
+        if reverse:
+            l2.reverse()
+        if key:
+            return [original[index] for elt, index in l2]
         return l2
-
+    
     def reversed(l):
         l2 = list(l)
         l2.reverse()

@@ -122,6 +122,12 @@ class Py24CompatTC(CompatTCMixIn, unittest.TestCase):
         s = sorted(l)
         self.assertEquals(s, [1, 2, 3, 4, 5])
         self.assertEquals(l, [3, 1, 2, 5, 4])
+        self.assertEquals(sorted('FeCBaD'), list('BCDFae'))
+        self.assertEquals(sorted('FeCBaD', key=str.lower), list('aBCDeF'))
+        self.assertEquals(sorted('FeCBaD', key=str.lower, reverse=True), list('FeDCBa'))
+        def strcmp(s1, s2):
+            return cmp(s1.lower(), s2.lower())
+        self.assertEquals(sorted('FeCBaD', cmp=strcmp), list('aBCDeF'))
 
 
     def test_reversed(self):
