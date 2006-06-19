@@ -354,26 +354,26 @@ class Table(object):
         """Returns a tuple which represents the table's shape
         """
         warn('table.get_dimensions() is deprecated, use table.shape instead',
-             DeprecationWarning)
+             DeprecationWarning, stacklevel=2)
         return self.shape
 
     def get_element(self, row_index, col_index):
         """Returns the element at [row_index][col_index]
         """
         warn('Table.get_element() is deprecated, use Table.get_cell instead',
-             DeprecationWarning)
+             DeprecationWarning, stacklevel=2)
         return self.data[row_index][col_index]
 
     def get_cell(self, row_index, col_index):
         warn('table.get_cell(i,j) is deprecated, use table[i,j] instead',
-             DeprecationWarning)
+             DeprecationWarning, stacklevel=2)
         return self.data[row_index][col_index]
         
     def get_cell_by_ids(self, row_id, col_id):
         """Returns the element at [row_id][col_id]
         """
         warn('table.get_cell_by_ids(i,j) is deprecated, use table[i,j] instead',
-             DeprecationWarning)
+             DeprecationWarning, stacklevel=2)
         try:
             row_index = self.row_names.index(row_id)
         except ValueError:
@@ -389,14 +389,14 @@ class Table(object):
         """Returns the 'row_index' row
         """
         warn('table.get_row(i) is deprecated, use table[i] instead',
-             DeprecationWarning)
+             DeprecationWarning, stacklevel=2)
         return self.data[row_index]
 
     def get_row_by_id(self, row_id):
         """Returns the 'row_id' row
         """
         warn('table.get_row_by_id(i) is deprecated, use table[i] instead',
-             DeprecationWarning)
+             DeprecationWarning, stacklevel=2)
         try:
             row_index = self.row_names.index(row_id)
         except ValueError:
@@ -407,7 +407,7 @@ class Table(object):
         """Returns the 'col_index' col
         """
         warn('table.get_column(i) is deprecated, use table[:,i] instead',
-             DeprecationWarning)
+             DeprecationWarning, stacklevel=2)
         col = [row[col_index] for row in self.data]
         if distinct:
             return set(col)
@@ -418,7 +418,7 @@ class Table(object):
         """Returns the 'col_id' col
         """
         warn('table.get_column_by_id(i) is deprecated, use table[:,i] instead',
-             DeprecationWarning)
+             DeprecationWarning, stacklevel=2)
         try:
             col_index = self.col_names.index(col_id)
         except ValueError:
@@ -430,7 +430,7 @@ class Table(object):
         """Returns all the rows in the table
         """
         warn('table.get_rows() is deprecated, just iterate over table instead',
-             DeprecationWarning)
+             DeprecationWarning, stacklevel=2)
         return self.data
 
 
