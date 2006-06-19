@@ -555,6 +555,15 @@ def parse_generative_args(params):
 class TestCase(unittest.TestCase):
     """unittest.TestCase with some additional methods"""
 
+    def __init__(self, methodName='runTest'):
+        unittest.TestCase.__init__(self, methodName)
+        # internal API changed in python2.5
+        if sys.version_info >= (2, 5):
+            self.__exc_info = self._exc_info
+            self.__testMethodName = self._testMethodName
+            
+        
+    
     def __call__(self, result=None):
         """rewrite TestCase.__call__ to support generative tests
         This is mostly a copy/paste from unittest.py (i.e same
@@ -587,7 +596,7 @@ class TestCase(unittest.TestCase):
                 result.addSuccess(self)
         finally:
             result.stopTest(self)
-
+            
     def _proceed_generative(self, result, testfunc, args=()):
         # cancel startTest()'s increment
         result.testsRun -= 1
