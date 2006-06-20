@@ -188,7 +188,7 @@ class Table(object):
         row_name = row_name or self._next_row_name()
         self.row_names.append(row_name)
         self.data.append(row_data)
-        
+        return len(self.data) - 1
 
     def insert_row(self, index, row_data, row_name=None):
         """Appends row_data before 'index' in the table. To make 'insert'

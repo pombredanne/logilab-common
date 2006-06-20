@@ -188,3 +188,28 @@ except NameError:
         l2 = list(l)
         l2.reverse()
         return l2
+
+# Python2.5 builtins
+try:
+    any = any
+    all = all
+except NameError:
+    def any(iterable):
+        """any(iterable) -> bool
+
+        Return True if bool(x) is True for any x in the iterable.
+        """
+        for elt in iterable:
+            if bool(elt):
+                return True
+        return False
+    
+    def all(iterable):
+        """all(iterable) -> bool
+
+        Return True if bool(x) is True for all values x in the iterable.
+        """
+        for elt in iterable:
+            if not bool(elt):
+                return False
+        return True

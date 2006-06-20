@@ -2,7 +2,7 @@
 
 __revision__ = '$Id: unittest_compat.py,v 1.3 2005-08-08 10:44:10 adim Exp $'
 
-import unittest
+from logilab.common.testlib import TestCase, unittest_main
 import sys
 import types
 import __builtin__
@@ -23,6 +23,7 @@ class CompatTCMixIn:
             del sys.modules[modname]
         for funcname, func in self.builtins_backup.items():
             setattr(__builtin__, funcname, func)
+            # delattr(__builtin__, 'builtin_%s' % funcname)
         for modname, mod in self.modules_backup.items():
             sys.modules[modname] = mod
         try:
@@ -36,7 +37,8 @@ class CompatTCMixIn:
             if func is not None:
                 self.builtins_backup[builtin] = func
                 delattr(__builtin__, builtin)
-
+                # setattr(__builtin__, 'builtin_%s' % builtin, func)
+                
     def remove_modules(self):
         for modname in self.MODNAMES:
             if modname in sys.modules:
@@ -57,7 +59,7 @@ class CompatTCMixIn:
             self.assertRaises(ImportError, eval, code)
 
 
-class Py23CompatTC(CompatTCMixIn, unittest.TestCase):
+class Py23CompatTC(CompatTCMixIn, TestCase):
     BUILTINS = ('enumerate', 'sum')
     MODNAMES = {
         'sets' : ('Set', 'ImmutableSet'),
@@ -113,7 +115,7 @@ class Py23CompatTC(CompatTCMixIn, unittest.TestCase):
         self.assertEquals(d[s], 'bar')
         
 
-class Py24CompatTC(CompatTCMixIn, unittest.TestCase):
+class Py24CompatTC(CompatTCMixIn, TestCase):
     BUILTINS = ('reversed', 'sorted', 'set', 'frozenset',)
     
     def test_sorted(self):
@@ -147,6 +149,41 @@ class Py24CompatTC(CompatTCMixIn, unittest.TestCase):
 
 
 
+
+class Py25CompatTC(CompatTCMixIn, TestCase):
+    BUILTINS = ('any', 'all',)
+
+    def test_any(self):
+        from logilab.common.compat import any
+        testdata = ([], (), '', 'abc', xrange(0, 10), xrange(0, -10, -1))
+        self.assertEquals(any([]), False)
+        self.assertEquals(any(()), False)
+        self.assertEquals(any(''), False)
+        self.assertEquals(any('abc'), True)
+        self.assertEquals(any(xrange(10)), True)
+        self.assertEquals(any(xrange(0, -10, -1)), True)
+        # python2.5's any consumes iterables 
+        irange = iter(range(10))
+        self.assertEquals(any(irange), True)
+        self.assertEquals(irange.next(), 2)
+
+
+    def test_all(self):
+        from logilab.common.compat import all
+        testdata = ([], (), '', 'abc', xrange(0, 10), xrange(0, -10, -1))
+        self.assertEquals(all([]), True)
+        self.assertEquals(all(()), True)
+        self.assertEquals(all(''), True)
+        self.assertEquals(all('abc'), True)
+        self.assertEquals(all(xrange(10)), False)
+        self.assertEquals(all(xrange(0, -10, -1)), False)
+        # python2.5's all consumes iterables 
+        irange = iter(range(10))
+        self.assertEquals(all(irange), False)
+        self.assertEquals(irange.next(), 1)
+
+
+
 if __name__ == '__main__':
-    unittest.main()
+    unittest_main()
 

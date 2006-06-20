@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+   * python2.5 compatibility (testlib.py + compat.py)
+
+
 2006-06-08  --  0.16.1
     * testlib: improved test collections
     * compat: added cmp argument to sorted
