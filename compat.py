@@ -200,7 +200,7 @@ except NameError:
         Return True if bool(x) is True for any x in the iterable.
         """
         for elt in iterable:
-            if bool(elt):
+            if elt:
                 return True
         return False
     
@@ -210,6 +210,6 @@ except NameError:
         Return True if bool(x) is True for all values x in the iterable.
         """
         for elt in iterable:
-            if not bool(elt):
+            if not elt:
                 return False
         return True
