@@ -401,7 +401,7 @@ class Table(object):
             row_index = self.row_names.index(row_id)
         except ValueError:
             raise KeyError("Row (%s) not found in table" % (row_id))
-        return self.get_row(row_index)
+        return self.data[row_index]
 
     def get_column(self, col_index, distinct=False):
         """Returns the 'col_index' col
