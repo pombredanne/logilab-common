@@ -631,7 +631,7 @@ class TestCase(unittest.TestCase):
 
         Note: addSuccess can't be called here because we have to wait
         for tearDown to be successfully executed to declare the test as
-        successfull
+        successful
         """
         kwargs = kwargs or {}
         try:
@@ -641,9 +641,6 @@ class TestCase(unittest.TestCase):
             return 1
         except KeyboardInterrupt:
             raise
-##         except TestSkipped:
-##             exc_type, exc, tcbk = self.__exc_info()
-##             result.addSkipped(self, exc)
         except:
             result.addError(self, self.__exc_info())
             return 2
@@ -654,7 +651,6 @@ class TestCase(unittest.TestCase):
 
     def skip(self, msg=None):
         msg = msg or 'test was skipped'
-        # warn(msg, stacklevel=2)
         raise TestSkipped(msg)
     skipped_test = deprecated_function(skip)
     
