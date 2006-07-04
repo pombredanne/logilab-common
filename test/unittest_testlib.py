@@ -132,6 +132,7 @@ class TestlibTC(TestCase):
 
 
 
+
 class GenerativeTestsTC(TestCase):
     
     def setUp(self):
@@ -174,6 +175,20 @@ class GenerativeTestsTC(TestCase):
         self.assertEquals(len(result.errors), 1)
 
 
+    def test_generative_error2(self):
+        class FooTC(TestCase):
+            def test_generative(self):
+                for i in xrange(10):
+                    if i == 5:
+                        yield self.ouch
+                    yield self.assertEquals, i, i
+            def ouch(self): raise ValueError('stop !')
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 6)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 1)
+
+
     def test_generative_setup(self):
         class FooTC(TestCase):
             def setUp(self):
@@ -193,17 +208,28 @@ class ExitFirstTC(TestCase):
         output = StringIO()
         self.runner = SkipAwareTextTestRunner(stream=output, exitfirst=True)
 
-    def test_simple_exit_first(self):
+    def test_failure_exit_first(self):
         class FooTC(TestCase):
-            def test_1(self):
-                assert False
-            def test_2(self):
-                assert False
+            def test_1(self): pass
+            def test_2(self): assert False
+            def test_3(self): pass
         tests = [FooTC('test_1'), FooTC('test_2')]
         result = self.runner.run(unittest.TestSuite(tests))
-        self.assertEquals(result.testsRun, 1)
+        self.assertEquals(result.testsRun, 2)
         self.assertEquals(len(result.failures), 1)
         self.assertEquals(len(result.errors), 0)
+        
+
+    def test_error_exit_first(self):
+        class FooTC(TestCase):
+            def test_1(self): pass
+            def test_2(self): raise ValueError()
+            def test_3(self): pass
+        tests = [FooTC('test_1'), FooTC('test_2'), FooTC('test_3')]
+        result = self.runner.run(unittest.TestSuite(tests))
+        self.assertEquals(result.testsRun, 2)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 1)
         
     def test_generative_exit_first(self):
         class FooTC(TestCase):

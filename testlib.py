@@ -584,7 +584,8 @@ class TestCase(unittest.TestCase):
             if is_generator(testMethod.im_func):
                 success = self._proceed_generative(result, testMethod)
             else:
-                success = self._proceed(result, testMethod)
+                status = self._proceed(result, testMethod)
+                success = (status == 0)
             try:
                 self.tearDown()
             except KeyboardInterrupt:
@@ -602,15 +603,21 @@ class TestCase(unittest.TestCase):
         result.testsRun -= 1
         try:
             for params in testfunc():
+                if not isinstance(params, (tuple, list)):
+                    params = (params,)
                 func = params[0]
                 args, kwargs = parse_generative_args(params[1:])
                 # increment test counter manually
                 result.testsRun += 1
-                success = self._proceed(result, func, args, kwargs, stop_on_error=True)
-                # XXX: how should tearDown errors be handled here ?
-                if success:
+                status = self._proceed(result, func, args, kwargs)
+                if status == 0:
                     result.addSuccess(self)
-                elif result.shouldStop:
+                    success = True
+                else:
+                    success = False
+                    if status == 2:
+                        result.shouldStop = True
+                if result.shouldStop: # either on error or on exitfirst + error
                     break
         except:
             # if an error occurs between two yield
@@ -618,16 +625,20 @@ class TestCase(unittest.TestCase):
             success = False
         return success
 
-    def _proceed(self, result, testfunc, args=(), kwargs=None, stop_on_error=False):
+    def _proceed(self, result, testfunc, args=(), kwargs=None):
         """proceed the actual test
-        returns True on sucess, False on error or failure
+        returns 0 on success, 1 on failure, 2 on error
+
+        Note: addSuccess can't be called here because we have to wait
+        for tearDown to be successfully executed to declare the test as
+        successfull
         """
         kwargs = kwargs or {}
         try:
             testfunc(*args, **kwargs)
         except self.failureException:
             result.addFailure(self, self.__exc_info())
-            return False
+            return 1
         except KeyboardInterrupt:
             raise
 ##         except TestSkipped:
@@ -635,9 +646,8 @@ class TestCase(unittest.TestCase):
 ##             result.addSkipped(self, exc)
         except:
             result.addError(self, self.__exc_info())
-            result.shouldStop = stop_on_error
-            return False
-        return True
+            return 2
+        return 0
             
     def defaultTestResult(self):
         return SkipAwareTestResult()

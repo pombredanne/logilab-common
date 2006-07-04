@@ -180,7 +180,7 @@ class Py25CompatTC(CompatTCMixIn, TestCase):
         # python2.5's all consumes iterables 
         irange = iter(range(10))
         self.assertEquals(all(irange), False)
-        self.assertEquals(irange.next(), 1)
+        self.assertEquals(irange.next(), 2)
 
 
 
