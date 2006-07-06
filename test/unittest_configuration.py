@@ -1,10 +1,8 @@
-import unittest
-from logilab.common import testlib
-
 import tempfile
 import os
 from cStringIO import StringIO
 
+from logilab.common.testlib import TestCase
 from logilab.common.configuration import Configuration, OptionValueError
 
 options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),
@@ -20,7 +18,7 @@ options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),
                                 'metavar':'<yo|ye>'}),
            ]
 
-class ConfigurationTC(testlib.TestCase):
+class ConfigurationTC(TestCase):
     
     def setUp(self):
         self.cfg = Configuration(name='test', options=options, usage='Just do it ! (tm)')
@@ -173,4 +171,4 @@ options:
         self.cfg.generate_manpage(__pkginfo__, stream=StringIO())
         
 if __name__ == '__main__':
-    unittest.main()
+    unittest_main()

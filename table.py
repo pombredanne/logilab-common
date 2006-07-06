@@ -437,7 +437,7 @@ class Table(object):
     def get_columns(self):
         """Returns all the columns in the table
         """
-        return [self.get_column(index) for index in range(len(self.col_names))]
+        return [self[:,index] for index in range(len(self.col_names))]
 
     
     def apply_stylesheet(self, stylesheet):

@@ -2,9 +2,7 @@
 
 __revision__ = '$Id: unittest_bind.py,v 1.2 2006-01-03 15:31:16 syt Exp $'
 
-import unittest
-
-
+from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.compat import set as Set
 from logilab.common import bind
 
@@ -18,7 +16,7 @@ def modify_hello():
 
 import foomod
 
-class BindTC(unittest.TestCase):
+class BindTC(TestCase):
     """Test suite for bind module"""
 
     def test_simple_bind(self):
@@ -61,5 +59,5 @@ class BindTC(unittest.TestCase):
         self.assertEquals(newf1_consts, f1_consts | f2_consts | f3_consts)
     
 if __name__ == '__main__':
-    unittest.main()
+    unittest_main()
     

@@ -42,7 +42,7 @@ import sys
 import os
 from os.path import walk, splitext, join, abspath, isdir, dirname, exists
 from imp import find_module, load_module, C_BUILTIN, PY_COMPILED, PKG_DIRECTORY
-
+from logilab.common import deprecated_function
 
 if sys.platform.startswith('win'):
     PY_SOURCE_EXTS = ('py', 'pyw')
@@ -132,7 +132,7 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
         prevmodule = module
     return module
 
-load_module_from_parts = load_module_from_modpath # backward compat
+load_module_from_parts = deprecated_function(load_module_from_modpath)
 
 
 

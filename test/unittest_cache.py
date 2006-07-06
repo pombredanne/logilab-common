@@ -1,10 +1,9 @@
 # unit tests for the cache module
 
+from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.cache import Cache
-import sys
-import unittest
 
-class CacheTestCase(unittest.TestCase):
+class CacheTestCase(TestCase):
 
     def setUp(self):
         self.cache = Cache(5)
@@ -84,19 +83,9 @@ class CacheTestCase(unittest.TestCase):
         # Deleting element should not raise error
         del null_cache['foo']
     
-        
-def suite():
-    loader = unittest.TestLoader()
-    testsuite = loader.loadTestsFromModule(sys.modules[__name__])
-    return testsuite
-    
-    
-def Run():
-    testsuite = suite()
-    runner = unittest.TextTestRunner()
-    return runner.run(testsuite)
 
 if __name__ == "__main__":
-    Run()
+    unittest_main()
+
  
 

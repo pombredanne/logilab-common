@@ -3,10 +3,8 @@
 
 __revision__ = "$Id: unittest_ureports_text.py,v 1.4 2005-05-27 12:27:08 syt Exp $"
 
-import unittest
 from utils import WriterTC
-from logilab.common.testlib import TestCase
-
+from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.ureports.text_writer import TextWriter
 
 class TextWriterTC(TestCase, WriterTC):
@@ -87,4 +85,4 @@ f333: v333
 '''
     
 if __name__ == '__main__':
-    unittest.main()
+    unittest_main()

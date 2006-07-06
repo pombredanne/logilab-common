@@ -1,12 +1,11 @@
 """unittests for logilab.common.logger"""
 
-import unittest
 from tempfile import mktemp
 import os
-
 import sys
 from cStringIO import StringIO
 
+from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.logger import *
 
 
@@ -17,7 +16,7 @@ def get_logged_messages(output):
     return [line.split(']')[-1].strip() for line in output.splitlines()]
 
 
-class LoggerTC(unittest.TestCase):
+class LoggerTC(TestCase):
 
     def test_defaultlogging(self):
         # redirect stdout so that we can test
@@ -50,5 +49,5 @@ class LoggerTC(unittest.TestCase):
         self.assertEquals(get_logged_messages(output), ['hello', 'world'])
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest_main()
 

@@ -3,11 +3,8 @@
 
 __revision__ = "$Id: unittest_ureports_html.py,v 1.3 2005-05-27 12:27:08 syt Exp $"
 
-import unittest
-
 from utils import WriterTC
-from logilab.common.testlib import TestCase
-
+from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.ureports.html_writer import *
 
 class HTMLWriterTC(TestCase, WriterTC):
@@ -47,4 +44,4 @@ Blabla bla</p></div>
     verbatim_base = '''<pre>blablabla</pre>'''
         
 if __name__ == '__main__':
-    unittest.main()
+    unittest_main()

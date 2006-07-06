@@ -227,11 +227,12 @@ def run_test(test, verbose, runner=None):
             loader = unittest.TestLoader()
             suite = loader.loadTestsFromModule(m)
         if runner is None:
-            runner = SkipAwareTextTestRunner()
+            runner = SkipAwareTextTestRunner() # verbosity=0)
         return runner.run(suite)
     except KeyboardInterrupt, v:
         raise KeyboardInterrupt, v, sys.exc_info()[2]
     except:
+        # raise
         type, value = sys.exc_info()[:2]
         msg = "test %s crashed -- %s : %s" % (test, type, value)
         if verbose:

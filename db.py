@@ -283,7 +283,7 @@ class _PySqlite2Adapter(DBAPIAdapter):
                 return False
             return True
         sqlite.register_converter('boolean', convert_boolean)
-
+        # import pysqlite2.dbapi2 as sqlite
         sqlite._mx_initialized = 1
 
             
@@ -536,7 +536,7 @@ def get_dbapi_compliant_module(driver, prefered_drivers = None, quiet = False,
                                pywrap = False):
     """returns a fully dbapi compliant module"""
     try:
-        mod = ADAPTER_DIRECTORY.adapt(driver, prefered_drivers, pywrap = pywrap)
+        mod = ADAPTER_DIRECTORY.adapt(driver, prefered_drivers, pywrap=pywrap)
     except NoAdapterFound, err:
         if not quiet:
             msg = 'No Adapter found for %s, returning native module'

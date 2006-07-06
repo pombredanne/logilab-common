@@ -8,13 +8,11 @@ Some file / file path manipulation utilities
 """
 __revision__ = "$Id: unittest_textutils.py,v 1.8 2005-02-07 18:01:05 syt Exp $"
 
-import unittest
-import sys
 import re
-from os.path import join
-from os import getcwd, linesep
+from os import linesep
 
-from logilab.common.textutils import *
+from logilab.common import textutils as tu # .textutils import *
+from logilab.common.testlib import TestCase, DocTest, unittest_main
 
 
 if linesep != '\n':
@@ -26,10 +24,10 @@ else:
     def ulines(string):
         return string
 
-class NormalizeTextTC(unittest.TestCase):
+class NormalizeTextTC(TestCase):
 
     def test_known_values(self):
-        self.assertEquals(ulines(normalize_text('''some really malformated
+        self.assertEquals(ulines(tu.normalize_text('''some really malformated
         text.
 With some times some veeeeeeeeeeeeeeerrrrryyyyyyyyyyyyyyyyyyy loooooooooooooooooooooong linnnnnnnnnnnes
 
@@ -41,10 +39,10 @@ linnnnnnnnnnnes
 
 and empty lines!''')
 
-class NormalizeParagraphTC(unittest.TestCase):
+class NormalizeParagraphTC(TestCase):
 
     def test_known_values(self):
-        self.assertEquals(ulines(normalize_text("""This package contains test files shared by the logilab-common package. It isn't
+        self.assertEquals(ulines(tu.normalize_text("""This package contains test files shared by the logilab-common package. It isn't
 necessary to install this package unless you want to execute or look at
 the tests.""", indent=' ', line_len=70)),
                          """\
@@ -53,24 +51,24 @@ the tests.""", indent=' ', line_len=70)),
  to execute or look at the tests.""")
 
         
-class GetCsvTC(unittest.TestCase):
+class GetCsvTC(TestCase):
 
     def test_known(self):
-        self.assertEquals(get_csv('a, b,c '), ['a', 'b', 'c'])
+        self.assertEquals(tu.get_csv('a, b,c '), ['a', 'b', 'c'])
 
     
 RGX = re.compile('abcd')
-class PrettyMatchTC(unittest.TestCase):
+class PrettyMatchTC(TestCase):
 
     def test_known(self):
         string = 'hiuherabcdef'
-        self.assertEquals(ulines(pretty_match(RGX.search(string), string)),
+        self.assertEquals(ulines(tu.pretty_match(RGX.search(string), string)),
                          'hiuherabcdef\n      ^^^^')
     def test_known_values_1(self):
         rgx = re.compile('(to*)')
         string = 'toto'
         match = rgx.search(string)
-        self.assertEquals(ulines(pretty_match(match, string)), '''toto
+        self.assertEquals(ulines(tu.pretty_match(match, string)), '''toto
 ^^''')
         
     def test_known_values_2(self):
@@ -78,43 +76,43 @@ class PrettyMatchTC(unittest.TestCase):
         string = ''' ... ... to to
  ... ... '''
         match = rgx.search(string)
-        self.assertEquals(ulines(pretty_match(match, string)), ''' ... ... to to
+        self.assertEquals(ulines(tu.pretty_match(match, string)), ''' ... ... to to
          ^^
  ... ...''')
         
         
 
 
-class SearchAllTC(unittest.TestCase):
+class SearchAllTC(TestCase):
 
     def test_known(self):
         string = 'hiuherabcdefabcd'
-        self.assertEquals(len(searchall(RGX, string)), 2)
+        self.assertEquals(len(tu.searchall(RGX, string)), 2)
 
 
-class UnquoteTC(unittest.TestCase):
+class UnquoteTC(TestCase):
     def test(self):
-        self.assertEquals(unquote('"toto"'), 'toto')
-        self.assertEquals(unquote("'l'inenarrable toto'"), "l'inenarrable toto")
-        self.assertEquals(unquote("no quote"), "no quote")
+        self.assertEquals(tu.unquote('"toto"'), 'toto')
+        self.assertEquals(tu.unquote("'l'inenarrable toto'"), "l'inenarrable toto")
+        self.assertEquals(tu.unquote("no quote"), "no quote")
 
         
-class ColorizeAnsiTC(unittest.TestCase):
+class ColorizeAnsiTC(TestCase):
     def test_known(self):
-        self.assertEquals(colorize_ansi('hello', 'blue', 'strike'), '\x1b[9;34mhello\x1b[0m')
-        self.assertEquals(colorize_ansi('hello', style='strike, inverse'), '\x1b[9;7mhello\x1b[0m')
-        self.assertEquals(colorize_ansi('hello', None, None), 'hello')
-        self.assertEquals(colorize_ansi('hello', '', ''), 'hello')
+        self.assertEquals(tu.colorize_ansi('hello', 'blue', 'strike'), '\x1b[9;34mhello\x1b[0m')
+        self.assertEquals(tu.colorize_ansi('hello', style='strike, inverse'), '\x1b[9;7mhello\x1b[0m')
+        self.assertEquals(tu.colorize_ansi('hello', None, None), 'hello')
+        self.assertEquals(tu.colorize_ansi('hello', '', ''), 'hello')
     def test_raise(self):
-        self.assertRaises(KeyError, colorize_ansi, 'hello', 'bleu', None)
-        self.assertRaises(KeyError, colorize_ansi, 'hello', None, 'italique')
+        self.assertRaises(KeyError, tu.colorize_ansi, 'hello', 'bleu', None)
+        self.assertRaises(KeyError, tu.colorize_ansi, 'hello', None, 'italique')
 
 
-from logilab.common.testlib import DocTest
 class ModuleDocTest(DocTest):
     """test doc test in this module"""
-    from logilab.common import textutils as module    
+    module = tu
+    # from logilab.common import textutils as module
 del DocTest # necessary if we don't want it to be executed (we don't...)
         
 if __name__ == '__main__':
-    unittest.main()
+    unittest_main()

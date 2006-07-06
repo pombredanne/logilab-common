@@ -4,12 +4,10 @@ unit tests for module logilab.common.patricia
 
 __revision__ = "$Id: unittest_patricia.py,v 1.3 2003-09-05 10:22:35 syt Exp $"
 
-import unittest
-import sys
 from logilab.common.patricia import *
-
+from logilab.common.testlib import TestCase, unittest_main
     
-class PatriciaTrieClassTest(unittest.TestCase):
+class PatriciaTrieClassTest(TestCase):
     
     def test_knownValues(self):
         """ 
@@ -54,19 +52,5 @@ class PatriciaTrieClassTest(unittest.TestCase):
         #print p
     
 
-def suite():
-    """return the unitest suite"""
-    loader = unittest.TestLoader()
-    testsuite = loader.loadTestsFromModule(sys.modules[__name__])
-    return testsuite
-    
-    
-def Run(runner=None):
-    """run tests"""
-    testsuite = suite()
-    if runner is None:
-        runner = unittest.TextTestRunner()
-    return runner.run(testsuite)
-    
 if __name__ == '__main__':
-    Run()
+    unittest_main()
