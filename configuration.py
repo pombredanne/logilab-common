@@ -266,7 +266,6 @@ def format_option_value(optdict, value):
 def ini_format_section(stream, section, options, doc=None):
     """format an options section using the INI format"""
     section_printed = False
-    section = {}
     for optname, optdict, value in options:
         if value is None:
             continue
