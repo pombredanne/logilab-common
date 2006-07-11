@@ -662,15 +662,18 @@ class TestCase(unittest.TestCase):
         message
         """
         d1 = d1.copy()
+        msgs = []
         for key, value in d2.items():
             try:
                 if d1[key] != value:
-                    self.fail('%r != %r for key %r' % (d1[key], value, key))
+                    msgs.append('%r != %r for key %r' % (d1[key], value, key))
                 del d1[key]
             except KeyError:
-                self.fail('missing %r key' % key)
+                msgs.append('missing %r key' % key)
         if d1:
-            self.fail('d2 is lacking %r' % d1)
+            msgs.append('d2 is lacking %r' % d1)
+        if msgs:
+            self.fail('\n'.join(msgs))
     assertDictEqual = assertDictEquals
 
     def assertSetEquals(self, got, expected):
