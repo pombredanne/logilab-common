@@ -2,7 +2,7 @@ import tempfile
 import os
 from cStringIO import StringIO
 
-from logilab.common.testlib import TestCase
+from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.configuration import Configuration, OptionValueError
 
 options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),

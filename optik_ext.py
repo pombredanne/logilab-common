@@ -105,6 +105,13 @@ def check_named(option, opt, value):
 <NAME>:<VALUE>"
     raise OptionValueError(msg % (opt, value))
 
+def check_password(option, opt, value):
+    """check a password value (can't be empty)
+    """
+    if value:
+        return value
+    raise OptionValueError("option %s: empty password" % opt)
+
 def check_file(option, opt, value):
     """check a file value
     return the filepath
@@ -135,7 +142,7 @@ import types
 class Option(BaseOption):
     """override optik.Option to add some new option types
     """
-    TYPES = BaseOption.TYPES + ("regexp", "csv", 'yn', 'named',
+    TYPES = BaseOption.TYPES + ("regexp", "csv", 'yn', 'named', "password",
                                 "multiple_choice", "file", "font", "color")
     TYPE_CHECKER = copy(BaseOption.TYPE_CHECKER)
     TYPE_CHECKER["regexp"] = check_regexp
@@ -145,6 +152,7 @@ class Option(BaseOption):
     TYPE_CHECKER["multiple_choice"] = check_csv
     TYPE_CHECKER["file"] = check_file
     TYPE_CHECKER["color"] = check_color
+    TYPE_CHECKER["password"] = check_password
 
     def _check_choice(self):
         """FIXME: need to override this due to optik misdesign"""
