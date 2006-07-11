@@ -3,7 +3,10 @@ ChangeLog for logilab.common
 
  --
    * python2.5 compatibility (testlib.py + compat.py)
-
+   * testlib.assertListEquals return all errors at once
+   * new "password" option type in optik_ext
+   * configuration: refactored to support interactive input of a configuration
+	
 
 2006-06-08  --  0.16.1
     * testlib: improved test collections
