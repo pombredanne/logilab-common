@@ -736,14 +736,14 @@ class Configuration(ConfigurationMixIn):
     """
 
     def __init__(self, config_file=None, options=None, name=None,
-                 usage=None, doc=None):
+                 usage=None, doc=None, version=None):
         if options is not None:
             self.options = options
         if name is not None:
             self.name = name
         if doc is not None:
             self.__doc__ = doc
-        super(Configuration, self).__init__(config_file=config_file, usage=usage)
+        super(Configuration, self).__init__(config_file=config_file, usage=usage, version=version)
         self.load_defaults()
 
 

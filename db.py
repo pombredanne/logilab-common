@@ -237,6 +237,7 @@ class _PySqlite2Adapter(DBAPIAdapter):
     """
     def __init__(self, native_module, pywrap=False):
         DBAPIAdapter.__init__(self, native_module, pywrap)
+        from pysqlite2 import _sqlite
         self._init_pysqlite2()
         # no type code in pysqlite2
         self.BINARY = 'XXX'
@@ -262,7 +263,11 @@ class _PySqlite2Adapter(DBAPIAdapter):
         sqlite.register_converter('date', convert_mxdate)
 
         def convert_mxdatetime(ustr):
-            return strptime(ustr, '%F %H:%M:%S')
+            try:
+                return strptime(ustr, '%F %H:%M:%S')
+            except Exception, ex:
+                print ex, ustr
+                return ustr
         sqlite.register_converter('timestamp', convert_mxdatetime)
 
         def convert_mxtime(ustr):
@@ -311,7 +316,6 @@ class _PySqlite2Adapter(DBAPIAdapter):
             
             def __getattr__(self, attrname):
                 return getattr(self._cnx, attrname)
-
         cnx = sqlite.connect(database, detect_types=sqlite.PARSE_DECLTYPES)
         return self._wrap_if_needed(PySqlite2CnxWrapper(cnx))
 
@@ -440,6 +444,8 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
         """return True if the DBMS support groups"""
         return False
     
+    # XXX according to current sql documentation, standard sql functions
+    # CURRENT_* are now supported
     def sql_current_date(self):
         return "DATE('now')"
     
