@@ -18,7 +18,7 @@
 __revision__ = "$Id: __pkginfo__.py,v 1.58 2006-04-25 12:08:52 syt Exp $"
 
 modname = 'common'
-numversion = (0, 16, 1)
+numversion = (0, 17, 0)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
@@ -40,7 +40,7 @@ modules,
   * generating of SQL queries
   * running unit tests
   * manipulating tree structures
-  * accessing RDBMS (currently postgreSQL and mysql)
+  * accessing RDBMS (currently postgreSQL, mysql and sqlite)
   * generating text and HTML reports
   * logging"""
 
