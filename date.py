@@ -36,3 +36,44 @@ def date_range(begin, end, step=1):
 #         yield date
 #         date = RelativeDateTime(months=+1)
 
+FRENCH_FIXED_HOLIDAYS = {
+    'jour_an'        : '%s-01-01',
+    'fete_travail'   : '%s-05-01',
+    'armistice1945'  : '%s-05-08',
+    'fete_nat'       : '%s-07-14',
+    'assomption'     : '%s-08-15',
+    'toussaint'      : '%s-11-01',
+    'armistice1918'  : '%s-11-11',
+    'noel'           : '%s-12-25',
+    }
+
+
+FRENCH_MOBILE_HOLIDAYS = {
+    'paques2004'    : '2004-04-12',
+    'ascension2004' : '2004-05-20',
+    'pentecote2004' : '2004-05-31',
+    
+    'paques2005'    : '2005-03-28',
+    'ascension2005' : '2005-05-05',
+    'pentecote2005' : '2005-05-16',
+    
+    'paques2006'    : '2006-04-17',
+    'ascension2006' : '2006-05-25',
+    'pentecote2006' : '2006-06-05',
+    
+    'paques2007'    : '2007-04-09',
+    'ascension2007' : '2007-05-17',
+    'pentecote2007' : '2007-05-28',
+    }
+
+
+def get_national_holidays(begin, end):
+    """return french national days off between begin and end"""
+    holidays = [strptime(datestr, '%Y-%m-%d')
+                for datestr in FRENCH_MOBILE_HOLIDAYS.values()]
+    for year in xrange(begin.year, end.year+1):
+        holidays += [strptime(datestr % year, '%Y-%m-%d')
+                     for datestr in FRENCH_FIXED_HOLIDAYS.values()]
+    return [day for day in holidays if begin <= day < end]
+
+
