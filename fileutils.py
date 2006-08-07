@@ -339,7 +339,7 @@ def stream_lines(stream, comments=None):
 
 
 
-BASE_BLACKLIST = ('CVS', '.svn', 'debian', 'dist', 'build', '__buildlog')
+BASE_BLACKLIST = ('CVS', '.svn', 'debian', 'dist', 'build', '__buildlog', '.hg')
 IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc', '~')
 
 def export(from_dir, to_dir,
