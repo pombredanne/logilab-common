@@ -372,8 +372,8 @@ class Table(object):
     def get_cell_by_ids(self, row_id, col_id):
         """Returns the element at [row_id][col_id]
         """
-        warn('table.get_cell_by_ids(i,j) is deprecated, use table[i,j] instead',
-             DeprecationWarning, stacklevel=2)
+        #warn('table.get_cell_by_ids(i,j) is deprecated, use table[i,j] instead',
+        #     DeprecationWarning, stacklevel=2)
         try:
             row_index = self.row_names.index(row_id)
         except ValueError:
@@ -395,8 +395,8 @@ class Table(object):
     def get_row_by_id(self, row_id):
         """Returns the 'row_id' row
         """
-        warn('table.get_row_by_id(i) is deprecated, use table[i] instead',
-             DeprecationWarning, stacklevel=2)
+        #warn('table.get_row_by_id(i) is deprecated, use table[i] instead',
+        #     DeprecationWarning, stacklevel=2)
         try:
             row_index = self.row_names.index(row_id)
         except ValueError:
@@ -417,8 +417,8 @@ class Table(object):
     def get_column_by_id(self, col_id, distinct=False):
         """Returns the 'col_id' col
         """
-        warn('table.get_column_by_id(i) is deprecated, use table[:,i] instead',
-             DeprecationWarning, stacklevel=2)
+        #warn('table.get_column_by_id(i) is deprecated, use table[:,i] instead',
+        #     DeprecationWarning, stacklevel=2)
         try:
             col_index = self.col_names.index(col_id)
         except ValueError:
