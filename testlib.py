@@ -28,6 +28,7 @@ __revision__ = "$Id: testlib.py,v 1.47 2006-04-19 10:26:15 adim Exp $"
 
 import sys
 import os, os.path as osp
+import time
 import getopt
 import traceback
 import unittest
@@ -116,15 +117,21 @@ def main(testdir=os.getcwd()):
         print >> sys.stderr, '** profiled run'
         from hotshot import Profile
         prof = Profile('stones.prof')
+        start_time, start_ctime = time.time(), time.clock()
         good, bad, skipped, all_result = prof.runcall(run_tests, tests, quiet,
                                                       verbose)
+        end_time, end_ctime = time.time(), time.clock()
         prof.close()
     else:
+        start_time, start_ctime = time.time(), time.clock()
         good, bad, skipped, all_result = run_tests(tests, quiet, verbose)
+        end_time, end_ctime = time.time(), time.clock()
     if not quiet:
         print '*'*80
         if all_result:
-            print 'Ran %s test cases' % all_result.testsRun,
+            print 'Ran %s test cases in %0.2fs (%0.2fs CPU)' % (all_result.testsRun,
+                                                                end_time - start_time,
+                                                                end_ctime - start_ctime), 
             if all_result.errors:
                 print ', %s errors' % len(all_result.errors),
             if all_result.failures:
