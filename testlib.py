@@ -27,7 +27,7 @@ from __future__ import nested_scopes
 __revision__ = "$Id: testlib.py,v 1.47 2006-04-19 10:26:15 adim Exp $"
 
 import sys
-import os
+import os, os.path as osp
 import getopt
 import traceback
 import unittest
@@ -864,3 +864,39 @@ def mock_object(**params):
     """
     return type('Mock', (), params)()
 
+
+def create_files(paths, chroot):
+    """creates directories and files found in <path>
+
+    :param path: list of relative paths to files or directories
+    :param chroot: the root directory in which paths will be created
+
+    >>> from os.path import isdir, isfile
+    >>> isdir('/tmp/a')
+    False
+    >>> create_files(['a/b/foo.py', 'a/b/c/', 'a/b/c/d/e.py'], '/tmp')
+    >>> isdir('/tmp/a')
+    True
+    >>> isdir('/tmp/a/b/c')
+    True
+    >>> isfile('/tmp/a/b/c/d/e.py')
+    True 
+    >>> isfile('/tmp/a/b/foo.py')
+    True
+    """
+    dirs, files = set(), set()
+    for path in paths:
+        path = osp.join(chroot, path)
+        filename = osp.basename(path)
+        # path is a directory path
+        if filename == '':
+            dirs.add(path)
+        # path is a filename path
+        else:
+            dirs.add(osp.dirname(path))
+            files.add(path)
+    for dirpath in dirs:
+        if not osp.isdir(dirpath):
+            os.makedirs(dirpath)
+    for filepath in files:
+        file(filepath, 'w').close()
