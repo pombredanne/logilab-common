@@ -188,7 +188,8 @@ def input_password(optdict, question='password:'):
         print 'password mismatch, try again'
 
 def input_string(optdict, question):
-    return raw_input(question).strip()
+    value = raw_input(question).strip()
+    return value or None
 
 def _make_input_function(opttype):
     def input_validator(optdict, question):
@@ -482,7 +483,7 @@ class OptionsManagerMixIn(object):
                 while default is REQUIRED and not value:
                     print 'please specify a value'
                     value = inputfunc(optdict, '%s: ' % option)
-                if not value and default:
+                if value is None and default is not None:
                     value = default
                 provider.set_option(option, value, opt_dict=optdict)
         # now we can generate the configuration file
@@ -624,6 +625,7 @@ class OptionsProviderMixIn:
     def set_option(self, opt_name, value, action=None, opt_dict=None):
         """method called to set an option (registered in the options list)
         """
+        # print "************ setting option", opt_name," to value", value
         if opt_dict is None:
             opt_dict = self.get_option_def(opt_name)
         if value is not None:
