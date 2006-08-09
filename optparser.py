@@ -69,7 +69,7 @@ class OptionParser(optparse.OptionParser):
         # optparse inserts self.description between usage and options help
         self.description = help
         if isinstance(mod_or_f, str):
-            exec('from %s import run, add_options'%module)
+            exec 'from %s import run, add_options' % mod_or_f
 	else:
 	    run, add_options = mod_or_f
         add_options(self)

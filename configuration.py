@@ -434,7 +434,7 @@ class OptionsManagerMixIn(object):
         
     # initialization methods ##################################################
 
-    def load_defaults(self):
+    def load_provider_defaults(self):
         """initialize configuration using default values"""
         for provider in self.options_providers:
             provider.load_defaults()

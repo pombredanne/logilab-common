@@ -3,7 +3,8 @@ import os
 from cStringIO import StringIO
 
 from logilab.common.testlib import TestCase, unittest_main
-from logilab.common.configuration import Configuration, OptionValueError
+from logilab.common.configuration import Configuration, OptionValueError, \
+     OptionsManagerMixIn, OptionsProviderMixIn
 
 options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),
            ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
@@ -169,6 +170,29 @@ options:
     def test_manpage(self):
         from logilab.common import __pkginfo__
         self.cfg.generate_manpage(__pkginfo__, stream=StringIO())
+
+
+class Linter(OptionsManagerMixIn, OptionsProviderMixIn):
+    options = (
+        ('profile', {'type' : 'yn', 'metavar' : '<y_or_n>',
+                     'default': False,
+                     'help' : 'Profiled execution.'}),
+        )
+    def __init__(self):
+        OptionsManagerMixIn.__init__(self, usage="")
+        OptionsProviderMixIn.__init__(self)
+        self.register_options_provider(self)
+        self.load_provider_defaults()
+
+class RegrTC(TestCase):
+
+    def setUp(self):
+        self.linter = Linter()
+        
+    def test_load_defaults(self):
+        self.linter.load_command_line_configuration([])
+        self.assertEquals(self.linter.config.profile, False)
+        
         
 if __name__ == '__main__':
     unittest_main()
