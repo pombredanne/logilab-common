@@ -1,23 +1,23 @@
 What's new ?
 ------------
-%CHANGELOG%
+%(CHANGELOG)s
 
 
-What is %SOURCEPACKAGE% ?
+What is %(SOURCEPACKAGE)s ?
 ------------------------
-%LONG_DESC%
+%(LONG_DESC)s
 
 
 Home page
 ---------
-%WEB%
+%(WEB)s
 
 Download
 --------
-%FTP%
+%(FTP)s
 
 Mailing list
 ------------
-%MAILINGLIST%
+%(MAILINGLIST)s
 
-%ADDITIONAL_DESCR%
+%(ADDITIONAL_DESCR)s

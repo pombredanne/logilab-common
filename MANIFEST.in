@@ -1,5 +1,6 @@
 include ChangeLog
 include README
+include COPYING
 include DEPENDS
 recursive-include test/data *.py *.txt
 recursive-include doc/html *
