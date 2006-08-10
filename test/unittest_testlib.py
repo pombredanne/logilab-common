@@ -4,6 +4,7 @@ __revision__ = '$Id: unittest_testlib.py,v 1.5 2006-02-09 22:37:46 nico Exp $'
 
 import unittest
 import os
+import sys
 from os.path import join, dirname, isdir, isfile
 from cStringIO import StringIO
 import tempfile
@@ -14,7 +15,6 @@ from logilab.common.compat import sorted
 try:
     __file__
 except NameError:
-    import sys
     __file__ = sys.argv[0]
     
 from logilab.common.testlib import TestCase, unittest_main, SkipAwareTextTestRunner
@@ -319,7 +319,69 @@ class TestLoaderTC(TestCase):
             collected = self.loader.loadTestsFromName(pattern, self.module)
             yield self.assertEquals, len(collected), expected_count
 
-    
+
+
+
+class OutErrCaptureTC(TestCase):
+
+    def setUp(self):
+        sys.stdout = sys.stderr = StringIO()
+        self.runner = SkipAwareTextTestRunner(stream=StringIO(), exitfirst=True, capture=True)
+
+    def tearDown(self):
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+
+    def test_stdout_capture(self):
+        class FooTC(TestCase):
+            def test_stdout(self):
+                print "foo"
+                self.assert_(False)
+        test = FooTC('test_stdout')
+        result = self.runner.run(test)
+        captured_out, captured_err = test.captured_output()
+        self.assertEqual(captured_out.strip(), "foo")
+        self.assertEqual(captured_err.strip(), "") 
+       
+    def test_stderr_capture(self):
+        class FooTC(TestCase):
+            def test_stderr(self):
+                print >> sys.stderr, "foo"
+                self.assert_(False)
+        test = FooTC('test_stderr')
+        result = self.runner.run(test)
+        captured_out, captured_err = test.captured_output()
+        self.assertEqual(captured_out.strip(), "")
+        self.assertEqual(captured_err.strip(), "foo") 
+        
+        
+    def test_both_capture(self):
+        class FooTC(TestCase):
+            def test_stderr(self):
+                print >> sys.stderr, "foo"
+                print "bar"
+                self.assert_(False)
+        test = FooTC('test_stderr')
+        result = self.runner.run(test)
+        captured_out, captured_err = test.captured_output()
+        self.assertEqual(captured_out.strip(), "bar")
+        self.assertEqual(captured_err.strip(), "foo") 
+        
+    def test_no_capture(self):
+        class FooTC(TestCase):
+            def test_stderr(self):
+                print >> sys.stderr, "foo"
+                print "bar"
+                self.assert_(False)
+        test = FooTC('test_stderr')
+        # this runner should not capture stdout / stderr
+        runner = SkipAwareTextTestRunner(stream=StringIO(), exitfirst=True)
+        result = runner.run(test)
+        captured_out, captured_err = test.captured_output()
+        self.assertEqual(captured_out.strip(), "")
+        self.assertEqual(captured_err.strip(), "") 
+        
+        
 if __name__ == '__main__':
     unittest_main()
 

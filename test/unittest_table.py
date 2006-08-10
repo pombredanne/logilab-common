@@ -5,6 +5,7 @@ Unittests for table management
 __revision__ = '$Id: unittest_table.py,v 1.13 2006-04-09 22:30:53 nico Exp $'
 
 import sys
+import os
 from cStringIO import StringIO
 
 from logilab.common.testlib import TestCase, unittest_main

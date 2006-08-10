@@ -1,8 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
-  --
+2006-08-09  --  0.18.0
 
+   * added -c / --capture option to testlib.unittest_main
+   * fixed bugs in lgc.configuration
    * optparser: added a OptionParser that extends optparse's with commands
 
 2006-07-13  --  0.17.0

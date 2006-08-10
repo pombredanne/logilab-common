@@ -303,20 +303,21 @@ from cStringIO import StringIO
 
 class SkipAwareTestResult(unittest._TextTestResult):
 
-    def __init__(self, stream, descriptions, verbosity, exitfirst=False):
+    def __init__(self, stream, descriptions, verbosity,
+                 exitfirst=False, capture=False):
         unittest._TextTestResult.__init__(self, stream, descriptions, verbosity)
         self.skipped = []
         self.debuggers = []
         self.descrs = []
         self.exitfirst = exitfirst
-
+        self.capture = capture
+        
     def _create_pdb(self, test_descr):
         self.debuggers.append(Debugger(sys.exc_info()[2]))
         self.descrs.append(test_descr)
         
     def addError(self, test, err):
         exc_type, exc, tcbk = err
-        # hack to avoid overriding the whole __call__ machinery in TestCase
         if exc_type == TestSkipped:
             self.addSkipped(test, exc)
         else:
@@ -348,16 +349,35 @@ class SkipAwareTestResult(unittest._TextTestResult):
             self.stream.writeln("%s: %s" % ('SKIPPED', self.getDescription(test)))
             self.stream.writeln("\t%s" % err)
 
+    def printErrorList(self, flavour, errors):
+        for test, err in errors:
+            self.stream.writeln(self.separator1)
+            self.stream.writeln("%s: %s" % (flavour,self.getDescription(test)))
+            self.stream.writeln(self.separator2)
+            self.stream.writeln("%s" % err)
+            if self.capture:
+                output, errput = test.captured_output()
+                self.stream.writeln(self.separator2)
+                self.stream.writeln("captured stdout".center(len(self.separator2)))
+                self.stream.writeln(self.separator2)
+                self.stream.writeln(output)
+                self.stream.writeln(self.separator2)
+                self.stream.writeln("captured stderr".center(len(self.separator2)))
+                self.stream.writeln(self.separator2)
+                self.stream.writeln(errput)
+
 
 class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
-    def __init__(self, stream=sys.stderr, verbosity=1, exitfirst=False):
+    def __init__(self, stream=sys.stderr, verbosity=1,
+                 exitfirst=False, capture=False):
         unittest.TextTestRunner.__init__(self, stream=stream, verbosity=verbosity)
         self.exitfirst = exitfirst
-
+        self.capture = capture
+        
     def _makeResult(self):
-        return SkipAwareTestResult(self.stream, self.descriptions,
-                                   self.verbosity, self.exitfirst)
+        return SkipAwareTestResult(self.stream, self.descriptions, self.verbosity,
+                                   self.exitfirst, self.capture)
 
 
 class keywords(dict):
@@ -484,10 +504,11 @@ Examples:
     def parseArgs(self, argv):
         self.pdbmode = False
         self.exitfirst = False
+        self.capture = False
         import getopt
         try:
-            options, args = getopt.getopt(argv[1:], 'hHvixq',
-                                          ['help','verbose','quiet', 'pdb', 'exitfirst'])
+            options, args = getopt.getopt(argv[1:], 'hHvixqc',
+                                          ['help','verbose','quiet', 'pdb', 'exitfirst', 'capture'])
             for opt, value in options:
                 if opt in ('-h','-H','--help'):
                     self.usageExit()
@@ -499,6 +520,8 @@ Examples:
                     self.verbosity = 0
                 if opt in ('-v','--verbose'):
                     self.verbosity = 2
+                if opt in ('-c', '--capture'):
+                    self.capture = True
             if len(args) == 0 and self.defaultTest is None:
                 self.test = self.testLoader.loadTestsFromModule(self.module)
                 return
@@ -514,7 +537,8 @@ Examples:
 
     def runTests(self):
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
-                                                  exitfirst=self.exitfirst)
+                                                  exitfirst=self.exitfirst,
+                                                  capture=self.capture)
         result = self.testRunner.run(self.test)
         if os.environ.get('PYDEBUG'):
             warn("PYDEBUG usage is deprecated, use -i / --pdb instead", DeprecationWarning)
@@ -522,6 +546,18 @@ Examples:
         if result.debuggers and self.pdbmode:
             start_interactive_mode(result.debuggers, result.descrs)
         sys.exit(not result.wasSuccessful())
+
+
+from cStringIO import StringIO
+def quiet_run(function, *args, **kwargs):
+    stdout, stderr = StringIO(), StringIO()
+    sys.stdout, sys.stderr = stdout, stderr
+    try:
+        result = function(*args, **kwargs)
+    finally:
+        sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
+    return result, stdout.getvalue(), stderr.getvalue()
+
 
 def unittest_main():
     """use this functon if you want to have the same functionality
@@ -569,15 +605,14 @@ class TestCase(unittest.TestCase):
         if sys.version_info >= (2, 5):
             self.__exc_info = self._exc_info
             self.__testMethodName = self._testMethodName
+        self._captured_stdout = ""
+        self._captured_stderr = ""
             
-        
+    def captured_output(self):
+        return self._captured_stdout, self._captured_stderr
     
-    def __call__(self, result=None):
-        """rewrite TestCase.__call__ to support generative tests
-        This is mostly a copy/paste from unittest.py (i.e same
-        variable names, same logic, except for the generative tests part)
-        """
-        if result is None: result = self.defaultTestResult()
+
+    def __run__(self, result=None):
         result.startTest(self)
         testMethod = getattr(self, self.__testMethodName)
         try:
@@ -605,6 +640,23 @@ class TestCase(unittest.TestCase):
                 result.addSuccess(self)
         finally:
             result.stopTest(self)
+        
+    def __call__(self, result=None):
+        """rewrite TestCase.__call__ to support generative tests
+        This is mostly a copy/paste from unittest.py (i.e same
+        variable names, same logic, except for the generative tests part)
+        """
+        if result is None:
+            result = self.defaultTestResult()
+        capture = getattr(result, 'capture', False)
+        if capture:
+            retval, out, err = quiet_run(self.__run__, result)
+            self._captured_stdout = out
+            self._captured_stderr = err
+            return retval
+        else:
+            return self.__run__(result)
+
             
     def _proceed_generative(self, result, testfunc, args=()):
         # cancel startTest()'s increment
