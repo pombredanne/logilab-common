@@ -17,6 +17,7 @@ Command line options:
 -t: testdir -- directory where the tests will be found
 -x: exclude -- add a test to exclude
 -p: profile -- profiled execution
+-c: capture -- capture standard out/err during tests
 
 If no non-option arguments are present, prefixes used are 'test',
 'regrtest', 'smoketest' and 'unittest'.
@@ -75,7 +76,7 @@ def main(testdir=os.getcwd()):
     """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'vqx:t:p')
+        opts, args = getopt.getopt(sys.argv[1:], 'vqx:t:pc')
     except getopt.error, msg:
         print msg
         print __doc__
@@ -84,11 +85,12 @@ def main(testdir=os.getcwd()):
     quiet = 0
     profile = 0
     exclude = []
+    capture = False
     for o, a in opts:
         if o == '-v':
             verbose = verbose+1
         elif o == '-q':
-            quiet = 1;
+            quiet = 1
             verbose = 0
         elif o == '-x':
             exclude.append(a)
@@ -96,6 +98,8 @@ def main(testdir=os.getcwd()):
             testdir = a
         elif o == '-p':
             profile = 1
+        elif o == '-c':
+            capture = True
         elif o == '-h':
             print __doc__
             sys.exit(0)
@@ -119,12 +123,12 @@ def main(testdir=os.getcwd()):
         prof = Profile('stones.prof')
         start_time, start_ctime = time.time(), time.clock()
         good, bad, skipped, all_result = prof.runcall(run_tests, tests, quiet,
-                                                      verbose)
+                                                      verbose, None, capture)
         end_time, end_ctime = time.time(), time.clock()
         prof.close()
     else:
         start_time, start_ctime = time.time(), time.clock()
-        good, bad, skipped, all_result = run_tests(tests, quiet, verbose)
+        good, bad, skipped, all_result = run_tests(tests, quiet, verbose, None, capture)
         end_time, end_ctime = time.time(), time.clock()
     if not quiet:
         print '*'*80
@@ -156,7 +160,7 @@ def main(testdir=os.getcwd()):
         stats.print_stats(30)
     sys.exit(len(bad) + len(skipped))
 
-def run_tests(tests, quiet, verbose, runner=None):
+def run_tests(tests, quiet, verbose, runner=None, capture=False):
     """ execute a list of tests
     return a 3-uple with :
        _ the list of passed tests
@@ -172,7 +176,7 @@ def run_tests(tests, quiet, verbose, runner=None):
             print 
             print '-'*80
             print "Executing", test
-        result = run_test(test, verbose, runner)
+        result = run_test(test, verbose, runner, capture)
         if type(result) is type(''):
             # an unexpected error occured
             skipped.append( (test, result))
@@ -215,7 +219,7 @@ def find_tests(testdir,
     return tests
 
 
-def run_test(test, verbose, runner=None):
+def run_test(test, verbose, runner=None, capture=False):
     """
     Run a single test.
 
@@ -234,7 +238,7 @@ def run_test(test, verbose, runner=None):
             loader = unittest.TestLoader()
             suite = loader.loadTestsFromModule(m)
         if runner is None:
-            runner = SkipAwareTextTestRunner() # verbosity=0)
+            runner = SkipAwareTextTestRunner(capture=capture) # verbosity=0)
         return runner.run(suite)
     except KeyboardInterrupt, v:
         raise KeyboardInterrupt, v, sys.exc_info()[2]
@@ -493,6 +497,7 @@ Options:
   -v, --verbose    Verbose output
   -i, --pdb        Enable test failure inspection
   -x, --exitfirst  Exit on first failure
+  -c, --capture    Captures and prints standard out/err only on errors
   -q, --quiet      Minimal output
 
 Examples:
