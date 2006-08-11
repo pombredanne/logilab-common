@@ -1,6 +1,6 @@
 # unit tests for the cache module
 
-from logilab.common.testlib import TestCase
+from logilab.common.testlib import TestCase, unittest_main
 from logilab.common import get_cycles
 
 class getCycleTestCase(TestCase):
