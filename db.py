@@ -215,7 +215,8 @@ class _PgsqlAdapter(DBAPIAdapter):
     """
     def connect(self, host='', database='', user='', password='', port=''):
         """Handles psycopg connexion format"""
-        kwargs = {'host' : host, 'port': port, 'database' : database,
+        kwargs = {'host' : host, 'port': port or None,
+                  'database' : database,
                   'user' : user, 'password' : password or None}
         cnx = self._native_module.connect(**kwargs)
         return self._wrap_if_needed(cnx)
@@ -338,15 +339,18 @@ class _SqliteAdapter(DBAPIAdapter):
 class _MySqlDBAdapter(DBAPIAdapter):
     """Simple mysql Adapter to DBAPI
     """
-    def connect(self, host='', database='', user='', password='', port='',
+    def connect(self, host='', database='', user='', password='', port=None,
                 unicode=False):
         """Handles mysqldb connexion format
         the unicode named argument asks to use Unicode objects for strings
         in result sets and query parameters
         """
-        kwargs = {'host' : host, 'port' : port, 'db' : database,
-                  'user' : user, 'passwd' : password or None,
+        kwargs = {'host' : host, 'db' : database,
+                  'user' : user, 'passwd' : password,
                   'use_unicode' : unicode}
+        if port:
+            # MySqlDb requires port to be an integer
+            kwargs['port'] = port
         return self._native_module.connect(**kwargs)
 
 

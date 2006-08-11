@@ -49,7 +49,7 @@ class PreferedDriverTC(TestCase):
 class getCnxTC(TestCase):
     def setUp(self):
         self.host = 'crater.logilab.fr'
-        self.db = 'gincotest2'
+        self.db = 'template1'
         self.user = 'adim'
         self.passwd = 'adim'
         
@@ -83,8 +83,7 @@ class getCnxTC(TestCase):
     def testMysql(self):
         set_prefered_driver('mysql', 'MySQLdb')
         try:
-            cnx = get_connection('mysql',
-                                 self.host, self.db, self.user, self.passwd,
+            cnx = get_connection('mysql', self.host, database='', user='root',
                                  quiet=1)
         except ImportError:
             self.skip('python-mysqldb is not installed')
