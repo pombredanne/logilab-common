@@ -628,14 +628,6 @@ def capture_stderr():
     """
     return _capture('stderr')
 
-def quiet_run(function, *args, **kwargs):
-    output = capture_stdout()
-    errput = capture_stderr()
-    try:
-        result = function(*args, **kwargs)
-    finally:
-        return result, output.restore(), errput.restore()
-
 
 def unittest_main():
     """use this functon if you want to have the same functionality
@@ -700,19 +692,19 @@ class TestCase(unittest.TestCase):
             self._captured_stderr += err
 
 
-##     def quiet_run(self, func, *args, **kwargs):
-##         self._start_capture()
-##         try:
-##             func(*args, **kwargs)
-##         except KeyboardInterrupt:
-##             self._stop_capture()
-##             raise
-##         except:
-##             self._stop_capture()
-##             result.addError(self, self.__exc_info())
-##             return
-##         self._stop_capture()
-        
+    def quiet_run(self, result, func, *args, **kwargs):
+        self._start_capture()
+        try:
+            func(*args, **kwargs)
+        except KeyboardInterrupt:
+            self._stop_capture()
+            raise
+        except:
+            self._stop_capture()
+            result.addError(self, self.__exc_info())
+            return False
+        self._stop_capture()
+        return True
 
     def __call__(self, result=None):
         """rewrite TestCase.__call__ to support generative tests
@@ -724,17 +716,8 @@ class TestCase(unittest.TestCase):
         self.capture = getattr(result, 'capture', False)
         result.startTest(self)
         testMethod = getattr(self, self.__testMethodName)
-        self._start_capture()
         try:
-            try:
-                self.setUp()
-                self._stop_capture()
-            except KeyboardInterrupt:
-                self._stop_capture()
-                raise
-            except:
-                self._stop_capture()
-                result.addError(self, self.__exc_info())
+            if not self.quiet_run(result, self.setUp):
                 return
             # generative tests
             if is_generator(testMethod.im_func):
@@ -742,17 +725,8 @@ class TestCase(unittest.TestCase):
             else:
                 status = self._proceed(result, testMethod)
                 success = (status == 0)
-            try:
-                self._start_capture()
-                self.tearDown()
-                self._stop_capture()
-            except KeyboardInterrupt:
-                self._stop_capture()
-                raise
-            except:
-                self._stop_capture()
-                result.addError(self, self.__exc_info())
-                success = False
+            if not self.quiet_run(result, self.tearDown):
+                return
             if success:
                 result.addSuccess(self)
         finally:
