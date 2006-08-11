@@ -19,6 +19,7 @@ except NameError:
     
 from logilab.common.testlib import TestCase, unittest_main, SkipAwareTextTestRunner
 from logilab.common.testlib import mock_object, NonStrictTestLoader, create_files
+from logilab.common.testlib import capture_stdout
 
 class MockTestCase(TestCase):
     def __init__(self):
@@ -322,8 +323,13 @@ class TestLoaderTC(TestCase):
 
 
 
-class OutErrCaptureTC(TestCase):
+def bootstrap_print(msg, output=sys.stdout):
+    """sys.stdout will be evaluated at function parsing time"""
+    # print msg
+    output.write(msg)
 
+class OutErrCaptureTC(TestCase):
+    
     def setUp(self):
         sys.stdout = sys.stderr = StringIO()
         self.runner = SkipAwareTextTestRunner(stream=StringIO(), exitfirst=True, capture=True)
@@ -381,7 +387,16 @@ class OutErrCaptureTC(TestCase):
         self.assertEqual(captured_out.strip(), "")
         self.assertEqual(captured_err.strip(), "") 
         
+
+    def test_capture_core(self):
+        # output = capture_stdout()
+        # bootstrap_print("hello", output=sys.stdout)
+        # self.assertEquals(output.restore(), "hello")
+        output = capture_stdout()
+        bootstrap_print("hello")
+        self.assertEquals(output.restore(), "hello")
         
+
 if __name__ == '__main__':
     unittest_main()
 
