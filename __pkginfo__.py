@@ -54,6 +54,6 @@ subpackage_master = True
 
 from os.path import join
 include_dirs = [join('test', 'data')]
-pyversions = ['all']
+pyversions = ['2.3', '2.4']
 debian_maintainer = 'Alexandre Fayolle'
 debian_maintainer_email = 'afayolle@debian.org'
