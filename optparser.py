@@ -30,6 +30,7 @@ With mymod.build that defines two functions run and add_options
 
 # XXX merge with optik_ext ?
 
+import sys
 import optparse
 
 class OptionParser(optparse.OptionParser):
