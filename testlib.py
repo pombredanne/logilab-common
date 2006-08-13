@@ -16,6 +16,7 @@ Command line options:
 -x: exclude -- add a test to exclude
 -p: profile -- profiled execution
 -c: capture -- capture standard out/err during tests
+-d: dbc     -- enable design-by-contract
 
 If no non-option arguments are present, prefixes used are 'test',
 'regrtest', 'smoketest' and 'unittest'.
@@ -52,6 +53,8 @@ __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
                     'func', 'validation')
 
+ENABLE_DBC = False
+
 def main(testdir=None):
     """Execute a test suite.
 
@@ -72,7 +75,7 @@ def main(testdir=None):
     """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvqx:t:pc')
+        opts, args = getopt.getopt(sys.argv[1:], 'hvqx:t:pcd')
     except getopt.error, msg:
         print msg
         print __doc__
@@ -96,6 +99,9 @@ def main(testdir=None):
             profile = True
         elif o == '-c':
             capture = True
+        elif o == '-d':
+            global ENABLE_DBC
+            ENABLE_DBC = True
         elif o == '-h':
             print __doc__
             sys.exit(0)
@@ -1035,3 +1041,25 @@ def create_files(paths, chroot):
             os.makedirs(dirpath)
     for filepath in files:
         file(filepath, 'w').close()
+
+def enable_dbc(*args):
+    """
+    Without arguments, return True if contracts can be enabled and should be
+    enabled (see option -d), return False otherwise.
+
+    With arguments, return False if contracts can't or shouldn't be enabled,
+    otherwise weave ContractAspect with items passed as arguments.
+    """
+    if not ENABLE_DBC:
+        return False
+    try:
+        from logilab.aspects.weaver import weaver
+        from logilab.aspects.lib.contracts import ContractAspect
+    except ImportError:
+        sys.stderr.write('Warning: logilab.aspects is not available. Contracts disabled.')
+        return False
+    for arg in args:
+        weaver.weave_module(arg, ContractAspect)
+    return True
+
+    
