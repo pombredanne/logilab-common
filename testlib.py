@@ -1,7 +1,5 @@
-
 # modified copy of some functions from test/regrtest.py from PyXml
-
-""" Copyright (c) 2003-2005 LOGILAB S.A. (Paris, FRANCE).
+"""Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
 http://www.logilab.fr/ -- mailto:contact@logilab.fr  
 
 Run tests.
@@ -24,8 +22,6 @@ If no non-option arguments are present, prefixes used are 'test',
 
 """
 from __future__ import nested_scopes
-
-__revision__ = "$Id: testlib.py,v 1.47 2006-04-19 10:26:15 adim Exp $"
 
 import sys
 import os, os.path as osp
@@ -56,7 +52,7 @@ __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
                     'func', 'validation')
 
-def main(testdir=os.getcwd()):
+def main(testdir=None):
     """Execute a test suite.
 
     This also parses command-line options and modifies its behaviour
@@ -76,43 +72,37 @@ def main(testdir=os.getcwd()):
     """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'vqx:t:pc')
+        opts, args = getopt.getopt(sys.argv[1:], 'hvqx:t:pc')
     except getopt.error, msg:
         print msg
         print __doc__
         return 2
     verbose = 0
-    quiet = 0
-    profile = 0
+    quiet = False
+    profile = False
     exclude = []
     capture = False
     for o, a in opts:
         if o == '-v':
-            verbose = verbose+1
+            verbose += 1
         elif o == '-q':
-            quiet = 1
+            quiet = True
             verbose = 0
         elif o == '-x':
             exclude.append(a)
         elif o == '-t':
             testdir = a
         elif o == '-p':
-            profile = 1
+            profile = True
         elif o == '-c':
             capture = True
         elif o == '-h':
             print __doc__
             sys.exit(0)
-            
-    for i in range(len(args)):
-        # Strip trailing ".py" from arguments
-        if args[i][-3:] == '.py':
-            args[i] = args[i][:-3]
-    if exclude:
-        for i in range(len(exclude)):
-            # Strip trailing ".py" from arguments
-            if exclude[i][-3:] == '.py':
-                exclude[i] = exclude[i][:-3]
+
+    args = [item.rstrip('.py') for item in args]
+    exclude = [item.rstrip('.py') for item in exclude]
+
     tests = find_tests(testdir, args or DEFAULT_PREFIXES, excludes=exclude)
     sys.path.insert(0, testdir)
     # Tell tests to be moderately quiet
@@ -202,17 +192,17 @@ def run_tests(tests, quiet, verbose, runner=None, capture=False):
 def find_tests(testdir,
                prefixes=DEFAULT_PREFIXES, suffix=".py",
                excludes=(),
-               remove_suffix=1):
+               remove_suffix=True):
     """
     Return a list of all applicable test modules.
     """
     tests = []
     for name in os.listdir(testdir):
-        if not suffix or name[-len(suffix):] == suffix:
+        if not suffix or name.endswith(suffix):
             for prefix in prefixes:
-                if name[:len(prefix)] == prefix:
+                if name.startswith(prefix):
                     if remove_suffix:
-                        name = name[:-len(suffix)]
+                        name = name.rstrip(suffix)
                     if name not in excludes:
                         tests.append(name)
     tests.sort()
