@@ -16,25 +16,21 @@
 
 """date manipulation helper functions"""
 
+from mx.DateTime import RelativeDateTime
+
+endOfMonth = RelativeDateTime(months=1,day=-1)
 
 def date_range(begin, end, step=1):
     """
     enumerate dates between begin and end dates.
 
     step can either be oneDay, oneHour, oneMinute, oneSecond, oneWeek
-    use RelativeDateTime(months=1,day=-1) to enumerate months
+    use endOfMonth to enumerate months
     """
     date = begin
     while date < end :
         yield date
         date += step
-
-# def enum_months(begin, end, day=1):
-#     klass = type(begin)
-#     date = begin
-#     while date < end:
-#         yield date
-#         date = RelativeDateTime(months=+1)
 
 FRENCH_FIXED_HOLIDAYS = {
     'jour_an'        : '%s-01-01',
