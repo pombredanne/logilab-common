@@ -2,7 +2,10 @@ ChangeLog for logilab.common
 ============================
 
  --
-
+   * new "date" otion type in optik_ext
+   * new clcommands module to handle commands based command line tool 
+     (based on the configuration module)
+   * new AttrObject in testlib to create objects in test with arbitrary attributes
    * add pytest to run project's tests and get rid of all runtests.py
    * add pytest option to enable design-by-contract using aspects
 	

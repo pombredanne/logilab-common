@@ -1,7 +1,7 @@
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -49,6 +49,8 @@ except ImportError:
         from optik import NO_DEFAULT
     except:
         NO_DEFAULT = []
+
+from mx import DateTime
 
 OPTPARSE_FORMAT_DEFAULT = sys.version_info >= (2, 4)
 
@@ -121,6 +123,16 @@ def check_file(option, opt, value):
     msg = "option %s: file %r does not exist"
     raise OptionValueError(msg % (opt, value))
 
+def check_date(option, opt, value):
+    """check a file value
+    return the filepath
+    """
+    try:
+        return DateTime.strptime(value, "%Y/%m/%d")
+    except DateTime.Error :
+        raise OptionValueError(
+            "expected format of %s is yyyy/mm/dd" % opt)
+
 def check_color(option, opt, value):
     """check a color value and returns it
     /!\ does *not* check color labels (like 'red', 'green'), only
@@ -142,17 +154,18 @@ import types
 class Option(BaseOption):
     """override optik.Option to add some new option types
     """
-    TYPES = BaseOption.TYPES + ("regexp", "csv", 'yn', 'named', "password",
-                                "multiple_choice", "file", "font", "color")
+    TYPES = BaseOption.TYPES + ('regexp', 'csv', 'yn', 'date', 'named', 'password',
+                                'multiple_choice', 'file', 'font', 'color')
     TYPE_CHECKER = copy(BaseOption.TYPE_CHECKER)
-    TYPE_CHECKER["regexp"] = check_regexp
-    TYPE_CHECKER["csv"] = check_csv
-    TYPE_CHECKER["yn"] = check_yn
-    TYPE_CHECKER["named"] = check_named
-    TYPE_CHECKER["multiple_choice"] = check_csv
-    TYPE_CHECKER["file"] = check_file
-    TYPE_CHECKER["color"] = check_color
-    TYPE_CHECKER["password"] = check_password
+    TYPE_CHECKER['regexp'] = check_regexp
+    TYPE_CHECKER['csv'] = check_csv
+    TYPE_CHECKER['yn'] = check_yn
+    TYPE_CHECKER['named'] = check_named
+    TYPE_CHECKER['multiple_choice'] = check_csv
+    TYPE_CHECKER['file'] = check_file
+    TYPE_CHECKER['color'] = check_color
+    TYPE_CHECKER['password'] = check_password
+    TYPE_CHECKER['date'] = check_date
 
     def _check_choice(self):
         """FIXME: need to override this due to optik misdesign"""

@@ -40,7 +40,9 @@ class Command(Configuration):
     """base class for command line commands"""
     arguments = ''
     name = ''
-    
+    # max/min args, None meaning unspecified
+    min_args = None
+    max_args = None
     def __init__(self, __doc__=None, version=None):
         if __doc__:
             usage = __doc__ % (self.name, self.arguments,
@@ -48,6 +50,13 @@ class Command(Configuration):
         else:
             usage = self.__doc__.replace('    ', '')
         Configuration.__init__(self, usage=usage, version=version)
+
+    def check_args(self, args):
+        """check command's arguments are provided"""
+        if self.min_args is not None and len(args) < self.min_args:
+            raise BadCommandUsage('missing argument')
+        if self.max_args is not None and len(args) > self.max_args:
+            raise BadCommandUsage('too many arguments')
         
     def run(self, args):
         """run the command with its specific arguments"""
@@ -96,6 +105,7 @@ def cmd_run(cmdname, *args):
     except KeyError:
         raise BadCommandUsage('no %s command' % cmdname)
     args = command.load_command_line_configuration(args)
+    command.check_args(args)
     try:
         command.run(args)
     except KeyboardInterrupt:

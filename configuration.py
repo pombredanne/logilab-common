@@ -88,7 +88,7 @@ from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 
 from logilab.common.textutils import normalize_text, unquote
 from logilab.common.optik_ext import OptionParser, OptionGroup, Values, \
-     OptionValueError, OptionError, HelpFormatter, generate_manpage, \
+     OptionValueError, OptionError, HelpFormatter, generate_manpage, check_date, \
      check_yn, check_csv, check_file, check_color, check_named, check_password,\
      NO_DEFAULT, OPTPARSE_FORMAT_DEFAULT
 
@@ -138,11 +138,15 @@ def file_validator(opt_dict, name, value):
     return check_file(None, name, value)
 
 def color_validator(opt_dict, name, value):
-    """validate and return a filepath for option of type 'file'"""
+    """validate and return a valid color for option of type 'color'"""
     return check_color(None, name, value)
 
 def password_validator(opt_dict, name, value):
-    """validate and return a filepath for option of type 'file'"""
+    """validate and return a string for option of type 'password'"""
+    return check_password(None, name, value)
+
+def date_validator(opt_dict, name, value):
+    """validate and return a mx DateTime object for option of type 'date'"""
     return check_password(None, name, value)
 
 
@@ -158,6 +162,7 @@ VALIDATORS = {'string' : unquote,
               'bool': yn_validator,
               'named': named_validator,
               'password': password_validator,
+              'date': date_validator,
               'choice': choice_validator,
               'multiple_choice': multiple_choice_validator,
               }
