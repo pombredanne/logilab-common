@@ -352,7 +352,7 @@ class OptionsManagerMixIn(object):
             goptions = [option for option in provider.options
                         if option[1].get('group') == gname]
             self.add_option_group(gname, gdoc, goptions, provider)
-                    
+        
     def add_option_group(self, group_name, doc, options, provider):
         """add an option group including the listed options
         """
@@ -716,6 +716,15 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
                     self.option_groups.append(gdef)
         self.register_options_provider(self, own_group=0)
 
+    def register_options(self, options):
+        """add some options to the configuration"""
+        options_by_group = {}
+        for optname, optdict in options:
+            options_by_group.setdefault(optdict['group'], []).append((optname, optdict))
+        for group, options in options_by_group.items():
+            self.add_option_group(group, None, options, self)
+        self.options += tuple(options)
+        
     def load_defaults(self):
         OptionsProviderMixIn.load_defaults(self)
 
