@@ -1063,6 +1063,6 @@ def enable_dbc(*args):
     return True
 
     
-class AttrObject:
+class AttrObject: # XXX cf mock_object
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
