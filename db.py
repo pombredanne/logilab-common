@@ -285,10 +285,15 @@ class _PySqlite2Adapter(DBAPIAdapter):
         sqlite.register_converter('bytea', convert_bytea)
 
         def convert_boolean(ustr):
-            if ustr.lower() == 'false':
+            if ustr.upper() in ('F', 'FALSE'):
                 return False
             return True
         sqlite.register_converter('boolean', convert_boolean)
+
+        def adapt_boolean(bval):
+            return str(bval).upper()
+        sqlite.register_adapter(bool, adapt_boolean)
+        
         # import pysqlite2.dbapi2 as sqlite
         sqlite._mx_initialized = 1
 
