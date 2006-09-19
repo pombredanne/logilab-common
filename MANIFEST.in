@@ -3,5 +3,5 @@ include README
 include COPYING
 include DEPENDS
 include bin/pytest
-recursive-include test/data *.py *.txt
+recursive-include test/data *.py *.txt *.msg
 recursive-include doc/html *
