@@ -639,6 +639,12 @@ class OptionsProviderMixIn:
             value = convert(value, opt_dict, opt_name)
         if action is None:
             action = opt_dict.get('action', 'store')
+        if opt_dict.get('type') == 'named': # XXX need specific handling
+            optname = self.option_name(opt_name, opt_dict)
+            currentvalue = getattr(self.config, optname, None)
+            if currentvalue:
+                currentvalue.update(value)
+                value = currentvalue
         if action == 'store':
             setattr(self.config, self.option_name(opt_name, opt_dict), value)
         elif action in ('store_true', 'count'):

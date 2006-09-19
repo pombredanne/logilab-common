@@ -186,6 +186,21 @@ class Option(BaseOption):
                 "must not supply choices for type %r" % self.type, self)
     BaseOption.CHECK_METHODS[2] = _check_choice
 
+
+    def process(self, opt, value, values, parser):
+        # First, convert the value(s) to the right type.  Howl if any
+        # value(s) are bogus.
+        value = self.convert_value(opt, value)
+        if self.type == 'named': 
+            existant = getattr(values, self.dest)
+            if existant:
+                existant.update(value)
+                value = existant
+       # And then take whatever action is expected of us.
+        # This is a separate method to make life easier for
+        # subclasses to add new actions.
+        return self.take_action(
+            self.action, self.dest, opt, value, values, parser)
     
 class OptionParser(BaseParser):
     """override optik.OptionParser to use our Option class
