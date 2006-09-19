@@ -2,8 +2,13 @@ ChangeLog for logilab.common
 ============================
 
  --
-   * db: fixed bug when querying boolean on sqlite using python's bool type
-
+   * db: 
+     - fixed bug when querying boolean on sqlite using python's bool type
+     - added "drop_on_commit" argument to create_temporary_table on db helper
+     - added missing implementation of executemany on pysqlite2 wrapper to 
+       support pyargs correctly like execute
+   * optik_ext: fixed "named" type option to support csv values and to return 
+     a dictionary
 	
 2006-09-05  --  0.19.0
    * new umessage module which provides a class similar to the standard

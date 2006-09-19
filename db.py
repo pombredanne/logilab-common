@@ -313,6 +313,10 @@ class _PySqlite2Adapter(DBAPIAdapter):
                 else:
                     self.__class__.__bases__[0].execute(self, sql)
                     
+            def executemany(self, sql, kwargss):
+                sql = re.sub(r'%\(([^\)]+)\)s', r':\1', sql)
+                self.__class__.__bases__[0].executemany(self, sql, kwargss)
+                    
         class PySqlite2CnxWrapper:
             def __init__(self, cnx):
                 self._cnx = cnx
@@ -402,9 +406,10 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
         return ('UPDATE %s SET last=last+1;' % seq_name,
                 'SELECT last FROM %s;' % seq_name)
 
-    def sql_temporary_table(self, table_name, table_schema):
+    def sql_temporary_table(self, table_name, table_schema,
+                            drop_on_commit=True):
         return "CREATE TEMPORARY TABLE %s (%s);" % (table_name,
-                                                                   table_schema)
+                                                    table_schema)
     
     def increment_sequence(self, cursor, seq_name):
         for sql in self.sqls_increment_sequence(seq_name):
@@ -429,9 +434,13 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
     def sqls_increment_sequence(self, seq_name):
         return ("SELECT nextval('%s');" % seq_name,)
     
-    def sql_temporary_table(self, table_name, table_schema):
+    def sql_temporary_table(self, table_name, table_schema,
+                            drop_on_commit=True):
+        if not drop_on_commit:
+            return "CREATE TEMPORARY TABLE %s (%s);" % (table_name,
+                                                        table_schema)    
         return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
-                                                                   table_schema)    
+                                                                   table_schema)
     def sql_current_date(self):
         return "'TODAY'"
     

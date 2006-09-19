@@ -1,6 +1,7 @@
 import tempfile
 import os
 from cStringIO import StringIO
+from sys import version_info
 
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.configuration import Configuration, OptionValueError, \
@@ -150,7 +151,24 @@ multiple-choice=yo,ye
         # it is not unlikely some optik/optparse versions do print -v<string>
         # so accept both
         help = help.replace(' -v <string>, ', ' -v<string>, ')
-        self.assertLinesEquals(help, """usage: Just do it ! (tm)
+        if version_info >= (2, 4):
+            self.assertLinesEquals(help, """usage: Just do it ! (tm)
+
+options:
+  -h, --help            show this help message and exit
+  --dothis=<y or n>     
+  -v<string>, --value=<string>
+  --multiple=<comma separated values>
+                        you can also document the option [current: none]
+  --number=<int>        
+  --choice=<yo|ye>      
+  --multiple-choice=<yo|ye>
+
+  Bonus:
+    a nice additional help
+""".strip())
+        else:
+            self.assertLinesEquals(help, """usage: Just do it ! (tm)
 
 options:
   -h, --help            show this help message and exit

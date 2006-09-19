@@ -78,7 +78,7 @@ def check_csv(option, opt, value):
         return get_csv(value)
     except ValueError:
         raise OptionValueError(
-            "option %s: invalid regexp value: %r" % (opt, value))
+            "option %s: invalid csv value: %r" % (opt, value))
 
 def check_yn(option, opt, value):
     """check a yn value
@@ -95,14 +95,18 @@ def check_yn(option, opt, value):
 
 def check_named(option, opt, value):
     """check a named value
-    return a 2-uple (name, value)
+    return a dictionnary containing (name, value) associations
     """
-    if isinstance(value, (list, tuple)) and len(value) % 2 == 0:
+    if isinstance(value, dict):
         return value
-    if value.find('=') != -1:
-        return value.split('=', 1)
-    if value.find(':') != -1:
-        return value.split(':', 1)
+    values = []
+    for value in check_csv(option, opt, value):
+        if value.find('=') != -1:
+            values.append(value.split('=', 1))
+        elif value.find(':') != -1:
+            values.append(value.split(':', 1))
+    if values:
+        return dict(values)
     msg = "option %s: invalid named value %r, should be <NAME>=<VALUE> or \
 <NAME>:<VALUE>"
     raise OptionValueError(msg % (opt, value))
