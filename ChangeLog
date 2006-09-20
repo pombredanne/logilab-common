@@ -4,6 +4,7 @@ ChangeLog for logilab.common
  --
    * db: 
      - fixed bug when querying boolean on sqlite using python's bool type
+     - fixed time handling and added an adapter for DateTimeDeltaType
      - added "drop_on_commit" argument to create_temporary_table on db helper
      - added missing implementation of executemany on pysqlite2 wrapper to 
        support pyargs correctly like execute

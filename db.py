@@ -252,27 +252,31 @@ class _PySqlite2Adapter(DBAPIAdapter):
         if hasattr(sqlite, '_mx_initialized'):
             return
 
-        from mx.DateTime import DateTimeType, strptime
+        from mx.DateTime import DateTimeType, DateTimeDeltaType, strptime
         from StringIO import StringIO
 
         def adapt_mxdatetime(mxd):
-            return mxd.strftime('%F %H:%M:%S')
+            return mxd.strftime('%Y-%m-%d %H:%M:%S')
         sqlite.register_adapter(DateTimeType, adapt_mxdatetime)
 
+        def adapt_mxdatetimedelta(mxd):
+            return mxd.strftime('%H:%M:%S')
+        sqlite.register_adapter(DateTimeDeltaType, adapt_mxdatetimedelta)
+
         def convert_mxdate(ustr):
-            return strptime(ustr, '%F %H:%M:%S')
+            return strptime(ustr, '%Y-%m-%d %H:%M:%S')
         sqlite.register_converter('date', convert_mxdate)
 
         def convert_mxdatetime(ustr):
-            try:
-                return strptime(ustr, '%F %H:%M:%S')
-            except Exception, ex:
-                print ex, ustr
-                return ustr
+            return strptime(ustr, '%Y-%m-%d %H:%M:%S')
         sqlite.register_converter('timestamp', convert_mxdatetime)
 
         def convert_mxtime(ustr):
-            return strptime(ustr, '%H:%M')
+            try:
+                return strptime(ustr, '%H:%M:%S')
+            except:
+                # DateTime used as Time?
+                return strptime(ustr, '%Y-%m-%d %H:%M:%S')
         sqlite.register_converter('time', convert_mxtime)
         
 
