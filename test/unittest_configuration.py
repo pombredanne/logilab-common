@@ -184,6 +184,7 @@ options:
   --number=<int>        
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>
+  --named=<key=val>     
 
   Bonus:
     a nice additional help
