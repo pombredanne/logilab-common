@@ -73,7 +73,6 @@ config.generate_config()
 
 from __future__ import generators 
 
-__revision__ = "$Id: configuration.py,v 1.40 2005-11-22 13:13:00 syt Exp $"
 __docformat__ = "restructuredtext en"
 __all__ = ('OptionsManagerMixIn', 'OptionsProviderMixIn',
            'ConfigurationMixIn', 'Configuration',

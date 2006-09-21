@@ -73,6 +73,8 @@ class GetByExtTC(TestCase):
                             [join('data', f) for f in ['foo.txt',
                                                        'newlines.txt',
                                                        'normal_file.txt',
+                                                       'test1.msg',
+                                                       'test2.msg',
                                                        'spam.txt',
                                                        join('sub', 'doc.txt'),
                                                        'write_protected_file.txt',

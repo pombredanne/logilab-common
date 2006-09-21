@@ -190,7 +190,10 @@ class Option(BaseOption):
     def process(self, opt, value, values, parser):
         # First, convert the value(s) to the right type.  Howl if any
         # value(s) are bogus.
-        value = self.convert_value(opt, value)
+        try:
+            value = self.convert_value(opt, value)
+        except AttributeError: # py < 2.4
+            value = self.check_value(opt, value)
         if self.type == 'named': 
             existant = getattr(values, self.dest)
             if existant:

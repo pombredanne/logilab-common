@@ -5,7 +5,7 @@ from sys import version_info
 
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.configuration import Configuration, OptionValueError, \
-     OptionsManagerMixIn, OptionsProviderMixIn
+     OptionsManagerMixIn, OptionsProviderMixIn, Method
 
 options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),
            ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
@@ -18,12 +18,19 @@ options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),
            ('multiple-choice', {'type': 'multiple_choice', 'default':('yo', 'ye'),
                                 'choices': ('yo', 'ye', 'yu', 'yi', 'ya'),
                                 'metavar':'<yo|ye>'}),
+           ('named', {'type':'named', 'default':Method('get_named'),
+                      'metavar': '<key=val>'}),
            ]
 
+class MyConfiguration(Configuration):
+    """test configuration"""
+    def get_named(self):
+        return {'key': 'val'}
+    
 class ConfigurationTC(TestCase):
     
     def setUp(self):
-        self.cfg = Configuration(name='test', options=options, usage='Just do it ! (tm)')
+        self.cfg = MyConfiguration(name='test', options=options, usage='Just do it ! (tm)')
 
     def test_default(self):
         cfg = self.cfg
@@ -33,6 +40,7 @@ class ConfigurationTC(TestCase):
         self.assertEquals(cfg['number'], 2)
         self.assertEquals(cfg['choice'], 'yo')
         self.assertEquals(cfg['multiple-choice'], ('yo', 'ye'))
+        self.assertEquals(cfg['named'], {'key': 'val'})
 
     def test_base(self):
         cfg = self.cfg
@@ -80,11 +88,7 @@ class ConfigurationTC(TestCase):
     def test_generate_config(self):
         stream = StringIO()
         self.cfg.generate_config(stream)
-        self.assertLinesEquals(stream.getvalue().strip(), """# class for simple configurations which don't need the
-# manager / providers model and prefer delegation to inheritance
-# 
-# configuration values are accessible through a dict like interface
-# 
+        self.assertLinesEquals(stream.getvalue().strip(), """# test configuration
 [TEST]
 
 dothis=yes
@@ -97,17 +101,15 @@ number=2
 choice=yo
 
 multiple-choice=yo,ye
+
+named=key:val
 """)
         
     def test_generate_config_with_space_string(self):
         self.cfg['value'] = '    '
         stream = StringIO()
         self.cfg.generate_config(stream)
-        self.assertLinesEquals(stream.getvalue().strip(), """# class for simple configurations which don't need the
-# manager / providers model and prefer delegation to inheritance
-# 
-# configuration values are accessible through a dict like interface
-# 
+        self.assertLinesEquals(stream.getvalue().strip(), """# test configuration
 [TEST]
 
 dothis=yes
@@ -122,6 +124,8 @@ number=2
 choice=yo
 
 multiple-choice=yo,ye
+
+named=key:val
 """)
         
 
@@ -132,7 +136,7 @@ multiple-choice=yo,ye
         try:
             cfg.generate_config(stream)
             stream.close()
-            new_cfg = Configuration(name='testloop', options=options)
+            new_cfg = MyConfiguration(name='testloop', options=options)
             new_cfg.load_file_configuration(f)
             self.assertEquals(cfg['dothis'], new_cfg['dothis'])
             self.assertEquals(cfg['multiple'], new_cfg['multiple'])
@@ -163,6 +167,7 @@ options:
   --number=<int>        
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>
+  --named=<key=val>     
 
   Bonus:
     a nice additional help
@@ -179,6 +184,7 @@ options:
   --number=<int>        
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>
+  --named=<key=val>     
 
   Bonus:
     a nice additional help
