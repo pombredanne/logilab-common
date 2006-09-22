@@ -15,10 +15,8 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 """logilab.common packaging information"""
 
-__revision__ = "$Id: __pkginfo__.py,v 1.58 2006-04-25 12:08:52 syt Exp $"
-
 modname = 'common'
-numversion = (0, 19, 0)
+numversion = (0, 19, 1)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
