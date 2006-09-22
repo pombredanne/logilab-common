@@ -1,38 +1,37 @@
 ChangeLog for logilab.common
 ============================
 
- --
-   * db: 
+2006-09-22  --  0.19.1
+    * db:
      - fixed bug when querying boolean on sqlite using python's bool type
      - fixed time handling and added an adapter for DateTimeDeltaType
      - added "drop_on_commit" argument to create_temporary_table on db helper
      - added missing implementation of executemany on pysqlite2 wrapper to 
        support pyargs correctly like execute
-   * optik_ext: fixed "named" type option to support csv values and to return 
+    * optik_ext: fixed "named" type option to support csv values and to return
      a dictionary
 	
 2006-09-05  --  0.19.0
-   * new umessage module which provides a class similar to the standard
+    * new umessage module which provides a class similar to the standard
      email.Message class but returning unicode strings
-   * new clcommands module to handle commands based command line tool 
+    * new clcommands module to handle commands based command line tool
      (based on the configuration module)
-   * new "date" otion type in optik_ext
-   * new AttrObject in testlib to create objects in test with arbitrary attributes
-   * add pytest to run project's tests and get rid of all runtests.py
-   * add pytest option to enable design-by-contract using aspects
-   * some enhancements to the configuration module
+    * new "date" otion type in optik_ext
+    * new AttrObject in testlib to create objects in test with arbitrary attributes
+    * add pytest to run project's tests and get rid of all runtests.py
+    * add pytest option to enable design-by-contract using aspects
+    * some enhancements to the configuration module
 	
 2006-08-09  --  0.18.0
-
-   * added -c / --capture option to testlib.unittest_main
-   * fixed bugs in lgc.configuration
-   * optparser: added a OptionParser that extends optparse's with commands
+    * added -c / --capture option to testlib.unittest_main
+    * fixed bugs in lgc.configuration
+    * optparser: added a OptionParser that extends optparse's with commands
 
 2006-07-13  --  0.17.0
-   * python2.5 compatibility (testlib.py + compat.py)
-   * testlib.assertListEquals return all errors at once
-   * new "password" option type in optik_ext
-   * configuration: refactored to support interactive input of a configuration
+    * python2.5 compatibility (testlib.py + compat.py)
+    * testlib.assertListEquals return all errors at once
+    * new "password" option type in optik_ext
+    * configuration: refactored to support interactive input of a configuration
 	
 
 2006-06-08  --  0.16.1
