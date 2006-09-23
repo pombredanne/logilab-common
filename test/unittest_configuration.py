@@ -155,7 +155,24 @@ named=key:val
         # it is not unlikely some optik/optparse versions do print -v<string>
         # so accept both
         help = help.replace(' -v <string>, ', ' -v<string>, ')
-        if version_info >= (2, 4):
+        if version_info >= (2, 5):
+            self.assertLinesEquals(help, """Usage: Just do it ! (tm)
+
+Options:
+  -h, --help            show this help message and exit
+  --dothis=<y or n>     
+  -v<string>, --value=<string>
+  --multiple=<comma separated values>
+                        you can also document the option [current: none]
+  --number=<int>        
+  --choice=<yo|ye>      
+  --multiple-choice=<yo|ye>
+  --named=<key=val>     
+
+  Bonus:
+    a nice additional help
+""".strip())
+        elif version_info >= (2, 4):
             self.assertLinesEquals(help, """usage: Just do it ! (tm)
 
 options:
