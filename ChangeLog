@@ -1,6 +1,12 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * testlib: fixed a bug in find_test making it returns some bad test names
+    * optik_ext: make it works if mx.DateTime is not installed, in which case
+      the date type option won't be available
+    * test fixes
+
 2006-09-22  --  0.19.1
     * db:
      - fixed bug when querying boolean on sqlite using python's bool type
