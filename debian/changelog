@@ -1,8 +1,11 @@
-logilab-common (0.19.1-1) unstable; urgency=low
+logilab-common (0.19.1-1) unstable; urgency=medium
 
-  * new upstream release
+  * New upstream release
+  * Added conflict with packages previously built by logilab-common and
+    available in Stable. (closes: #388322)
+  * Urgency set to medium because it closes an RC bug
 
- -- Sylvain Thénault <sylvain.thenault@logilab.fr>  Fri, 22 Sep 2006 11:13:41 +0200
+ -- Alexandre Fayolle <afayolle@debian.org>  Fri, 22 Sep 2006 13:57:44 +0200
 
 logilab-common (0.19.0-3) unstable; urgency=medium
 
