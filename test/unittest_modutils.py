@@ -17,8 +17,6 @@
 unit tests for module modutils (module manipulation utilities)
 """
 
-__revision__ = "$Id: unittest_modutils.py,v 1.26 2006-02-16 10:58:40 ludal Exp $"
-
 import sys
 try:
     __file__
@@ -187,14 +185,15 @@ class get_modules_files_tc(TestCase):
                          [path.join('data', x) for x in ['__init__.py', 'module.py', 'module2.py', 'noendingnewline.py', 'nonregr.py']])
 
     def test_load_module_set_attribute(self):
-        import logilab.common
+        import logilab.common.fileutils
         import logilab
-        del logilab.common
-        del sys.modules['logilab.common']
-        m = modutils.load_module_from_modpath(['logilab','common'])
-        self.assert_( hasattr(logilab,'common') )
-        self.assert_( m is logilab.common )
-
+        del logilab.common.fileutils
+        del sys.modules['logilab.common.fileutils']
+        m = modutils.load_module_from_modpath(['logilab','common', 'fileutils'])
+        self.assert_( hasattr(logilab, 'common') )
+        self.assert_( hasattr(logilab.common, 'fileutils') )
+        self.assert_( m is logilab.common.fileutils )
+        
 from logilab.common.testlib import DocTest
 class ModuleDocTest(DocTest):
     """test doc test in this module"""
