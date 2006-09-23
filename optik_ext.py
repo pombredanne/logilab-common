@@ -28,8 +28,6 @@ It also defines three new types for optik/optparse command line parser :
 
 """
 
-__revision__ = '$Id: optik_ext.py,v 1.16 2006-03-28 10:34:54 syt Exp $'
-    
 import re
 import sys
 import time
@@ -50,7 +48,12 @@ except ImportError:
     except:
         NO_DEFAULT = []
 
-from mx import DateTime
+try:
+    from mx import DateTime
+    HAS_MX_DATETIME = True
+except ImportError:
+    HAS_MX_DATETIME = False
+
 
 OPTPARSE_FORMAT_DEFAULT = sys.version_info >= (2, 4)
 
@@ -158,7 +161,7 @@ import types
 class Option(BaseOption):
     """override optik.Option to add some new option types
     """
-    TYPES = BaseOption.TYPES + ('regexp', 'csv', 'yn', 'date', 'named', 'password',
+    TYPES = BaseOption.TYPES + ('regexp', 'csv', 'yn', 'named', 'password',
                                 'multiple_choice', 'file', 'font', 'color')
     TYPE_CHECKER = copy(BaseOption.TYPE_CHECKER)
     TYPE_CHECKER['regexp'] = check_regexp
@@ -169,7 +172,9 @@ class Option(BaseOption):
     TYPE_CHECKER['file'] = check_file
     TYPE_CHECKER['color'] = check_color
     TYPE_CHECKER['password'] = check_password
-    TYPE_CHECKER['date'] = check_date
+    if HAS_MX_DATETIME:
+        TYPES += ('date',)
+        TYPE_CHECKER['date'] = check_date
 
     def _check_choice(self):
         """FIXME: need to override this due to optik misdesign"""
