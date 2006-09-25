@@ -904,6 +904,12 @@ class TestCase(unittest.TestCase):
     def assertFileEqual(self, fname1, fname2, junk=(' ', '\t')):
         """compares two files using difflib"""
         self.assertStreamEqual(file(fname1), file(fname2), junk)
+            
+    def assertIsInstance(self, obj, klass, msg=None):
+        """compares two files using difflib"""
+        if msg is None:
+            msg = '%s is not an instance of %s' % (obj, klass)
+        self.assert_(isinstance(obj, klass), msg)
 
 
 import doctest
