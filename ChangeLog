@@ -1,8 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
- --
-    * testlib: fixed a bug in find_test making it returns some bad test names
+2006-09-25  --  0.19.2
+    * testlib:
+      - fixed a bug in find_test making it returns some bad test names
+      - new assertIsInstance method on TestCase
     * optik_ext: make it works if mx.DateTime is not installed, in which case
       the date type option won't be available
     * test fixes
