@@ -598,6 +598,7 @@ class OptionsProviderMixIn:
                 raise Exception('Bad option: %r' % option)
             if isinstance(optdict.get('default'), Method):
                 optdict['default'].bind(self)
+        self.load_defaults()
                 
     def load_defaults(self):
         """initialize the provider using default values"""
@@ -767,7 +768,6 @@ class Configuration(ConfigurationMixIn):
         if doc is not None:
             self.__doc__ = doc
         super(Configuration, self).__init__(config_file=config_file, usage=usage, version=version)
-        self.load_defaults()
 
 
 class OptionsManager2ConfigurationAdapter:
