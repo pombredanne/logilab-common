@@ -34,11 +34,13 @@ ChangeLog for logilab.common
     * add pytest to run project's tests and get rid of all runtests.py
     * add pytest option to enable design-by-contract using aspects
     * some enhancements to the configuration module
-	
+
+
 2006-08-09  --  0.18.0
     * added -c / --capture option to testlib.unittest_main
     * fixed bugs in lgc.configuration
     * optparser: added a OptionParser that extends optparse's with commands
+
 
 2006-07-13  --  0.17.0
     * python2.5 compatibility (testlib.py + compat.py)

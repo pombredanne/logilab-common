@@ -10,15 +10,13 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-""" Copyright (c) 2000-2002 LOGILAB S.A. (Paris, FRANCE).
+""" Copyright (c) 2002-2006 LOGILAB S.A. (Paris, FRANCE).
  http://www.logilab.fr/ -- mailto:contact@logilab.fr
  
 Logilab common libraries
 """
 
 from __future__ import nested_scopes
-
-__revision__ = "$Id: __init__.py,v 1.30 2006-03-24 10:37:48 syt Exp $"
 
 # FIXME: move all those functions in a separated module
 

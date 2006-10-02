@@ -16,7 +16,7 @@
 """logilab.common packaging information"""
 
 modname = 'common'
-numversion = (0, 19, 2)
+numversion = (0, 19, 3)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
