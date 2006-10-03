@@ -272,15 +272,10 @@ def format_option_value(optdict, value):
 
 def ini_format_section(stream, section, options, doc=None):
     """format an options section using the INI format"""
-    section_printed = False
+    if doc:
+        print >> stream, comment(doc)
+    print >> stream, '[%s]' % section
     for optname, optdict, value in options:
-        if value is None:
-            continue
-        if not section_printed:
-            if doc:
-                print >> stream, comment(doc)
-            print >> stream, '[%s]' % section
-            section_printed = True
         value = format_option_value(optdict, value)
         help = optdict.get('help')
         if help:
@@ -288,7 +283,10 @@ def ini_format_section(stream, section, options, doc=None):
             print >> stream, normalize_text(help, line_len=79, indent='# ')
         else:
             print >> stream
-        print >> stream, '%s=%s' % (optname, str(value).strip())
+        if value is None:
+            print >> stream, '#%s=' % optname
+        else:
+            print >> stream, '%s=%s' % (optname, str(value).strip())
         
 format_section = ini_format_section
 
@@ -410,7 +408,7 @@ class OptionsManagerMixIn(object):
         """set option on the correct option provider"""
         self._all_options[opt_name].set_option(opt_name, value)
 
-    def generate_config(self, stream=None):
+    def generate_config(self, stream=None, skipsections=()):
         """write a configuration file according to the current configuration
         into the given stream or stdout
         """
@@ -420,8 +418,12 @@ class OptionsManagerMixIn(object):
             default_options = []
             sections = {}
             for section, options in provider.options_by_section():
+                if section in skipsections:
+                    continue
                 options = [(n, d, v) for (n, d, v) in options
-                           if d.get('type') is not None and v is not None]
+                           if d.get('type') is not None]
+                if not options:
+                    continue
                 if section is None:
                     section = provider.name
                     doc = provider.__doc__

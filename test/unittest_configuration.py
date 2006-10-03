@@ -93,6 +93,8 @@ class ConfigurationTC(TestCase):
 
 dothis=yes
 
+#value=
+
 # you can also document the option
 multiple=yop
 

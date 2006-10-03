@@ -5,6 +5,8 @@ ChangeLog for logilab.common
     * fixed bug in textutils.normalise_[text|paragraph] with unsplitable
       word larger than the maximum line size
     * added pytest.bat for windows installation
+    * changed configuration.generate_config to include None values into the
+      generated file
 
 2006-09-25  --  0.19.2
     * testlib:
