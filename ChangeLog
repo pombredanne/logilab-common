@@ -1,5 +1,10 @@
 ChangeLog for logilab.common
 ============================
+	
+  --
+    * fixed date handling in db.py
+    * new implementation of pytest
+
 
 2006-10-06  --  0.19.3
     * fixed bug in textutils.normalise_[text|paragraph] with unsplitable
