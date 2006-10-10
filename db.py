@@ -445,9 +445,6 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
                                                         table_schema)    
         return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
                                                                    table_schema)
-    def sql_current_date(self):
-        return "'TODAY'"
-    
 
 class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     """Generic helper, trying to provide generic way to implement
@@ -466,16 +463,6 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
         """return True if the DBMS support groups"""
         return False
     
-    # XXX according to current sql documentation, standard sql functions
-    # CURRENT_* are now supported
-    def sql_current_date(self):
-        return "DATE('now')"
-    
-    def sql_current_time(self):
-        return "TIME('now')"
-    
-    def sql_current_timestamp(self):
-        return "DATETIME('now')"
     
 
 ## Drivers, Adapters and helpers registries ###################################
