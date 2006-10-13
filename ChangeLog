@@ -6,7 +6,7 @@ ChangeLog for logilab.common
     * new implementation of pytest
 
 
-2006-10-06  --  0.19.3
+2006-10-03  --  0.19.3
     * fixed bug in textutils.normalise_[text|paragraph] with unsplitable
       word larger than the maximum line size
     * added pytest.bat for windows installation
