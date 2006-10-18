@@ -100,7 +100,11 @@ class AbstractLogger:
                 plus = ''
             l.append('filename="%s" line_number="%s" function_name="%s"%s' %
                      (stackentry[0], stackentry[1], stackentry[2], plus))
-        l.append('%s: %s' % (e_type, value))
+        try:
+            l.append(str(e_type) + ': ' + value.__str__())
+        except UnicodeError:
+            l.append(str(e_type) + ' (message can\'t be displayed)')
+            
         self.log(priority, '\n'.join(l))
 
 
