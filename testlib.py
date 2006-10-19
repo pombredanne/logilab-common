@@ -75,7 +75,7 @@ def main(testdir=None, exitafter=True):
     """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvqx:t:pcd')
+        opts, args = getopt.getopt(sys.argv[1:], 'hvqx:t:pcd', ['help'])
     except getopt.error, msg:
         print msg
         print __doc__
@@ -102,7 +102,7 @@ def main(testdir=None, exitafter=True):
         elif o == '-d':
             global ENABLE_DBC
             ENABLE_DBC = True
-        elif o == '-h':
+        elif o in ('-h', '--help'):
             print __doc__
             sys.exit(0)
 
