@@ -578,7 +578,8 @@ class Method:
         
     def bind(self, instance):
         """bind the method to its instance"""
-        self._inst = instance
+        if self._inst is None:
+            self._inst = instance
         
     def __call__(self):
         assert self._inst, 'unbound method'
@@ -823,6 +824,8 @@ def read_old_config(newconfig, changes, configfile):
             oldname, newname = action[1:]
             changesindex.setdefault(newname, []).append((action[0], oldname))
             continue
+        if action[1] in ('added', 'removed'):
+            continue # nothing to do here
         raise Exception('unknown change %s' % action[0])    
     # build a config object able to read the old config
     options = []
@@ -837,7 +840,7 @@ def read_old_config(newconfig, changes, configfile):
         options.append((optname, optdef))
     if changesindex:
         raise Exception('unapplied changes: %s' % changesindex)
-    oldconfig = newconfig.__class__(options=options, name=newconfig.name)
+    oldconfig = Configuration(options=options, name=newconfig.name)
     # read the old config
     oldconfig.load_file_configuration(configfile)
     # apply values reverting changes
