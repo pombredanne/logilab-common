@@ -436,7 +436,7 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
     
     def backup_command(self, dbname, dbhost, dbuser, backupfile):
         """return a command to backup the given database"""
-        cmd = ['pg_dump -Fc -W']
+        cmd = ['pg_dump -Fc']
         if dbhost:
             cmd.append('--host=%s' % dbhost)
         if dbuser:
