@@ -313,11 +313,7 @@ class OptionsManagerMixIn(object):
     
     def __init__(self, usage, config_file=None, version=None, quiet=0):
         self.config_file = config_file
-        # configuration file parser
-        self._config_parser = ConfigParser()
-        # command line parser
-        self._optik_parser = OptionParser(usage=usage, version=version)
-        self._optik_parser.options_manager = self
+        self.reset_parsers(usage, version=None)
         # list of registered options providers
         self.options_providers = []
         # dictionary assocating option name to checker
@@ -326,6 +322,13 @@ class OptionsManagerMixIn(object):
         self._nocallback_options = {}
         # verbosity
         self.quiet = quiet
+
+    def reset_parsers(self, usage='', version=None):
+        # configuration file parser
+        self._config_parser = ConfigParser()
+        # command line parser
+        self._optik_parser = OptionParser(usage=usage, version=version)
+        self._optik_parser.options_manager = self
         
     def register_options_provider(self, provider, own_group=True):
         """register an options provider"""
@@ -730,7 +733,7 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
         """add some options to the configuration"""
         options_by_group = {}
         for optname, optdict in options:
-            options_by_group.setdefault(optdict['group'], []).append((optname, optdict))
+            options_by_group.setdefault(optdict.get('group', self.name.upper()), []).append((optname, optdict))
         for group, options in options_by_group.items():
             self.add_option_group(group, None, options, self)
         self.options += tuple(options)
@@ -798,4 +801,53 @@ class OptionsManager2ConfigurationAdapter:
             return getattr(provider.config, provider.option_name(key))
         except AttributeError:
             return default
+
+def read_old_config(newconfig, changes, configfile):
+    """possible changes:
+    * ('renamed', oldname, newname)
+    * ('moved', option, oldgroup, newgroup)
+    """
+    # build an index of changes
+    changesindex = {}
+    for action in changes:
+        if action[0] not in ('moved', 'renamed'):
+            raise Exception('unknown change %s' % action[0])
+        if action[0] == 'moved':
+            option, oldgroup, newgroup = action[1:]
+            changesindex.setdefault(option, []).append((action[0], oldgroup, newgroup))
+            continue
+        if action[0] == 'renamed':
+            oldname, newname = action[1:]
+            changesindex.setdefault(newname, []).append((action[0], oldname))
+            continue
+        raise Exception('unknown change %s' % action[0])    
+    # build a config object able to read the old config
+    options = []
+    for optname, optdef in newconfig.options:
+        for action in changesindex.pop(optname, ()):
+            if action[0] == 'moved':
+                oldgroup, newgroup = action[1:]
+                optdef = optdef.copy()
+                optdef['group'] = oldgroup
+            elif action[0] == 'renamed':
+                optname = action[1]
+        options.append((optname, optdef))
+    if changesindex:
+        raise Exception('unapplied changes: %s' % changesindex)
+    oldconfig = newconfig.__class__(options=options, name=newconfig.name)
+    # read the old config
+    oldconfig.load_file_configuration(configfile)
+    # apply values reverting changes
+    changes.reverse()
+    done = set()
+    for action in changes:
+        if action[0] == 'renamed':
+            oldname, newname = action[1:]
+            newconfig[newname] = oldconfig[oldname]
+            done.add(newname)
+            continue
+    for optname, optdef in newconfig.options:
+        if optname in done:
+            continue
+        newconfig.set_option(optname, oldconfig[optname], opt_dict=optdef)
 

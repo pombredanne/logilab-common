@@ -5,7 +5,7 @@ from sys import version_info
 
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.configuration import Configuration, OptionValueError, \
-     OptionsManagerMixIn, OptionsProviderMixIn, Method
+     OptionsManagerMixIn, OptionsProviderMixIn, Method, read_old_config
 
 options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),
            ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
@@ -214,7 +214,32 @@ options:
         from logilab.common import __pkginfo__
         self.cfg.generate_manpage(__pkginfo__, stream=StringIO())
 
+    def test_rewrite_config(self):
+        changes = [('renamed', 'renamed', 'choice'),
+                   ('moved', 'named', 'old', 'test'),
+                   ]
+        read_old_config(self.cfg, changes, 'data/test.ini')
+        stream = StringIO()
+        self.cfg.generate_config(stream)
+        self.assertLinesEquals(stream.getvalue().strip(), """# test configuration
+[TEST]
 
+dothis=yes
+
+value='    '
+
+# you can also document the option
+multiple=yop
+
+number=2
+
+choice=yo
+
+multiple-choice=yo,ye
+
+named=key:val
+""")
+        
 class Linter(OptionsManagerMixIn, OptionsProviderMixIn):
     options = (
         ('profile', {'type' : 'yn', 'metavar' : '<y_or_n>',

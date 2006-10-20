@@ -5,6 +5,7 @@ ChangeLog for logilab.common
     * db:
       - fixed date handling
       - new method on advanced helper to generate backup command
+    * configuration: basic deprecated config handling support
     * new implementation of pytest
 
 2006-10-03  --  0.19.3
