@@ -16,8 +16,6 @@
 """Helpers to get a DBAPI2 compliant database connection.
 """
 
-__revision__ = "$Id: db.py,v 1.35 2006-04-25 12:02:09 syt Exp $"
-
 import sys
 import re
 
@@ -367,7 +365,7 @@ class _MySqlDBAdapter(DBAPIAdapter):
         return self._native_module.connect(**kwargs)
 
 
-## Helpers for DBMS specific Advanced functionalities #########################
+## Helpers for DBMS specific advanced or non standard functionalities #########
 
 class _GenericAdvFuncHelper:
     """Generic helper, trying to provide generic way to implement
@@ -375,6 +373,7 @@ class _GenericAdvFuncHelper:
 
     An exception is raised when the functionality is not emulatable
     """
+    # DBMS resources descriptors and accessors
     
     def support_users(self):
         """return True if the DBMS support users (this is usually
@@ -388,8 +387,14 @@ class _GenericAdvFuncHelper:
 
     def system_database(self):
         """return the system database for the given driver"""
-        raise Exception('not supported by this DBMS')
+        raise NotImplementedError('not supported by this DBMS')
+    
+    def backup_command(self, dbname, dbhost, dbuser, dbpassword, backupfile):
+        """return a command to backup the given database"""
+        raise NotImplementedError('not supported by this DBMS')
 
+    # helpers to standardize SQL according to the database
+    
     def sql_current_date(self):
         return 'CURRENT_DATE'
     
@@ -428,6 +433,17 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
     def system_database(self):
         """return the system database for the given driver"""
         return 'template1'
+    
+    def backup_command(self, dbname, dbhost, dbuser, backupfile):
+        """return a command to backup the given database"""
+        cmd = ['pg_dump -Fc -W']
+        if dbhost:
+            cmd.append('--host=%s' % dbhost)
+        if dbuser:
+            cmd.append('--username=%s' % dbuser)
+        cmd.append('--file=%s' % backupfile)
+        cmd.append(dbname)
+        return ' '.join(cmd)
 
     def sql_create_sequence(self, seq_name):
         return 'CREATE SEQUENCE %s;' % seq_name
