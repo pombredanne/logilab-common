@@ -802,8 +802,11 @@ class OptionsManager2ConfigurationAdapter:
         except AttributeError:
             return default
 
+
 def read_old_config(newconfig, changes, configfile):
-    """possible changes:
+    """initialize newconfig from a deprecated configuration file
+    
+    possible changes:
     * ('renamed', oldname, newname)
     * ('moved', option, oldgroup, newgroup)
     """
@@ -851,3 +854,17 @@ def read_old_config(newconfig, changes, configfile):
             continue
         newconfig.set_option(optname, oldconfig[optname], opt_dict=optdef)
 
+
+def merge_options(options):
+    """preprocess options to remove duplicate"""
+    alloptions = {}
+    options = list(options)
+    for i in range(len(options)-1, -1, -1):
+        optname, optdict = options[i]
+        if optname in alloptions:
+            options.pop(alloptions[optname][1])
+            alloptions[optname][0].update(optdict)
+            alloptions[optname][1] = i
+        else:
+            alloptions[optname] = [optdict, i]
+    return tuple(options)
