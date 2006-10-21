@@ -4,9 +4,10 @@ ChangeLog for logilab.common
   --
     * db:
       - fixed date handling
-      - new method on advanced helper to generate backup command
+      - new methods on advanced helper to generate backup commands
     * configuration: basic deprecated config handling support
     * new implementation of pytest
+    * backport a dot backend from yams into a new "graph" module
 
 2006-10-03  --  0.19.3
     * fixed bug in textutils.normalise_[text|paragraph] with unsplitable

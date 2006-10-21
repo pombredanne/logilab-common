@@ -444,7 +444,31 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         cmd.append('--file=%s' % backupfile)
         cmd.append(dbname)
         return ' '.join(cmd)
-
+    
+    def restore_commands(self, dbname, dbhost, dbuser, backupfile,
+                         encoding='UTF8', drop=True):
+        """return a command to restore a backup the given database"""
+        cmds = []
+        if drop:
+            cmd = dbcmd('dropdb', dbhost, dbuser)
+            cmd.append(dbname)
+            cmds.append(' '.join(cmd))
+        cmd = dbcmd('createdb -T template0 -E %s' % encoding, dbhost, dbuser)
+        cmd.append(dbname)
+        cmds.append(' '.join(cmd))
+        cmd = dbcmd('pg_restore -Fc', dbhost, dbuser)
+        cmd.append('--dbname %s' % dbname)
+        cmd.append(backupfile)
+        cmds.append(' '.join(cmd))
+        return cmds
+                
+def dbcmd(cmd, dbhost, dbuser):
+    cmd = [cmd]
+    if dbhost:
+        cmd.append('--host=%s' % dbhost)
+    if dbuser:
+        cmd.append('--username=%s' % dbuser)
+    return cmd
     def sql_create_sequence(self, seq_name):
         return 'CREATE SEQUENCE %s;' % seq_name
     

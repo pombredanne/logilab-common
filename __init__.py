@@ -18,6 +18,9 @@ Logilab common libraries
 
 from __future__ import nested_scopes
 
+# bw compat
+from logilab.common.graph import get_cycles
+
 # FIXME: move all those functions in a separated module
 
 def intersection(list1, list2):
@@ -92,46 +95,6 @@ def flatten(iterable, tr_func=None, results=None):
         else:
             results.append(tr_func(val))
     return results
-
-
-def get_cycles(graph_dict, vertices=None):
-    '''given a dictionnary representing an ordered graph (i.e. key are vertices
-    and values is a list of destination vertices representing edges), return a
-    list of detected cycles
-    '''
-    if not graph_dict:
-        return ()
-    result = []
-    if vertices is None:
-        vertices = graph_dict.keys()
-    for vertice in vertices:
-        _get_cycles(graph_dict, vertice, [], result)
-    return result
-
-def _get_cycles(graph_dict, vertice=None, path=None, result=None):
-    """recursive function doing the real work for get_cycles"""
-    if vertice in path:
-        cycle = [vertice]
-        for i in range(len(path)-1, 0, -1):
-            node = path[i]
-            if node == vertice:
-                break
-            cycle.insert(0, node)
-        # make a canonical representation
-        start_from = min(cycle)
-        index = cycle.index(start_from)
-        cycle = cycle[index:] + cycle[0:index]
-        # append it to result if not already in
-        if not cycle in result:
-            result.append(cycle)
-        return
-    path.append(vertice)
-    try:
-        for node in graph_dict[vertice]:
-            _get_cycles(graph_dict, node, path, result)
-    except KeyError:
-        pass
-    path.pop()
 
 
 def cached(callableobj, keyarg=None):
