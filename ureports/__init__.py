@@ -21,8 +21,6 @@ formatted as text and html
 
 from __future__ import generators
 
-__revision__ = "$Id: __init__.py,v 1.8 2005-07-02 13:22:30 syt Exp $"
-
 import sys
 from os import linesep
 from cStringIO import StringIO

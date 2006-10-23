@@ -11,6 +11,9 @@
 __docformat__ = "restructuredtext en"
 __metaclass__ = type
 
+import os.path as osp
+import os
+
 def escape(value):
     """make <value> usable in a dot file"""
     lines = [line.replace('"', '\\"') for line in value.split('\n')]
