@@ -85,6 +85,7 @@ from os.path import exists
 from copy import copy
 from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 
+from logilab.common.compat import set
 from logilab.common.textutils import normalize_text, unquote
 from logilab.common.optik_ext import OptionParser, OptionGroup, Values, \
      OptionValueError, OptionError, HelpFormatter, generate_manpage, check_date, \

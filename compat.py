@@ -20,10 +20,9 @@ in python 2.2
 """
 from __future__ import generators
 
-__revision__ = '$Id: compat.py,v 1.13 2006-01-03 15:31:15 syt Exp $'
+from warnings import warn
 
 from logilab.common import class_renamed
-from warnings import warn
 
 try:
     set = set
