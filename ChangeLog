@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
-	
-  --
+
+2006-10-27  --  0.20.0
     * db:
       - fixed date handling
       - new methods on advanced helper to generate backup commands

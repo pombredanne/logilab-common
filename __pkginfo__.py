@@ -15,8 +15,8 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 """logilab.common packaging information"""
 
-modname = 'common'
-numversion = (0, 19, 3)
+modname = 'logilab-common'
+numversion = (0, 20, 0)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
