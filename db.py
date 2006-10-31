@@ -230,7 +230,10 @@ class _Psycopg2Adapter(_PsycopgAdapter):
 
         def cast_datetime(value, cursor):
             if value:
-                return strptime(value, '%Y-%m-%d %H:%M:%S')
+                # XXX value.split('.', 1)[0] to protect against
+                # date such as 2006-10-31 19:09:34.29
+                return strptime(value.split('.', 1)[0],
+                                '%Y-%m-%d %H:%M:%S')
 
         DATETIME = extensions.new_type(psycopg2.DATETIME.values, "DATETIME", cast_datetime)
         for v in DATETIME.values:
