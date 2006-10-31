@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * umessage:
+      - new message_from_string function
+      - fixed get_payload encoding bug
+
 2006-10-27  --  0.20.0
     * db:
       - fixed date handling
