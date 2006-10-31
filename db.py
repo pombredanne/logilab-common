@@ -217,37 +217,10 @@ class _Psycopg2Adapter(_PsycopgAdapter):
         if hasattr(psycopg2, '_mx_initialized'):
             return
         from psycopg2 import extensions
-        from mx.DateTime import strptime
-
-        def cast_date(value, cursor):
-            if value:
-                return strptime(value, '%Y-%m-%d')
-
-        DATE = extensions.new_type(extensions.DATE.values, "DATE", cast_date)
-        for v in DATE.values:
-            extensions.string_types[v] = DATE
-        extensions.DATE = DATE
-
-        def cast_datetime(value, cursor):
-            if value:
-                # XXX value.split('.', 1)[0] to protect against
-                # date such as 2006-10-31 19:09:34.29
-                return strptime(value.split('.', 1)[0],
-                                '%Y-%m-%d %H:%M:%S')
-
-        DATETIME = extensions.new_type(psycopg2.DATETIME.values, "DATETIME", cast_datetime)
-        for v in DATETIME.values:
-            extensions.string_types[v] = DATETIME
-        psycopg2.DATETIME = DATETIME
-
-        def cast_time(value, cursor):
-            if value:
-                return strptime(value, '%H:%M:%S')
-        TIME = extensions.new_type(extensions.TIME.values, "TIME", cast_time)
-        for v in TIME.values:
-            extensions.string_types[v] = TIME
-        extensions.TIME = TIME
-    
+        extensions.register_type(psycopg2._psycopg.MXDATETIME)
+        extensions.register_type(psycopg2._psycopg.MXINTERVAL)
+        extensions.register_type(psycopg2._psycopg.MXDATE)
+        extensions.register_type(psycopg2._psycopg.MXTIME)
         psycopg2._mx_initialized = 1
         
 
