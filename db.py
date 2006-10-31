@@ -206,7 +206,47 @@ class _Psycopg2Adapter(_PsycopgAdapter):
     """Simple Psycopg2 Adapter to DBAPI (cnx_string differs from classical ones)
     """
     BOOLEAN = 16 # XXX
+    def __init__(self, native_module, pywrap=False):
+        DBAPIAdapter.__init__(self, native_module, pywrap)
+        self._init_psycopg2()
+
+    def _init_psycopg2(self):
+        """initialize psycopg2 to use mx.DateTime for date and timestamps
+        instead for datetime.datetime"""
+        psycopg2 = self._native_module
+        if hasattr(psycopg2, '_mx_initialized'):
+            return
+        from psycopg2 import extensions
+        from mx.DateTime import strptime
+
+        def cast_date(value, cursor):
+            if value:
+                return strptime(value, '%Y-%m-%d')
+
+        DATE = extensions.new_type(extensions.DATE.values, "DATE", cast_date)
+        for v in DATE.values:
+            extensions.string_types[v] = DATE
+        extensions.DATE = DATE
+
+        def cast_datetime(value, cursor):
+            if value:
+                return strptime(value, '%Y-%m-%d %H:%M:%S')
+
+        DATETIME = extensions.new_type(psycopg2.DATETIME.values, "DATETIME", cast_datetime)
+        for v in DATETIME.values:
+            extensions.string_types[v] = DATETIME
+        psycopg2.DATETIME = DATETIME
+
+        def cast_time(value, cursor):
+            if value:
+                return strptime(value, '%H:%M:%S')
+        TIME = extensions.new_type(extensions.TIME.values, "TIME", cast_time)
+        for v in TIME.values:
+            extensions.string_types[v] = TIME
+        extensions.TIME = TIME
     
+        psycopg2._mx_initialized = 1
+        
 
 class _PgsqlAdapter(DBAPIAdapter):
     """Simple pyPgSQL Adapter to DBAPI
@@ -236,7 +276,6 @@ class _PySqlite2Adapter(DBAPIAdapter):
     """
     def __init__(self, native_module, pywrap=False):
         DBAPIAdapter.__init__(self, native_module, pywrap)
-        from pysqlite2 import _sqlite
         self._init_pysqlite2()
         # no type code in pysqlite2
         self.BINARY = 'XXX'
@@ -296,7 +335,6 @@ class _PySqlite2Adapter(DBAPIAdapter):
             return str(bval).upper()
         sqlite.register_adapter(bool, adapt_boolean)
         
-        # import pysqlite2.dbapi2 as sqlite
         sqlite._mx_initialized = 1
 
             
@@ -510,7 +548,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 
 
 PREFERED_DRIVERS = {
-    "postgres" : [ 'psycopg', 'psycopg2', 'pgdb', 'pyPgSQL.PgSQL', ],
+    "postgres" : [ 'psycopg2', 'psycopg', 'pgdb', 'pyPgSQL.PgSQL', ],
     "mysql" : [ 'MySQLdb', ], # 'pyMySQL.MySQL, ],
     "sqlite" : [ 'pysqlite2.dbapi2', 'sqlite', ],
     }

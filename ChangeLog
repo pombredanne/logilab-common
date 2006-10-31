@@ -5,7 +5,9 @@ ChangeLog for logilab.common
     * umessage:
       - new message_from_string function
       - fixed get_payload encoding bug
-
+    * db: default postgres module is now psycopg2, which has been customized
+      to return mx.Datetime objects for date/time related types
+	
 2006-10-27  --  0.20.0
     * db:
       - fixed date handling
