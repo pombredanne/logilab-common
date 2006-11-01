@@ -4,6 +4,12 @@ logilab-common (0.20.1-1) unstable; urgency=low
 
  -- Sylvain Thénault <sylvain.thenault@logilab.fr>  Wed,  1 Nov 2006 13:42:47 +0100
 
+logilab-common (0.20.0-2) unstable; urgency=low
+
+  * fix installation
+
+ -- Sylvain Thénault <sylvain.thenault@logilab.fr>  Mon, 30 Oct 2006 13:22:00 +0100
+
 logilab-common (0.20.0-1) unstable; urgency=low
 
   * new upstream release
