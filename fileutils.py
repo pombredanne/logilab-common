@@ -1,6 +1,3 @@
-# Copyright (c) 2003-2005 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
-#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
 # Foundation; either version 2 of the License, or (at your option) any later
@@ -15,13 +12,13 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 """Some file / file path manipulation utilities.
 
-:version:   $Revision: 1.28 $  
 :author:    Logilab
-:copyright: 2003-2005 LOGILAB S.A. (Paris, FRANCE)
+:copyright: 2003-2006 LOGILAB S.A. (Paris, FRANCE)
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 
 :group path manipulation: first_level_directory, relative_path, is_binary,\
-files_by_ext, include_files_by_ext, exclude_files_by_ext, get_by_ext
+files_by_ext, include_files_by_ext, exclude_files_by_ext, get_by_ext, \
+remove_dead_links
 :group file manipulation: norm_read, norm_open, lines, stream_lines, lines,\
 write_open_mode, ensure_fs_mode, export
 :sort: path manipulation, file manipulation
@@ -40,13 +37,12 @@ write_open_mode, ensure_fs_mode, export
 
 from __future__ import nested_scopes
 
-__revision__ = "$Id: fileutils.py,v 1.28 2006-02-07 13:46:01 adim Exp $"
 __docformat__ = "restructuredtext en"
 
 import sys
 import shutil
 import mimetypes
-from os.path import isabs, isdir, split, exists, walk, normpath, join
+from os.path import isabs, isdir, islink, split, exists, walk, normpath, join
 from os import sep, mkdir, remove, listdir, stat, chmod
 from stat import ST_MODE, S_IWRITE
 from cStringIO import StringIO
@@ -369,7 +365,7 @@ def export(from_dir, to_dir,
     :type verbose: bool
     :param verbose:
       flag indicating wether information about exported files should be
-      printed to stderr, default to True
+      printed to stderr, default to False
     """
     def make_mirror(_, directory, fnames):
         """walk handler"""
@@ -503,3 +499,26 @@ def exclude_files_by_ext(directory, exclude_exts,
             else:
                 result.append(join(directory, fname))
     return result
+
+
+
+def remove_dead_links(directory, verbose=0):
+    """recursivly traverse directory and remove all dead links
+
+    :type directory: str
+    :param directory: directory to cleanup
+
+    :type verbose: bool
+    :param verbose:
+      flag indicating wether information about deleted links should be
+      printed to stderr, default to False
+    """
+    def _remove_dead_link(_, directory, fnames):
+        """walk handler"""
+        for filename in fnames:
+            src = join(directory, filename)
+            if islink(src) and not exists(src):
+                if verbose:
+                    print 'remove dead link', src
+                remove(src)
+    walk(directory, _remove_dead_link, None)
