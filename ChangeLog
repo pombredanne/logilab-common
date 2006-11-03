@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * fileutils: new remove_dead_links function
+
 2006-11-01  --  0.20.1
     * umessage:
       - new message_from_string function
@@ -15,6 +18,7 @@ ChangeLog for logilab.common
     * configuration: basic deprecated config handling support
     * new implementation of pytest
     * backport a dot backend from yams into a new "graph" module
+
 
 2006-10-03  --  0.19.3
     * fixed bug in textutils.normalise_[text|paragraph] with unsplitable
