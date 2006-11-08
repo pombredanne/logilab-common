@@ -90,14 +90,6 @@ class PrettyMatchTC(TestCase):
         
         
 
-
-class SearchAllTC(TestCase):
-
-    def test_known(self):
-        string = 'hiuherabcdefabcd'
-        self.assertEquals(len(tu.searchall(RGX, string)), 2)
-
-
 class UnquoteTC(TestCase):
     def test(self):
         self.assertEquals(tu.unquote('"toto"'), 'toto')

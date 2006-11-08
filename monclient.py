@@ -1,6 +1,11 @@
 """Simple interpreter client for monserver
 provides a simple readline interface.
 """
+
+from warnings import warn
+warn('this module is deprecated and will disappear in a near release',
+     DeprecationWarning, stacklevel=1)
+
 from socket import socket, SOCK_STREAM, AF_INET
 from select import select
 import sys

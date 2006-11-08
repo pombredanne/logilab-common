@@ -45,6 +45,12 @@ package directory of your application.
 #
 # Happy twisting!
 #
+
+
+from warnings import warn
+warn('this module is deprecated and will disappear in a near release',
+     DeprecationWarning, stacklevel=1)
+
 __revision__ = "$Id: twisted_distutils.py,v 1.4 2003-09-12 11:54:48 syt Exp $"
 
 from distutils.core import Distribution, Command

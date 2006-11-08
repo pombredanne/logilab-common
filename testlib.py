@@ -44,7 +44,7 @@ except ImportError:
             pass
     test_support = TestSupport()
 
-from logilab.common import class_renamed, deprecated_function
+from logilab.common.deprecation import class_renamed, deprecated_function
 from logilab.common.compat import set, enumerate
 from logilab.common.modutils import load_module_from_name
 

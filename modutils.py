@@ -1,5 +1,5 @@
 # -*- coding: iso-8859-1 -*-
-# Copyright (c) 2003-2005 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -16,9 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 """Python modules manipulation utility functions.
 
-:version:   $Revision: 1.53 $  
 :author:    Logilab
-:copyright: 2003-2005 LOGILAB S.A. (Paris, FRANCE)
+:copyright: 2003-2006 LOGILAB S.A. (Paris, FRANCE)
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 
 
@@ -33,16 +32,12 @@
 :var BUILTIN_MODULES: dictionary with builtin module names has key
 """
 
-from __future__ import nested_scopes
-
-__revision__ = "$Id: modutils.py,v 1.53 2006-03-06 08:05:11 syt Exp $"
 __docformat__ = "restructuredtext en"
 
 import sys
 import os
 from os.path import walk, splitext, join, abspath, isdir, dirname, exists
 from imp import find_module, load_module, C_BUILTIN, PY_COMPILED, PKG_DIRECTORY
-from logilab.common import deprecated_function
 
 if sys.platform.startswith('win'):
     PY_SOURCE_EXTS = ('py', 'pyw')
@@ -131,9 +126,6 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
         path = [dirname( _file )]
         prevmodule = module
     return module
-
-load_module_from_parts = deprecated_function(load_module_from_modpath)
-
 
 
 def modpath_from_file(filename):

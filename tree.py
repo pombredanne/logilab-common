@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2003 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -17,12 +17,8 @@
  base class to represent tree structure
 """
 
-__revision__ = "$Id: tree.py,v 1.24 2006-02-24 10:40:21 nico Exp $"
-
 import sys
-from warnings import warn
 
-from logilab.common import deprecated_function
 from logilab.common.visitor import VisitedMixIn, FilteredIterator, no_filter
 
 ## Exceptions #################################################################
@@ -186,8 +182,6 @@ class Node :
         else:
             return [self]
 
-    leafs = deprecated_function(leaves) # backward compatibility
-    
     def flatten(self, _list=None):
         """
         return a list with all the nodes descendant from this node

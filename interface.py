@@ -24,8 +24,6 @@
   This module requires at least python 2.2
 """
 
-__revision__ = "$Id: interface.py,v 1.6 2004-05-10 14:40:50 syt Exp $"
-
 from types import ListType, TupleType
 
 class Interface:

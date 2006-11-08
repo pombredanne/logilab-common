@@ -26,6 +26,10 @@ TODO: _ advanced search
       _ use mxTextTools ?
 """
 
+from warnings import warn
+warn('this module is deprecated and will disappear in a near release',
+     DeprecationWarning, stacklevel=1)
+
 __revision__ = "$Id: patricia.py,v 1.5 2003-10-31 14:18:32 syt Exp $"
 
 def prefix(prfx, string):

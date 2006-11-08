@@ -1,7 +1,5 @@
 """provides unit tests for compat module"""
 
-__revision__ = '$Id: unittest_compat.py,v 1.3 2005-08-08 10:44:10 adim Exp $'
-
 from logilab.common.testlib import TestCase, unittest_main
 import sys
 import types

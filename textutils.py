@@ -15,9 +15,8 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 """Some text manipulation utility functions.
 
-:version:   $Revision: 1.25 $  
 :author:    Logilab
-:copyright: 2003-2005 LOGILAB S.A. (Paris, FRANCE)
+:copyright: 2003-2006 LOGILAB S.A. (Paris, FRANCE)
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 
 :group text formatting: normalize_text, normalize_paragraph, pretty_match,\
@@ -46,28 +45,10 @@ unquote, colorize_ansi
   ANSI terminal code reseting format defined by a previous ANSI escape sequence
 """
 
-__revision__ = "$Id: textutils.py,v 1.25 2005-09-06 08:51:01 alf Exp $"
 __docformat__ = "restructuredtext en"
 
 import re
 from os import linesep
-from warnings import warn
-
-
-def searchall(rgx, data):
-    """apply a regexp using "search" until no more match is found
-
-    This function is deprecated, use re.finditer() instead.
-    """
-    warn('logilab.common.textutils.searchall() is deprecated, use '
-         're.finditer() instead', DeprecationWarning)
-    result = []
-    match = rgx.search(data)
-    while match is not None:
-        result.append(match)
-        match = rgx.search(data, match.end())        
-    return result
-
 
 def unquote(string):
     """remove optional quotes (simple or double) from the string

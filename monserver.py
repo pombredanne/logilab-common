@@ -4,6 +4,10 @@ allows *one* client to connect and provides a command line interpreter
 allowing the remote client to explore the process on the fly
 """
 
+from warnings import warn
+warn('this module is deprecated and will disappear in a near release',
+     DeprecationWarning, stacklevel=1)
+
 __revision__ = '$Id: monserver.py,v 1.2 2005-11-22 13:13:02 syt Exp $'
 
 import threading

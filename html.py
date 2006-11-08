@@ -14,6 +14,10 @@
  http://www.logilab.fr/ -- mailto:contact@logilab.fr
 """
 
+from warnings import warn
+warn('this module is deprecated and will disappear in a near release',
+     DeprecationWarning, stacklevel=1)
+
 __revision__ = "$Id: html.py,v 1.5 2003-09-12 11:54:47 syt Exp $"
 
 import traceback

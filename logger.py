@@ -17,6 +17,11 @@ Define a logger interface and two concrete loggers : one which prints
 everything on stdout, the other using syslog.
 """
 
+from warnings import warn
+warn('this module is deprecated and will disappear in a near release. \
+use logging module instead.',
+     DeprecationWarning, stacklevel=1)
+
 __revision__ = "$Id: logger.py,v 1.18 2006-02-03 14:17:42 adim Exp $"
 
 

@@ -1,6 +1,6 @@
 # pylint: disable-msg=E0601,W0622,W0611
 #
-# Copyright (c) 2004-2005 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2004-2006 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@ from __future__ import generators
 
 from warnings import warn
 
-from logilab.common import class_renamed
+from logilab.common.deprecation import class_renamed
 
 try:
     set = set
