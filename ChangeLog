@@ -1,7 +1,13 @@
 ChangeLog for logilab.common
 ============================
 
- --
+-- 
+   * db: 
+     - new optional keepownership argument to backup|restore_database methods
+     - only register mxDatetime converters on psycopg2 adapter if
+       mx.DateTime is available
+
+2006-11-03  --  0.20.2
     * fileutils: new remove_dead_links function
     * date: add missing strptime import
 
@@ -48,7 +54,7 @@ ChangeLog for logilab.common
 	
 2006-09-05  --  0.19.0
     * new umessage module which provides a class similar to the standard
-     email.Message class but returning unicode strings
+      email.Message class but returning unicode strings
     * new clcommands module to handle commands based command line tool
      (based on the configuration module)
     * new "date" otion type in optik_ext
