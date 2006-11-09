@@ -19,7 +19,7 @@
 """
 
 from warnings import warn
-warn('this module is deprecated and will disappear in a near release',
+warn('bind module is deprecated and will disappear in a near release',
      DeprecationWarning, stacklevel=1)
 
 __revision__ = '$Id: bind.py,v 1.8 2005-11-22 13:12:59 syt Exp $'

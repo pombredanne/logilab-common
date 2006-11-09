@@ -5,9 +5,9 @@ http://www.logilab.fr/ -- mailto:contact@logilab.fr
 """
 
 from warnings import warn
-warn('this module is deprecated and will disappear in a near release. \
+warn('logservice module is deprecated and will disappear in a near release. \
 use logging module instead.',
-     DeprecationWarning, stacklevel=1)
+     DeprecationWarning, stacklevel=2)
 
 __revision__ = "$Id: logservice.py,v 1.5 2006-03-05 16:13:28 syt Exp $"
 
