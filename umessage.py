@@ -11,7 +11,7 @@ def decode_QP(string):
     for decoded, charset in decode_header(string):
         if charset is None:
             charset = 'iso-8859-15'
-        parts.append(unicode(decoded, charset))
+        parts.append(unicode(decoded, charset, 'replace'))
 
     return u' '.join(parts)
 
