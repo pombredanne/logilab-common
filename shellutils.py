@@ -83,8 +83,8 @@ def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
 
     :type blacklist: list or tuple
     :param blacklist:
-      optional list of files or directory to ignore, default to
-      the value of `logilab.common.STD_BLACKLIST`
+      optional list of files or directory to ignore, default to the value of
+      `logilab.common.STD_BLACKLIST`
 
     :rtype: list
     :return:

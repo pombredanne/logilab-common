@@ -311,7 +311,7 @@ def get_modules(package, src_directory, blacklist=STD_BLACKLIST):
 
 
 
-def get_module_files(src_directory, blacklist=('CVS', '.svn', '.hg', 'debian')):
+def get_module_files(src_directory, blacklist=STD_BLACKLIST):
     """given a package directory return a list of all available python
     module's files in the package and its subpackages
 
@@ -319,10 +319,10 @@ def get_module_files(src_directory, blacklist=('CVS', '.svn', '.hg', 'debian')):
     :param src_directory:
       path of the directory corresponding to the package
 
-    :type blacklist: list(str) or tuple(str) 
+    :type blacklist: list or tuple
     :param blacklist:
-      optional list of files or directory to ignore, default to 'CVS',
-      '.svn' and 'debian'
+      optional list of files or directory to ignore, default to the value of
+      `logilab.common.STD_BLACKLIST`
 
     :rtype: list
     :return:
