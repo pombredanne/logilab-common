@@ -1,20 +1,14 @@
-"""unit tests for logilab.common.fileutils
+"""unit tests for logilab.common.fileutils"""
 
-Some file / path manipulation utilities
-"""
-__revision__ = "$Id: unittest_fileutils.py,v 1.22 2006-01-03 15:31:16 syt Exp $"
-
-import unittest
 import sys, os, tempfile, shutil
 from os.path import join
 
-from logilab.common.testlib import TestCase
+from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.fileutils import *
 
 
-#import data
-DATA_DIR = 'data' #data.__path__[0]
+DATA_DIR = 'data'
 NEWLINES_TXT = join(DATA_DIR,'newlines.txt')
 
 class FirstleveldirectoryTC(TestCase):
@@ -53,37 +47,6 @@ class LinesTC(TestCase):
     def test_known_values_lines_comment(self):
         self.assertEqual(lines(NEWLINES_TXT, comments='#'),
                          ['1', '2', '3'])
-
-class GetByExtTC(TestCase):
-    def test_include(self):
-        files = files_by_ext(DATA_DIR, include_exts=('.py',))
-        self.assertSetEqual(files,
-                            [join('data', f) for f in ['__init__.py', 'module.py',
-                                                       'module2.py', 'noendingnewline.py',
-                                                       'nonregr.py', join('sub', 'momo.py')]])
-        files = files_by_ext(DATA_DIR, include_exts=('.py',), exclude_dirs=('sub', 'CVS'))
-        self.assertSetEqual(files,
-                            [join('data', f) for f in ['__init__.py', 'module.py',
-                                                       'module2.py', 'noendingnewline.py',
-                                                       'nonregr.py']])
-        
-    def test_exclude(self):
-        files = files_by_ext(DATA_DIR, exclude_exts=('.py', '.pyc'))
-        self.assertSetEqual(files,
-                            [join('data', f) for f in ['foo.txt',
-                                                       'newlines.txt',
-                                                       'normal_file.txt',
-                                                       'test.ini',
-                                                       'test1.msg',
-                                                       'test2.msg',
-                                                       'spam.txt',
-                                                       join('sub', 'doc.txt'),
-                                                       'write_protected_file.txt',
-                                                       ]])
-        
-    def test_exclude_base_dir(self):
-        self.assertEquals(files_by_ext(DATA_DIR, include_exts=('.py',), exclude_dirs=(DATA_DIR,)),
-                          [])
 
 class ExportTC(TestCase):
     def setUp(self):
@@ -147,4 +110,4 @@ class ModuleDocTest(DocTest):
 del DocTest # necessary if we don't want it to be executed (we don't...)
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest_main()

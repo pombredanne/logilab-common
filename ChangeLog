@@ -8,7 +8,9 @@ ChangeLog for logilab.common
        mx.DateTime is available
    * moved some stuff which was in common __init__ file into specific
      module. At this occasion new "decorators" and "deprecation" modules
-     has been add
+     has been added
+   * deprecated fileutils.[files_by_ext,include_files_by_ext,exclude_files_by_ext]
+     functions in favor of new function shellutils.find	
    * mark the following modules for deprecation, they will be removed in a
      near version:
      * astutils: moved to astng
@@ -23,6 +25,7 @@ ChangeLog for logilab.common
      * modutils.load_module_from_parts
      * textutils.searchall
      * tree.Node.leafs
+     * fileutils.get_by_ext, filetutils.get_mode, fileutils.ensure_mode
 
 2006-11-03  --  0.20.2
     * fileutils: new remove_dead_links function

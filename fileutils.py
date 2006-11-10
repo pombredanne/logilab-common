@@ -1,3 +1,6 @@
+# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
+# http://www.logilab.fr/ -- mailto:contact@logilab.fr
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
 # Foundation; either version 2 of the License, or (at your option) any later
@@ -12,30 +15,12 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 """Some file / file path manipulation utilities.
 
-:author:    Logilab
-:copyright: 2003-2006 LOGILAB S.A. (Paris, FRANCE)
-:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
-
 :group path manipulation: first_level_directory, relative_path, is_binary,\
-files_by_ext, include_files_by_ext, exclude_files_by_ext, get_by_ext, \
-remove_dead_links
+get_by_ext, remove_dead_links
 :group file manipulation: norm_read, norm_open, lines, stream_lines, lines,\
 write_open_mode, ensure_fs_mode, export
 :sort: path manipulation, file manipulation
-
-
-
-:type BASE_BLACKLIST: tuple
-:var BASE_BLACKLIST:
-  list files or directories ignored by default by the `export` function
-
-:type IGNORED_EXTENSIONS: tuple
-:var IGNORED_EXTENSIONS:
-  list file extensions ignored by default by the `export` function
-
 """
-
-from __future__ import nested_scopes
 
 __docformat__ = "restructuredtext en"
 
@@ -46,8 +31,9 @@ from os.path import isabs, isdir, islink, split, exists, walk, normpath, join
 from os import sep, mkdir, remove, listdir, stat, chmod
 from stat import ST_MODE, S_IWRITE
 from cStringIO import StringIO
-from warnings import warn
 
+from logilab.common import STD_BLACKLIST as BASE_BLACKLIST, IGNORED_EXTENSIONS
+from logilab.common.shellutils import find
 
 def first_level_directory(path):
     """return the first level directory of a path
@@ -106,12 +92,6 @@ def write_open_mode(filename):
         return 'wb'
     return 'w'
 
-# backward compat
-def get_mode(*args, **kwargs):
-    """deprecated, use `files_by_ext` instead"""
-    warn('logilab.common.fileutils.get_mode() is deprecated, use '
-         'write_open_mode() instead', DeprecationWarning)
-    return write_open_mode(*args, **kwargs)
 
 def ensure_fs_mode(filepath, desired_mode=S_IWRITE):
     """check that the given file has the given mode(s) set, else try to
@@ -129,7 +109,6 @@ def ensure_fs_mode(filepath, desired_mode=S_IWRITE):
     if not mode & desired_mode:
         chmod(filepath, mode | desired_mode)
         
-ensure_mode = ensure_fs_mode # backward compat
 
 class ProtectedFile(file):
     """a special file-object class that automatically that automatically
@@ -267,6 +246,7 @@ def norm_read(path):
         return open(path, 'U').read()
     return _LINE_RGX.sub('\n', open(path).read())
 
+
 def norm_open(path):
     """return a stream for a file with content with normalized line feeds
 
@@ -304,6 +284,7 @@ def lines(path, comments=None):
     stream.close()
     return result
 
+
 def stream_lines(stream, comments=None):
     """return a list of non empty lines in the given `stream`
 
@@ -334,13 +315,8 @@ def stream_lines(stream, comments=None):
     return result
 
 
-
-BASE_BLACKLIST = ('CVS', '.svn', 'debian', 'dist', 'build', '__buildlog', '.hg')
-IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc', '~')
-
 def export(from_dir, to_dir,
-           blacklist=BASE_BLACKLIST,
-           ignore_ext=IGNORED_EXTENSIONS,
+           blacklist=BASE_BLACKLIST, ignore_ext=IGNORED_EXTENSIONS,
            verbose=0):
     """make a mirror of `from_dir` in `to_dir`, omitting directories and
     files listed in the black list or ending with one of the given
@@ -398,8 +374,32 @@ def export(from_dir, to_dir,
     walk(from_dir, make_mirror, None)
 
 
+def remove_dead_links(directory, verbose=0):
+    """recursivly traverse directory and remove all dead links
+
+    :type directory: str
+    :param directory: directory to cleanup
+
+    :type verbose: bool
+    :param verbose:
+      flag indicating wether information about deleted links should be
+      printed to stderr, default to False
+    """
+    def _remove_dead_link(_, directory, fnames):
+        """walk handler"""
+        for filename in fnames:
+            src = join(directory, filename)
+            if islink(src) and not exists(src):
+                if verbose:
+                    print 'remove dead link', src
+                remove(src)
+    walk(directory, _remove_dead_link, None)
+
+
+from warnings import warn
+
 def files_by_ext(directory, include_exts=None, exclude_exts=None,
-                 exclude_dirs=('CVS', '.svn')):
+                 exclude_dirs=BASE_BLACKLIST):
     """return a list of files in a directory matching (or not) some
     extensions: you should either give the `include_exts` argument (and
     only files ending with one of the listed extensions will be
@@ -423,22 +423,13 @@ def files_by_ext(directory, include_exts=None, exclude_exts=None,
     :return: the list of files matching input criteria
     """
     assert not (include_exts and exclude_exts)
-    if directory in exclude_dirs:
-        return []
-    if exclude_exts:
-        return exclude_files_by_ext(directory, exclude_exts, exclude_dirs)
-    return include_files_by_ext(directory, include_exts, exclude_dirs)
+    warn("files_by_ext is deprecated, use shellutils.find instead" ,
+         DeprecationWarning, stacklevel=2)
+    if include_exts:
+        return find(directory, include_exts, blacklist=exclude_dirs)
+    return find(directory, exclude_exts, exclude=True, blacklist=exclude_dirs)
 
-# backward compat
-def get_by_ext(*args, **kwargs):
-    """deprecated, use `files_by_ext` instead"""
-    warn('logilab.common.fileutils.get_by_ext() is deprecated, use '
-         'files_by_ext() instead', DeprecationWarning)
-    return files_by_ext(*args, **kwargs)
-
-
-def include_files_by_ext(directory, include_exts,
-                         exclude_dirs=('CVS', '.svn')):
+def include_files_by_ext(directory, include_exts, exclude_dirs=BASE_BLACKLIST):
     """return a list of files in a directory matching some extensions
 
     :type directory: str
@@ -451,25 +442,13 @@ def include_files_by_ext(directory, include_exts,
     :param exclude_dirs: list of directory where we should not recurse
 
     :rtype: list
-    :return: the list of files matching input criteria
+    :return: the list of files matching input criterias
     """
-    result = []
-    for fname in listdir(directory):
-        absfile = join(directory, fname)
-        for ext in include_exts:
-            if fname.endswith(ext):
-                result.append(join(directory, fname))
-                break
-        else:
-            if isdir(absfile):
-                if fname in exclude_dirs:
-                    continue
-                result += include_files_by_ext(join(directory, fname),
-                                               include_exts, exclude_dirs)
-    return result
+    warn("include_files_by_ext is deprecated, use shellutils.find instead" ,
+         DeprecationWarning, stacklevel=2)
+    return find(directory, include_exts, blacklist=exclude_dirs)
 
-def exclude_files_by_ext(directory, exclude_exts,
-                         exclude_dirs=('CVS', '.svn')):
+def exclude_files_by_ext(directory, exclude_exts, exclude_dirs=BASE_BLACKLIST):
     """return a list of files in a directory not matching some extensions
 
     :type directory: str
@@ -482,43 +461,8 @@ def exclude_files_by_ext(directory, exclude_exts,
     :param exclude_dirs: list of directory where we should not recurse
 
     :rtype: list
-    :return: the list of files matching input criteria
+    :return: the list of files matching input criterias
     """
-    result = []
-    for fname in listdir(directory):
-        absfile = join(directory, fname)
-        for ext in exclude_exts:
-            if fname.endswith(ext) or fname == 'makefile':
-                break
-        else:
-            if isdir(absfile):
-                if fname in exclude_dirs:
-                    continue
-                result += exclude_files_by_ext(absfile, exclude_exts,
-                                               exclude_dirs)
-            else:
-                result.append(join(directory, fname))
-    return result
-
-
-
-def remove_dead_links(directory, verbose=0):
-    """recursivly traverse directory and remove all dead links
-
-    :type directory: str
-    :param directory: directory to cleanup
-
-    :type verbose: bool
-    :param verbose:
-      flag indicating wether information about deleted links should be
-      printed to stderr, default to False
-    """
-    def _remove_dead_link(_, directory, fnames):
-        """walk handler"""
-        for filename in fnames:
-            src = join(directory, filename)
-            if islink(src) and not exists(src):
-                if verbose:
-                    print 'remove dead link', src
-                remove(src)
-    walk(directory, _remove_dead_link, None)
+    warn("exclude_files_by_ext is deprecated, use shellutils.find instead" ,
+         DeprecationWarning, stacklevel=2)
+    return find(directory, exclude_exts, exclude=True, blacklist=exclude_dirs)
