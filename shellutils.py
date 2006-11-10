@@ -24,7 +24,9 @@ import shutil
 import sys
 import tempfile
 import time
-from os.path import exists, isdir, basename, join
+from os.path import exists, isdir, basename, join, walk
+
+from logilab.common import STD_BLACKLIST
 
 def mv(source, destination, _action=os.rename):
     """a shell like mv, supporting wildcards
@@ -61,7 +63,65 @@ def cp(source, destination):
     """a shell like cp, supporting wildcards
     """
     mv(source, destination, _action=shutil.copy)
-    
+
+
+def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
+    """recursivly find files ending with the given extensions from the directory
+
+    :type directory: str
+    :param directory:
+      directory where the search should start
+
+    :type exts: basestring or list or tuple
+    :param exts:
+      extensions or lists or extensions to search
+
+    :type exclude: boolean
+    :param exts:
+      if this argument is True, returning files NOT ending with the given
+      extensions
+
+    :type blacklist: list or tuple
+    :param blacklist:
+      optional list of files or directory to ignore, default to the value of
+      `logilab.common.STD_BLACKLIST`
+
+    :rtype: list
+    :return:
+      the list of all matching files
+    """
+    if isinstance(exts, basestring):
+        exts = (exts,)
+    if exclude:
+        def match(filename, exts):
+            for ext in exts:
+                if filename.endswith(ext):
+                    return False
+            return True
+    else:
+        def match(filename, exts):
+            for ext in exts:
+                if filename.endswith(ext):
+                    return True
+            return False
+    def func(files, directory, fnames):
+        """walk handler"""
+        # remove files/directories in the black list
+        for norecurs in blacklist:
+            try:
+                fnames.remove(norecurs)
+            except ValueError:
+                continue
+        for filename in fnames:
+            src = join(directory, filename)
+            if isdir(src):
+                continue
+            if match(filename, exts):
+                files.append(src)
+    files = []
+    walk(directory, func, files)
+    return files
+
 
 class Execute:
     """This is a deadlock safe version of popen2 (no stdin), that returns
@@ -77,6 +137,7 @@ class Execute:
         self.err = open(errfile,"r").read()
         os.remove(outfile)
         os.remove(errfile)
+
 
 def acquire_lock(lock_file, max_try=10, delay=10):
     """acquire a lock represented by a file on the file system"""

@@ -39,6 +39,8 @@ import os
 from os.path import walk, splitext, join, abspath, isdir, dirname, exists
 from imp import find_module, load_module, C_BUILTIN, PY_COMPILED, PKG_DIRECTORY
 
+from logilab.common import STD_BLACKLIST
+
 if sys.platform.startswith('win'):
     PY_SOURCE_EXTS = ('py', 'pyw')
     PY_COMPILED_EXTS = ('dll', 'pyd')
@@ -259,7 +261,7 @@ def get_module_part(dotted_name, context_file=None):
 
 
     
-def get_modules(package, src_directory, blacklist=('CVS', '.svn', 'debian')):
+def get_modules(package, src_directory, blacklist=STD_BLACKLIST):
     """given a package directory return a list of all available python
     modules in the package and its subpackages
 
@@ -272,8 +274,8 @@ def get_modules(package, src_directory, blacklist=('CVS', '.svn', 'debian')):
 
     :type blacklist: list or tuple
     :param blacklist:
-      optional list of files or directory to ignore, default to 'CVS',
-      '.svn' and 'debian'
+      optional list of files or directory to ignore, default to
+      the value of `logilab.common.STD_BLACKLIST`
 
     :rtype: list
     :return:
@@ -309,7 +311,7 @@ def get_modules(package, src_directory, blacklist=('CVS', '.svn', 'debian')):
 
 
 
-def get_module_files(src_directory, blacklist=('CVS', '.svn', 'debian')):
+def get_module_files(src_directory, blacklist=STD_BLACKLIST):
     """given a package directory return a list of all available python
     module's files in the package and its subpackages
 
@@ -317,10 +319,10 @@ def get_module_files(src_directory, blacklist=('CVS', '.svn', 'debian')):
     :param src_directory:
       path of the directory corresponding to the package
 
-    :type blacklist: list(str) or tuple(str) 
+    :type blacklist: list or tuple
     :param blacklist:
-      optional list of files or directory to ignore, default to 'CVS',
-      '.svn' and 'debian'
+      optional list of files or directory to ignore, default to the value of
+      `logilab.common.STD_BLACKLIST`
 
     :rtype: list
     :return:

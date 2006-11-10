@@ -17,10 +17,6 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 """ Generic Setup script, takes package info from __pkginfo__.py file """
 
-from __future__ import nested_scopes
-
-__revision__ = '$Id: setup.py,v 1.24 2006-04-10 15:12:53 syt Exp $'
-
 import os
 import sys
 import shutil
@@ -58,6 +54,7 @@ try:
 except ImportError:
     ext_modules = None
 
+from __init__ import STD_BLACKLIST, IGNORED_EXTENSIONS
 BASE_BLACKLIST = ('CVS', 'debian', 'dist', 'build', '__buildlog', '.svn')
 IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc')
     
@@ -92,7 +89,7 @@ def get_packages(directory, prefix):
     return result
 
 def export(from_dir, to_dir,
-           blacklist=BASE_BLACKLIST,
+           blacklist=STD_BLACKLIST,
            ignore_ext=IGNORED_EXTENSIONS):
     """make a mirror of from_dir in to_dir, omitting directories and files
     listed in the black list

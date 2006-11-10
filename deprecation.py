@@ -16,6 +16,7 @@
 """Deprecation utilities"""
 
 from warnings import warn
+
 from logilab.common.modutils import load_module_from_name
 
 class deprecated(type):
