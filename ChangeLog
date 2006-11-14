@@ -1,32 +1,33 @@
 ChangeLog for logilab.common
 ============================
 
--- 
-   * db: 
+2006-11-14  --  0.21.0
+    * db:
      - new optional keepownership argument to backup|restore_database methods
      - only register mxDatetime converters on psycopg2 adapter if
        mx.DateTime is available
-   * moved some stuff which was in common __init__ file into specific
-     module. At this occasion new "decorators" and "deprecation" modules
-     has been added
-   * deprecated fileutils.[files_by_ext,include_files_by_ext,exclude_files_by_ext]
-     functions in favor of new function shellutils.find	
-   * mark the following modules for deprecation, they will be removed in a
-     near version:
-     * astutils: moved to astng
-     * bind (never been used)
-     * html: deprecated
-     * logger/logservice: use logging module
-     * monclient/monserver (not used anymore)
-     * patricia (never been used)
-     * twisted_distutils (not used anymore)
-   * removed the following functions/methods which have been deprecated for a
-     while now:
-     * modutils.load_module_from_parts
-     * textutils.searchall
-     * tree.Node.leafs
-     * fileutils.get_by_ext, filetutils.get_mode, fileutils.ensure_mode
+    * moved some stuff which was in common __init__ file into specific
+      module. At this occasion new "decorators" and "deprecation" modules
+      has been added
+    * deprecated fileutils.[files_by_ext,include_files_by_ext,exclude_files_by_ext]
+      functions in favor of new function shellutils.find	
+    * mark the following modules for deprecation, they will be removed in a
+      near version:
+      * astutils: moved to astng
+      * bind (never been used)
+      * html: deprecated
+      * logger/logservice: use logging module
+      * monclient/monserver (not used anymore)
+      * patricia (never been used)
+      * twisted_distutils (not used anymore)
+    * removed the following functions/methods which have been deprecated for a
+      while now:
+      * modutils.load_module_from_parts
+      * textutils.searchall
+      * tree.Node.leafs
+      * fileutils.get_by_ext, filetutils.get_mode, fileutils.ensure_mode
    * umessage: more robust charset handling
+
 
 2006-11-03  --  0.20.2
     * fileutils: new remove_dead_links function
