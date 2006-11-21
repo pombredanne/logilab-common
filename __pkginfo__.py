@@ -44,7 +44,7 @@ modules,
   * logging"""
 
 
-web = "http://www.logilab.org/projects/%s" % modname
+web = "http://www.logilab.org/Project/name/%s" % distname
 ftp = "ftp://ftp.logilab.org/pub/%s" % modname
 mailinglist = "mailto://python-projects@lists.logilab.org"
 
