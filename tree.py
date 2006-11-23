@@ -268,7 +268,9 @@ class ListNode(VNode, list_class):
         """add a node to children"""
         child = list_class.pop(self, index)
         child.parent = None
-        
+
+    def __iter__(self):
+        return list_class.__iter__(self)
 
 # construct list from tree ####################################################
 
