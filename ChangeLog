@@ -3,6 +3,7 @@ ChangeLog for logilab.common
 
  --
     * tree: make Node iterable (iter on its children)
+    * some packaging fixes
 	
 2006-11-14  --  0.21.0
     * db:
