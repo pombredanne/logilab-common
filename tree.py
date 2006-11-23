@@ -19,6 +19,7 @@
 
 import sys
 
+from logilab.common import flatten
 from logilab.common.visitor import VisitedMixIn, FilteredIterator, no_filter
 
 ## Exceptions #################################################################
@@ -182,16 +183,14 @@ class Node :
         else:
             return [self]
 
+    def __iter__(self):
+        return iter(self.children)
+    
     def flatten(self, _list=None):
         """
         return a list with all the nodes descendant from this node
         """
-        if _list is None:
-            _list = []
-        _list.append(self)
-        for c in self.children:
-            c.flatten(_list)
-        return _list
+        return flatten(self)
 
     def lineage(self):
         """

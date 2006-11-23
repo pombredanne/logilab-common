@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * tree: make Node iterable (iter on its children)
+	
 2006-11-14  --  0.21.0
     * db:
      - new optional keepownership argument to backup|restore_database methods
