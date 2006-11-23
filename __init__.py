@@ -81,7 +81,27 @@ def union(list1, list2):
     return tmp.keys()
 
 
-# XXX are functions below still used ?
+# XXX move in a specific module
+
+def flatten(iterable, tr_func=None, results=None):
+    """flatten a list of list with any level
+
+    if tr_func is not None, it should be a one argument function that'll be called
+    on each final element
+    """
+    if results is None:
+        results = []
+    for val in iterable:
+        if isinstance(val, (list, tuple)):
+            flatten(val, tr_func, results)
+        elif tr_func is None:
+            results.append(val)
+        else:
+            results.append(tr_func(val))
+    return results
+
+
+# XXX is function below still used ?
 
 def make_domains(lists):
     """
@@ -108,21 +128,3 @@ def make_domains(lists):
                 i += 1
         domains.append(new_domain)
     return domains
-
-
-def flatten(iterable, tr_func=None, results=None):
-    """flatten a list of list with any level
-
-    if tr_func is not None, it should be a one argument function that'll be called
-    on each final element
-    """
-    if results is None:
-        results = []
-    for val in iterable:
-        if isinstance(val, (list, tuple)):
-            flatten(val, tr_func, results)
-        elif tr_func is None:
-            results.append(val)
-        else:
-            results.append(tr_func(val))
-    return results
