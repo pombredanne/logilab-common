@@ -190,7 +190,14 @@ class Node :
         """
         return a list with all the nodes descendant from this node
         """
-        return flatten(self)
+        if _list is None:
+            _list = []
+        _list.append(self)
+        for c in self.children:
+            c.flatten(_list)
+        return _list
+
+##        return flatten(self)
 
     def lineage(self):
         """

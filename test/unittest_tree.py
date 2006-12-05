@@ -24,6 +24,21 @@ class Node_ClassTest(TestCase):
     def setUp(self):
         """ called before each test from this class """        
         self.o = make_tree(tree)
+
+
+    def test_flatten(self):
+        result = [r.id for r in self.o.flatten()]
+        expected = ['root', 'child_1_1', 'child_2_1', 'child_2_2', 'child_3_1', 'child_1_2', 'child_2_3']
+        self.assertListEqual(result, expected)
+
+    def test_flatten_with_outlist(self):
+        resultnodes = []
+        self.o.flatten(resultnodes)
+        result = [r.id for r in resultnodes]
+        expected = ['root', 'child_1_1', 'child_2_1', 'child_2_2', 'child_3_1', 'child_1_2', 'child_2_3']
+        self.assertListEqual(result, expected)
+        
+        
     def test_known_values_remove(self):
         """ 
         remove a child node
