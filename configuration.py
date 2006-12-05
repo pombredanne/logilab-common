@@ -65,7 +65,6 @@ print config['value']
 config.generate_config()
 
 
-:version:   $Revision: 1.40 $  
 :author:    Logilab
 :copyright: 2003-2006 LOGILAB S.A. (Paris, FRANCE)
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
@@ -314,7 +313,7 @@ class OptionsManagerMixIn(object):
     
     def __init__(self, usage, config_file=None, version=None, quiet=0):
         self.config_file = config_file
-        self.reset_parsers(usage, version=None)
+        self.reset_parsers(usage, version=version)
         # list of registered options providers
         self.options_providers = []
         # dictionary assocating option name to checker
