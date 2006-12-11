@@ -197,8 +197,6 @@ class Node :
             c.flatten(_list)
         return _list
 
-##        return flatten(self)
-
     def lineage(self):
         """
         return list of parents up to root node
