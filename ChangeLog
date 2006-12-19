@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
 
- --
+2006-12-19  --  0.21.1
     * tree: make Node iterable (iter on its children)
     * configuration: fix #3197 (OptionsManagerMixin __init__ isn't passing
       correctly its "version" argument) 
@@ -21,20 +21,20 @@ ChangeLog for logilab.common
       functions in favor of new function shellutils.find	
     * mark the following modules for deprecation, they will be removed in a
       near version:
-      * astutils: moved to astng
-      * bind (never been used)
-      * html: deprecated
-      * logger/logservice: use logging module
-      * monclient/monserver (not used anymore)
-      * patricia (never been used)
-      * twisted_distutils (not used anymore)
+    * astutils: moved to astng
+    * bind (never been used)
+    * html: deprecated
+    * logger/logservice: use logging module
+    * monclient/monserver (not used anymore)
+    * patricia (never been used)
+    * twisted_distutils (not used anymore)
     * removed the following functions/methods which have been deprecated for a
       while now:
-      * modutils.load_module_from_parts
-      * textutils.searchall
-      * tree.Node.leafs
-      * fileutils.get_by_ext, filetutils.get_mode, fileutils.ensure_mode
-   * umessage: more robust charset handling
+    * modutils.load_module_from_parts
+    * textutils.searchall
+    * tree.Node.leafs
+    * fileutils.get_by_ext, filetutils.get_mode, fileutils.ensure_mode
+    * umessage: more robust charset handling
 
 
 2006-11-03  --  0.20.2

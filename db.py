@@ -230,6 +230,16 @@ class _Psycopg2Adapter(_PsycopgAdapter):
             extensions.register_type(psycopg2._psycopg.MXINTERVAL)
             extensions.register_type(psycopg2._psycopg.MXDATE)
             extensions.register_type(psycopg2._psycopg.MXTIME)
+            # StringIO/cStringIO adaptation
+            # XXX (syt) todo, see my december discussion on the psycopg2 list
+            # for a working solution
+            #def adapt_stringio(stringio):
+            #    print 'ADAPTING', stringio
+            #    return psycopg2.Binary(stringio.getvalue())
+            #import StringIO
+            #extensions.register_adapter(StringIO.StringIO, adapt_stringio)
+            #import cStringIO
+            #extensions.register_adapter(cStringIO.StringIO, adapt_stringio)
         
 
 class _PgsqlAdapter(DBAPIAdapter):
