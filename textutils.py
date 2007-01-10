@@ -156,11 +156,17 @@ def normalize_rest_paragraph(text, line_len=80, indent=''):
     for line in text.splitlines():
         line = indent + toreport + _NORM_SPACES_RGX.sub(' ', line.strip())
         toreport = ''
-        if len(line) > line_len:
+        while len(line) > line_len:
             # too long line, need split
             line, toreport = splittext(line, line_len)
-            toreport += ' '
-        lines.append(line)
+            lines.append(line)
+            if toreport:
+                line = indent + toreport + ' '
+                toreport = ''
+            else:
+                line = ''
+        if line:
+            lines.append(line.strip())
     return linesep.join(lines)
 
 def splittext(text, line_len):
@@ -179,7 +185,7 @@ def splittext(text, line_len):
         pos = min(len(text), line_len)
         while len(text) > pos and text[pos] != ' ':
             pos += 1
-    return text[:pos], text[pos+1:]
+    return text[:pos], text[pos+1:].strip()
 
 
 def get_csv(string, sep=','):
