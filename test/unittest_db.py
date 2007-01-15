@@ -48,7 +48,7 @@ class PreferedDriverTC(TestCase):
 
 class getCnxTC(TestCase):
     def setUp(self):
-        self.host = 'crater.logilab.fr'
+        self.host = None # 'crater.logilab.fr'
         self.db = 'template1'
         self.user = 'adim'
         self.passwd = 'adim'
