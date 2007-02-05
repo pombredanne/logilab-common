@@ -28,6 +28,7 @@ import sys
 import shutil
 import mimetypes
 from os.path import isabs, isdir, islink, split, exists, walk, normpath, join
+from os.path import abspath
 from os import sep, mkdir, remove, listdir, stat, chmod
 from stat import ST_MODE, S_IWRITE
 from cStringIO import StringIO
@@ -60,7 +61,18 @@ def first_level_directory(path):
     # path was absolute, head is the fs root
     return head
 
+def abspath_listdir(path):
+    """lists path's content using absolute paths
 
+    >>> os.listdir('/home')
+    ['adim', 'alf', 'arthur', 'auc']    
+    >>> abspath_listdir('/home')
+    ['/home/adim', '/home/alf', '/home/arthur', '/home/auc']
+    """
+    path = abspath(path)
+    return [join(path, filename) for filename in listdir(path)]
+
+    
 def is_binary(filename):
     """return true if filename may be a binary file, according to it's
     extension

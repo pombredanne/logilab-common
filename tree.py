@@ -282,7 +282,7 @@ class ListNode(VNode, list_class):
 def post_order_list(node, filter_func=no_filter):
     """ 
     create a list with tree nodes for which the <filter> function returned true
-    in a post order foashion
+    in a post order fashion
     """
     l, stack = [], []
     poped, index = 0, 0

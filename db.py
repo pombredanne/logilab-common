@@ -383,7 +383,7 @@ class _MySqlDBAdapter(DBAPIAdapter):
         the unicode named argument asks to use Unicode objects for strings
         in result sets and query parameters
         """
-        kwargs = {'host' : host, 'db' : database,
+        kwargs = {'host' : host or '', 'db' : database,
                   'user' : user, 'passwd' : password,
                   'use_unicode' : unicode}
         if port:

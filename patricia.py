@@ -14,7 +14,7 @@
  http://www.logilab.fr/ -- mailto:contact@logilab.fr
 
 
-a Python implementation of PATRICIA trie
+a Python implementation of PATRICIA tree
 
 PATRICIA - Practical Algorithm to Retrieve Information Coded in Alphanumeric
            D.R.Morrison (1968).
