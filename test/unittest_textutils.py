@@ -33,7 +33,7 @@ veeeeeeeeeeeeeeerrrrryyyyyyyyyyyyyyyyyyy loooooooooooooooooooooong
 linnnnnnnnnnnes
 
 and empty lines!''')
-        self.assertEquals(ulines(tu.normalize_text('''\
+        self.assertTextEquals(ulines(tu.normalize_text('''\
 some ReST formated text
 =======================
 With some times some veeeeeeeeeeeeeeerrrrryyyyyyyyyyyyyyyyyyy loooooooooooooooooooooong linnnnnnnnnnnes
@@ -45,10 +45,10 @@ another paragraph
 some ReST formated text
 =======================
 With some times some veeeeeeeeeeeeeeerrrrryyyyyyyyyyyyyyyyyyy
-loooooooooooooooooooooong linnnnnnnnnnnes and normal lines!
+loooooooooooooooooooooong linnnnnnnnnnnes
+and normal lines!
 
-another paragraph
-''')
+another paragraph''')
 
     def test_nonregr_unsplitable_word(self):
         self.assertEquals(ulines(tu.normalize_text('''petit complement :
@@ -127,8 +127,8 @@ ce qu'on a deja (situation des comptes, affaires en cours avec nb de jours prevu
 et depenses, etc.).""")
 
     def test_normalize_rest_paragraph(self):
-        self.assertEquals(ulines(tu.normalize_rest_paragraph("""**syt**: il sera avec alf a  compter de jeudi pour preparation sprint pypy et ptet un peu de ginco sur les bords""")),
-                          """""")
+        self.assertEquals(ulines(tu.normalize_rest_paragraph("""**syt**: il sera avec alf a compter de jeudi pour preparation sprint pypy et ptet un peu de ginco sur les bords""")),
+                              """**syt**: il sera avec alf a compter de jeudi pour preparation sprint pypy et\nptet un peu de ginco sur les bords""")
 
         
 class NormalizeParagraphTC(TestCase):
