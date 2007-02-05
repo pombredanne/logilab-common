@@ -17,7 +17,7 @@
 
 distname = 'logilab-common'
 modname = 'common'
-numversion = (0, 21, 1)
+numversion = (0, 21, 2)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
