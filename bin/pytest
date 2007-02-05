@@ -1,0 +1,27 @@
+#!/usr/bin/python
+
+import os, sys
+import os.path as osp
+from logilab.common import testlib
+
+
+def autopath(projdir=os.getcwd()):
+    """try to find project's root and add it to sys.path"""
+    curdir = osp.abspath(projdir)
+    while not osp.isfile(osp.join(curdir, '__pkginfo__.py')):
+        newdir = osp.normpath(osp.join(curdir, os.pardir))
+        if newdir == curdir:
+            break
+        curdir = newdir
+    else:
+        sys.path.insert(0, curdir)
+
+autopath()
+
+for dirname, dirs, files in os.walk(os.getcwd()):
+    for skipped in ('CVS', '.svn', '.hg'):
+        if skipped in dirs:
+            dirs.remove(skipped)
+    basename = osp.basename(dirname)
+    if basename in ('test', 'tests'):
+        testlib.main(dirname, exitafter=False)
