@@ -1,4 +1,4 @@
-# Copyright (c) 2006 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2006-2007 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -26,8 +26,8 @@ def cached(callableobj, keyarg=None):
             cache = '_%s_cache_' % callableobj.__name__
             #print 'cache1?', cache
             try:
-                return getattr(self, cache)
-            except AttributeError:
+                return self.__dict__[cache]
+            except KeyError:
                 #print 'miss'
                 value = callableobj(self, *args)
                 setattr(self, cache, value)
@@ -41,8 +41,8 @@ def cached(callableobj, keyarg=None):
             key = args[keyarg-1]
             #print 'cache2?', cache, self, key
             try:
-                _cache = getattr(self, cache)
-            except AttributeError:
+                _cache = self.__dict__[cache]
+            except KeyError:
                 #print 'init'
                 _cache = {}
                 setattr(self, cache, _cache)
@@ -57,8 +57,8 @@ def cached(callableobj, keyarg=None):
         cache = '_%s_cache_' % callableobj.__name__
         #print 'cache3?', cache, self, args
         try:
-            _cache = getattr(self, cache)
-        except AttributeError:
+            _cache = self.__dict__[cache]
+        except KeyError:
             #print 'init'
             _cache = {}
             setattr(self, cache, _cache)
@@ -73,16 +73,16 @@ def cached(callableobj, keyarg=None):
 def clear_cache(obj, funcname):
     """function to clear a cache handled by the cached decorator"""
     try:
-        delattr(obj, '_%s_cache_' % funcname)
-    except AttributeError:
+        del obj.__dict__['_%s_cache_' % funcname]
+    except KeyError:
         pass
 
 def copy_cache(obj, funcname, cacheobj):
     """copy cache for <funcname> from cacheobj to obj"""
     cache = '_%s_cache_' % funcname
     try:
-        setattr(obj, cache, getattr(cacheobj, cache))
-    except AttributeError:
+        setattr(obj, cache, cacheobj.__dict__[cache])
+    except KeyError:
         pass
 
 

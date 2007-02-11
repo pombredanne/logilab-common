@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * fixed cached decorator to use __dict__ instead of attribute lookup,
+      avoiding potential bugs with inheritance when using cached class 
+      methods
+
 2007-02-05  --  0.21.2
     * fix ReST normalization (#3471)
 
