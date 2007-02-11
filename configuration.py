@@ -480,17 +480,19 @@ class OptionsManagerMixIn(object):
                 if onlysection is not None and section != onlysection:
                     continue
                 default = provider.option_default(option, optdict)
-                if default is REQUIRED:
-                    defaultstr = 'required'
+                if optdict['type'] == 'password':
+                    defaultstr = ': '
+                elif default is REQUIRED:
+                    defaultstr = '(required): '
                 else:
                     if optdict.get('inputlevel', 0) > inputlevel:
                         provider.set_option(option, default, opt_dict=optdict)
                         continue
-                    defaultstr = 'default: %s' % format_option_value(optdict, default)
+                    defaultstr = '(default: %s): ' % format_option_value(optdict, default)
                 print ':%s:' % option
                 print optdict.get('help') or option
                 inputfunc = INPUT_FUNCTIONS[optdict['type']]
-                value = inputfunc(optdict, '(%s): ' % defaultstr)
+                value = inputfunc(optdict, defaultstr)
                 while default is REQUIRED and not value:
                     print 'please specify a value'
                     value = inputfunc(optdict, '%s: ' % option)
