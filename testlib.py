@@ -84,7 +84,7 @@ def main(testdir=None, exitafter=True):
     quiet = False
     profile = False
     exclude = []
-    capture = False
+    capture = 0
     for o, a in opts:
         if o == '-v':
             verbose += 1
@@ -98,7 +98,7 @@ def main(testdir=None, exitafter=True):
         elif o == '-p':
             profile = True
         elif o == '-c':
-            capture = True
+            capture += 1
         elif o == '-d':
             global ENABLE_DBC
             ENABLE_DBC = True
@@ -161,7 +161,7 @@ def main(testdir=None, exitafter=True):
     else:
         sys.path.pop(0)
 
-def run_tests(tests, quiet, verbose, runner=None, capture=False):
+def run_tests(tests, quiet, verbose, runner=None, capture=0):
     """ execute a list of tests
     return a 3-uple with :
        _ the list of passed tests
@@ -220,7 +220,7 @@ def find_tests(testdir,
     return tests
 
 
-def run_test(test, verbose, runner=None, capture=False):
+def run_test(test, verbose, runner=None, capture=0):
     """
     Run a single test.
 
@@ -309,7 +309,7 @@ from cStringIO import StringIO
 class SkipAwareTestResult(unittest._TextTestResult):
 
     def __init__(self, stream, descriptions, verbosity,
-                 exitfirst=False, capture=False):
+                 exitfirst=False, capture=0):
         unittest._TextTestResult.__init__(self, stream, descriptions, verbosity)
         self.skipped = []
         self.debuggers = []
@@ -360,7 +360,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
             self.stream.writeln("%s: %s" % (flavour,self.getDescription(test)))
             self.stream.writeln(self.separator2)
             self.stream.writeln("%s" % err)
-            if self.capture:
+            if self.capture == 1:
                 output, errput = test.captured_output()
                 if output:
                     self.stream.writeln(self.separator2)
@@ -516,7 +516,7 @@ Examples:
     def parseArgs(self, argv):
         self.pdbmode = False
         self.exitfirst = False
-        self.capture = False
+        self.capture = 0
         import getopt
         try:
             options, args = getopt.getopt(argv[1:], 'hHvixqc',
@@ -533,7 +533,7 @@ Examples:
                 if opt in ('-v','--verbose'):
                     self.verbosity = 2
                 if opt in ('-c', '--capture'):
-                    self.capture = True
+                    self.capture += 1
             if len(args) == 0 and self.defaultTest is None:
                 self.test = self.testLoader.loadTestsFromModule(self.module)
                 return
@@ -844,6 +844,9 @@ class TestCase(unittest.TestCase):
         for i, value in enumerate(l2):
             try:
                 if _l1[0] != value:
+                    from pprint import pprint
+                    pprint(l1)
+                    pprint(l2)
                     self.fail('%r != %r for index %d' % (_l1[0], value, i))
                 del _l1[0]
             except IndexError:
