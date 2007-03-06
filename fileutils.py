@@ -64,9 +64,9 @@ def first_level_directory(path):
 def abspath_listdir(path):
     """lists path's content using absolute paths
 
-    >>> os.listdir('/home')
+    >> os.listdir('/home')
     ['adim', 'alf', 'arthur', 'auc']    
-    >>> abspath_listdir('/home')
+    >> abspath_listdir('/home')
     ['/home/adim', '/home/alf', '/home/arthur', '/home/auc']
     """
     path = abspath(path)
