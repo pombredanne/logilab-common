@@ -1,8 +1,19 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import os, sys
 import os.path as osp
 from logilab.common import testlib
+import doctest
+import unittest
+
+# monkeypatch unittest and doctest (ouch !)
+unittest.TestCase = testlib.TestCase
+unittest.main = testlib.unittest_main
+unittest._TextTestResult = testlib.SkipAwareTestResult
+unittest.TextTestRunner = testlib.SkipAwareTextTestRunner
+unittest.TestLoader = testlib.NonStrictTestLoader
+unittest.TestProgram = testlib.SkipAwareTestProgram
+doctest.DocTestCase.__bases__ = (testlib.TestCase,)
 
 
 def autopath(projdir=os.getcwd()):
@@ -16,12 +27,35 @@ def autopath(projdir=os.getcwd()):
     else:
         sys.path.insert(0, curdir)
 
-autopath()
+def testfile(filename):
+    sys.argv.remove(filename)
+    here = os.getcwd()
+    dirname = osp.dirname(filename)
+    if dirname:
+        os.chdir(dirname)
+    sys.path.insert(0, '')
+    modname = osp.basename(filename)[:-3]
+    testlib.unittest_main(modname)
 
-for dirname, dirs, files in os.walk(os.getcwd()):
-    for skipped in ('CVS', '.svn', '.hg'):
-        if skipped in dirs:
-            dirs.remove(skipped)
-    basename = osp.basename(dirname)
-    if basename in ('test', 'tests'):
-        testlib.main(dirname, exitafter=False)
+def testall():
+    errcode = 0
+    for dirname, dirs, files in os.walk(os.getcwd()):
+        for skipped in ('CVS', '.svn', '.hg'):
+            if skipped in dirs:
+                dirs.remove(skipped)
+        basename = osp.basename(dirname)
+        if basename in ('test', 'tests'):
+            errcode += testlib.main(dirname, exitafter=False)
+    return errcode
+
+if __name__ == '__main__':
+    autopath()
+    filenames = [arg for arg in sys.argv[1:] if arg.endswith('.py')]
+    if filenames:
+        if len(filenames) > 1:
+            print "Usage: pytest [filename]"
+            sys.exit(-1)
+        # testfile will exit directly
+        testfile(filenames[0])
+    sys.exit(testall())
+
