@@ -1,4 +1,4 @@
-# Copyright (c) 2004-2006 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2004-2007 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -26,7 +26,7 @@ from logilab.common.configuration import Configuration
 
 
 DEFAULT_COPYRIGHT = '''\
-Copyright (c) 2004-2006 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+Copyright (c) 2004-2007 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
 
 

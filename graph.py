@@ -3,7 +3,7 @@
 (dot generation adapted from pypy/translator/tool/make_dot.py)
 
 :organization: Logilab
-:copyright: 2003-2005 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2003-2007 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 """
 
@@ -89,13 +89,15 @@ class DotBackend:
         """
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
         self.emit('edge [%s];' % ", ".join(attrs))
-        self.emit('%s -> %s' % (name1.replace(' ', '_'), name2.replace(' ', '_')))
+        self.emit('%s -> %s' % (normalize_node_id(name1), normalize_node_id(name2)))
 
     def emit_node(self, name, **props):
         """authorized props: shape, label, color, fillcolor, style"""
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
-        self.emit('%s [%s];' % (name.replace(' ', '_'), ", ".join(attrs)))
+        self.emit('%s [%s];' % (normalize_node_id(name), ", ".join(attrs)))
 
+def normalize_node_id(nid):
+    return nid.replace(' ', '_').replace('-', '_')
 
 class GraphGenerator:
     def __init__(self, backend):
