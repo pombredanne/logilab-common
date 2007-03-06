@@ -336,7 +336,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
     def addFailure(self, test, err):
         if self.exitfirst:
             self.shouldStop = True
-        super(SkipAwareTestResult, self).addError(test, err)
+        super(SkipAwareTestResult, self).addFailure(test, err)
         self._create_pdb(self.getDescription(test))
 
     def addSkipped(self, test, reason):
@@ -783,7 +783,7 @@ class TestCase(unittest.TestCase):
         try:
             testfunc(*args, **kwargs)
             self._stop_capture()
-        except self.failureException:
+        except (self.failureException, AssertionError):
             self._stop_capture()
             result.addFailure(self, self.__exc_info())
             return 1
