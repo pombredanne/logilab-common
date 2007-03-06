@@ -431,7 +431,7 @@ class NonStrictTestLoader(unittest.TestLoader):
     def _collect_tests(self, module):
         tests = {}
         for obj in vars(module).values():
-            if type(obj) in (types.ClassType, type) and \
+            if issubclass(type(obj), (types.ClassType, type)) and \
                    issubclass(obj, unittest.TestCase):
                 classname = obj.__name__
                 methodnames = []

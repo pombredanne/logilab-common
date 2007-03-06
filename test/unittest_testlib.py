@@ -320,7 +320,25 @@ class TestLoaderTC(TestCase):
             collected = self.loader.loadTestsFromName(pattern, self.module)
             yield self.assertEquals, len(collected), expected_count
 
-
+    def test_tescase_with_custom_metaclass(self):
+        class mymetaclass(type): pass
+        class MyMod:
+            class MyTestCase(TestCase):
+                __metaclass__ = mymetaclass
+                def test_foo1(self): pass
+                def test_foo2(self): pass
+                def test_bar(self): pass
+        data = [('test_foo1', 1), ('test_foo', 2), ('test_bar', 1),
+                ('foo1', 1), ('foo', 2), ('bar', 1), ('ba', 1),
+                ('test', 3), ('ab', 0),
+                ('MyTestCase.test_foo1', 1), ('MyTestCase.test_foo', 2),
+                ('MyTestCase.test_fo', 2), ('MyTestCase.foo1', 1),
+                ('MyTestCase.foo', 2), ('MyTestCase.whatever', 0)
+                ]
+        for pattern, expected_count in data:
+            collected = self.loader.loadTestsFromName(pattern, MyMod)
+            yield self.assertEquals, len(collected), expected_count
+        
 
 
 def bootstrap_print(msg, output=sys.stdout):
