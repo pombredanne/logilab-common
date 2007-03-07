@@ -783,7 +783,7 @@ class TestCase(unittest.TestCase):
         try:
             testfunc(*args, **kwargs)
             self._stop_capture()
-        except (self.failureException, AssertionError):
+        except self.failureException:
             self._stop_capture()
             result.addFailure(self, self.__exc_info())
             return 1
