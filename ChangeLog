@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+  --
+    * pytest improvements
+
+	
 2007-02-12  --  0.21.3
     * fixed cached decorator to use __dict__ instead of attribute lookup,
       avoiding potential bugs with inheritance when using cached class 
