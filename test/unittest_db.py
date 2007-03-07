@@ -4,6 +4,8 @@ unit tests for module logilab.common.db
 """
 __revision__ = "$Id: unittest_db.py,v 1.13 2006-03-13 12:42:56 syt Exp $"
 
+import socket
+
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.db import *
 from logilab.common.db import PREFERED_DRIVERS, _GenericAdvFuncHelper, _PGAdvFuncHelper
@@ -46,8 +48,10 @@ class PreferedDriverTC(TestCase):
         self.assertEquals(PREFERED_DRIVERS['postgres'], expected)
 
 
-class getCnxTC(TestCase):
+class GetCnxTC(TestCase):
     def setUp(self):
+        if not socket.gethostname().startswith('lepus'):
+            self.skip("those tests require specific DB configuration")
         self.host = None # 'crater.logilab.fr'
         self.db = 'template1'
         self.user = 'adim'
