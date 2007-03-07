@@ -50,7 +50,7 @@ class PreferedDriverTC(TestCase):
 
 class GetCnxTC(TestCase):
     def setUp(self):
-        if not socket.gethostname().startswith('lepus'):
+        if not socket.gethostname().startswith('crater'):
             self.skip("those tests require specific DB configuration")
         self.host = None # 'crater.logilab.fr'
         self.db = 'template1'
