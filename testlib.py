@@ -511,7 +511,8 @@ Examples:
   %(progName)s MyTestCase                    - run all 'test*' test methods
                                                in MyTestCase
 """
-    def __init__(self, module='__main__'):
+    def __init__(self, module='__main__', batchmode=False):
+        self.batchmode = batchmode
         super(SkipAwareTestProgram, self).__init__(
             module=module, testLoader=NonStrictTestLoader())
        
@@ -560,7 +561,9 @@ Examples:
             self.pdbmode = True
         if result.debuggers and self.pdbmode:
             start_interactive_mode(result.debuggers, result.descrs)
-        sys.exit(not result.wasSuccessful())
+        if not self.batchmode:
+            sys.exit(not result.wasSuccessful())
+        self.result = result
 
 
 
@@ -638,10 +641,10 @@ def capture_stderr():
     return _capture('stderr')
 
 
-def unittest_main(module='__main__'):
+def unittest_main(module='__main__', batchmode=False):
     """use this functon if you want to have the same functionality
     as unittest.main"""
-    SkipAwareTestProgram(module)
+    return SkipAwareTestProgram(module, batchmode)
 
 class TestSkipped(Exception):
     """raised when a test is skipped"""
