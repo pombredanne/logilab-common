@@ -22,14 +22,14 @@ doctest.DocTestCase.__bases__ = (testlib.TestCase,)
 def autopath(projdir=os.getcwd()):
     """try to find project's root and add it to sys.path"""
     curdir = osp.abspath(projdir)
-    while not osp.isfile(osp.join(curdir, '__pkginfo__.py')):
+    while osp.isfile(osp.join(curdir, '__init__.py')):
         newdir = osp.normpath(osp.join(curdir, os.pardir))
         if newdir == curdir:
             break
         curdir = newdir
     else:
         sys.path.insert(0, curdir)
-
+    sys.path.insert(0, '')
 
 class GlobalTestReport(object):
     """this class holds global test statistics"""
@@ -107,7 +107,7 @@ def testonedir(testdir, exitfirst=False, report=None):
     for filename in abspath_listdir(testdir):
         if this_is_a_testfile(filename):
             # run test and collect information
-            prog, ttime, ctime = testfile(filename)
+            prog, ttime, ctime = testfile(filename, batchmode=True)
             report.feed(filename, prog.result, ttime, ctime)
             if exitfirst and not prog.result.wasSuccessful():
                 break
@@ -117,7 +117,7 @@ def testonedir(testdir, exitfirst=False, report=None):
     return report.failures + report.errors
 
 
-def testfile(filename):
+def testfile(filename, batchmode=False):
     """runs every test in `filename`
     
     :param filename: an absolute path pointing to a unittest file
@@ -126,16 +126,16 @@ def testfile(filename):
     dirname = osp.dirname(filename)
     if dirname:
         os.chdir(dirname)
-    sys.path.insert(0, '')
     modname = osp.basename(filename)[:-3]
     try:
         tstart, cstart = time(), clock()
-        testprog = testlib.unittest_main(modname, batchmode=True)
+        testprog = testlib.unittest_main(modname, batchmode)
         tend, cend = time(), clock()
         return testprog, (tend - tstart), (cend - cstart)
     finally:
-        sys.path.pop(0)
-
+        if dirname:
+            os.chdir(here)
+        
 
 def parseargs():
     """builds an option parser
