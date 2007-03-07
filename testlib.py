@@ -44,7 +44,8 @@ except ImportError:
             pass
     test_support = TestSupport()
 
-from logilab.common.deprecation import class_renamed, deprecated_function
+from logilab.common.deprecation import class_renamed, deprecated_function, \
+     obsolete
 from logilab.common.compat import set, enumerate
 from logilab.common.modutils import load_module_from_name
 
@@ -161,6 +162,8 @@ def main(testdir=None, exitafter=True):
     else:
         sys.path.pop(0)
         return len(bad)
+main = obsolete("testlib.main() is obsolete, use the pytest tool instead")(main)
+
 
 def run_tests(tests, quiet, verbose, runner=None, capture=0):
     """ execute a list of tests

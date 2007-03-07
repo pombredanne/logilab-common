@@ -82,3 +82,15 @@ def moved(modpath, objname):
         m = load_module_from_name(modpath)
         return getattr(m, objname)(*args, **kwargs)
     return callnew
+
+def obsolete(reason="This function is obsolete"):
+    """this function is an alternative to `deprecated_function`
+    when there's no real replacement for the deprecated function
+    """
+    def newdecorator(func):
+        def wrapped(*args, **kwargs):
+            warn(reason, DeprecationWarning, stacklevel=2)
+            return func(*args, **kwargs)
+        return wrapped
+    return newdecorator
+
