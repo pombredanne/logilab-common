@@ -783,7 +783,7 @@ class TestCase(unittest.TestCase):
         try:
             testfunc(*args, **kwargs)
             self._stop_capture()
-        except (self.failureException, AssertionError):
+        except self.failureException:
             self._stop_capture()
             result.addFailure(self, self.__exc_info())
             return 1
@@ -931,14 +931,36 @@ class SkippedSuite(unittest.TestSuite):
         print 'goiooo'
         self.skipped_test('doctest module has no DocTestSuite class')
 
+
+class DocTestFinder(doctest.DocTestFinder):
+
+    def __init__(self, *args, **kwargs):
+        self.skipped = kwargs.pop('skipped', ())
+        doctest.DocTestFinder.__init__(self, *args, **kwargs)
+    
+    def _get_test(self, obj, name, module, globs, source_lines):
+        """override default _get_test method to be able to skip tests
+        according to skipped attribute's value
+
+        Note: Python (<=2.4) use a _name_filter which could be used for that
+              purpose but it's no longer available in 2.5
+              Python 2.5 seems to have a [SKIP] flag
+        """
+        if getattr(obj, '__name__', '') in self.skipped:
+            return None
+        return doctest.DocTestFinder._get_test(self, obj, name, module,
+                                               globs, source_lines)
+
 class DocTest(TestCase):
     """trigger module doctest
     I don't know how to make unittest.main consider the DocTestSuite instance
     without this hack
     """
+    skipped = ()
     def __call__(self, result=None):
         try:
-            suite = doctest.DocTestSuite(self.module)
+            finder = DocTestFinder(skipped=self.skipped)
+            suite = doctest.DocTestSuite(self.module, test_finder=finder)
         except AttributeError:
             suite = SkippedSuite()
         return suite.run(result)
