@@ -938,24 +938,44 @@ class SkippedSuite(unittest.TestSuite):
         self.skipped_test('doctest module has no DocTestSuite class')
 
 
-class DocTestFinder(doctest.DocTestFinder):
+# DocTestFinder was introduced in python2.4
+if sys.version_info >= (2, 4):
+    class DocTestFinder(doctest.DocTestFinder):
 
-    def __init__(self, *args, **kwargs):
-        self.skipped = kwargs.pop('skipped', ())
-        doctest.DocTestFinder.__init__(self, *args, **kwargs)
-    
-    def _get_test(self, obj, name, module, globs, source_lines):
-        """override default _get_test method to be able to skip tests
-        according to skipped attribute's value
+        def __init__(self, *args, **kwargs):
+            self.skipped = kwargs.pop('skipped', ())
+            doctest.DocTestFinder.__init__(self, *args, **kwargs)
 
-        Note: Python (<=2.4) use a _name_filter which could be used for that
-              purpose but it's no longer available in 2.5
-              Python 2.5 seems to have a [SKIP] flag
-        """
-        if getattr(obj, '__name__', '') in self.skipped:
-            return None
-        return doctest.DocTestFinder._get_test(self, obj, name, module,
-                                               globs, source_lines)
+        def _get_test(self, obj, name, module, globs, source_lines):
+            """override default _get_test method to be able to skip tests
+            according to skipped attribute's value
+
+            Note: Python (<=2.4) use a _name_filter which could be used for that
+                  purpose but it's no longer available in 2.5
+                  Python 2.5 seems to have a [SKIP] flag
+            """
+            if getattr(obj, '__name__', '') in self.skipped:
+                return None
+            return doctest.DocTestFinder._get_test(self, obj, name, module,
+                                                   globs, source_lines)
+else:
+    # this is a hack to make skipped work with python <= 2.3
+    class DocTestFinder(object):
+        def __init__(self, skipped):
+            self.skipped = skipped
+            self.original_find_tests = doctest._find_tests
+            doctest._find_tests = self._find_tests
+            
+        def _find_tests(self, module, prefix=None):
+            tests = []
+            for testinfo  in self.original_find_tests(module, prefix):
+                testname, _, _, _ = testinfo
+                # testname looks like A.B.C.function_name
+                testname = testname.split('.')[-1]
+                if testname not in self.skipped:
+                    tests.append(testinfo)
+            return tests
+
 
 class DocTest(TestCase):
     """trigger module doctest
@@ -966,7 +986,10 @@ class DocTest(TestCase):
     def __call__(self, result=None):
         try:
             finder = DocTestFinder(skipped=self.skipped)
-            suite = doctest.DocTestSuite(self.module, test_finder=finder)
+            if sys.version_info >= (2, 4):
+                suite = doctest.DocTestSuite(self.module, test_finder=finder)
+            else:
+                suite = doctest.DocTestSuite(self.module)
         except AttributeError:
             suite = SkippedSuite()
         return suite.run(result)

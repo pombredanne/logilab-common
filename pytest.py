@@ -16,8 +16,10 @@ unittest._TextTestResult = testlib.SkipAwareTestResult
 unittest.TextTestRunner = testlib.SkipAwareTextTestRunner
 unittest.TestLoader = testlib.NonStrictTestLoader
 unittest.TestProgram = testlib.SkipAwareTestProgram
-doctest.DocTestCase.__bases__ = (testlib.TestCase,)
-
+if sys.version_info >= (2, 4):
+    doctest.DocTestCase.__bases__ = (testlib.TestCase,)
+else:
+    unittest.FunctionTestCase.__bases__ = (testlib.TestCase,)
 
 def autopath(projdir=os.getcwd()):
     """try to find project's root and add it to sys.path"""
@@ -71,7 +73,7 @@ class GlobalTestReport(object):
         if self.errors or self.failures:
             line2 = '%s modules OK (%s failed)' % (modulesok,
                                                    len(self.errmodules))
-            descr = ', '.join('%s [%s/%s]' % info for info in self.errmodules)
+            descr = ', '.join(['%s [%s/%s]' % info for info in self.errmodules])
             line3 = '\nfailures: %s' % descr
         else:
             line2 = 'All %s modules OK' % modulesok
