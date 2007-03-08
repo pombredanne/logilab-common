@@ -63,6 +63,8 @@ class UtilTC(TestCase):
 
 class TestlibTC(TestCase):
 
+    capture = True
+    
     def setUp(self):
         self.tc = MockTestCase()
 
