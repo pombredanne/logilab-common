@@ -684,6 +684,8 @@ def parse_generative_args(params):
 class TestCase(unittest.TestCase):
     """unittest.TestCase with some additional methods"""
 
+    capture = False
+    
     def __init__(self, methodName='runTest'):
         super(TestCase, self).__init__(methodName)
         # internal API changed in python2.5
@@ -728,7 +730,9 @@ class TestCase(unittest.TestCase):
         """
         if result is None:
             result = self.defaultTestResult()
-        self.capture = getattr(result, 'capture', False)
+        # if self.capture is True here, it means it was explicitly specified
+        # in the user's TestCase class. If not, do what was asked on cmd line
+        self.capture = self.capture or getattr(result, 'capture', False)
         result.startTest(self)
         testMethod = getattr(self, self.__testMethodName)
         try:
