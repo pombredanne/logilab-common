@@ -129,6 +129,7 @@ def testfile(filename, batchmode=False):
     if dirname:
         os.chdir(dirname)
     modname = osp.basename(filename)[:-3]
+    print ('  %s  ' % osp.basename(filename)).center(70, '=')
     try:
         tstart, cstart = time(), clock()
         testprog = testlib.unittest_main(modname, batchmode=batchmode)
