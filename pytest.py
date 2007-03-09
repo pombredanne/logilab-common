@@ -131,7 +131,7 @@ def testfile(filename, batchmode=False):
     modname = osp.basename(filename)[:-3]
     try:
         tstart, cstart = time(), clock()
-        testprog = testlib.unittest_main(modname, batchmode)
+        testprog = testlib.unittest_main(modname, batchmode=batchmode)
         tend, cend = time(), clock()
         return testprog, (tend - tstart), (cend - cstart)
     finally:

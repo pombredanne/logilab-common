@@ -450,6 +450,15 @@ class NonStrictTestLoader(unittest.TestLoader):
                 # keep track of class (obj) for convenience
                 tests[classname] = (obj, methodnames)
         return tests
+
+    def loadTestsFromSuite(self, module, suitename):
+        try:
+            suite = getattr(module, suitename)()
+        except AttributeError:
+            print "No such suite", suitename
+            return []
+        return suite
+    
         
     def loadTestsFromName(self, name, module=None):
         parts = name.split('.')
@@ -462,6 +471,9 @@ class NonStrictTestLoader(unittest.TestLoader):
         collected = []
         if len(parts) == 1:
             pattern = parts[0]
+            if callable(getattr(module, pattern, None)) and pattern not in tests:
+                # consider it as a suite
+                return self.loadTestsFromSuite(module, pattern)
             if pattern in tests:
                 # case python unittest_foo.py MyTestTC
                 klass, methodnames = tests[pattern]
@@ -514,10 +526,11 @@ Examples:
   %(progName)s MyTestCase                    - run all 'test*' test methods
                                                in MyTestCase
 """
-    def __init__(self, module='__main__', batchmode=False):
+    def __init__(self, module='__main__', defaultTest=None, batchmode=False):
         self.batchmode = batchmode
         super(SkipAwareTestProgram, self).__init__(
-            module=module, testLoader=NonStrictTestLoader())
+            module=module, defaultTest=defaultTest,
+            testLoader=NonStrictTestLoader())
        
     
     def parseArgs(self, argv):
@@ -644,10 +657,10 @@ def capture_stderr():
     return _capture('stderr')
 
 
-def unittest_main(module='__main__', batchmode=False):
+def unittest_main(module='__main__', defaultTest=None, batchmode=False):
     """use this functon if you want to have the same functionality
     as unittest.main"""
-    return SkipAwareTestProgram(module, batchmode)
+    return SkipAwareTestProgram(module, defaultTest, batchmode)
 
 class TestSkipped(Exception):
     """raised when a test is skipped"""
