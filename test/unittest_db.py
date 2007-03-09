@@ -52,7 +52,7 @@ class GetCnxTC(TestCase):
     def setUp(self):
         if not socket.gethostname().startswith('crater'):
             self.skip("those tests require specific DB configuration")
-        self.host = None # 'crater.logilab.fr'
+        self.host = 'localhost' # None
         self.db = 'template1'
         self.user = 'adim'
         self.passwd = 'adim'
