@@ -3,19 +3,20 @@ Unittests for date helpers
 """
 
 from logilab.common.testlib import TestCase, unittest_main
-from logilab.common.date import date_range, endOfMonth
+
+from logilab.common.date import date_range
 
 try:
     from mx.DateTime import Date, RelativeDate
+    from logilab.common.date import endOfMonth
 except ImportError:
-    Date = None
+    from datetime import date as Date
+    endOfMonth = None
 
 class DateTC(TestCase):
-
+    
     def test_day(self):
         """enumerate days"""
-        if Date is None:
-            self.skip('mx.DateTime is not installed')
         r = list(date_range(Date(2000,1,1), Date(2000,1,4)))
         expected = [Date(2000,1,1), Date(2000,1,2), Date(2000,1,3)]
         self.assertListEquals(r, expected)
@@ -25,7 +26,7 @@ class DateTC(TestCase):
 
     def test_month(self):
         """enumerate months"""
-        if Date is None:
+        if endOfMonth is None:
             self.skip('mx.DateTime is not installed')
         r = list(date_range(Date(2000,1,2), Date(2000,4,4), endOfMonth))
         expected = [Date(2000,1,2), Date(2000,2,29), Date(2000,3,31)]
