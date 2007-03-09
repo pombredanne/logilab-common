@@ -457,7 +457,11 @@ class NonStrictTestLoader(unittest.TestLoader):
         except AttributeError:
             print "No such suite", suitename
             return []
-        return suite
+        assert hasattr(suite, '_tests'), \
+               "%s.%s is not a valid TestSuite" % (module.__name__, suitename)
+        # python2.3 does not implement __iter__ on suites, we need to return
+        # _tests explicitly
+        return suite._tests
     
         
     def loadTestsFromName(self, name, module=None):
