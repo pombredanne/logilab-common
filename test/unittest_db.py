@@ -179,7 +179,10 @@ class DBAPIAdaptersTC(TestCase):
         except ImportError:
             self.skip('postgresql dbapi module not installed')            
         self.failUnless(isinstance(module.adv_func_helper, _PGAdvFuncHelper))
-        module = get_dbapi_compliant_module('sqlite')
+        try:
+            module = get_dbapi_compliant_module('sqlite')
+        except ImportError:
+            self.skip('postgresql dbapi module not installed')            
         self.failUnless(isinstance(module.adv_func_helper, _GenericAdvFuncHelper))
 
 

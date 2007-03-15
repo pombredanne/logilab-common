@@ -26,6 +26,7 @@ from __future__ import nested_scopes
 
 import sys
 import os, os.path as osp
+import re
 import time
 import getopt
 import traceback
@@ -34,6 +35,8 @@ import difflib
 import types
 from warnings import warn
 from compiler.consts import CO_GENERATOR
+
+# PRINT_ = file('stdout.txt', 'w').write
 
 try:
     from test import test_support
@@ -313,7 +316,7 @@ from cStringIO import StringIO
 class SkipAwareTestResult(unittest._TextTestResult):
 
     def __init__(self, stream, descriptions, verbosity,
-                 exitfirst=False, capture=0):
+                 exitfirst=False, capture=0, printonly=None):
         super(SkipAwareTestResult, self).__init__(stream,
                                                   descriptions, verbosity)
         self.skipped = []
@@ -321,6 +324,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.descrs = []
         self.exitfirst = exitfirst
         self.capture = capture
+        self.printonly = printonly
         
     def _create_pdb(self, test_descr):
         self.debuggers.append(Debugger(sys.exc_info()[2]))
@@ -365,36 +369,36 @@ class SkipAwareTestResult(unittest._TextTestResult):
             self.stream.writeln("%s: %s" % (flavour,self.getDescription(test)))
             self.stream.writeln(self.separator2)
             self.stream.writeln("%s" % err)
-            if self.capture == 1:
-                output, errput = test.captured_output()
-                if output:
-                    self.stream.writeln(self.separator2)
-                    self.stream.writeln("captured stdout".center(len(self.separator2)))
-                    self.stream.writeln(self.separator2)
-                    self.stream.writeln(output)
-                else:
-                    self.stream.writeln('no stdout'.center(len(self.separator2)))
-                if errput:
-                    self.stream.writeln(self.separator2)
-                    self.stream.writeln("captured stderr".center(len(self.separator2)))
-                    self.stream.writeln(self.separator2)
-                    self.stream.writeln(errput)
-                else:
-                    self.stream.writeln('no stderr'.center(len(self.separator2)))
+            output, errput = test.captured_output()
+            if output:
+                self.stream.writeln(self.separator2)
+                self.stream.writeln("captured stdout".center(len(self.separator2)))
+                self.stream.writeln(self.separator2)
+                self.stream.writeln(output)
+            else:
+                self.stream.writeln('no stdout'.center(len(self.separator2)))
+            if errput:
+                self.stream.writeln(self.separator2)
+                self.stream.writeln("captured stderr".center(len(self.separator2)))
+                self.stream.writeln(self.separator2)
+                self.stream.writeln(errput)
+            else:
+                self.stream.writeln('no stderr'.center(len(self.separator2)))
 
 
 class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
     def __init__(self, stream=sys.stderr, verbosity=1,
-                 exitfirst=False, capture=False):
+                 exitfirst=False, capture=False, printonly=None):
         super(SkipAwareTextTestRunner, self).__init__(stream=stream,
                                                       verbosity=verbosity)
         self.exitfirst = exitfirst
         self.capture = capture
+        self.printonly = printonly
         
     def _makeResult(self):
         return SkipAwareTestResult(self.stream, self.descriptions, self.verbosity,
-                                   self.exitfirst, self.capture)
+                                   self.exitfirst, self.capture, self.printonly)
 
 
 class keywords(dict):
@@ -521,6 +525,7 @@ Options:
   -i, --pdb        Enable test failure inspection
   -x, --exitfirst  Exit on first failure
   -c, --capture    Captures and prints standard out/err only on errors
+  -p, --printonly  Only prints lines matching specified pattern (implies capture)
   -q, --quiet      Minimal output
 
 Examples:
@@ -541,10 +546,11 @@ Examples:
         self.pdbmode = False
         self.exitfirst = False
         self.capture = 0
+        self.printonly = None
         import getopt
         try:
-            options, args = getopt.getopt(argv[1:], 'hHvixqc',
-                                          ['help','verbose','quiet', 'pdb', 'exitfirst', 'capture'])
+            options, args = getopt.getopt(argv[1:], 'hHvixqcp:',
+                                          ['help','verbose','quiet', 'pdb', 'exitfirst', 'capture', 'printonly='])
             for opt, value in options:
                 if opt in ('-h','-H','--help'):
                     self.usageExit()
@@ -558,6 +564,10 @@ Examples:
                     self.verbosity = 2
                 if opt in ('-c', '--capture'):
                     self.capture += 1
+                if opt in ('-p', '--printonly'):
+                    self.printonly = re.compile(value)
+            if self.printonly is not None:
+                self.capture += 1
             if len(args) == 0 and self.defaultTest is None:
                 self.test = self.testLoader.loadTestsFromModule(self.module)
                 return
@@ -570,11 +580,11 @@ Examples:
             self.usageExit(msg)
 
 
-
     def runTests(self):
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
                                                   exitfirst=self.exitfirst,
-                                                  capture=self.capture)
+                                                  capture=self.capture,
+                                                  printonly=self.printonly)
         result = self.testRunner.run(self.test)
         if os.environ.get('PYDEBUG'):
             warn("PYDEBUG usage is deprecated, use -i / --pdb instead", DeprecationWarning)
@@ -592,18 +602,28 @@ class FDCapture:
     """adapted from py lib (http://codespeak.net/py)
     Capture IO to/from a given os-level filedescriptor.
     """
-    def __init__(self, fd, attr='stdout'):
+    def __init__(self, fd, attr='stdout', printonly=None):
         self.targetfd = fd
         self.tmpfile = os.tmpfile() # self.maketempfile()
+        self.printonly = printonly
         # save original file descriptor
         self._savefd = os.dup(fd)
         # override original file descriptor
         os.dup2(self.tmpfile.fileno(), fd)
         # also modify sys module directly
         self.oldval = getattr(sys, attr)
-        setattr(sys, attr, self.tmpfile)
+        setattr(sys, attr, self) # self.tmpfile)
         self.attr = attr
-    
+
+    def write(self, msg):
+        # msg might be composed of several lines
+        for line in msg.splitlines():
+            line += '\n' # keepdend=True is not enough
+            if self.printonly is None or self.printonly.search(line) is None:
+                self.tmpfile.write(line)
+            else:
+                os.write(self._savefd, line)
+        
 ##     def maketempfile(self):
 ##         tmpf = os.tmpfile()
 ##         fd = os.dup(tmpf.fileno())
@@ -633,7 +653,7 @@ class FDCapture:
         return self.tmpfile.read()
 
 
-def _capture(which='stdout'):
+def _capture(which='stdout', printonly=None):
     """private method, should not be called directly
     (cf. capture_stdout() and capture_stderr())
     """
@@ -642,23 +662,23 @@ def _capture(which='stdout'):
         fd = 1
     else:
         fd = 2
-    return FDCapture(fd, which)
+    return FDCapture(fd, which, printonly)
     
-def capture_stdout():
+def capture_stdout(printonly=None):
     """captures the standard output
 
     returns a handle object which has a `restore()` method.
     The restore() method returns the captured stdout and restores it
     """
-    return _capture('stdout')
+    return _capture('stdout', printonly)
         
-def capture_stderr():
+def capture_stderr(printonly=None):
     """captures the standard error output
 
     returns a handle object which has a `restore()` method.
     The restore() method returns the captured stderr and restores it
     """
-    return _capture('stderr')
+    return _capture('stderr', printonly)
 
 
 def unittest_main(module='__main__', defaultTest=None, batchmode=False):
@@ -711,21 +731,43 @@ class TestCase(unittest.TestCase):
             self.__testMethodName = self._testMethodName
         self._captured_stdout = ""
         self._captured_stderr = ""
+        self._out = []
+        self._err = []
             
     def captured_output(self):
-        return self._captured_stdout, self._captured_stderr
+        return self._captured_stdout.strip(), self._captured_stderr.strip()
 
     def _start_capture(self):
         if self.capture:
-            self._out, self._err = capture_stdout(), capture_stderr()
+            self.start_capture()
 
     def _stop_capture(self):
-        if self.capture:
-            out, err = self._out.restore(), self._err.restore()
-            self._captured_stdout += out
-            self._captured_stderr += err
+        self._force_output_restore()
+    
+    def start_capture(self, printonly=None):
+        self._out.append(capture_stdout(printonly or self._printonly))
+        self._err.append(capture_stderr(printonly or self._printonly))
 
-
+    def printonly(self, pattern, flags=0):
+        rgx = re.compile(pattern, flags)
+        if self._out:
+            self._out[-1].printonly = rgx
+            self._err[-1].printonly = rgx
+        else:
+            self.start_capture(printonly=rgx)
+        
+    def stop_capture(self):
+        if self._out:
+            _out = self._out.pop()
+            _err = self._err.pop()
+            return _out.restore(), _err.restore()
+        return '', ''
+    
+    def _force_output_restore(self):
+        while self._out:
+            self._captured_stdout += self._out.pop().restore()
+            self._captured_stderr += self._err.pop().restore()
+    
     def quiet_run(self, result, func, *args, **kwargs):
         self._start_capture()
         try:
@@ -750,6 +792,7 @@ class TestCase(unittest.TestCase):
         # if self.capture is True here, it means it was explicitly specified
         # in the user's TestCase class. If not, do what was asked on cmd line
         self.capture = self.capture or getattr(result, 'capture', False)
+        self._printonly = getattr(result, 'printonly', None)
         result.startTest(self)
         testMethod = getattr(self, self.__testMethodName)
         try:
