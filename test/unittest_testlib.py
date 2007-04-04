@@ -341,7 +341,39 @@ class TestLoaderTC(TestCase):
             collected = self.loader.loadTestsFromName(pattern, MyMod)
             yield self.assertEquals, len(collected), expected_count
         
+    def test_collect_everything_and_skipped_patterns(self):
+        testdata = [ (['foo1'], 3), (['foo'], 2),
+                     (['foo', 'bar'], 0),
+                     ]
+        for skipped, expected_count in testdata:
+            self.loader.skipped_patterns = skipped
+            testsuite = self.loader.loadTestsFromModule(self.module)
+            yield self.assertEquals, testsuite.countTestCases(), expected_count
+        
 
+    def test_collect_specific_pattern_and_skip_some(self):
+        testdata = [ ('bar', ['foo1'], 2), ('bar', [], 2),
+                     ('bar', ['bar'], 0), ]
+        
+        for runpattern, skipped, expected_count in testdata:
+            self.loader.skipped_patterns = skipped
+            collected = self.loader.loadTestsFromName(runpattern, self.module)
+            yield self.assertEquals, len(collected), expected_count
+
+    def test_skip_classname(self):
+        testdata = [ (['BarTC'], 3), (['FooTC'], 1), ]
+        for skipped, expected_count in testdata:
+            self.loader.skipped_patterns = skipped
+            testsuite = self.loader.loadTestsFromModule(self.module)
+            yield self.assertEquals, testsuite.countTestCases(), expected_count
+
+    def test_skip_classname_and_specific_collect(self):
+        testdata = [ ('bar', ['BarTC'], 1), ('foo', ['FooTC'], 0), ]
+        for runpattern, skipped, expected_count in testdata:
+            self.loader.skipped_patterns = skipped
+            collected = self.loader.loadTestsFromName(runpattern, self.module)
+            yield self.assertEquals, len(collected), expected_count
+        
 
 def bootstrap_print(msg, output=sys.stdout):
     """sys.stdout will be evaluated at function parsing time"""

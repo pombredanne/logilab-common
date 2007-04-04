@@ -431,6 +431,11 @@ class NonStrictTestLoader(unittest.TestLoader):
     python test_foo.py test_foo1 will run test_foo1
     python test_foo.py test_bar will run FooTC.test_bar1 and BarTC.test_bar2
     """
+
+    def __init__(self):
+        self.skipped_patterns = []
+
+    
     def loadTestsFromNames(self, names, module=None):
         suites = []
         for name in names:
@@ -445,12 +450,18 @@ class NonStrictTestLoader(unittest.TestLoader):
                    issubclass(obj, unittest.TestCase):
                 classname = obj.__name__
                 methodnames = []
+                if self._this_is_skipped(classname):
+                    continue
                 # obj is a TestCase class
                 for attrname in dir(obj):
                     if attrname.startswith(self.testMethodPrefix):
                         attr = getattr(obj, attrname)
                         if callable(attr):
-                            methodnames.append(attrname)
+                            for pattern in self.skipped_patterns:
+                                if pattern in attrname:
+                                    break
+                            else:
+                                methodnames.append(attrname)
                 # keep track of class (obj) for convenience
                 tests[classname] = (obj, methodnames)
         return tests
@@ -514,6 +525,23 @@ class NonStrictTestLoader(unittest.TestLoader):
         """
         return pattern in methodname
 
+
+    def _this_is_skipped(self, testedname):
+        for pattern in self.skipped_patterns:
+            if pattern in testedname:
+                return True
+        return False
+
+    def getTestCaseNames(self, testCaseClass):
+        """Return a sorted sequence of method names found within testCaseClass
+        """
+        if self._this_is_skipped(testCaseClass.__name__):
+            return []
+        testnames = super(NonStrictTestLoader, self).getTestCaseNames(testCaseClass)
+        return [testname for testname in testnames
+                if not self._this_is_skipped(testname)]
+
+
 class SkipAwareTestProgram(unittest.TestProgram):
     # XXX: don't try to stay close to unittest.py, use optparse
     USAGE = """\
@@ -526,6 +554,7 @@ Options:
   -x, --exitfirst  Exit on first failure
   -c, --capture    Captures and prints standard out/err only on errors
   -p, --printonly  Only prints lines matching specified pattern (implies capture)
+  -s, --skip       skip test matching this pattern (no regexp for now)
   -q, --quiet      Minimal output
 
 Examples:
@@ -547,10 +576,13 @@ Examples:
         self.exitfirst = False
         self.capture = 0
         self.printonly = None
+        skipped_patterns = []
         import getopt
         try:
-            options, args = getopt.getopt(argv[1:], 'hHvixqcp:',
-                                          ['help','verbose','quiet', 'pdb', 'exitfirst', 'capture', 'printonly='])
+            options, args = getopt.getopt(argv[1:], 'hHvixqcp:s:',
+                                          ['help','verbose','quiet', 'pdb',
+                                           'exitfirst', 'capture', 'printonly=',
+                                           'skip='])
             for opt, value in options:
                 if opt in ('-h','-H','--help'):
                     self.usageExit()
@@ -566,6 +598,9 @@ Examples:
                     self.capture += 1
                 if opt in ('-p', '--printonly'):
                     self.printonly = re.compile(value)
+                if opt in ('-s', '--skip'):
+                    skipped_patterns = [pat.strip() for pat in value.split(',')]
+            self.testLoader.skipped_patterns = skipped_patterns
             if self.printonly is not None:
                 self.capture += 1
             if len(args) == 0 and self.defaultTest is None:

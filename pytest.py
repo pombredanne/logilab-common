@@ -185,6 +185,13 @@ def parseargs():
                       action="store", dest="printonly", default=None,
                       help="Only prints lines matching specified pattern (implies capture) "
                       "(only make sense when pytest run one test file)")
+    parser.add_option('-s', '--skip',
+                      # XXX: I wish I could use the callback action but it
+                      #      doesn't seem to be able to get the value
+                      #      associated to the option
+                      action="store", dest="skipped", default=None,
+                      help="test names matching this name will be skipped "
+                      "to skip several patterns, use commas")
     parser.add_option('-q', '--quiet', callback=rebuild_cmdline,
                       action="callback", help="Minimal output")
 
@@ -202,6 +209,8 @@ def parseargs():
     testlib.ENABLE_DBC = options.dbc
     if options.printonly:
         newargs.extend(['--printonly', options.printonly])
+    if options.skipped:
+        newargs.extend(['--skip', options.skipped])
     # append additional args to the new sys.argv and let unittest_main
     # do the rest
     newargs += args
