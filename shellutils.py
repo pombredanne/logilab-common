@@ -28,7 +28,7 @@ from os.path import exists, isdir, basename, join, walk
 
 from logilab.common import STD_BLACKLIST
 
-def mv(source, destination, _action=os.rename):
+def mv(source, destination, _action=shutil.move):
     """a shell like mv, supporting wildcards
     """
     sources = glob.glob(source)

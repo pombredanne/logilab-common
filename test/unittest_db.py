@@ -1,8 +1,6 @@
 """
 unit tests for module logilab.common.db
-
 """
-__revision__ = "$Id: unittest_db.py,v 1.13 2006-03-13 12:42:56 syt Exp $"
 
 import socket
 
