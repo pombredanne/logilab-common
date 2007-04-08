@@ -1,4 +1,14 @@
-"""%prog [OPTIONS] [testfile [testpattern]]"""
+"""%prog [OPTIONS] [testfile [testpattern]]
+
+examples:
+
+pytest path/to/mytests.py
+pytest path/to/mytests.py TheseTests
+pytest path/to/mytests.py TheseTests.test_thisone
+
+pytest one (will run both test_thisone and test_thatone)
+pytest path/to/mytests.py -s not (will skip test_notthisone)
+"""
 
 import os, sys
 import os.path as osp
@@ -141,9 +151,8 @@ def testfile(filename, batchmode=False):
         
 
 def parseargs():
-    """builds an option parser
-
-    This funcion also rebuilds a sys.argv usable by unittest_main
+    """Parse the command line and return (options processed), (options to pass to
+    unittest_main()), (explicitfile or None).
     """
     from optparse import OptionParser
     parser = OptionParser(usage=__doc__)
@@ -200,7 +209,7 @@ def parseargs():
     filenames = [arg for arg in args if arg.endswith('.py')]
     if filenames:
         if len(filenames) > 1:
-            parser.error("only one filename is accetable")
+            parser.error("only one filename is acceptable")
         explicitfile = filenames[0]
         args.remove(explicitfile)
     else:
