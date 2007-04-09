@@ -34,7 +34,7 @@ class DotBackend:
         self.graphname = graphname
         self.lines = []
         self._source = None
-        self.emit("digraph %s {" % graphname)
+        self.emit("digraph %s {" % normalize_node_id(graphname))
         if rankdir:
             self.emit('rankdir=%s' % rankdir)
         if ratio:
