@@ -474,7 +474,6 @@ class NonStrictTestLoader(unittest.TestLoader):
         try:
             suite = getattr(module, suitename)()
         except AttributeError:
-            print "No such suite", suitename
             return []
         assert hasattr(suite, '_tests'), \
                "%s.%s is not a valid TestSuite" % (module.__name__, suitename)
@@ -608,7 +607,11 @@ Examples:
             if self.printonly is not None:
                 self.capture += 1
             if len(args) == 0 and self.defaultTest is None:
-                self.test = self.testLoader.loadTestsFromModule(self.module)
+                suitefunc = getattr(self.module, 'suite', None)
+                if callable(suitefunc):
+                    self.test = self.module.suite()
+                else:
+                    self.test = self.testLoader.loadTestsFromModule(self.module)
                 return
             if len(args) > 0:
                 self.testNames = args
