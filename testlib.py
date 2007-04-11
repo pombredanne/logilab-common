@@ -608,7 +608,7 @@ Examples:
                 self.capture += 1
             if len(args) == 0 and self.defaultTest is None:
                 suitefunc = getattr(self.module, 'suite', None)
-                if hasattr(suitefunc, 'im_func'):
+                if isinstance(suitefunc, (types.FunctionType, types.MethodType)):
                     self.test = self.module.suite()
                 else:
                     self.test = self.testLoader.loadTestsFromModule(self.module)
