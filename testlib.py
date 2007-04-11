@@ -369,21 +369,25 @@ class SkipAwareTestResult(unittest._TextTestResult):
             self.stream.writeln("%s: %s" % (flavour,self.getDescription(test)))
             self.stream.writeln(self.separator2)
             self.stream.writeln("%s" % err)
-            output, errput = test.captured_output()
-            if output:
-                self.stream.writeln(self.separator2)
-                self.stream.writeln("captured stdout".center(len(self.separator2)))
-                self.stream.writeln(self.separator2)
-                self.stream.writeln(output)
+            try:
+                output, errput = test.captured_output()
+            except AttributeError:
+                pass # original unittest
             else:
-                self.stream.writeln('no stdout'.center(len(self.separator2)))
-            if errput:
-                self.stream.writeln(self.separator2)
-                self.stream.writeln("captured stderr".center(len(self.separator2)))
-                self.stream.writeln(self.separator2)
-                self.stream.writeln(errput)
-            else:
-                self.stream.writeln('no stderr'.center(len(self.separator2)))
+                if output:
+                    self.stream.writeln(self.separator2)
+                    self.stream.writeln("captured stdout".center(len(self.separator2)))
+                    self.stream.writeln(self.separator2)
+                    self.stream.writeln(output)
+                else:
+                    self.stream.writeln('no stdout'.center(len(self.separator2)))
+                if errput:
+                    self.stream.writeln(self.separator2)
+                    self.stream.writeln("captured stderr".center(len(self.separator2)))
+                    self.stream.writeln(self.separator2)
+                    self.stream.writeln(errput)
+                else:
+                    self.stream.writeln('no stderr'.center(len(self.separator2)))
 
 
 class SkipAwareTextTestRunner(unittest.TextTestRunner):
