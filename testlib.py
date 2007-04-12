@@ -771,6 +771,9 @@ class TestCase(unittest.TestCase):
         if sys.version_info >= (2, 5):
             self.__exc_info = self._exc_info
             self.__testMethodName = self._testMethodName
+        else:
+            # let's give easier access to _testMethodName to every subclasses
+            self._testMethodName = self.__testMethodName
         self._captured_stdout = ""
         self._captured_stderr = ""
         self._out = []
@@ -858,6 +861,7 @@ class TestCase(unittest.TestCase):
     def _proceed_generative(self, result, testfunc, args=()):
         # cancel startTest()'s increment
         result.testsRun -= 1
+        self._start_capture()
         try:
             for params in testfunc():
                 if not isinstance(params, (tuple, list)):
@@ -880,6 +884,7 @@ class TestCase(unittest.TestCase):
             # if an error occurs between two yield
             result.addError(self, self.__exc_info())
             success = False
+        self._stop_capture()
         return success
 
     def _proceed(self, result, testfunc, args=(), kwargs=None):
