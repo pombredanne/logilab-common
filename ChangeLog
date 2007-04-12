@@ -24,9 +24,11 @@ ChangeLog for logilab.common
 	
 2006-11-14  --  0.21.0
     * db:
-     - new optional keepownership argument to backup|restore_database methods
-     - only register mxDatetime converters on psycopg2 adapter if
-       mx.DateTime is available
+	
+      - new optional keepownership argument to backup|restore_database methods
+      - only register mxDatetime converters on psycopg2 adapter if
+        mx.DateTime is available
+	
     * moved some stuff which was in common __init__ file into specific
       module. At this occasion new "decorators" and "deprecation" modules
       has been added
@@ -87,19 +89,21 @@ ChangeLog for logilab.common
 
 2006-09-22  --  0.19.1
     * db:
-     - fixed bug when querying boolean on sqlite using python's bool type
-     - fixed time handling and added an adapter for DateTimeDeltaType
-     - added "drop_on_commit" argument to create_temporary_table on db helper
-     - added missing implementation of executemany on pysqlite2 wrapper to 
-       support pyargs correctly like execute
+	
+      - fixed bug when querying boolean on sqlite using python's bool type
+      - fixed time handling and added an adapter for DateTimeDeltaType
+      - added "drop_on_commit" argument to create_temporary_table on db helper
+      - added missing implementation of executemany on pysqlite2 wrapper to 
+        support pyargs correctly like execute
+	
     * optik_ext: fixed "named" type option to support csv values and to return
-     a dictionary
+      a dictionary
 	
 2006-09-05  --  0.19.0
     * new umessage module which provides a class similar to the standard
       email.Message class but returning unicode strings
     * new clcommands module to handle commands based command line tool
-     (based on the configuration module)
+      (based on the configuration module)
     * new "date" otion type in optik_ext
     * new AttrObject in testlib to create objects in test with arbitrary attributes
     * add pytest to run project's tests and get rid of all runtests.py
@@ -126,20 +130,24 @@ ChangeLog for logilab.common
 
 2006-05-19  --  0.16.0
     * testlib:
-	 - added a set of command line options (PYDEBUG is deprecated,
-       use the -i/--pdb option, and added -x/--exitfirst option)
-     - added support for generative tests
+	
+      - added a set of command line options (PYDEBUG is deprecated,
+        use the -i/--pdb option, and added -x/--exitfirst option)
+      - added support for generative tests
+	
     * db:
-	- fix get_connection parameter order and host/port handling
-	- added .sql_temporary_table method to advanced func helpers
-	- started a psycopg2 adapter
+	
+      - fix get_connection parameter order and host/port handling
+      - added .sql_temporary_table method to advanced func helpers
+      - started a psycopg2 adapter
+	
     * configuration: enhanced to handle default value in help and man pages
       generation (require python >= 2.4)
 
 	
 2006-04-25  --  0.15.1
     * db: add missing port handling to get_connection function and
-	  dbapimodule.connect methods
+      dbapimodule.connect methods
     * testlib: various fixes and minor improvments
 	
 2006-03-28  --  0.15.0
@@ -166,10 +174,12 @@ ChangeLog for logilab.common
 2006-01-06  --  0.13.0
     * testlib: ability to skip a test
     * configuration:
+	
       - cleaner configuration file generation
       - refactoring so that we can have more control on file
         configuration loading using read_config_file and load_config_file
         instead of load_file_configuration
+	
     * modutils: fix is_relative to return False when from_file is a file
       located somewhere in sys.path
     * ureport: new "escaped" attribute on Text nodes, controling html escaping
