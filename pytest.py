@@ -94,7 +94,9 @@ class GlobalTestReport(object):
 def this_is_a_testfile(filename):
     """returns True if `filename` seems to be a test file"""
     filename = osp.basename(filename)
-    return ((filename.startswith('unittest') or filename.startswith('test')) 
+    return ((filename.startswith('unittest')
+             or filename.startswith('test')
+             or filename.startswith('smoketest')) 
             and filename.endswith('.py'))
     
 def testall(exitfirst=False):
