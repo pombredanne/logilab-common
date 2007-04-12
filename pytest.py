@@ -110,6 +110,7 @@ def testall(exitfirst=False):
         if basename in ('test', 'tests'):
             # we found a testdir, let's explore it !
             errcode += testonedir(dirname, exitfirst)
+            dirs[:] = []
     return errcode
 
 
