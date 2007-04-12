@@ -119,7 +119,14 @@ Here is a brief description of the available modules :
   are not twisted plugins in any package directory of your application.
 
 
-If you have any questions, please mail devel@logilab.fr for support. 
+Comments, support, bug reports
+------------------------------
+Use the python-projects@logilab.org mailing list. Since we do not have
+publicly available bug tracker yet, bug reports should be emailed
+there too. 
 
-Sylvain Thénault
-Apr 15, 2004
+You can subscribe to this mailing list at
+http://www.logilab.org/mailinglists/python_projects/mailinglist_register_form
+
+Archives are available at 
+http://lists.logilab.org/pipermail/python-projects/
