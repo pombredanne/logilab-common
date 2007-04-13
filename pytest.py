@@ -103,6 +103,7 @@ def testall(exitfirst=False):
     """walks trhough current working directory, finds something
     which can be considered as a testdir and runs every test there
     """
+    report = GlobalTestReport()
     errcode = 0
     for dirname, dirs, files in os.walk(os.getcwd()):
         for skipped in ('CVS', '.svn', '.hg'):
@@ -110,15 +111,48 @@ def testall(exitfirst=False):
                 dirs.remove(skipped)
         basename = osp.basename(dirname)
         if basename in ('test', 'tests'):
+            print "going into", dirname
             # we found a testdir, let's explore it !
-            errcode += testonedir(dirname, exitfirst)
+            errcode += testonedir(dirname, exitfirst, report)
             dirs[:] = []
+            
+            
+    # everything has been ran, print report
+    print "*" * 79
+    print report
     return errcode
+
+
+def remove_local_modules_from_sys(testdir):
+    """remove all modules from cache that come from `testdir`
+
+    This is used to avoid strange side-effects when using the
+    testall() mode of pytest.
+    For instance, if we run pytest on this tree::
+    
+      A/test/test_utils.py
+      B/test/test_utils.py
+
+    we **have** to clean sys.modules to make sure the correct test_utils
+    module is ran in B
+    """
+    for modname, mod in sys.modules.items():
+        if mod is None:
+            continue
+        if not hasattr(mod, '__file__'):
+            # this is the case of some built-in modules like sys, imp, marshal
+            continue
+        modfile = mod.__file__
+        # if modfile is not an asbolute path, it was probably loaded locally
+        # during the tests
+        if not osp.isabs(modfile) or modfile.startswith(testdir):
+            del sys.modules[modname]
 
 
 def testonedir(testdir, exitfirst=False, report=None):
     """finds each testfile in the `testdir` and runs it"""
-    report = report or GlobalTestReport()
+    if report is None:
+        report = GlobalTestReport()
     for filename in abspath_listdir(testdir):
         if this_is_a_testfile(filename):
             # run test and collect information
@@ -126,6 +160,8 @@ def testonedir(testdir, exitfirst=False, report=None):
             report.feed(filename, prog.result, ttime, ctime)
             if exitfirst and not prog.result.wasSuccessful():
                 break
+    # clean local modules
+    remove_local_modules_from_sys(testdir)
     # everything has been ran, print report
     print "*" * 79
     print report
