@@ -31,10 +31,26 @@ if sys.version_info >= (2, 4):
 else:
     unittest.FunctionTestCase.__bases__ = (testlib.TestCase,)
 
+
+def this_is_a_testfile(filename):
+    """returns True if `filename` seems to be a test file"""
+    filename = osp.basename(filename)
+    return ((filename.startswith('unittest')
+             or filename.startswith('test')
+             or filename.startswith('smoketest')) 
+            and filename.endswith('.py'))
+    
+
+def this_is_a_testdir(dirpath):
+    """returns True if `filename` seems to be a test directory"""
+    return osp.basename(dirpath) in ('test', 'tests', 'unittests')
+
+
 def autopath(projdir=os.getcwd()):
     """try to find project's root and add it to sys.path"""
     curdir = osp.abspath(projdir)
-    while osp.isfile(osp.join(curdir, '__init__.py')):
+    while this_is_a_testdir(curdir) or \
+              osp.isfile(osp.join(curdir, '__init__.py')):
         newdir = osp.normpath(osp.join(curdir, os.pardir))
         if newdir == curdir:
             break
@@ -42,6 +58,8 @@ def autopath(projdir=os.getcwd()):
     else:
         sys.path.insert(0, curdir)
     sys.path.insert(0, '')
+    return curdir
+
 
 class GlobalTestReport(object):
     """this class holds global test statistics"""
@@ -91,37 +109,6 @@ class GlobalTestReport(object):
         return '%s\n%s%s' % (', '.join(line1), line2, line3)
 
 
-def this_is_a_testfile(filename):
-    """returns True if `filename` seems to be a test file"""
-    filename = osp.basename(filename)
-    return ((filename.startswith('unittest')
-             or filename.startswith('test')
-             or filename.startswith('smoketest')) 
-            and filename.endswith('.py'))
-    
-def testall(exitfirst=False):
-    """walks trhough current working directory, finds something
-    which can be considered as a testdir and runs every test there
-    """
-    report = GlobalTestReport()
-    errcode = 0
-    for dirname, dirs, files in os.walk(os.getcwd()):
-        for skipped in ('CVS', '.svn', '.hg'):
-            if skipped in dirs:
-                dirs.remove(skipped)
-        basename = osp.basename(dirname)
-        if basename in ('test', 'tests'):
-            print "going into", dirname
-            # we found a testdir, let's explore it !
-            errcode += testonedir(dirname, exitfirst, report)
-            dirs[:] = []
-            
-            
-    # everything has been ran, print report
-    print "*" * 79
-    print report
-    return errcode
-
 
 def remove_local_modules_from_sys(testdir):
     """remove all modules from cache that come from `testdir`
@@ -149,45 +136,74 @@ def remove_local_modules_from_sys(testdir):
             del sys.modules[modname]
 
 
-def testonedir(testdir, exitfirst=False, report=None):
-    """finds each testfile in the `testdir` and runs it"""
-    if report is None:
-        report = GlobalTestReport()
-    for filename in abspath_listdir(testdir):
-        if this_is_a_testfile(filename):
-            # run test and collect information
-            prog, ttime, ctime = testfile(filename, batchmode=True)
-            report.feed(filename, prog.result, ttime, ctime)
-            if exitfirst and not prog.result.wasSuccessful():
-                break
-    # clean local modules
-    remove_local_modules_from_sys(testdir)
-    # everything has been ran, print report
-    print "*" * 79
-    print report
-    return report.failures + report.errors
 
-
-def testfile(filename, batchmode=False):
-    """runs every test in `filename`
+class PyTester(object):
+    """encaspulates testrun logic"""
     
-    :param filename: an absolute path pointing to a unittest file
-    """
-    here = os.getcwd()
-    dirname = osp.dirname(filename)
-    if dirname:
-        os.chdir(dirname)
-    modname = osp.basename(filename)[:-3]
-    print ('  %s  ' % osp.basename(filename)).center(70, '=')
-    try:
-        tstart, cstart = time(), clock()
-        testprog = testlib.unittest_main(modname, batchmode=batchmode)
-        tend, cend = time(), clock()
-        return testprog, (tend - tstart), (cend - cstart)
-    finally:
-        if dirname:
-            os.chdir(here)
+    def __init__(self):
+        self.tested_files = []
+        self.report = GlobalTestReport()
+
+
+    def show_report(self):
+        """prints the report and returns appropriate exitcode"""
+        # everything has been ran, print report
+        print "*" * 79
+        print self.report
+        return self.report.failures + self.report.errors
         
+
+    def testall(self, exitfirst=False):
+        """walks trhough current working directory, finds something
+        which can be considered as a testdir and runs every test there
+        """
+        for dirname, dirs, files in os.walk(os.getcwd()):
+            for skipped in ('CVS', '.svn', '.hg'):
+                if skipped in dirs:
+                    dirs.remove(skipped)
+            basename = osp.basename(dirname)
+            if basename in ('test', 'tests'):
+                print "going into", dirname
+                # we found a testdir, let's explore it !
+                self.testonedir(dirname, exitfirst)
+                dirs[:] = []
+
+
+
+    def testonedir(self, testdir, exitfirst=False):
+        """finds each testfile in the `testdir` and runs it"""
+        for filename in abspath_listdir(testdir):
+            if this_is_a_testfile(filename):
+                # run test and collect information
+                prog, ttime, ctime = self.testfile(filename, batchmode=True)
+                self.report.feed(filename, prog.result, ttime, ctime)
+                if exitfirst and not prog.result.wasSuccessful():
+                    break
+        # clean local modules
+        remove_local_modules_from_sys(testdir)
+
+
+    def testfile(self, filename, batchmode=False):
+        """runs every test in `filename`
+
+        :param filename: an absolute path pointing to a unittest file
+        """
+        here = os.getcwd()
+        dirname = osp.dirname(filename)
+        if dirname:
+            os.chdir(dirname)
+        modname = osp.basename(filename)[:-3]
+        print ('  %s  ' % osp.basename(filename)).center(70, '=')
+        try:
+            tstart, cstart = time(), clock()
+            testprog = testlib.unittest_main(modname, batchmode=batchmode)
+            tend, cend = time(), clock()
+            return testprog, (tend - tstart), (cend - cstart)
+        finally:
+            if dirname:
+                os.chdir(here)
+
+
 
 def parseargs():
     """Parse the command line and return (options processed), (options to pass to
@@ -243,6 +259,14 @@ def parseargs():
     parser.add_option('-q', '--quiet', callback=rebuild_cmdline,
                       action="callback", help="Minimal output")
 
+    try:
+        from logilab.devtools.lib.coverage import Coverage
+    except ImportError:
+        pass
+    else:
+        parser.add_option('--coverage', dest="coverage", default=False,
+                          action="store_true", help="run tests with pycoverage")
+
     # parse the command line
     options, args = parser.parse_args()
     filenames = [arg for arg in args if arg.endswith('.py')]
@@ -263,15 +287,34 @@ def parseargs():
     # do the rest
     newargs += args
     return options, newargs, explicitfile 
+
     
 def run():
-    autopath()
+    rootdir = autopath()
+    tester = PyTester()
     options, newargs, explicitfile = parseargs()
     # mock a new command line
     sys.argv[1:] = newargs
-    if explicitfile:
-        sys.exit(testfile(explicitfile))
-    elif options.testdir:
-        sys.exit(testonedir(options.testdir, options.exitfirst))
-    else:
-        sys.exit(testall(options.exitfirst))
+    covermode = getattr(options, 'coverage')
+    try:
+        if covermode:
+            from logilab.devtools.lib.coverage import Coverage
+            the_coverage = Coverage()
+            the_coverage.erase()
+            the_coverage.start()
+        if explicitfile:
+            tester.testfile(explicitfile)
+        elif options.testdir:
+            tester.testonedir(options.testdir, options.exitfirst)
+        else:
+            tester.testall(options.exitfirst)
+    finally:
+        errcode = tester.show_report()
+	if covermode:
+	    print "computing code coverage, this might thake some time"
+            the_coverage.save()
+            executed = [fname for fname in the_coverage.cexecuted.keys()
+                        if fname.startswith(rootdir) if osp.isfile(fname)]
+            the_coverage.annotate(executed)
+            the_coverage.report(executed, False)
+        sys.exit(errcode)
