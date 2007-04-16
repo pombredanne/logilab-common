@@ -778,7 +778,26 @@ class TestCase(unittest.TestCase):
         self._captured_stderr = ""
         self._out = []
         self._err = []
-            
+        self._current_test_descr = None
+
+
+    def set_description(self, descr):
+        """sets the current test's description.
+        This can be useful for generative tests because it allows to specify
+        a description per yield
+        """
+        self._current_test_descr = descr
+
+    # override default's unittest.py feature
+    def shortDescription(self):
+	"""override default unitest shortDescription to handle correctly
+	generative tests
+	"""
+        if self._current_test_descr is not None:
+	    return self._current_test_descr
+	return super(TestCase, self).shortDescription()
+
+    
     def captured_output(self):
         return self._captured_stdout.strip(), self._captured_stderr.strip()
 
