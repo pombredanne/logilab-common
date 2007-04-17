@@ -10,6 +10,7 @@ pytest one (will run both test_thisone and test_thatone)
 pytest path/to/mytests.py -s not (will skip test_notthisone)
 
 pytest --coverage test_foo.py
+  (only of logilab.devtools is available)
 """
 
 import os, sys
@@ -193,7 +194,7 @@ class PyTester(object):
         if dirname:
             os.chdir(dirname)
         modname = osp.basename(filename)[:-3]
-        print ('  %s  ' % osp.basename(filename)).center(70, '=')
+        print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
         try:
             tstart, cstart = time(), clock()
             testprog = testlib.unittest_main(modname, batchmode=batchmode)
@@ -318,6 +319,8 @@ def run():
     finally:
         errcode = tester.show_report()
         if covermode:
+            cvg.stop()
+            cvg.save()
             here = osp.abspath(os.getcwd())
             if this_is_a_testdir(here):
                 morfdir = osp.normpath(osp.join(here, '..'))
@@ -325,7 +328,6 @@ def run():
                 morfdir = here
             print "computing code coverage (%s), this might thake some time" % \
                   morfdir
-            cvg.save()
             cvg.annotate([morfdir])
             cvg.report([morfdir], False)
         sys.exit(errcode)
