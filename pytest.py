@@ -8,6 +8,8 @@ pytest path/to/mytests.py TheseTests.test_thisone
 
 pytest one (will run both test_thisone and test_thatone)
 pytest path/to/mytests.py -s not (will skip test_notthisone)
+
+pytest --coverage test_foo.py
 """
 
 import os, sys
@@ -175,8 +177,7 @@ class PyTester(object):
         for filename in abspath_listdir(testdir):
             if this_is_a_testfile(filename):
                 # run test and collect information
-                prog, ttime, ctime = self.testfile(filename, batchmode=True)
-                self.report.feed(filename, prog.result, ttime, ctime)
+                prog = self.testfile(filename, batchmode=True)
                 if exitfirst and not prog.result.wasSuccessful():
                     break
         # clean local modules
@@ -198,7 +199,9 @@ class PyTester(object):
             tstart, cstart = time(), clock()
             testprog = testlib.unittest_main(modname, batchmode=batchmode)
             tend, cend = time(), clock()
-            return testprog, (tend - tstart), (cend - cstart)
+            ttime, ctime = (tend - tstart), (cend - cstart)
+            self.report.feed(filename, testprog.result, ttime, ctime)
+            return testprog
         finally:
             if dirname:
                 os.chdir(here)
@@ -299,9 +302,9 @@ def run():
     try:
         if covermode:
             from logilab.devtools.lib.coverage import Coverage
-            the_coverage = Coverage()
-            the_coverage.erase()
-            the_coverage.start()
+            cvg = Coverage()
+            cvg.erase()
+            cvg.start()
         if explicitfile:
             tester.testfile(explicitfile)
         elif options.testdir:
@@ -309,12 +312,18 @@ def run():
         else:
             tester.testall(options.exitfirst)
     finally:
-        errcode = tester.show_report()
-	if covermode:
-	    print "computing code coverage, this might thake some time"
-            the_coverage.save()
-            executed = [fname for fname in the_coverage.cexecuted.keys()
-                        if fname.startswith(rootdir) if osp.isfile(fname)]
-            the_coverage.annotate(executed)
-            the_coverage.report(executed, False)
+        errcode = tester.
+        if covermode:
+            here = osp.abspath(os.getcwd())
+            if this_is_a_testdir(here):
+                morfdir = osp.normpath(osp.join(here, '..'))
+            else:
+                morfdir = here
+            print "computing code coverage (%s), this might thake some time" % \
+                  morfdir
+            cvg.save()
+            executed = [fname for fname in cvg.cexecuted if fname.startswith(morfdir)
+                        if osp.isfile(fname)]
+            cvg.annotate(executed)
+            cvg.report(executed, False)
         sys.exit(errcode)
