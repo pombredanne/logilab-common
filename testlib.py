@@ -316,7 +316,8 @@ from cStringIO import StringIO
 class SkipAwareTestResult(unittest._TextTestResult):
 
     def __init__(self, stream, descriptions, verbosity,
-                 exitfirst=False, capture=0, printonly=None):
+                 exitfirst=False, capture=0, printonly=None,
+                 pdbmode=False):
         super(SkipAwareTestResult, self).__init__(stream,
                                                   descriptions, verbosity)
         self.skipped = []
@@ -325,10 +326,12 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.exitfirst = exitfirst
         self.capture = capture
         self.printonly = printonly
+        self.pdbmode = pdbmode
         
     def _create_pdb(self, test_descr):
-        self.debuggers.append(Debugger(sys.exc_info()[2]))
-        self.descrs.append(test_descr)
+        if self.pdbmode:
+            self.debuggers.append(Debugger(sys.exc_info()[2]))
+            self.descrs.append(test_descr)
         
     def addError(self, test, err):
         exc_type, exc, tcbk = err
@@ -393,16 +396,19 @@ class SkipAwareTestResult(unittest._TextTestResult):
 class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
     def __init__(self, stream=sys.stderr, verbosity=1,
-                 exitfirst=False, capture=False, printonly=None):
+                 exitfirst=False, capture=False, printonly=None,
+                 pdbmode=False):
         super(SkipAwareTextTestRunner, self).__init__(stream=stream,
                                                       verbosity=verbosity)
         self.exitfirst = exitfirst
         self.capture = capture
         self.printonly = printonly
+        self.pdbmode = pdbmode
         
     def _makeResult(self):
         return SkipAwareTestResult(self.stream, self.descriptions, self.verbosity,
-                                   self.exitfirst, self.capture, self.printonly)
+                                   self.exitfirst, self.capture, self.printonly,
+                                   self.pdbmode)
 
 
 class keywords(dict):
@@ -626,7 +632,8 @@ Examples:
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
                                                   exitfirst=self.exitfirst,
                                                   capture=self.capture,
-                                                  printonly=self.printonly)
+                                                  printonly=self.printonly,
+                                                  pdbmode=self.pdbmode)
         result = self.testRunner.run(self.test)
         if os.environ.get('PYDEBUG'):
             warn("PYDEBUG usage is deprecated, use -i / --pdb instead", DeprecationWarning)

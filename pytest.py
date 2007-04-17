@@ -60,7 +60,6 @@ def autopath(projdir=os.getcwd()):
     else:
         sys.path.insert(0, curdir)
     sys.path.insert(0, '')
-    return curdir
 
 
 class GlobalTestReport(object):
@@ -219,6 +218,7 @@ def parseargs():
     def rebuild_cmdline(option, opt, value, parser):
         """carry the option to unittest_main"""
         newargs.append(opt)
+        
 
     def rebuild_and_store(option, opt, value, parser):
         """carry the option to unittest_main and store
@@ -235,8 +235,9 @@ def parseargs():
     # unittest_main options provided and passed through pytest
     parser.add_option('-v', '--verbose', callback=rebuild_cmdline,
                       action="callback", help="Verbose output")
-    parser.add_option('-i', '--pdb', callback=rebuild_cmdline,
-                      action="callback", help="Enable test failure inspection")
+    parser.add_option('-i', '--pdb', callback=rebuild_and_store,
+                      dest="pdb", action="callback",
+                      help="Enable test failure inspection (conflicts with --coverage)")
     parser.add_option('-x', '--exitfirst', callback=rebuild_and_store,
                       dest="exitfirst",
                       action="callback", help="Exit on first failure "
@@ -268,10 +269,13 @@ def parseargs():
         pass
     else:
         parser.add_option('--coverage', dest="coverage", default=False,
-                          action="store_true", help="run tests with pycoverage")
+                          action="store_true",
+                          help="run tests with pycoverage (conflicts with --pdb)")
 
     # parse the command line
     options, args = parser.parse_args()
+    if options.pdb and getattr(options, 'coverage', False):
+        parser.error("'pdb' and 'coverage' options are exclusive")
     filenames = [arg for arg in args if arg.endswith('.py')]
     if filenames:
         if len(filenames) > 1:
@@ -293,7 +297,7 @@ def parseargs():
 
     
 def run():
-    rootdir = autopath()
+    autopath()
     tester = PyTester()
     options, newargs, explicitfile = parseargs()
     # mock a new command line
@@ -312,7 +316,7 @@ def run():
         else:
             tester.testall(options.exitfirst)
     finally:
-        errcode = tester.
+        errcode = tester.show_report()
         if covermode:
             here = osp.abspath(os.getcwd())
             if this_is_a_testdir(here):
@@ -322,8 +326,6 @@ def run():
             print "computing code coverage (%s), this might thake some time" % \
                   morfdir
             cvg.save()
-            executed = [fname for fname in cvg.cexecuted if fname.startswith(morfdir)
-                        if osp.isfile(fname)]
-            cvg.annotate(executed)
-            cvg.report(executed, False)
+            cvg.annotate([morfdir])
+            cvg.report([morfdir], False)
         sys.exit(errcode)
