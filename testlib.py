@@ -317,7 +317,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def __init__(self, stream, descriptions, verbosity,
                  exitfirst=False, capture=0, printonly=None,
-                 pdbmode=False):
+                 pdbmode=False, cvg=None):
         super(SkipAwareTestResult, self).__init__(stream,
                                                   descriptions, verbosity)
         self.skipped = []
@@ -327,6 +327,20 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.capture = capture
         self.printonly = printonly
         self.pdbmode = pdbmode
+        self.cvg = cvg
+
+##     def startTest(self, test):
+##         "Called when the given test is about to be run"
+##         if self.cvg:
+##             self.cvg.start()
+##         return super(SkipAwareTestResult, self).startTest(test)
+
+##     def stopTest(self, test):
+##         "Called when the given test has been run"
+##         ret = super(SkipAwareTestResult, self).startTest(test)
+##         if self.cvg:
+##             self.cvg.stop()
+##         return ret
         
     def _create_pdb(self, test_descr):
         if self.pdbmode:
@@ -397,18 +411,20 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
     def __init__(self, stream=sys.stderr, verbosity=1,
                  exitfirst=False, capture=False, printonly=None,
-                 pdbmode=False):
+                 pdbmode=False, cvg=None):
         super(SkipAwareTextTestRunner, self).__init__(stream=stream,
                                                       verbosity=verbosity)
         self.exitfirst = exitfirst
         self.capture = capture
         self.printonly = printonly
         self.pdbmode = pdbmode
+        self.cvg = cvg
+        
         
     def _makeResult(self):
         return SkipAwareTestResult(self.stream, self.descriptions, self.verbosity,
                                    self.exitfirst, self.capture, self.printonly,
-                                   self.pdbmode)
+                                   self.pdbmode, self.cvg)
 
 
 class keywords(dict):
@@ -573,11 +589,16 @@ Examples:
   %(progName)s MyTestCase                    - run all 'test*' test methods
                                                in MyTestCase
 """
-    def __init__(self, module='__main__', defaultTest=None, batchmode=False):
+    def __init__(self, module='__main__', defaultTest=None, batchmode=False, cvg=None):
         self.batchmode = batchmode
+        self.cvg = cvg
+        # if cvg:
+        #     cvg.start()
         super(SkipAwareTestProgram, self).__init__(
             module=module, defaultTest=defaultTest,
             testLoader=NonStrictTestLoader())
+        # if cvg:
+        #     cvg.stop()
        
     
     def parseArgs(self, argv):
@@ -633,7 +654,8 @@ Examples:
                                                   exitfirst=self.exitfirst,
                                                   capture=self.capture,
                                                   printonly=self.printonly,
-                                                  pdbmode=self.pdbmode)
+                                                  pdbmode=self.pdbmode,
+                                                  cvg=self.cvg)
         result = self.testRunner.run(self.test)
         if os.environ.get('PYDEBUG'):
             warn("PYDEBUG usage is deprecated, use -i / --pdb instead", DeprecationWarning)
@@ -730,10 +752,11 @@ def capture_stderr(printonly=None):
     return _capture('stderr', printonly)
 
 
-def unittest_main(module='__main__', defaultTest=None, batchmode=False):
+def unittest_main(module='__main__', defaultTest=None,
+                  batchmode=False, cvg=None):
     """use this functon if you want to have the same functionality
     as unittest.main"""
-    return SkipAwareTestProgram(module, defaultTest, batchmode)
+    return SkipAwareTestProgram(module, defaultTest, batchmode, cvg)
 
 class TestSkipped(Exception):
     """raised when a test is skipped"""
@@ -864,6 +887,8 @@ class TestCase(unittest.TestCase):
         # in the user's TestCase class. If not, do what was asked on cmd line
         self.capture = self.capture or getattr(result, 'capture', False)
         self._printonly = getattr(result, 'printonly', None)
+        # if result.cvg:
+        #     result.cvg.start()
         result.startTest(self)
         testMethod = getattr(self, self.__testMethodName)
         try:
@@ -880,6 +905,8 @@ class TestCase(unittest.TestCase):
             if success:
                 result.addSuccess(self)
         finally:
+            # if result.cvg:
+            #     result.cvg.stop()
             result.stopTest(self)
 
 

@@ -22,6 +22,74 @@ from logilab.common import testlib
 import doctest
 import unittest
 
+
+import imp
+
+import __builtin__
+
+
+## coverage hacks, do not read this, do not read this, do not read this
+
+# hey, but this is an aspect, right ?!!!
+class TraceController(object):
+    nesting = 0
+
+    def pause_tracing(cls):
+        if not cls.nesting:
+            cls.tracefunc = getattr(sys, '__settrace__', sys.settrace)
+            cls.oldtracer = getattr(sys, '__tracer__', None)
+            sys.__notrace__ = True
+            cls.tracefunc(None)
+            # print "<TRACING PAUSED>"
+        cls.nesting += 1
+    pause_tracing = classmethod(pause_tracing)
+
+    def resume_tracing(cls):
+        cls.nesting -= 1
+        assert cls.nesting >= 0
+        if not cls.nesting:
+            # print "<TRACING RESUMED>"
+            # print "nesting ...", cls.nesting
+            cls.tracefunc(cls.oldtracer)
+            delattr(sys, '__notrace__')
+    resume_tracing = classmethod(resume_tracing)
+    
+
+pause_tracing = TraceController.pause_tracing
+resume_tracing = TraceController.resume_tracing
+
+# del TraceController # remove direct obvious reference to TraceController
+
+def nocoverage(func):
+    if hasattr(func, 'uncovered'):
+        return func
+    func.uncovered = True
+    def not_covered(*args, **kwargs):
+        pause_tracing()
+        # print "now calling", func.func_name
+        try:
+            return func(*args, **kwargs)
+        finally:
+            resume_tracing()
+    not_covered.uncovered = True
+    return not_covered
+
+from types import ClassType, FunctionType
+def weave_notrace_on(module):
+    for funcname in dir(module):
+        func = getattr(module, funcname)
+        if isinstance(func, FunctionType):
+            setattr(module, funcname, nocoverage(func))
+        elif isinstance(func, (type, ClassType)):
+            for attrname, attrvalue in func.__dict__.items():
+                if isinstance(attrvalue, FunctionType):
+                    try:
+                        if not hasattr(attrvalue, 'uncovered'):
+                            func.__dict__[attrname] = nocoverage(attrvalue)
+                    except TypeError:
+                        pass
+
+
 # monkeypatch unittest and doctest (ouch !)
 unittest.TestCase = testlib.TestCase
 unittest.main = testlib.unittest_main
@@ -52,15 +120,18 @@ def this_is_a_testdir(dirpath):
 def autopath(projdir=os.getcwd()):
     """try to find project's root and add it to sys.path"""
     curdir = osp.abspath(projdir)
+    previousdir = curdir
     while this_is_a_testdir(curdir) or \
               osp.isfile(osp.join(curdir, '__init__.py')):
         newdir = osp.normpath(osp.join(curdir, os.pardir))
         if newdir == curdir:
             break
+        previousdir = curdir
         curdir = newdir
     else:
         sys.path.insert(0, curdir)
     sys.path.insert(0, '')
+    return previousdir
 
 
 class GlobalTestReport(object):
@@ -142,9 +213,10 @@ def remove_local_modules_from_sys(testdir):
 class PyTester(object):
     """encaspulates testrun logic"""
     
-    def __init__(self):
+    def __init__(self, cvg):
         self.tested_files = []
         self.report = GlobalTestReport()
+        self.cvg = cvg
 
 
     def show_report(self):
@@ -197,7 +269,7 @@ class PyTester(object):
         print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
         try:
             tstart, cstart = time(), clock()
-            testprog = testlib.unittest_main(modname, batchmode=batchmode)
+            testprog = testlib.unittest_main(modname, batchmode=batchmode, cvg=self.cvg)
             tend, cend = time(), clock()
             ttime, ctime = (tend - tstart), (cend - cstart)
             self.report.feed(filename, testprog.result, ttime, ctime)
@@ -267,6 +339,7 @@ def parseargs():
     try:
         from logilab.devtools.lib.coverage import Coverage
     except ImportError:
+        print "kouch kouch"
         pass
     else:
         parser.add_option('--coverage', dest="coverage", default=False,
@@ -296,26 +369,64 @@ def parseargs():
     newargs += args
     return options, newargs, explicitfile 
 
+
+
+def control_import_coverage(rootdir, oldimport=__import__):
+    def myimport(modname, globals=None, locals=None, fromlist=None):
+        pkgname = modname.split('.')[0]
+        try:
+            _, path, _ = imp.find_module(pkgname)
+        except ImportError:
+            pass # don't bother too much
+        else:
+            path = osp.abspath(path)
+            if osp.isfile(path):
+                dirname = osp.dirname(path)
+            else: # it's probably already a directory
+                dirname = path
+            if not dirname.startswith(rootdir):
+                pause_tracing()
+                try:
+                    not_yet_uncovered = modname not in sys.modules
+                    m = oldimport(modname, globals, locals, fromlist)
+                    if not_yet_uncovered:
+                        weave_notrace_on(m)
+                        # print m.__name__, "should now be protected"
+                    return m
+                finally:
+                    resume_tracing()
+        return oldimport(modname, globals, locals, fromlist)
+    __builtin__.__import__ = myimport
+
     
+
 def run():
-    autopath()
-    tester = PyTester()
+    rootdir = autopath()
     options, newargs, explicitfile = parseargs()
     # mock a new command line
     sys.argv[1:] = newargs
     covermode = getattr(options, 'coverage')
     try:
-        if covermode:
-            from logilab.devtools.lib.coverage import Coverage
-            cvg = Coverage()
-            cvg.erase()
-            cvg.start()
-        if explicitfile:
-            tester.testfile(explicitfile)
-        elif options.testdir:
-            tester.testonedir(options.testdir, options.exitfirst)
-        else:
-            tester.testall(options.exitfirst)
+        try:
+            cvg = None
+            if covermode:
+                control_import_coverage(rootdir)
+                from logilab.devtools.lib.coverage import Coverage
+                cvg = Coverage()
+                cvg.erase()
+                cvg.start()
+            tester = PyTester(cvg)
+            if explicitfile:
+                tester.testfile(explicitfile)
+            elif options.testdir:
+                tester.testonedir(options.testdir, options.exitfirst)
+            else:
+                tester.testall(options.exitfirst)
+        except SystemExit:
+            raise
+        except:
+            import traceback
+            traceback.print_exc()
     finally:
         errcode = tester.show_report()
         if covermode:
@@ -326,7 +437,7 @@ def run():
                 morfdir = osp.normpath(osp.join(here, '..'))
             else:
                 morfdir = here
-            print "computing code coverage (%s), this might thake some time" % \
+            print "computing code coverage (%s), this might take some time" % \
                   morfdir
             cvg.annotate([morfdir])
             cvg.report([morfdir], False)

@@ -18,6 +18,8 @@ class TableTC(TestCase):
 
     def setUp(self):
         """Creates a default table"""
+        # from logilab.common import table
+        # reload(table)
         self.table = Table()
         self.table.create_rows(['row1', 'row2', 'row3'])
         self.table.create_columns(['col1', 'col2'])
