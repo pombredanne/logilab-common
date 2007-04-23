@@ -33,23 +33,21 @@ import __builtin__
 # hey, but this is an aspect, right ?!!!
 class TraceController(object):
     nesting = 0
+    active = False
 
     def pause_tracing(cls):
-        if not cls.nesting:
+        if cls.active and not cls.nesting:
             cls.tracefunc = getattr(sys, '__settrace__', sys.settrace)
             cls.oldtracer = getattr(sys, '__tracer__', None)
             sys.__notrace__ = True
             cls.tracefunc(None)
-            # print "<TRACING PAUSED>"
         cls.nesting += 1
     pause_tracing = classmethod(pause_tracing)
 
     def resume_tracing(cls):
         cls.nesting -= 1
         assert cls.nesting >= 0
-        if not cls.nesting:
-            # print "<TRACING RESUMED>"
-            # print "nesting ...", cls.nesting
+        if cls.active and not cls.nesting:
             cls.tracefunc(cls.oldtracer)
             delattr(sys, '__notrace__')
     resume_tracing = classmethod(resume_tracing)
@@ -58,7 +56,7 @@ class TraceController(object):
 pause_tracing = TraceController.pause_tracing
 resume_tracing = TraceController.resume_tracing
 
-# del TraceController # remove direct obvious reference to TraceController
+del TraceController # remove direct obvious reference to TraceController
 
 def nocoverage(func):
     if hasattr(func, 'uncovered'):
@@ -66,7 +64,6 @@ def nocoverage(func):
     func.uncovered = True
     def not_covered(*args, **kwargs):
         pause_tracing()
-        # print "now calling", func.func_name
         try:
             return func(*args, **kwargs)
         finally:
@@ -74,20 +71,8 @@ def nocoverage(func):
     not_covered.uncovered = True
     return not_covered
 
-from types import ClassType, FunctionType
-def weave_notrace_on(module):
-    for funcname in dir(module):
-        func = getattr(module, funcname)
-        if isinstance(func, FunctionType):
-            setattr(module, funcname, nocoverage(func))
-        elif isinstance(func, (type, ClassType)):
-            for attrname, attrvalue in func.__dict__.items():
-                if isinstance(attrvalue, FunctionType):
-                    try:
-                        if not hasattr(attrvalue, 'uncovered'):
-                            func.__dict__[attrname] = nocoverage(attrvalue)
-                    except TypeError:
-                        pass
+
+## end of coverage hacks
 
 
 # monkeypatch unittest and doctest (ouch !)
@@ -370,36 +355,6 @@ def parseargs():
     return options, newargs, explicitfile 
 
 
-
-def control_import_coverage(rootdir, oldimport=__import__):
-    def myimport(modname, globals=None, locals=None, fromlist=None):
-        pkgname = modname.split('.')[0]
-        try:
-            _, path, _ = imp.find_module(pkgname)
-        except ImportError:
-            pass # don't bother too much
-        else:
-            path = osp.abspath(path)
-            if osp.isfile(path):
-                dirname = osp.dirname(path)
-            else: # it's probably already a directory
-                dirname = path
-            if not dirname.startswith(rootdir):
-                pause_tracing()
-                try:
-                    not_yet_uncovered = modname not in sys.modules
-                    m = oldimport(modname, globals, locals, fromlist)
-                    if not_yet_uncovered:
-                        weave_notrace_on(m)
-                        # print m.__name__, "should now be protected"
-                    return m
-                finally:
-                    resume_tracing()
-        return oldimport(modname, globals, locals, fromlist)
-    __builtin__.__import__ = myimport
-
-    
-
 def run():
     rootdir = autopath()
     options, newargs, explicitfile = parseargs()
@@ -410,11 +365,12 @@ def run():
         try:
             cvg = None
             if covermode:
-                control_import_coverage(rootdir)
+                # control_import_coverage(rootdir)
                 from logilab.devtools.lib.coverage import Coverage
-                cvg = Coverage()
+                cvg = Coverage([rootdir])
                 cvg.erase()
                 cvg.start()
+                TraceController.active = True
             tester = PyTester(cvg)
             if explicitfile:
                 tester.testfile(explicitfile)
@@ -431,6 +387,7 @@ def run():
         errcode = tester.show_report()
         if covermode:
             cvg.stop()
+            TraceController.active = False
             cvg.save()
             here = osp.abspath(os.getcwd())
             if this_is_a_testdir(here):
