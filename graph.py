@@ -97,7 +97,8 @@ class DotBackend:
         self.emit('%s [%s];' % (normalize_node_id(name), ", ".join(attrs)))
 
 def normalize_node_id(nid):
-    return nid.replace(' ', '_').replace('-', '_')
+    """returns a suitable DOT node id for `nid`"""
+    return '"%s"' % nid
 
 class GraphGenerator:
     def __init__(self, backend):
