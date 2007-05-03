@@ -11,7 +11,8 @@ all: apydoc
 #        ${MKHTML} ${MKHTMLOPTS} $<
 
 apydoc:
-	epydoc --html -n "Logilab's common library" ../modutils.py ../textutils.py ../fileutils.py
+	epydoc --html -n "Logilab's common library" ..
 
 clean:
 	rm -f *.html
+	rm -rf html
