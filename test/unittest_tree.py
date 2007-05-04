@@ -10,7 +10,8 @@ from logilab.common.tree import *
 tree = ('root', (
     ('child_1_1', (
     ('child_2_1', ()), ('child_2_2', (
-    ('child_3_1', ()),)))),
+    ('child_3_1', ()),
+    )))),
     ('child_1_2', (('child_2_3', ()),))))
 
 def make_tree(tuple):
@@ -91,12 +92,26 @@ class Node_ClassTest(TestCase):
     def test_raise_get_child_by_path_NodeNotFound(self):
         self.assertRaises(NodeNotFound, self.o.get_child_by_path, ['child_1_1', 'child_2_11'])
     
+    def test_known_values_depth_down(self):
+        """
+        return depth of this node in the tree
+        """
+        self.assertEqual(self.o.depth_down(), 4)
+        self.assertEqual(self.o.get_child_by_id('child_2_1',True).depth_down(), 1)
+
     def test_known_values_depth(self):
         """
         return depth of this node in the tree
         """
         self.assertEqual(self.o.depth(), 0)
         self.assertEqual(self.o.get_child_by_id('child_2_1',True).depth(), 2)
+
+    def test_known_values_width(self):
+        """
+        return depth of this node in the tree
+        """
+        self.assertEqual(self.o.width(), 3)
+        self.assertEqual(self.o.get_child_by_id('child_2_1',True).width(), 1)
     
     def test_known_values_root(self):
         """
