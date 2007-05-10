@@ -163,6 +163,20 @@ class Node :
         else :
             return 0
 
+    def depth_down(self):
+        """
+        return depth of the tree from this node
+        """
+        if self.children:
+            return 1 + max([c.depth_down() for c in self.children])
+        return 1
+
+    def width(self):
+        """
+        return the width of the tree from this node
+        """
+        return len(self.leaves())
+        
     def root(self):
         """
         return the root node of the tree
