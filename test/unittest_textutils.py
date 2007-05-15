@@ -61,74 +61,74 @@ http://www.plonefr.net/blog/archive/2005/10/30/tester-la-future-infrastructure-i
 
 
     def test_nonregr_rest_normalize(self):
-        self.assertEquals(ulines(tu.normalize_text("""... Il est donc evident que tout le monde doit lire le compte-rendu de RSH et aller discuter avec les autres si c'est utile ou necessaire.
+        self.assertEquals(ulines(tu.normalize_text("""... xx xxx xxxx xxxxxxx xxx xxxx xx xxxxx xxxx xxxx xx xxxxxx-xxxxx xx xxx xx xxxxx xxxxxxxx xxxx xxx xxxxxx xx x'xxx xxxxx xx xxxxxxxxxx.
 
 
-**adim**: un poil de ginco, une pincee d'agueol, du pypy et 10 jours de dijon d'ici la fin du mois dont 4 sur place.
+**xxxx**: xx xxxx xx xxxxx, xxx xxxxxx x'xxxxxx, xx xxxx xx yy xxxxx xx xxxxx x'xxx xx xxx xx xxxx xxxx y xxx xxxxx.
 
-**alf**: une intro a  pypy, un peu de ginco peut-etre et preparer cours IN2P01.
+**xxx**: xxx xxxxx x  xxxx, xx xxx xx xxxxx xxxx-xxxx xx xxxxxxxx xxxxx xxyxyy.
 
-**arthur**: y'a du eStock a  faire
+**xxxxxx**: x'x xx xxxxxx x  xxxxx
 
-**auc**: atuk02 et ginco
+**xxx**: xxxxyy xx xxxxx
 
-**david**: terminer EDFC21 qui etait du pour le 21 decembre et pour lequel il reste encore 1 semaine
+**xxxxx**: xxxxxxxx xxxxyy xxx xxxxx xx xxxx xx yy xxxxxxxx xx xxxx xxxxxx xx xxxxx xxxxxx y xxxxxxx
 
-**jphc**: deposer les comptes, finir des papiers administratifs, envoyer des voeux et garder un oeil sur les reponses a  faire et nouveaux appels.
+**xxxx**: xxxxxxx xxx xxxxxxx, xxxxx xxx xxxxxxx xxxxxxxxxxxxxx, xxxxxxx xxx xxxxx xx xxxxxx xx xxxx xxx xxx xxxxxxxx x  xxxxx xx xxxxxxxx xxxxxx.
 
 
-**katia**: AGRI06 vient de demarrer et y'a besoin d'arthur
+**xxxxx**: xxxxyy xxxxx xx xxxxxxxx xx x'x xxxxxx x'xxxxxx
 
-**ludal**: terminer EDFC16 devrait prendre jusqu'a  mardi prochain.
+**xxxxx**: xxxxxxxx xxxxyy xxxxxxx xxxxxxx xxxxx'x  xxxxx xxxxxxxx.
 
-**nico**: qq reponses (dont EADA03 pour laquelle il me faudra de l'aide de gens qui aiment l'admin sys) et mise en place d'un tableau de bord propre a  partir de ce qu'on a deja  (situation des comptes, affaires en cours avec nb de jours prevu et depenses, etc.).
+**xxxx**: xx xxxxxxxx (xxxx xxxxyy xxxx xxxxxxxx xx xx xxxxxx xx x'xxxx xx xxxx xxx xxxxxx x'xxxxx xxx) xx xxxx xx xxxxx x'xx xxxxxxx xx xxxx xxxxxx x  xxxxxx xx xx xx'xx x xxxx  (xxxxxxxxx xxx xxxxxxx, xxxxxxxx xx xxxxx xxxx xx xx xxxxx xxxxx xx xxxxxxxx, xxx.).
 
-**ocy**: voeux, recrutement, tableau de bord, reponses
+**xxx**: xxxxx, xxxxxxxxxxx, xxxxxxx xx xxxx, xxxxxxxx
 
-**syt**: il sera avec alf a  compter de jeudi pour preparation sprint pypy et ptet un peu de ginco sur les bords
-        """, rest=True)), """... Il est donc evident que tout le monde doit lire le compte-rendu de RSH et
-aller discuter avec les autres si c'est utile ou necessaire.
+**xxx**: xx xxxx xxxx xxx x  xxxxxxx xx xxxxx xxxx xxxxxxxxxxx xxxxxx xxxx xx xxxx xx xxx xx xxxxx xxx xxx xxxxx
+        """, rest=True)), """... xx xxx xxxx xxxxxxx xxx xxxx xx xxxxx xxxx xxxx xx xxxxxx-xxxxx xx xxx xx
+xxxxx xxxxxxxx xxxx xxx xxxxxx xx x'xxx xxxxx xx xxxxxxxxxx.
 
-**adim**: un poil de ginco, une pincee d'agueol, du pypy et 10 jours de dijon
-d'ici la fin du mois dont 4 sur place.
+**xxxx**: xx xxxx xx xxxxx, xxx xxxxxx x'xxxxxx, xx xxxx xx yy xxxxx xx xxxxx
+x'xxx xx xxx xx xxxx xxxx y xxx xxxxx.
 
-**alf**: une intro a pypy, un peu de ginco peut-etre et preparer cours IN2P01.
+**xxx**: xxx xxxxx x xxxx, xx xxx xx xxxxx xxxx-xxxx xx xxxxxxxx xxxxx xxyxyy.
 
-**arthur**: y'a du eStock a faire
+**xxxxxx**: x'x xx xxxxxx x xxxxx
 
-**auc**: atuk02 et ginco
+**xxx**: xxxxyy xx xxxxx
 
-**david**: terminer EDFC21 qui etait du pour le 21 decembre et pour lequel il
-reste encore 1 semaine
+**xxxxx**: xxxxxxxx xxxxyy xxx xxxxx xx xxxx xx yy xxxxxxxx xx xxxx xxxxxx xx
+xxxxx xxxxxx y xxxxxxx
 
-**jphc**: deposer les comptes, finir des papiers administratifs, envoyer des
-voeux et garder un oeil sur les reponses a faire et nouveaux appels.
+**xxxx**: xxxxxxx xxx xxxxxxx, xxxxx xxx xxxxxxx xxxxxxxxxxxxxx, xxxxxxx xxx
+xxxxx xx xxxxxx xx xxxx xxx xxx xxxxxxxx x xxxxx xx xxxxxxxx xxxxxx.
 
-**katia**: AGRI06 vient de demarrer et y'a besoin d'arthur
+**xxxxx**: xxxxyy xxxxx xx xxxxxxxx xx x'x xxxxxx x'xxxxxx
 
-**ludal**: terminer EDFC16 devrait prendre jusqu'a mardi prochain.
+**xxxxx**: xxxxxxxx xxxxyy xxxxxxx xxxxxxx xxxxx'x xxxxx xxxxxxxx.
 
-**nico**: qq reponses (dont EADA03 pour laquelle il me faudra de l'aide de gens
-qui aiment l'admin sys) et mise en place d'un tableau de bord propre a partir de
-ce qu'on a deja (situation des comptes, affaires en cours avec nb de jours prevu
-et depenses, etc.).
+**xxxx**: xx xxxxxxxx (xxxx xxxxyy xxxx xxxxxxxx xx xx xxxxxx xx x'xxxx xx xxxx
+xxx xxxxxx x'xxxxx xxx) xx xxxx xx xxxxx x'xx xxxxxxx xx xxxx xxxxxx x xxxxxx xx
+xx xx'xx x xxxx (xxxxxxxxx xxx xxxxxxx, xxxxxxxx xx xxxxx xxxx xx xx xxxxx xxxxx
+xx xxxxxxxx, xxx.).
 
-**ocy**: voeux, recrutement, tableau de bord, reponses
+**xxx**: xxxxx, xxxxxxxxxxx, xxxxxxx xx xxxx, xxxxxxxx
 
-**syt**: il sera avec alf a compter de jeudi pour preparation sprint pypy et
-ptet un peu de ginco sur les bords""")
-
-    def test_normalize_rest_paragraph(self):
-        self.assertEquals(ulines(tu.normalize_rest_paragraph("""**nico**: qq reponses (dont EADA03 pour laquelle il me faudra de l'aide de gens
-qui aiment l'admin sys) et mise en place d'un tableau de bord propre a partir de ce qu'on a deja (situation des comptes, affaires en cours avec nb de jours prevu et depenses, etc.).""")),
-                          """**nico**: qq reponses (dont EADA03 pour laquelle il me faudra de l'aide de gens
-qui aiment l'admin sys) et mise en place d'un tableau de bord propre a partir de
-ce qu'on a deja (situation des comptes, affaires en cours avec nb de jours prevu
-et depenses, etc.).""")
+**xxx**: xx xxxx xxxx xxx x xxxxxxx xx xxxxx xxxx xxxxxxxxxxx xxxxxx xxxx xx
+xxxx xx xxx xx xxxxx xxx xxx xxxxx""")
 
     def test_normalize_rest_paragraph(self):
-        self.assertEquals(ulines(tu.normalize_rest_paragraph("""**syt**: il sera avec alf a compter de jeudi pour preparation sprint pypy et ptet un peu de ginco sur les bords""")),
-                              """**syt**: il sera avec alf a compter de jeudi pour preparation sprint pypy et\nptet un peu de ginco sur les bords""")
+        self.assertEquals(ulines(tu.normalize_rest_paragraph("""**xxxx**: xx xxxxxxxx (xxxx xxxxyy xxxx xxxxxxxx xx xx xxxxxx xx x'xxxx xx xxxx
+xxx xxxxxx x'xxxxx xxx) xx xxxx xx xxxxx x'xx xxxxxxx xx xxxx xxxxxx x xxxxxx xx xx xx'xx x xxxx (xxxxxxxxx xxx xxxxxxx, xxxxxxxx xx xxxxx xxxx xx xx xxxxx xxxxx xx xxxxxxxx, xxx.).""")),
+                          """**xxxx**: xx xxxxxxxx (xxxx xxxxyy xxxx xxxxxxxx xx xx xxxxxx xx x'xxxx xx xxxx
+xxx xxxxxx x'xxxxx xxx) xx xxxx xx xxxxx x'xx xxxxxxx xx xxxx xxxxxx x xxxxxx xx
+xx xx'xx x xxxx (xxxxxxxxx xxx xxxxxxx, xxxxxxxx xx xxxxx xxxx xx xx xxxxx xxxxx
+xx xxxxxxxx, xxx.).""")
+
+    def test_normalize_rest_paragraph(self):
+        self.assertEquals(ulines(tu.normalize_rest_paragraph("""**xxx**: xx xxxx xxxx xxx x xxxxxxx xx xxxxx xxxx xxxxxxxxxxx xxxxxx xxxx xx xxxx xx xxx xx xxxxx xxx xxx xxxxx""")),
+                              """**xxx**: xx xxxx xxxx xxx x xxxxxxx xx xxxxx xxxx xxxxxxxxxxx xxxxxx xxxx xx\nxxxx xx xxx xx xxxxx xxx xxx xxxxx""")
 
         
 class NormalizeParagraphTC(TestCase):
