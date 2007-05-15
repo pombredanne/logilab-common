@@ -35,6 +35,10 @@ import difflib
 import types
 from warnings import warn
 from compiler.consts import CO_GENERATOR
+try:
+    import readline
+except ImportError:
+    readline = None
 
 # PRINT_ = file('stdout.txt', 'w').write
 
@@ -266,6 +270,8 @@ def _count(n, word):
         return "%d %ss" % (n, word)
 
 
+    
+
 ## PostMortem Debug facilities #####
 from pdb import Pdb
 class Debugger(Pdb):
@@ -275,9 +281,26 @@ class Debugger(Pdb):
         while tcbk.tb_next is not None:
             tcbk = tcbk.tb_next
         self._tcbk = tcbk
+        self._histfile = osp.join(os.environ["HOME"], ".pdbhist")
         
+    def setup_history_file(self):
+        if readline is not None:
+            try:
+                readline.read_history_file(self._histfile)
+            except IOError:
+                pass
+
     def start(self):
         self.interaction(self._tcbk.tb_frame, self._tcbk)
+
+    def setup(self, frame, tcbk):
+        self.setup_history_file()
+        Pdb.setup(self, frame, tcbk)
+
+    def set_quit(self):
+        if readline is not None:
+            readline.write_history_file(self._histfile)
+        Pdb.set_quit(self)
 
 def start_interactive_mode(debuggers, descrs):
     """starts an interactive shell so that the user can inspect errors
@@ -328,6 +351,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.printonly = printonly
         self.pdbmode = pdbmode
         self.cvg = cvg
+        self.pdbclass = Debugger
 
 ##     def startTest(self, test):
 ##         "Called when the given test is about to be run"
@@ -344,7 +368,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
         
     def _create_pdb(self, test_descr):
         if self.pdbmode:
-            self.debuggers.append(Debugger(sys.exc_info()[2]))
+            self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
             self.descrs.append(test_descr)
         
     def addError(self, test, err):
@@ -794,6 +818,7 @@ class TestCase(unittest.TestCase):
     """unittest.TestCase with some additional methods"""
 
     capture = False
+    pdbclass = Debugger
     
     def __init__(self, methodName='runTest'):
         super(TestCase, self).__init__(methodName)
@@ -883,6 +908,7 @@ class TestCase(unittest.TestCase):
         """
         if result is None:
             result = self.defaultTestResult()
+        result.pdbclass = self.pdbclass
         # if self.capture is True here, it means it was explicitly specified
         # in the user's TestCase class. If not, do what was asked on cmd line
         self.capture = self.capture or getattr(result, 'capture', False)
