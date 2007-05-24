@@ -531,7 +531,7 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
     def list_users(self, cursor, username=None):
         if username is None:
             return cursor.execute("SELECT usename FROM pg_user")
-        return cursor.execute("SELECT usename FROM pg_user WHERE usename=%(user)s'",
+        return cursor.execute("SELECT usename FROM pg_user WHERE usename=%(user)s",
                               {'user': username})
 
 def dbcmd(cmd, dbhost, dbuser):
