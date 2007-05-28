@@ -360,7 +360,7 @@ def run():
     options, newargs, explicitfile = parseargs()
     # mock a new command line
     sys.argv[1:] = newargs
-    covermode = getattr(options, 'coverage')
+    covermode = getattr(options, 'coverage', None)
     try:
         try:
             cvg = None
