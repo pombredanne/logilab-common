@@ -56,7 +56,6 @@ class TraceController(object):
 pause_tracing = TraceController.pause_tracing
 resume_tracing = TraceController.resume_tracing
 
-del TraceController # remove direct obvious reference to TraceController
 
 def nocoverage(func):
     if hasattr(func, 'uncovered'):
