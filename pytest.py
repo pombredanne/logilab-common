@@ -33,10 +33,9 @@ import __builtin__
 # hey, but this is an aspect, right ?!!!
 class TraceController(object):
     nesting = 0
-    active = False
 
     def pause_tracing(cls):
-        if cls.active and not cls.nesting:
+        if not cls.nesting:
             cls.tracefunc = getattr(sys, '__settrace__', sys.settrace)
             cls.oldtracer = getattr(sys, '__tracer__', None)
             sys.__notrace__ = True
@@ -47,7 +46,7 @@ class TraceController(object):
     def resume_tracing(cls):
         cls.nesting -= 1
         assert cls.nesting >= 0
-        if cls.active and not cls.nesting:
+        if not cls.nesting:
             cls.tracefunc(cls.oldtracer)
             delattr(sys, '__notrace__')
     resume_tracing = classmethod(resume_tracing)
@@ -360,17 +359,16 @@ def run():
     # mock a new command line
     sys.argv[1:] = newargs
     covermode = getattr(options, 'coverage', None)
+    cvg = None
+    if covermode:
+        # control_import_coverage(rootdir)
+        from logilab.devtools.lib.coverage import Coverage
+        cvg = Coverage([rootdir])
+        cvg.erase()
+        cvg.start()
+    tester = PyTester(cvg)
     try:
         try:
-            cvg = None
-            if covermode:
-                # control_import_coverage(rootdir)
-                from logilab.devtools.lib.coverage import Coverage
-                cvg = Coverage([rootdir])
-                cvg.erase()
-                cvg.start()
-                TraceController.active = True
-            tester = PyTester(cvg)
             if explicitfile:
                 tester.testfile(explicitfile)
             elif options.testdir:
@@ -386,7 +384,6 @@ def run():
         errcode = tester.show_report()
         if covermode:
             cvg.stop()
-            TraceController.active = False
             cvg.save()
             here = osp.abspath(os.getcwd())
             if this_is_a_testdir(here):
