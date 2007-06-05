@@ -63,8 +63,7 @@ http://www.plonefr.net/blog/archive/2005/10/30/tester-la-future-infrastructure-i
     def test_nonregr_rest_normalize(self):
         self.assertEquals(ulines(tu.normalize_text("""... Il est donc evident que tout le monde doit lire le compte-rendu de RSH et aller discuter avec les autres si c'est utile ou necessaire.
         """, rest=True)), """... Il est donc evident que tout le monde doit lire le compte-rendu de RSH et
-aller discuter avec les autres si c'est utile ou necessaire.
-""")
+aller discuter avec les autres si c'est utile ou necessaire.""")
 
     def test_normalize_rest_paragraph(self):
         self.assertEquals(ulines(tu.normalize_rest_paragraph("""**nico**: toto""")),
