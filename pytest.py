@@ -10,7 +10,7 @@ pytest one (will run both test_thisone and test_thatone)
 pytest path/to/mytests.py -s not (will skip test_notthisone)
 
 pytest --coverage test_foo.py
-  (only of logilab.devtools is available)
+  (only if logilab.devtools is available)
 """
 
 import os, sys
@@ -321,13 +321,11 @@ def parseargs():
 
     try:
         from logilab.devtools.lib.coverage import Coverage
-    except ImportError:
-        print "kouch kouch"
-        pass
-    else:
         parser.add_option('--coverage', dest="coverage", default=False,
                           action="store_true",
                           help="run tests with pycoverage (conflicts with --pdb)")
+    except ImportError:
+        pass
 
     # parse the command line
     options, args = parser.parse_args()

@@ -1,6 +1,13 @@
 ChangeLog for logilab.common
 ============================
 
+2007-05-14  --  0.22.1
+    * important bug fix in bd.py
+    * added history in pytest debugger sessions
+    * fix pytest coverage bug
+    * fix textutils test
+    * fix a bug which provoqued a crash if devtools was not installed
+
 2007-05-14  --  0.22.0
     * pytest improvements
     * shellutils: use shutil.move instead of os.rename as default action
