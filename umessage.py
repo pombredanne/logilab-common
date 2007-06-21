@@ -4,7 +4,10 @@ import email
 from email.Utils import parseaddr, parsedate
 from email.Header import decode_header
 
-from mx.DateTime import DateTime
+try:
+    from mx.DateTime import DateTime
+except ImportError:
+    def DateTime(*args): return None
 
 def decode_QP(string):
     parts = []
