@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+2007-06-25  --  0.22.2
+    * new 'typechanged' action for configuration.read_old_config
+
 2007-05-14  --  0.22.1
     * important bug fix in bd.py
     * added history in pytest debugger sessions
