@@ -567,7 +567,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 PREFERED_DRIVERS = {
     "postgres" : [ 'psycopg2', 'psycopg', 'pgdb', 'pyPgSQL.PgSQL', ],
     "mysql" : [ 'MySQLdb', ], # 'pyMySQL.MySQL, ],
-    "sqlite" : [ 'pysqlite2.dbapi2', 'sqlite', ],
+    "sqlite" : ['sqlite3', 'pysqlite2.dbapi2', 'sqlite', ],
     }
 
 _ADAPTERS = {
@@ -578,7 +578,8 @@ _ADAPTERS = {
                    },
     'mysql' : { 'MySQLdb' : _MySqlDBAdapter, },
     'sqlite' : { 'pysqlite2.dbapi2' : _PySqlite2Adapter,
-                 'sqlite' : _SqliteAdapter, },
+                 'sqlite' : _SqliteAdapter,
+                 'sqlite3' : _PySqlite2Adapter, },
     }
 
 # _AdapterDirectory could be more generic by adding a 'protocol' parameter

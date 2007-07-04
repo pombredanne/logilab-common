@@ -10,7 +10,7 @@ pytest one (will run both test_thisone and test_thatone)
 pytest path/to/mytests.py -s not (will skip test_notthisone)
 
 pytest --coverage test_foo.py
-  (only of logilab.devtools is available)
+  (only if logilab.devtools is available)
 """
 
 import os, sys

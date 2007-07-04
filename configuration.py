@@ -812,12 +812,11 @@ def read_old_config(newconfig, changes, configfile):
     possible changes:
     * ('renamed', oldname, newname)
     * ('moved', option, oldgroup, newgroup)
+    * ('typechanged', option, oldtype, newvalue)
     """
     # build an index of changes
     changesindex = {}
     for action in changes:
-        if action[0] not in ('moved', 'renamed'):
-            raise Exception('unknown change %s' % action[0])
         if action[0] == 'moved':
             option, oldgroup, newgroup = action[1:]
             changesindex.setdefault(option, []).append((action[0], oldgroup, newgroup))
@@ -826,6 +825,10 @@ def read_old_config(newconfig, changes, configfile):
             oldname, newname = action[1:]
             changesindex.setdefault(newname, []).append((action[0], oldname))
             continue
+        if action[0] == 'typechanged':
+            option, oldtype, newvalue = action[1:]
+            changesindex.setdefault(option, []).append((action[0], oldtype, newvalue))
+            continue        
         if action[1] in ('added', 'removed'):
             continue # nothing to do here
         raise Exception('unknown change %s' % action[0])    
@@ -839,6 +842,10 @@ def read_old_config(newconfig, changes, configfile):
                 optdef['group'] = oldgroup
             elif action[0] == 'renamed':
                 optname = action[1]
+            elif action[0] == 'typechanged':
+                oldtype = action[1]
+                optdef = optdef.copy()
+                optdef['type'] = oldtype
         options.append((optname, optdef))
     if changesindex:
         raise Exception('unapplied changes: %s' % changesindex)
@@ -853,11 +860,13 @@ def read_old_config(newconfig, changes, configfile):
             oldname, newname = action[1:]
             newconfig[newname] = oldconfig[oldname]
             done.add(newname)
-            continue
+        elif action[0] == 'typechanged':
+            optname, oldtype, newvalue = action[1:]
+            newconfig[optname] = newvalue
+            done.add(optname)
     for optname, optdef in newconfig.options:
-        if optname in done:
-            continue
-        newconfig.set_option(optname, oldconfig[optname], opt_dict=optdef)
+        if not optname in done:
+            newconfig.set_option(optname, oldconfig[optname], opt_dict=optdef)
 
 
 def merge_options(options):
