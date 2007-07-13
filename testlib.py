@@ -891,7 +891,7 @@ class TestCase(unittest.TestCase):
         self._start_capture()
         try:
             func(*args, **kwargs)
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, SystemExit):
             self._stop_capture()
             raise
         except:
