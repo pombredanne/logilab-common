@@ -17,8 +17,7 @@
  deletion of entries.
 """
 
-__revision__ = '$Id: cache.py,v 1.8 2003-10-31 14:18:31 syt Exp $'
-
+_marker = object()
 
 class Cache:
     """ a dictionnary like cache
@@ -78,6 +77,13 @@ class Cache:
             del self.data[key]
             self._usage.remove(key)
         
+    def pop(self, value, default=_marker):
+        if value in self.data:
+            self._usage.remove(value)
+        if default is _marker:
+            return self.data.pop(value)
+        return self.data.pop(value, default)
+    
     def clear(self):
         self.data.clear()
         self._usage = []
@@ -93,5 +99,4 @@ class Cache:
 
     def has_key(self, key):
         return self.data.has_key(key)
-
     
