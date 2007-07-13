@@ -19,6 +19,7 @@
 import sys
 import re
 
+from logilab.common.deprecation import obsolete
 try:
     from mx.DateTime import DateTimeType, DateTimeDeltaType, strptime
     HAS_MX_DATETIME = True
@@ -402,15 +403,21 @@ class _GenericAdvFuncHelper:
     """
     # DBMS resources descriptors and accessors
     
-    def support_users(self):
+    users_support = True
+    groups_support = True
+    ilike_support = True
+    
+    @obsolete('use users_support attribute')
+    def support_users(self):# XXX deprecated
         """return True if the DBMS support users (this is usually
         not true for in memory DBMS)
         """
-        return True
+        return self.users_support
     
+    @obsolete('use groups_support attribute')    
     def support_groups(self):
         """return True if the DBMS support groups"""
-        return True
+        return self.groups_support
 
     def system_database(self):
         """return the system database for the given driver"""
@@ -463,7 +470,7 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
         return cursor.fetchone()[0]
     
     def list_users(self, cursor, username=None):
-        if not self.support_users():
+        if not self.users_support:
             return None
         if username is None:
             return ()
@@ -549,15 +556,8 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     An exception is raised when the functionality is not emulatable
     """
     
-    def support_users(self):
-        """return True if the DBMS support users (this is usually
-        not true for in memory DBMS)
-        """
-        return False
-    
-    def support_groups(self):
-        """return True if the DBMS support groups"""
-        return False
+    users_support = groups_support = False
+    ilike_support = False
     
     
 

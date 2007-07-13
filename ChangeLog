@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+  --
+    * db: mark support_users and support_groups methods as obsolete in
+      favor of users_support and groups_support attributes, new
+      ilike_support property on dbms helpers
+	
 2007-06-25  --  0.22.2
     * new 'typechanged' action for configuration.read_old_config
 
