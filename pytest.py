@@ -266,6 +266,8 @@ class PyTester(object):
                 ttime, ctime = (tend - tstart), (cend - cstart)
                 self.report.feed(filename, testprog.result, ttime, ctime)
                 return testprog
+            except SystemExit:
+                raise
             except Exception, exc:
                 self.report.failed_to_test_module(filename)
                 print 'unhandled exception occured while testing', modname
