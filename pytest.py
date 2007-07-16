@@ -142,6 +142,14 @@ class GlobalTestReport(object):
         if not testresult.wasSuccessful():
             problems = len(testresult.failures) + len(testresult.errors)
             self.errmodules.append((filename[:-3], problems, ran))
+
+
+    def failed_to_test_module(self, filename):
+        """called when the test module could not be imported by unittest
+        """
+        self.errors += 1
+        self.errmodules.append((filename[:-3], 1, 1))
+        
     
     def __str__(self):
         """this is just presentation stuff"""
@@ -233,7 +241,7 @@ class PyTester(object):
             if this_is_a_testfile(filename):
                 # run test and collect information
                 prog = self.testfile(filename, batchmode=True)
-                if exitfirst and not prog.result.wasSuccessful():
+                if exitfirst and (prog is None or not prog.result.wasSuccessful()):
                     break
         # clean local modules
         remove_local_modules_from_sys(testdir)
@@ -251,12 +259,18 @@ class PyTester(object):
         modname = osp.basename(filename)[:-3]
         print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
         try:
-            tstart, cstart = time(), clock()
-            testprog = testlib.unittest_main(modname, batchmode=batchmode, cvg=self.cvg)
-            tend, cend = time(), clock()
-            ttime, ctime = (tend - tstart), (cend - cstart)
-            self.report.feed(filename, testprog.result, ttime, ctime)
-            return testprog
+            try:
+                tstart, cstart = time(), clock()
+                testprog = testlib.unittest_main(modname, batchmode=batchmode, cvg=self.cvg)
+                tend, cend = time(), clock()
+                ttime, ctime = (tend - tstart), (cend - cstart)
+                self.report.feed(filename, testprog.result, ttime, ctime)
+                return testprog
+            except Exception, exc:
+                self.report.failed_to_test_module(filename)
+                print 'unhandled exception occured while testing', modname
+                print 'error: %s' % exc
+                return None                
         finally:
             if dirname:
                 os.chdir(here)
