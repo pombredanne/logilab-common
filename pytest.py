@@ -28,6 +28,15 @@ import imp
 import __builtin__
 
 
+try:
+    from django.conf import settings
+    from django.core.management import setup_environ
+    from logilab.common.modutils import modpath_from_file, load_module_from_modpath
+    DJANGO_FOUND = True
+except ImportError:
+    DJANGO_FOUND = False
+
+
 ## coverage hacks, do not read this, do not read this, do not read this
 
 # hey, but this is an aspect, right ?!!!
@@ -84,6 +93,7 @@ if sys.version_info >= (2, 4):
     doctest.DocTestCase.__bases__ = (testlib.TestCase,)
 else:
     unittest.FunctionTestCase.__bases__ = (testlib.TestCase,)
+
 
 
 def this_is_a_testfile(filename):
@@ -279,6 +289,80 @@ class PyTester(object):
 
 
 
+class DjangoTester(PyTester):
+
+    def load_django_settings(self, dirname):
+        """try to find project's setting and load it"""
+        curdir = osp.abspath(dirname)
+        previousdir = curdir
+        while not osp.isfile(osp.join(curdir, 'settings.py')) and \
+                  osp.isfile(osp.join(curdir, '__init__.py')):
+            newdir = osp.normpath(osp.join(curdir, os.pardir))
+            if newdir == curdir:
+                break
+            previousdir = curdir
+            curdir = newdir
+        else:
+            settings = load_module_from_modpath(modpath_from_file(osp.join(curdir, 'settings.py')))
+            setup_environ(settings)
+        from django.test.testcases import TestCase
+        TestCase.__bases__ = (testlib.TestCase,)
+            
+
+    def before_testfile(self):
+        # Those imports must be done **after** setup_environ was called
+        from django.test.utils import setup_test_environment
+        from django.test.utils import create_test_db
+        setup_test_environment()
+        settings.DEBUG = False
+        old_name = settings.DATABASE_NAME
+        create_test_db(verbosity=0)
+        
+
+    def after_testfile(self):
+        # Those imports must be done **after** setup_environ was called
+        from django.test.utils import teardown_test_environment
+        from django.test.utils import destroy_test_db
+        teardown_test_environment()
+        old_name = settings.DATABASE_NAME
+        destroy_test_db(old_name, verbosity=0)
+        
+
+    def testfile(self, filename, batchmode=False):
+        """runs every test in `filename`
+
+        :param filename: an absolute path pointing to a unittest file
+        """
+        here = os.getcwd()
+        dirname = osp.dirname(filename)
+        if dirname:
+            os.chdir(dirname)
+        self.load_django_settings(dirname)
+        modname = osp.basename(filename)[:-3]
+        print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
+        try:
+            try:
+                tstart, cstart = time(), clock()
+                self.before_testfile()
+                testprog = testlib.unittest_main(modname, batchmode=batchmode, cvg=self.cvg)
+                tend, cend = time(), clock()
+                ttime, ctime = (tend - tstart), (cend - cstart)
+                self.report.feed(filename, testprog.result, ttime, ctime)
+                return testprog
+            except SystemExit:
+                raise
+            except Exception, exc:
+                self.report.failed_to_test_module(filename)
+                print 'unhandled exception occured while testing', modname
+                print 'error: %s' % exc
+                return None                
+        finally:
+            self.after_testfile()
+            if dirname:
+                os.chdir(here)
+
+
+
 def parseargs():
     """Parse the command line and return (options processed), (options to pass to
     unittest_main()), (explicitfile or None).
@@ -343,6 +427,11 @@ def parseargs():
     except ImportError:
         pass
 
+    if DJANGO_FOUND:
+        parser.add_option('-J', '--django', dest='django', default=False,
+                          action="store_true",
+                          help='use pytest for django test cases')
+
     # parse the command line
     options, args = parser.parse_args()
     if options.pdb and getattr(options, 'coverage', False):
@@ -380,7 +469,10 @@ def run():
         cvg = Coverage([rootdir])
         cvg.erase()
         cvg.start()
-    tester = PyTester(cvg)
+    if options.django:
+        tester = DjangoTester(cvg)
+    else:
+        tester = PyTester(cvg)
     try:
         try:
             if explicitfile:
