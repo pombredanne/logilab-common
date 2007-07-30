@@ -29,8 +29,7 @@ import __builtin__
 
 
 try:
-    from django.conf import settings
-    from django.core.management import setup_environ
+    import django
     from logilab.common.modutils import modpath_from_file, load_module_from_modpath
     DJANGO_FOUND = True
 except ImportError:
@@ -245,18 +244,6 @@ class PyTester(object):
 
 
 
-    def testonedir(self, testdir, exitfirst=False):
-        """finds each testfile in the `testdir` and runs it"""
-        for filename in abspath_listdir(testdir):
-            if this_is_a_testfile(filename):
-                # run test and collect information
-                prog = self.testfile(filename, batchmode=True)
-                if exitfirst and (prog is None or not prog.result.wasSuccessful()):
-                    break
-        # clean local modules
-        remove_local_modules_from_sys(testdir)
-
-
     def testfile(self, filename, batchmode=False):
         """runs every test in `filename`
 
@@ -291,6 +278,10 @@ class PyTester(object):
 
 class DjangoTester(PyTester):
 
+    def __init__(self, cvg):
+        super(DjangoTester, self).__init__(cvg)
+
+
     def load_django_settings(self, dirname):
         """try to find project's setting and load it"""
         curdir = osp.abspath(dirname)
@@ -299,23 +290,24 @@ class DjangoTester(PyTester):
                   osp.isfile(osp.join(curdir, '__init__.py')):
             newdir = osp.normpath(osp.join(curdir, os.pardir))
             if newdir == curdir:
-                break
+                raise AssertionError('could not find settings.py')
             previousdir = curdir
             curdir = newdir
-        else:
-            settings = load_module_from_modpath(modpath_from_file(osp.join(curdir, 'settings.py')))
-            setup_environ(settings)
-        from django.test.testcases import TestCase
-        TestCase.__bases__ = (testlib.TestCase,)
-            
+        # late django initialization
+        settings = load_module_from_modpath(modpath_from_file(osp.join(curdir, 'settings.py')))
+        from django.core.management import setup_environ
+        setup_environ(settings)
+        self.dbname = settings.DATABASE_NAME
+        settings.DEBUG = False
+        # add settings dir to pythonpath since it's the project's root
+        if curdir not in sys.path:
+            sys.path.insert(1, curdir)
 
     def before_testfile(self):
         # Those imports must be done **after** setup_environ was called
         from django.test.utils import setup_test_environment
         from django.test.utils import create_test_db
         setup_test_environment()
-        settings.DEBUG = False
-        old_name = settings.DATABASE_NAME
         create_test_db(verbosity=0)
         
 
@@ -324,9 +316,48 @@ class DjangoTester(PyTester):
         from django.test.utils import teardown_test_environment
         from django.test.utils import destroy_test_db
         teardown_test_environment()
-        old_name = settings.DATABASE_NAME
-        destroy_test_db(old_name, verbosity=0)
+        destroy_test_db(self.dbname, verbosity=0)
         
+
+    def testall(self, exitfirst=False):
+        """walks trhough current working directory, finds something
+        which can be considered as a testdir and runs every test there
+        """
+        for dirname, dirs, files in os.walk(os.getcwd()):
+            for skipped in ('CVS', '.svn', '.hg'):
+                if skipped in dirs:
+                    dirs.remove(skipped)
+            if 'tests.py' in files:
+                self.testonedir(dirname, exitfirst)
+                dirs[:] = []
+            else:
+                basename = osp.basename(dirname)
+                if basename in ('test', 'tests'):
+                    print "going into", dirname
+                    # we found a testdir, let's explore it !
+                    self.testonedir(dirname, exitfirst)
+                    dirs[:] = []
+
+
+    def testonedir(self, testdir, exitfirst=False):
+        """finds each testfile in the `testdir` and runs it"""
+        # special django behaviour : if tests are splited in several files,
+        # remove the main tests.py file and tests each test file separately
+        testfiles = [fpath for fpath in abspath_listdir(testdir)
+                     if this_is_a_testfile(fpath)]
+        if len(testfiles) > 1:
+            try:
+                testfiles.remove(osp.join(testdir, 'tests.py'))
+            except ValueError:
+                pass
+        for filename in testfiles:
+            # run test and collect information
+            prog = self.testfile(filename, batchmode=True)
+            if exitfirst and (prog is None or not prog.result.wasSuccessful()):
+                break
+        # clean local modules
+        remove_local_modules_from_sys(testdir)
+
 
     def testfile(self, filename, batchmode=False):
         """runs every test in `filename`
