@@ -242,6 +242,17 @@ class PyTester(object):
                 self.testonedir(dirname, exitfirst)
                 dirs[:] = []
 
+ 
+    def testonedir(self, testdir, exitfirst=False):
+        """finds each testfile in the `testdir` and runs it"""
+        for filename in abspath_listdir(testdir):
+            if this_is_a_testfile(filename):
+                # run test and collect information
+                prog = self.testfile(filename, batchmode=True)
+                if exitfirst and (prog is None or not prog.result.wasSuccessful()):
+                    break
+        # clean local modules
+        remove_local_modules_from_sys(testdir)
 
 
     def testfile(self, filename, batchmode=False):
