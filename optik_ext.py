@@ -117,9 +117,8 @@ def check_named(option, opt, value):
 def check_password(option, opt, value):
     """check a password value (can't be empty)
     """
-    if value:
-        return value
-    raise OptionValueError("option %s: empty password" % opt)
+    # no actual checking, monkey patch if you want more
+    return value
 
 def check_file(option, opt, value):
     """check a file value
