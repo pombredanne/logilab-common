@@ -308,8 +308,8 @@ class DjangoTester(PyTester):
         settings = load_module_from_modpath(modpath_from_file(osp.join(curdir, 'settings.py')))
         from django.core.management import setup_environ
         setup_environ(settings)
-        self.dbname = settings.DATABASE_NAME
         settings.DEBUG = False
+        self.settings = settings
         # add settings dir to pythonpath since it's the project's root
         if curdir not in sys.path:
             sys.path.insert(1, curdir)
@@ -320,6 +320,7 @@ class DjangoTester(PyTester):
         from django.test.utils import create_test_db
         setup_test_environment()
         create_test_db(verbosity=0)
+        self.dbname = self.settings.TEST_DATABASE_NAME
         
 
     def after_testfile(self):
@@ -327,6 +328,7 @@ class DjangoTester(PyTester):
         from django.test.utils import teardown_test_environment
         from django.test.utils import destroy_test_db
         teardown_test_environment()
+        print 'destroying', self.dbname
         destroy_test_db(self.dbname, verbosity=0)
         
 
@@ -394,6 +396,8 @@ class DjangoTester(PyTester):
             except SystemExit:
                 raise
             except Exception, exc:
+                import traceback
+                traceback.print_exc()
                 self.report.failed_to_test_module(filename)
                 print 'unhandled exception occured while testing', modname
                 print 'error: %s' % exc
