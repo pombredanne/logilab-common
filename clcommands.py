@@ -90,12 +90,17 @@ def main_usage(status=0, __doc__=None, copyright=DEFAULT_COPYRIGHT):
     commands.sort()
     doc = __doc__ % ('<command>', '<command arguments>',
                      '''\
-Type "%%prog <command> --help" for more information about a specific
-command. Available commands are :\n  * %s.
-''' % '\n  * '.join(commands))
+Type "%prog <command> --help" for more information about a specific
+command. Available commands are :\n''')
     doc = doc.replace('%prog', basename(sys.argv[0]))
     print 'usage:', doc
-    print copyright
+    max_len = max(len(cmd) for cmd in commands)
+    padding = ' '*max_len
+    for command in commands:
+        cmd = _COMMANDS[command]
+        title = cmd.__doc__.split('.')[0]
+        print ' ', (command+padding)[:max_len], title
+    print '\n', copyright
     sys.exit(status)
 
 
