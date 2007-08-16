@@ -61,7 +61,7 @@ class Visitor:
         n = iterator.next()
         while n:
             result = n.accept(self)
-            n = iterator.next()  
+            n = iterator.next()
         return result
 
     def _get_iterator(self, node):

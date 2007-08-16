@@ -322,7 +322,7 @@ def post_order_list(node, filter_func=no_filter):
     return l
 
 def pre_order_list(node, filter_func=no_filter):
-    """ 
+    """
     create a list with tree nodes for which the <filter> function returned true
     in a pre order fashion
     """

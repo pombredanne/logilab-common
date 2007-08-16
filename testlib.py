@@ -22,8 +22,6 @@ If no non-option arguments are present, prefixes used are 'test',
 'regrtest', 'smoketest' and 'unittest'.
 
 """
-from __future__ import nested_scopes
-
 import sys
 import os, os.path as osp
 import re
