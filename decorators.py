@@ -100,3 +100,13 @@ class wproperty(object):
     def __get__(self, obj, cls):
         assert obj is not None
         return getattr(obj, self.attrname)
+
+from time import clock
+def timed(f):
+    def wrap(*args, **kwargs):
+        t = clock()
+        #for i in range(100):
+        res = f(*args, **kwargs)
+        print '%s time: %.9f' % (f.__name__, clock() - t)
+        return res
+    return wrap
