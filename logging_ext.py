@@ -42,7 +42,7 @@ class ColorFormatter(logging.Formatter):
         self.colorfilters = []
         self.colors = colors or {'CRITICAL': 'red',
                                  'ERROR': 'red',
-                                 'WARNING': 'orange',
+                                 'WARNING': 'magenta',
                                  'INFO': 'yellow',
                                  }
         assert isinstance(self.colors, dict)
