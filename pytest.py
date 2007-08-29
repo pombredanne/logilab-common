@@ -515,7 +515,7 @@ def run():
         cvg = Coverage([rootdir])
         cvg.erase()
         cvg.start()
-    if options.django:
+    if DJANGO_FOUND and options.django:
         tester = DjangoTester(cvg)
     else:
         tester = PyTester(cvg)
