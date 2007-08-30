@@ -1,4 +1,4 @@
-# -*- encoding: iso-8859-1 -*-
+# -*- coding: iso-8859-1 -*-
 # Copyright (c) 2006 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
@@ -23,6 +23,10 @@ This module provides extensions to the logging module from the standard library.
 import logging
 
 from logilab.common.textutils import colorize_ansi
+
+def xxx_cyan(record):
+    if 'XXX' in record.message:
+        return 'cyan'
 
 class ColorFormatter(logging.Formatter):
     """
@@ -58,3 +62,13 @@ class ColorFormatter(logging.Formatter):
                 if color: 
                     return colorize_ansi(msg, color)
         return msg
+
+def set_color_formatter(logger=None):
+    if logger is None:
+        logger = logging.getLogger()
+        if not logger.handlers:
+            logging.basicConfig()
+    format_msg = logger.handlers[0].formatter._fmt
+    fmt = ColorFormatter(format_msg)
+    fmt.colorfilters.append(xxx_cyan)
+    logger.handlers[0].setFormatter(fmt)
