@@ -130,6 +130,31 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
     return module
 
 
+def load_module_from_file(filepath, path=None, use_sys=1):
+    """load a Python module from it's path
+
+    :type filepath: str
+    :param dotted_name: path to the python module or package
+
+    :type path: list or None
+    :param path:
+      optional list of path where the module or package should be
+      searched (use sys.path if nothing or None is given)
+
+    :type use_sys: bool
+    :param use_sys:
+      boolean indicating whether the sys.modules dictionary should be
+      used or not
+
+
+    :raise ImportError: if the module or package is not found
+    
+    :rtype: module
+    :return: the loaded module
+    """
+    return load_module_from_modpath(modpath_from_file(filepath), path, use_sys)
+
+
 def modpath_from_file(filename):
     """given a file path return the corresponding splitted module's name
     (i.e name of a module or package splitted on '.')
