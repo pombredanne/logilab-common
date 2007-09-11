@@ -1113,7 +1113,7 @@ class TestCase(unittest.TestCase):
     def assertIsInstance(self, obj, klass, msg=None):
         """compares two files using difflib"""
         if msg is None:
-            msg = '%s is not an instance of %s' % (obj, klass)
+            msg = '%s is not an instance of %s but of %s' % (obj, klass, type(obj))
         self.assert_(isinstance(obj, klass), msg)
 
 
