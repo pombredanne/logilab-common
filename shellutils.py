@@ -1,4 +1,4 @@
-# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2003-2007 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 
 # This program is free software; you can redistribute it and/or modify it under
@@ -24,7 +24,7 @@ import shutil
 import sys
 import tempfile
 import time
-from os.path import exists, isdir, basename, join, walk
+from os.path import exists, isdir, islink, basename, join, walk
 
 from logilab.common import STD_BLACKLIST
 
@@ -54,7 +54,9 @@ def rm(*files):
     """
     for wfile in files:
         for filename in glob.glob(wfile):
-            if isdir(filename):
+            if islink(filename):
+                os.remove(filename)
+            elif isdir(filename):
                 shutil.rmtree(filename)
             else:
                 os.remove(filename)
