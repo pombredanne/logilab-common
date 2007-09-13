@@ -2,9 +2,14 @@ ChangeLog for logilab.common
 ============================
 
   --
-    * db: mark support_users and support_groups methods as obsolete in
-      favor of users_support and groups_support attributes, new
-      ilike_support property on dbms helpers
+    * db:
+	
+      - mark support_users and support_groups methods as obsolete in
+        favor of users_support and groups_support attributes
+      - new ilike_support property on dbms helpers
+	
+    * textutils: new unormalize function to normalize diacritical chars by
+      their ascii equivalent
     * modutils: new load_module_from_file shortcut function
     * clcommands: pop_args accept None as value for expected_size_after,
       meaning remaining args should not be checked
@@ -13,7 +18,7 @@ ChangeLog for logilab.common
     * new 'typechanged' action for configuration.read_old_config
 
 2007-05-14  --  0.22.1
-    * important bug fix in bd.py
+    * important bug fix in db.py
     * added history in pytest debugger sessions
     * fix pytest coverage bug
     * fix textutils test

@@ -48,7 +48,23 @@ unquote, colorize_ansi
 __docformat__ = "restructuredtext en"
 
 import re
+from unicodedata import normalize as _uninormalize
 from os import linesep
+
+def unormalize(ustring, killchars='', ignorenonascii=False):
+    """replace diacritical characters with their corresponding ascii characters
+    """
+    res = []
+    for letter in ustring[:]:
+        if ord(letter) >= 2**8:
+            if ignorenonascii:
+                continue
+            raise ValueError("can't deal with non-ascii based characters")
+        replacement = _uninormalize('NFD', letter)[0]
+        if replacement in killchars:
+            continue
+        res.append(replacement)
+    return u''.join(res)
 
 def unquote(string):
     """remove optional quotes (simple or double) from the string
