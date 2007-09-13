@@ -7,6 +7,8 @@ ChangeLog for logilab.common
       - mark support_users and support_groups methods as obsolete in
         favor of users_support and groups_support attributes
       - new ilike_support property on dbms helpers
+      - extended db helper api
+      - completed mysql support
 	
     * textutils: new unormalize function to normalize diacritical chars by
       their ascii equivalent

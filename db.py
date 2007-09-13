@@ -1,4 +1,4 @@
-# Copyright (c) 2002-2006 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2002-2007 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -13,7 +13,23 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""Helpers to get a DBAPI2 compliant database connection.
+"""This modules contains wrappers to get actually replaceable DBAPI2 compliant
+modules and database connection whatever the database and client lib used.
+
+Currently support:
+
+- postgresql (pgdb, psycopg, psycopg2, pyPgSQL)
+- mysql (MySQLdb)
+- sqlite (pysqlite2, sqlite, sqlite3)
+
+just use the `get_connection` function from this module to get a
+wrapped connection.  If multiple drivers for a database are available,
+you can control which one you want to use using the
+`set_prefered_driver` function.
+
+Additional helpers are also provided for advanced functionalities such
+as listing existing users or databases, creating database... Get the
+helper for your database using the `get_adv_func_helper` function.
 """
 
 import sys
@@ -169,7 +185,26 @@ class DBAPIAdapter:
     def __getattr__(self, attrname):
         return getattr(self._native_module, attrname)
 
-
+    def process_value(self, value, description, encoding='utf-8', binarywrap=None):
+        typecode = description[1]
+        assert typecode is not None, self # dbapi module isn't supporting type codes, override to return value directly
+        if typecode == self.STRING:
+            if isinstance(value, str):
+                return unicode(value, encoding)
+        elif typecode == self.BOOLEAN:
+            return bool(value)
+        elif typecode == self.BINARY and not binarywrap is None:
+            return binarywrap(value)
+##                 elif typecode == dbapimod.DATETIME:
+##                     pass
+##                 elif typecode == dbapimod.NUMBER:
+##                     pass
+##                 else:
+##                     self.warning("type -%s- unknown for %r (%s) ",
+##                         typecode, value, type(value))
+        return value
+        
+    
 # Postgresql #########################################################
 
 class _PgdbAdapter(DBAPIAdapter):
@@ -208,7 +243,6 @@ class _PsycopgAdapter(DBAPIAdapter):
         cnx.set_isolation_level(1)
         return self._wrap_if_needed(cnx)
     
-
 class _Psycopg2Adapter(_PsycopgAdapter):
     """Simple Psycopg2 Adapter to DBAPI (cnx_string differs from classical ones)
     """
@@ -358,6 +392,9 @@ class _PySqlite2Adapter(DBAPIAdapter):
                 return getattr(self._cnx, attrname)
         cnx = sqlite.connect(database, detect_types=sqlite.PARSE_DECLTYPES)
         return self._wrap_if_needed(PySqlite2CnxWrapper(cnx))
+    
+    def process_value(self, value, description, encoding='utf-8', binarywrap=None):
+        return value # no type code support, can't do anything
 
     
 class _SqliteAdapter(DBAPIAdapter):
@@ -378,8 +415,9 @@ class _SqliteAdapter(DBAPIAdapter):
 class _MySqlDBAdapter(DBAPIAdapter):
     """Simple mysql Adapter to DBAPI
     """
+    BOOLEAN = 'XXX' # no specific type code for boolean
     def connect(self, host='', database='', user='', password='', port=None,
-                unicode=False):
+                unicode=True):
         """Handles mysqldb connexion format
         the unicode named argument asks to use Unicode objects for strings
         in result sets and query parameters
@@ -387,12 +425,53 @@ class _MySqlDBAdapter(DBAPIAdapter):
         kwargs = {'host' : host or '', 'db' : database,
                   'user' : user, 'passwd' : password,
                   'use_unicode' : unicode}
+        # MySQLdb doesn't support None port
         if port:
-            # MySqlDb requires port to be an integer
-            kwargs['port'] = port
-        return self._native_module.connect(**kwargs)
+            kwargs['port'] = int(port)
+        cnx = self._native_module.connect(**kwargs)
+        return self._wrap_if_needed(cnx)
 
+    def process_value(self, value, description, encoding='utf-8', binarywrap=None):
+        typecode = description[1]
+        # hack to differentiate mediumtext (String) and tinyblob/longblog
+        # (Password/Bytes) which are all sharing the same type code :(
+        if typecode == self.BINARY:
+            maxsize = description[3]
+            if maxsize == 16777215: # mediumtext (2**24 - 1)
+                if isinstance(value, str):
+                    return unicode(value, encoding)
+                return value
+            #if maxsize == 255: # tinyblob (2**8 - 1)
+            #    return value
+            if binarywrap is None:
+                return value
+            return binarywrap(value)
+        return DBAPIAdapter.process_value(self, value, description, encoding, binarywrap)
 
+    def type_code_test(self, cursor):
+        print '*'*80
+        print 'module type codes'
+        for typename in ('STRING', 'BOOLEAN', 'BINARY', 'DATETIME', 'NUMBER'):
+            print typename, getattr(self, typename)
+        try:
+            cursor.execute("""CREATE TABLE _type_code_test(
+            varchar_field varchar(50),
+            text_field text unicode, 
+            mtext_field mediumtext,
+            binary_field tinyblob,
+            blob_field blob,
+            lblob_field longblob
+            )""")
+            cursor.execute("INSERT INTO _type_code_test VALUES ('1','2','3','4', '5', '6')")
+            cursor.execute("SELECT * FROM _type_code_test")
+            descr = cursor.description
+            print 'db fields type codes'
+            for i, name in enumerate(('varchar', 'text', 'mediumtext',
+                                      'binary', 'blob', 'longblob')):
+                print name, descr[i]
+        finally:
+            cursor.execute("DROP TABLE _type_code_test")
+            
 ## Helpers for DBMS specific advanced or non standard functionalities #########
 
 class _GenericAdvFuncHelper:
@@ -400,15 +479,36 @@ class _GenericAdvFuncHelper:
     specific functionnalities from others DBMS
 
     An exception is raised when the functionality is not emulatable
-    """
+    """    
     # DBMS resources descriptors and accessors
     
     users_support = True
     groups_support = True
     ilike_support = True
+
+
+    TYPE_MAPPING = {
+        'String' :   'text',
+        'Int' :      'integer',
+        'Float' :    'float',
+        'Boolean' :  'boolean',
+        'Date' :     'date', 
+        'Time' :     'time', 
+        'Datetime' : 'timestamp',
+        'Interval' : 'interval',
+        'Password' : 'bytea',
+        'Bytes' :    'bytea',
+        # FIXME: still there for use from erudi, should be moved out
+        'COUNT' : 'integer',
+        'MIN' :   'integer',
+        'MAX' :   'integer',
+        'SUM' :   'integer',
+        'LOWER' : 'text',
+        'UPPER' : 'text',
+        }
     
     @obsolete('use users_support attribute')
-    def support_users(self):# XXX deprecated
+    def support_users(self):
         """return True if the DBMS support users (this is usually
         not true for in memory DBMS)
         """
@@ -429,7 +529,8 @@ class _GenericAdvFuncHelper:
         raise NotImplementedError('not supported by this DBMS')
     
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
-                         encoding='UTF8', keepownership=True, drop=True):
+                         encoding='utf-8', keepownership=True, drop=True):
+        """return a list of commands to restore a backup the given database"""
         raise NotImplementedError('not supported by this DBMS')
     
     # helpers to standardize SQL according to the database
@@ -463,20 +564,56 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
         # XXX postgres specific ?
         return 'ALTER TABLE %s DROP CONSTRAINT %s_%s_key' % (
             table, table, column)
-    
+
+    def boolean_value(self, value):
+        if value:
+            return 'TRUE'
+        else:
+            return 'FALSE'
+        
     def increment_sequence(self, cursor, seq_name):
         for sql in self.sqls_increment_sequence(seq_name):
             cursor.execute(sql)
         return cursor.fetchone()[0]
-    
-    def list_users(self, cursor, username=None):
-        if not self.users_support:
-            return None
-        if username is None:
-            return ()
-        return None
 
+    def create_user(self, cursor, user, password):
+        """create a new database user"""
+        if not self.users_support:
+            raise NotImplementedError('not supported by this DBMS')
+        cursor.execute("CREATE USER %(user)s "
+                       "WITH PASSWORD '%(password)s'" % locals())
     
+    def user_exists(self, cursor, username):
+        """return True if a user with the given username exists"""
+        return username in self.list_users(cursor)
+    
+    def list_users(self, cursor):
+        """return the list of existing database users"""
+        raise NotImplementedError('not supported by this DBMS')
+    
+    def create_database(self, cursor, dbname, owner=None, encoding='utf-8'):
+        """create a new database"""
+        raise NotImplementedError('not supported by this DBMS')
+        
+    def list_databases(self):
+        """return the list of existing databases"""
+        raise NotImplementedError('not supported by this DBMS')
+    
+    def list_tables(self, cursor):
+        """return the list of tables of a database"""
+        raise NotImplementedError('not supported by this DBMS')
+    
+
+
+def pgdbcmd(cmd, dbhost, dbuser):
+    cmd = [cmd]
+    if dbhost:
+        cmd.append('--host=%s' % dbhost)
+    if dbuser:
+        cmd.append('--username=%s' % dbuser)
+    return cmd
+
+
 class _PGAdvFuncHelper(_GenericAdvFuncHelper):
     """Postgres helper, taking advantage of postgres SEQUENCE support
     """
@@ -500,17 +637,17 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         return ' '.join(cmd)
     
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
-                         encoding='UTF8', keepownership=True, drop=True):
-        """return a command to restore a backup the given database"""
+                         encoding='utf-8', keepownership=True, drop=True):
+        """return a list of commands to restore a backup the given database"""
         cmds = []
         if drop:
-            cmd = dbcmd('dropdb', dbhost, dbuser)
+            cmd = pgdbcmd('dropdb', dbhost, dbuser)
             cmd.append(dbname)
             cmds.append(' '.join(cmd))
-        cmd = dbcmd('createdb -T template0 -E %s' % encoding, dbhost, dbuser)
+        cmd = pgdbcmd('createdb -T template0 -E %s' % encoding, dbhost, dbuser)
         cmd.append(dbname)
         cmds.append(' '.join(cmd))
-        cmd = dbcmd('pg_restore -Fc', dbhost, dbuser)
+        cmd = pgdbcmd('pg_restore -Fc', dbhost, dbuser)
         cmd.append('--dbname %s' % dbname)
         if not keepownership:
             cmd.append('--no-owner')
@@ -535,20 +672,41 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
                                                                    table_schema)
 
-    def list_users(self, cursor, username=None):
-        if username is None:
-            return cursor.execute("SELECT usename FROM pg_user")
-        return cursor.execute("SELECT usename FROM pg_user WHERE usename=%(user)s",
-                              {'user': username})
+    def list_users(self, cursor):
+        """return the list of existing database users"""
+        cursor.execute("SELECT usename FROM pg_user")
+        return [r[0] for r in cursor.fetchall()]
+    
+    def create_database(self, cursor, dbname, owner=None, encoding='utf-8'):
+        """create a new database"""
+        sql = "CREATE DATABASE %(dbname)s"
+        if owner:
+            sql += " WITH OWNER=%(owner)s"
+        if encoding:
+            sql += " ENCODING='%(encoding)s'"
+        cursor.execute(sql % locals())
 
-def dbcmd(cmd, dbhost, dbuser):
-    cmd = [cmd]
-    if dbhost:
-        cmd.append('--host=%s' % dbhost)
-    if dbuser:
-        cmd.append('--username=%s' % dbuser)
-    return cmd
+    def list_databases(self, cursor):
+        """return the list of existing databases"""
+        cursor.execute('SELECT datname FROM pg_database')
+        return [r[0] for r in cursor.fetchall()]
+    
+    def list_tables(self, cursor):
+        """return the list of tables of a database"""
+        cursor.execute("SELECT tablename FROM pg_tables")
+        return cursor.fetchall()
 
+    def create_language(self, cursor, extlang):
+        """postgres specific method to install a procedural language on a database"""
+        # make sure plpythonu is not directly in template1
+        cursor.execute("SELECT * FROM pg_language WHERE lanname='%s';" % extlang)
+        if cursor.fetchall():
+            print '%s language already installed' % extlang
+        else:
+            cursor.execute('CREATE LANGUAGE %s' % extlang)
+            print '%s language installed' % extlang
+
+            
 class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     """Generic helper, trying to provide generic way to implement
     specific functionnalities from others DBMS
@@ -560,6 +718,81 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     ilike_support = False
     
     
+class _MyAdvFuncHelper(_GenericAdvFuncHelper):
+    """Postgres helper, taking advantage of postgres SEQUENCE support
+    """
+    TYPE_MAPPING = _GenericAdvFuncHelper.TYPE_MAPPING.copy()
+    TYPE_MAPPING['Password'] = 'tinyblob'
+    TYPE_MAPPING['String'] = 'mediumtext'
+    TYPE_MAPPING['Bytes'] = 'longblob'
+    
+    def system_database(self):
+        """return the system database for the given driver"""
+        return ''
+    
+    def backup_command(self, dbname, dbhost, dbuser, backupfile,
+                       keepownership=True):
+        """return a command to backup the given database"""
+        # XXX compress
+        return 'mysqldump -h %s -u %s -r %s %s' % (dbhost, dbuser, backupfile, dbname)
+    
+    def restore_commands(self, dbname, dbhost, dbuser, backupfile,
+                         encoding='utf-8', keepownership=True, drop=True):
+        """return a list of commands to restore a backup the given database"""
+        cmds = []
+        if drop:
+            cmd = 'echo "DROP DATABASE %s;" | mysql -h %s -u %s' % (dbname, dbhost, dbuser)
+            cmds.append(cmd)
+        cmd = 'echo "%s;" | mysql -h %s -u %s' % (self.sql_create_database(dbname, encoding),
+                                                  dbhost, dbuser)
+        cmds.append(cmd)
+        cmd = pgdbcmd('mysql -h %s -u %s < %s' % (dbname, dbhost, dbuser, backupfile))
+        cmds.append(cmd)
+        return cmds
+                
+    def sql_temporary_table(self, table_name, table_schema,
+                            drop_on_commit=True):
+        if not drop_on_commit:
+            return "CREATE TEMPORARY TABLE %s (%s);" % (table_name,
+                                                        table_schema)    
+        return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
+                                                                   table_schema)
+
+
+    def boolean_value(self, value):
+        if value:
+            return True
+        else:
+            return False
+        
+    def list_users(self, cursor):
+        """return the list of existing database users"""
+        # Host, Password
+        cursor.execute("SELECT User FROM mysql.user")
+        return [r[0] for r in cursor.fetchall()]
+
+    def list_databases(self, cursor):
+        """return the list of existing databases"""
+        cursor.execute('SHOW DATABASES')
+        return [r[0] for r in cursor.fetchall()]
+    
+    def sql_create_database(self, dbname, encoding='utf-8'):
+        sql = "CREATE DATABASE %(dbname)s"
+        if encoding:
+            sql += " CHARACTER SET %(encoding)s"
+        return sql % locals()
+    
+    def create_database(self, cursor, dbname, owner=None, encoding='utf-8'):
+        """create a new database"""
+        cursor.execute(self.sql_create_database(dbname, encoding))
+        if owner:
+            cursor.execute('GRANT ALL ON `%s`.* to %s' % (dbname, owner))
+    
+    def list_tables(self, cursor):
+        """return the list of tables of a database"""
+        cursor.execute("SHOW TABLES")
+        return [r[0] for r in cursor.fetchall()]
+
 
 ## Drivers, Adapters and helpers registries ###################################
 
@@ -616,6 +849,7 @@ del _AdapterDirectory
     
 ADV_FUNC_HELPER_DIRECTORY = {'postgres': _PGAdvFuncHelper(),
                              'sqlite': _SqliteAdvFuncHelper(),
+                             'mysql': _MyAdvFuncHelper(),
                              None: _GenericAdvFuncHelper()}
 
 
