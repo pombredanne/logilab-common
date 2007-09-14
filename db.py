@@ -34,6 +34,7 @@ helper for your database using the `get_adv_func_helper` function.
 
 import sys
 import re
+from warnings import warn
 
 from logilab.common.deprecation import obsolete
 try:
@@ -672,8 +673,12 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
                                                                    table_schema)
 
-    def list_users(self, cursor):
+    def list_users(self, cursor, username=None):
         """return the list of existing database users"""
+        if username:
+            warn('username argument is deprecated, use user_exists method',
+                 DeprecationWarning, stacklevel=2)
+            return self.user_exists(cursor, username)
         cursor.execute("SELECT usename FROM pg_user")
         return [r[0] for r in cursor.fetchall()]
     
