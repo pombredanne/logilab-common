@@ -15,6 +15,8 @@ ChangeLog for logilab.common
     * modutils: new load_module_from_file shortcut function
     * clcommands: pop_args accept None as value for expected_size_after,
       meaning remaining args should not be checked
+    * interface: new extend function to dynamically add an implemented interface 
+      to a new style class	
 	
 2007-06-25  --  0.22.2
     * new 'typechanged' action for configuration.read_old_config
