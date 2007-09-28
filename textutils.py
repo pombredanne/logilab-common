@@ -51,18 +51,37 @@ import re
 from unicodedata import normalize as _uninormalize
 from os import linesep
 
-def unormalize(ustring, killchars='', ignorenonascii=False):
+
+MANUAL_UNICODE_MAP = {
+    u'\xa1': u'!',    # INVERTED EXCLAMATION MARK
+    u'\u0142': u'l',  # LATIN SMALL LETTER L WITH STROKE
+    u'\u2044': u'/',  # FRACTION SLASH
+    u'\xc6': u'AE',   # LATIN CAPITAL LETTER AE
+    u'\xa9': u'(c)',  # COPYRIGHT SIGN
+    u'\xab': u'"',    # LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+    u'\xe6': u'ae',   # LATIN SMALL LETTER AE
+    u'\xae': u'(r)',  # REGISTERED SIGN
+    u'\u0153': u'oe', # LATIN SMALL LIGATURE OE
+    u'\u0152': u'OE', # LATIN CAPITAL LIGATURE OE
+    u'\xd8': u'O',    # LATIN CAPITAL LETTER O WITH STROKE
+    u'\xf8': u'o',    # LATIN SMALL LETTER O WITH STROKE
+    u'\xbb': u'"',    # RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+    u'\xdf': u'ss',   # LATIN SMALL LETTER SHARP S
+    }
+
+def unormalize(ustring, ignorenonascii=False):
     """replace diacritical characters with their corresponding ascii characters
     """
     res = []
     for letter in ustring[:]:
-        if ord(letter) >= 2**8:
-            if ignorenonascii:
-                continue
-            raise ValueError("can't deal with non-ascii based characters")
-        replacement = _uninormalize('NFD', letter)[0]
-        if replacement in killchars:
-            continue
+        try:
+            replacement = MANUAL_UNICODE_MAP[letter]
+        except KeyError:
+            if ord(letter) >= 2**8:
+                if ignorenonascii:
+                    continue
+                raise ValueError("can't deal with non-ascii based characters")
+            replacement = _uninormalize('NFD', letter)[0]
         res.append(replacement)
     return u''.join(res)
 
