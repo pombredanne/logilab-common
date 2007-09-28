@@ -22,6 +22,7 @@ class C2(B):
 class D(C1):
     __implements__ = ()
 
+class Z(object): pass
 
 class ExtendTC(TestCase):
 
@@ -33,8 +34,6 @@ class ExtendTC(TestCase):
         dimpl = D.__implements__
         
     def test_base(self):
-        extend(A, IFace1)
-        self.failUnless(A.__implements__ is aimpl)
         extend(A, IFace2)
         self.failUnlessEqual(A.__implements__, (IFace1, IFace2))  
         self.failUnlessEqual(B.__implements__, (IFace1, IFace2))
@@ -44,6 +43,14 @@ class ExtendTC(TestCase):
         self.failUnless(C2.__implements__ is c2impl)
         self.failUnlessEqual(D.__implements__, (IFace2,))
 
+    def test_already_impl(self):
+        extend(A, IFace1)
+        self.failUnless(A.__implements__ is aimpl)
+
+    def test_no_impl(self):
+        extend(Z, IFace1)
+        self.failUnlessEqual(Z.__implements__, (IFace1,))
+        
     def test_notimpl_explicit(self):
         extend(C1, IFace3)
         self.failUnless(C1.__implements__ is c1impl)

@@ -59,6 +59,7 @@ def extend(klass, interface, _recurs=False):
             kimplementsklass = type(kimplements)
             kimplements = list(kimplements)
         except AttributeError:
+            kimplementsklass = tuple
             kimplements = []
         kimplements.append(interface)
         klass.__implements__ = kimplementsklass(kimplements)
