@@ -88,10 +88,10 @@ def fill_pdf(infile, outfile, fields):
     write_fields(file('/tmp/toto.fdf', 'w'), fields)
     os.system('pdftk %s fill_form /tmp/toto.fdf output %s flatten' % (infile, outfile))
 
-def testfill_pdf(filename):
-    keys = extract_keys_from_pdf(filename)
+def testfill_pdf(infile, outfile):
+    keys = extract_keys_from_pdf(infile)
     fields = []
     for key in keys:
         fields.append( (key, key, '') )
-    fill_pdf(filename, '_'+filename, fields)
+    fill_pdf(infile, outfile, fields)
 
