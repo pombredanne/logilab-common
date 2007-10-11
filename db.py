@@ -508,17 +508,19 @@ class _GenericAdvFuncHelper:
         'UPPER' : 'text',
         }
     
-    @obsolete('use users_support attribute')
+    # @obsolete('use users_support attribute')
     def support_users(self):
         """return True if the DBMS support users (this is usually
         not true for in memory DBMS)
         """
         return self.users_support
+    support_user = obsolete('use users_support attribute')(support_users)
     
-    @obsolete('use groups_support attribute')    
+    # @obsolete('use groups_support attribute')    
     def support_groups(self):
         """return True if the DBMS support groups"""
         return self.groups_support
+    support_user = obsolete('use groups_support attribute')(support_groups)
 
     def system_database(self):
         """return the system database for the given driver"""
