@@ -371,16 +371,22 @@ class _PySqlite2Adapter(DBAPIAdapter):
             """cursor adapting usual dict format to pysqlite named format
             in SQL queries
             """
+            def _replace_parameters(self, sql, kwargs):
+                if isinstance(kwargs, dict):
+                    return re.sub(r'%\(([^\)]+)\)s', r':\1', sql)
+                # XXX dumb
+                return re.sub(r'%s', r'?', sql)
+                    
             def execute(self, sql, kwargs=None):
-                if kwargs is not None:
-                    sql = re.sub(r'%\(([^\)]+)\)s', r':\1', sql)
-                    self.__class__.__bases__[0].execute(self, sql, kwargs)
-                else:
+                if kwargs is None:
                     self.__class__.__bases__[0].execute(self, sql)
+                else:
+                    self.__class__.__bases__[0].execute(self, self._replace_parameters(sql, kwargs), kwargs)
                     
             def executemany(self, sql, kwargss):
-                sql = re.sub(r'%\(([^\)]+)\)s', r':\1', sql)
-                self.__class__.__bases__[0].executemany(self, sql, kwargss)
+                if not isinstance(kwargss, (list, tuple)):
+                    kwargss = tuple(kwargss)
+                self.__class__.__bases__[0].executemany(self, self._replace_parameters(sql, kwargss[0]), kwargss)
                     
         class PySqlite2CnxWrapper:
             def __init__(self, cnx):
