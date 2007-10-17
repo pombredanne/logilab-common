@@ -596,6 +596,8 @@ class OptionsProviderMixIn:
             if action != 'callback':
                 # callback action have no default
                 default = self.option_default(opt_name, opt_dict)
+                if default is REQUIRED:
+                    continue
                 self.set_option(opt_name, default, action, opt_dict)
 
     def option_default(self, opt_name, opt_dict=None):
