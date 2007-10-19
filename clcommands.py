@@ -94,7 +94,7 @@ Type "%prog <command> --help" for more information about a specific
 command. Available commands are :\n''')
     doc = doc.replace('%prog', basename(sys.argv[0]))
     print 'usage:', doc
-    max_len = max(len(cmd) for cmd in commands)
+    max_len = max([len(cmd) for cmd in commands]) # list comprehension for py 2.3 support
     padding = ' '*max_len
     for command in commands:
         cmd = _COMMANDS[command]
