@@ -109,13 +109,19 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
     :rtype: module
     :return: the loaded module
     """
+    if use_sys:
+        try:
+            return sys.modules['.'.join(parts)]
+        except KeyError:
+            pass
     modpath = []
     prevmodule = None
     for part in parts:
         modpath.append(part)
         curname = ".".join(modpath)
         module = None
-        if use_sys:
+        if len(modpath) != len(parts):
+            # even with use_sys=Fallse, should try to get outer packages from sys.modules
             module = sys.modules.get( curname )
         if module is None:
             mp_file, mp_filename, mp_desc = find_module(part, path)

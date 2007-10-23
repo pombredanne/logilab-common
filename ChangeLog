@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+--
+    * modutils: fix load_module_from_* (even with use_sys=False, it should
+      try to get outer packages from sys.modules)
+
+	
 2007-10-17  --  0.23.0
     * db:
 	
