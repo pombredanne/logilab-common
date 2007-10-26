@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+	 --
+    * decorators: new classproperty decorator
+    * adbh: new module containing advanced db helper which were in the "db" 
+      module, with additional registered procedures handling 
+	
 2007-10-23  --  0.23.1
     * modutils: fix load_module_from_* (even with use_sys=False, it should
       try to get outer packages from sys.modules)
