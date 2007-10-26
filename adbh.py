@@ -27,7 +27,7 @@ class UnsupportedFunction(BadQuery): pass
 
 class metafunc(type):
     def __new__(mcs, name, bases, dict):
-        dict['name'] = name
+        dict['name'] = name.upper()
         return type.__new__(mcs, name, bases, dict)
 
     
@@ -122,6 +122,15 @@ class _GenericAdvFuncHelper:
         'LOWER' : 'text',
         'UPPER' : 'text',
         }
+
+
+    @classmethod
+    def register_function(cls, funcdef):
+        if isinstance(funcdef, basestring) :
+            funcdef = FunctionDescr(funcdef.upper())
+        assert not funcdef.name in cls.FUNCTIONS, \
+               '%s is already registered' % funcdef.name
+        cls.FUNCTIONS[funcdef.name] = funcdef
 
     @classmethod
     def function_description(cls, funcname):
@@ -433,19 +442,14 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
 ADV_FUNC_HELPER_DIRECTORY = {'postgres': _PGAdvFuncHelper(),
                              'sqlite': _SqliteAdvFuncHelper(),
                              'mysql': _MyAdvFuncHelper(),
-                             None: _GenericAdvFuncHelper()}
+                             }
 
 
-
-def register_function(driver, funcdef):
-    if isinstance(funcdef, basestring) :
-        funcdef = FunctionDescr(funcdef.upper())
-    assert not funcdef.name in FUNCTIONS, \
-           '%s is already registered' % funcdef.name
-    ADV_FUNC_HELPER_DIRECTORY[driver].FUNCTIONS[funcdef.name] = funcdef
-    
 
 def get_adv_func_helper(driver):
     """returns an advanced function helper for the given driver"""
-    return ADV_FUNC_HELPER_DIRECTORY.get(driver,
-                                         ADV_FUNC_HELPER_DIRECTORY[None])
+    return ADV_FUNC_HELPER_DIRECTORY[driver]
+
+def register_function(driver, funcdef):
+    ADV_FUNC_HELPER_DIRECTORY[driver].register_function(funcdef)    
+
