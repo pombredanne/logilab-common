@@ -479,30 +479,11 @@ class OptionsManagerMixIn(object):
             for section, option, optdict in provider.all_options():
                 if onlysection is not None and section != onlysection:
                     continue
-                default = provider.option_default(option, optdict)
-                if optdict['type'] == 'password':
-                    defaultstr = ': '
-                elif default is REQUIRED:
-                    defaultstr = '(required): '
-                else:
-                    if optdict.get('inputlevel', 0) > inputlevel:
-                        provider.set_option(option, default, opt_dict=optdict)
-                        continue
-                    defaultstr = '(default: %s): ' % format_option_value(optdict, default)
-                print ':%s:' % option
-                print optdict.get('help') or option
-                inputfunc = INPUT_FUNCTIONS[optdict['type']]
-                value = inputfunc(optdict, defaultstr)
-                while default is REQUIRED and not value:
-                    print 'please specify a value'
-                    value = inputfunc(optdict, '%s: ' % option)
-                if value is None and default is not None:
-                    value = default
-                provider.set_option(option, value, opt_dict=optdict)
+                provider.input_option(option, optdict, inputlevel)
         # now we can generate the configuration file
         if stream is not None:
             self.generate_config(stream)
-        
+
     def load_config_file(self):
         """dispatch values previously read from a configuration file to each
         options provider)
@@ -615,6 +596,8 @@ class OptionsProviderMixIn:
             if action != 'callback':
                 # callback action have no default
                 default = self.option_default(opt_name, opt_dict)
+                if default is REQUIRED:
+                    continue
                 self.set_option(opt_name, default, action, opt_dict)
 
     def option_default(self, opt_name, opt_dict=None):
@@ -675,6 +658,28 @@ class OptionsProviderMixIn:
                 _list.append(value)
         else:
             raise UnsupportedAction(action)
+
+    def input_option(self, option, optdict, inputlevel=99):
+        default = self.option_default(option, optdict)
+        if default is REQUIRED:
+            defaultstr = '(required): '
+        elif optdict.get('inputlevel', 0) > inputlevel:
+            self.set_option(option, default, opt_dict=optdict)
+            return
+        elif optdict['type'] == 'password':
+            defaultstr = ': '
+        else:
+            defaultstr = '(default: %s): ' % format_option_value(optdict, default)
+        print ':%s:' % option
+        print optdict.get('help') or option
+        inputfunc = INPUT_FUNCTIONS[optdict['type']]
+        value = inputfunc(optdict, defaultstr)
+        while default is REQUIRED and not value:
+            print 'please specify a value'
+            value = inputfunc(optdict, '%s: ' % option)
+        if value is None and default is not None:
+            value = default
+        self.set_option(option, value, opt_dict=optdict)
             
     def get_option_def(self, opt_name):
         """return the dictionary defining an option given it's name"""
