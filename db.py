@@ -565,6 +565,7 @@ def get_dbapi_compliant_module(driver, prefered_drivers = None, quiet = False,
             msg = 'No Adapter found for %s, returning native module'
             print >> sys.stderr, msg % err.objname
         mod = err.adapted_obj
+    from logilab.common.adbh import get_adv_func_helper
     mod.adv_func_helper = get_adv_func_helper(driver)
     return mod
 
