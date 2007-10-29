@@ -6,7 +6,8 @@ import socket
 
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.db import *
-from logilab.common.db import PREFERED_DRIVERS, _GenericAdvFuncHelper, _PGAdvFuncHelper
+from logilab.common.db import PREFERED_DRIVERS
+from logilab.common.adbh import _SqliteAdvFuncHelper, _PGAdvFuncHelper
 
 
 class PreferedDriverTC(TestCase):
@@ -180,8 +181,8 @@ class DBAPIAdaptersTC(TestCase):
         try:
             module = get_dbapi_compliant_module('sqlite')
         except ImportError:
-            self.skip('postgresql dbapi module not installed')            
-        self.failUnless(isinstance(module.adv_func_helper, _GenericAdvFuncHelper))
+            self.skip('sqlite dbapi module not installed')            
+        self.failUnless(isinstance(module.adv_func_helper, _SqliteAdvFuncHelper))
 
 
 if __name__ == '__main__':
