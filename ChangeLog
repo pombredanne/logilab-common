@@ -1,9 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
-	 --
+2007-10-29  --  0.24.0
     * decorators: new classproperty decorator
-    * adbh: new module containing advanced db helper which were in the "db" 
+    * adbh: new module containing advanced db helper which were in the "db"
       module, with additional registered procedures handling 
 
 	
