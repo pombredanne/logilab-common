@@ -359,6 +359,11 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     users_support = groups_support = False
     ilike_support = False
     
+    def list_tables(self, cursor):
+        """return the list of tables of a database"""
+        # filter type='table' else we get indices as well
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        return cursor.fetchall( )   
     
 class _MyAdvFuncHelper(_GenericAdvFuncHelper):
     """Postgres helper, taking advantage of postgres SEQUENCE support
