@@ -335,7 +335,7 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
     def list_tables(self, cursor):
         """return the list of tables of a database"""
         cursor.execute("SELECT tablename FROM pg_tables")
-        return cursor.fetchall()
+        return [r[0] for r in cursor.fetchall()]
 
     def create_language(self, cursor, extlang):
         """postgres specific method to install a procedural language on a database"""
@@ -363,7 +363,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
         """return the list of tables of a database"""
         # filter type='table' else we get indices as well
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        return cursor.fetchall( )   
+        return [r[0] for r in cursor.fetchall()]
     
 class _MyAdvFuncHelper(_GenericAdvFuncHelper):
     """Postgres helper, taking advantage of postgres SEQUENCE support
