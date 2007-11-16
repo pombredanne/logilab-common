@@ -191,7 +191,7 @@ class DBAPIAdapter:
         assert typecode is not None, self # dbapi module isn't supporting type codes, override to return value directly
         if typecode == self.STRING:
             if isinstance(value, str):
-                return unicode(value, encoding)
+                return unicode(value, encoding, 'replace')
         elif typecode == self.BOOLEAN:
             return bool(value)
         elif typecode == self.BINARY and not binarywrap is None:
