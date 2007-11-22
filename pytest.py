@@ -279,7 +279,8 @@ class PyTester(object):
             except Exception, exc:
                 self.report.failed_to_test_module(filename)
                 print 'unhandled exception occured while testing', modname
-                print 'error: %s' % exc
+                import traceback
+                traceback.print_exc()
                 return None                
         finally:
             if dirname:
