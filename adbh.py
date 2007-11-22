@@ -45,8 +45,8 @@ class FunctionDescr(object):
         self.name = name
         self.rtype = rtype
         self.aggregat = aggregat
-        
-    @classmethod
+
+    #@classmethod
     def check_nbargs(cls, nbargs):
         if cls.minargs is not None and \
                nbargs < cls.minargs:
@@ -54,7 +54,7 @@ class FunctionDescr(object):
         if cls.maxargs is not None and \
                nbargs < cls.maxargs:
             raise BadQuery('too many arguments for function %s' % cls.name)
-
+    check_nbargs = classmethod(check_nbargs)
 
 class AggrFunctionDescr(FunctionDescr):
     aggregat = True
@@ -94,7 +94,7 @@ class _GenericAdvFuncHelper:
         # aggregat functions
         'MIN': MIN, 'MAX': MAX,
         'SUM': SUM,
-        'COUNT':COUNT,
+        'COUNT': COUNT,
         'AVG': AVG,
         # transformation functions
         'UPPER': UPPER, 'LOWER': LOWER,
@@ -192,14 +192,8 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
 
     def sql_temporary_table(self, table_name, table_schema,
                             drop_on_commit=True):
-        return "CREATE TEMPORARY TABLE %s (%s);" % (table_name,
-                                                    table_schema)
+        return "CREATE TEMPORARY TABLE %s (%s);" % (table_name, table_schema)
     
-    def sql_drop_unique_constraint(self, table, column):
-        # XXX postgres specific ?
-        return 'ALTER TABLE %s DROP CONSTRAINT %s_%s_key' % (
-            table, table, column)
-
     def boolean_value(self, value):
         if value:
             return 'TRUE'
@@ -218,20 +212,32 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
         cursor.execute("CREATE USER %(user)s "
                        "WITH PASSWORD '%(password)s'" % locals())
 
-    def _index_name(self, table, column):
-        return '%s_%s_idx' % (table.lower(), column.lower())
+    def _index_name(self, table, column, unique=False):
+        if unique:
+            # note: this naming is consistent with indices automatically
+            # created by postgres when UNIQUE appears in a table schema
+            return '%s_%s_key' % (table.lower(), column.lower())
+        else:
+            return '%s_%s_idx' % (table.lower(), column.lower())
     
-    def create_index(self, cursor, table, column):
-        if not self.index_exists(cursor, table, column):
-            idx = self._index_name(table, column)
-            cursor.execute('CREATE INDEX %s ON %s(%s)' % (idx, table, column))
+    def create_index(self, cursor, table, column, unique=False):
+        if not self.index_exists(cursor, table, column, unique):
+            idx = self._index_name(table, column, unique)
+            if unique:
+                cursor.execute('CREATE UNIQUE INDEX %s ON %s(%s)' % (idx, table,
+                                                                     column))
+            else:
+                cursor.execute('CREATE INDEX %s ON %s(%s)' % (idx, table,
+                                                              column))
             
-    def drop_index(self, cursor, table, column):
-        if self.index_exists(cursor, table, column):
-            cursor.execute('DROP INDEX %s' % self._index_name(table, column))
+    def drop_index(self, cursor, table, column, unique=False):
+        if self.index_exists(cursor, table, column, unique):
+            idx = self._index_name(table, column, unique)
+            cursor.execute('DROP INDEX %s' % idx)
         
-    def index_exists(self, cursor, table, column):
-        return self._index_name(table, column) in self.list_indices(cursor, table)
+    def index_exists(self, cursor, table, column, unique=False):
+        idx = self._index_name(table, column, unique)
+        return idx in self.list_indices(cursor, table)
 
     def user_exists(self, cursor, username):
         """return True if a user with the given username exists"""
