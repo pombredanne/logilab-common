@@ -2,7 +2,9 @@ ChangeLog for logilab.common
 ============================
 
 --
-    * adbh: list_tables implementation for sqlite
+    * adbh:
+      - list_tables implementation for sqlite
+      - new list_indices, create_index, drop_index methods
 	
 2007-10-29  --  0.24.0
     * decorators: new classproperty decorator

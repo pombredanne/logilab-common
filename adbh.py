@@ -217,7 +217,22 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
             raise NotImplementedError('not supported by this DBMS')
         cursor.execute("CREATE USER %(user)s "
                        "WITH PASSWORD '%(password)s'" % locals())
+
+    def _index_name(self, table, column):
+        return '%s_%s_idx' % (table.lower(), column.lower())
     
+    def create_index(self, cursor, table, column):
+        if not self.index_exists(cursor, table, column):
+            idx = self._index_name(table, column)
+            cursor.execute('CREATE INDEX %s ON %s(%s)' % (idx, table, column))
+            
+    def drop_index(self, cursor, table, column):
+        if self.index_exists(cursor, table, column):
+            cursor.execute('DROP INDEX %s' % self._index_name(table, column))
+        
+    def index_exists(self, cursor, table, column):
+        return self._index_name(table, column) in self.list_indices(cursor, table)
+
     def user_exists(self, cursor, username):
         """return True if a user with the given username exists"""
         return username in self.list_users(cursor)
@@ -236,6 +251,10 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
     
     def list_tables(self, cursor):
         """return the list of tables of a database"""
+        raise NotImplementedError('not supported by this DBMS')
+    
+    def list_indices(self, cursor, table=None):
+        """return the list of indices of a database, only for the given table if specified"""
         raise NotImplementedError('not supported by this DBMS')
     
 
@@ -308,15 +327,6 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
                                                         table_schema)    
         return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
                                                                    table_schema)
-
-    def list_users(self, cursor, username=None):
-        """return the list of existing database users"""
-        if username:
-            warn('username argument is deprecated, use user_exists method',
-                 DeprecationWarning, stacklevel=2)
-            return self.user_exists(cursor, username)
-        cursor.execute("SELECT usename FROM pg_user")
-        return [r[0] for r in cursor.fetchall()]
     
     def create_database(self, cursor, dbname, owner=None, encoding='utf-8'):
         """create a new database"""
@@ -326,6 +336,25 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         if encoding:
             sql += " ENCODING='%(encoding)s'"
         cursor.execute(sql % locals())
+
+    def create_language(self, cursor, extlang):
+        """postgres specific method to install a procedural language on a database"""
+        # make sure plpythonu is not directly in template1
+        cursor.execute("SELECT * FROM pg_language WHERE lanname='%s';" % extlang)
+        if cursor.fetchall():
+            print '%s language already installed' % extlang
+        else:
+            cursor.execute('CREATE LANGUAGE %s' % extlang)
+            print '%s language installed' % extlang
+
+    def list_users(self, cursor, username=None):
+        """return the list of existing database users"""
+        if username:
+            warn('username argument is deprecated, use user_exists method',
+                 DeprecationWarning, stacklevel=2)
+            return self.user_exists(cursor, username)
+        cursor.execute("SELECT usename FROM pg_user")
+        return [r[0] for r in cursor.fetchall()]
 
     def list_databases(self, cursor):
         """return the list of existing databases"""
@@ -337,15 +366,13 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         cursor.execute("SELECT tablename FROM pg_tables")
         return [r[0] for r in cursor.fetchall()]
 
-    def create_language(self, cursor, extlang):
-        """postgres specific method to install a procedural language on a database"""
-        # make sure plpythonu is not directly in template1
-        cursor.execute("SELECT * FROM pg_language WHERE lanname='%s';" % extlang)
-        if cursor.fetchall():
-            print '%s language already installed' % extlang
-        else:
-            cursor.execute('CREATE LANGUAGE %s' % extlang)
-            print '%s language installed' % extlang
+    def list_indices(self, cursor, table=None):
+        """return the list of indices of a database, only for the given table if specified"""
+        sql = "SELECT indexname FROM pg_indexes"
+        if table:
+            sql += " WHERE tablename='%s'" % table
+        cursor.execute(sql)
+        return [r[0] for r in cursor.fetchall()]
 
             
 class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
@@ -364,6 +391,15 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
         # filter type='table' else we get indices as well
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
         return [r[0] for r in cursor.fetchall()]
+
+    def list_indices(self, cursor, table=None):
+        """return the list of indices of a database, only for the given table if specified"""
+        sql = "SELECT name FROM sqlite_master WHERE type='index'"
+        if table:
+            sql += " AND tbl_name='%s'" % table
+        cursor.execute(sql)
+        return [r[0] for r in cursor.fetchall()]
+
     
 class _MyAdvFuncHelper(_GenericAdvFuncHelper):
     """Postgres helper, taking advantage of postgres SEQUENCE support
@@ -406,7 +442,18 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
                                                         table_schema)    
         return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
                                                                    table_schema)
-
+    
+    def sql_create_database(self, dbname, encoding='utf-8'):
+        sql = "CREATE DATABASE %(dbname)s"
+        if encoding:
+            sql += " CHARACTER SET %(encoding)s"
+        return sql % locals()
+    
+    def create_database(self, cursor, dbname, owner=None, encoding='utf-8'):
+        """create a new database"""
+        cursor.execute(self.sql_create_database(dbname, encoding))
+        if owner:
+            cursor.execute('GRANT ALL ON `%s`.* to %s' % (dbname, owner))
 
     def boolean_value(self, value):
         if value:
@@ -424,18 +471,6 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
         """return the list of existing databases"""
         cursor.execute('SHOW DATABASES')
         return [r[0] for r in cursor.fetchall()]
-    
-    def sql_create_database(self, dbname, encoding='utf-8'):
-        sql = "CREATE DATABASE %(dbname)s"
-        if encoding:
-            sql += " CHARACTER SET %(encoding)s"
-        return sql % locals()
-    
-    def create_database(self, cursor, dbname, owner=None, encoding='utf-8'):
-        """create a new database"""
-        cursor.execute(self.sql_create_database(dbname, encoding))
-        if owner:
-            cursor.execute('GRANT ALL ON `%s`.* to %s' % (dbname, owner))
     
     def list_tables(self, cursor):
         """return the list of tables of a database"""
