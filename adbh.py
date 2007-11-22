@@ -186,9 +186,9 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
     def sql_create_index(self, table, column, unique=False):
         idx = self._index_name(table, column, unique)
         if unique:
-            return 'CREATE UNIQUE INDEX %s ON %s(%s)' % (idx, table, column)
+            return 'CREATE UNIQUE INDEX %s ON %s(%s);' % (idx, table, column)
         else:
-            return 'CREATE INDEX %s ON %s(%s)' % (idx, table, column)
+            return 'CREATE INDEX %s ON %s(%s);' % (idx, table, column)
     
     def sql_drop_sequence(self, seq_name):
         return 'DROP TABLE %s;' % seq_name
