@@ -183,6 +183,13 @@ class _GenericAdvFuncHelper:
         return '''CREATE TABLE %s (last INTEGER);
 INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
     
+    def sql_create_index(self, table, column, unique=False):
+        idx = self._index_name(table, column, unique)
+        if unique:
+            return 'CREATE UNIQUE INDEX %s ON %s(%s)' % (idx, table, column)
+        else:
+            return 'CREATE INDEX %s ON %s(%s)' % (idx, table, column)
+    
     def sql_drop_sequence(self, seq_name):
         return 'DROP TABLE %s;' % seq_name
     
@@ -222,13 +229,7 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
     
     def create_index(self, cursor, table, column, unique=False):
         if not self.index_exists(cursor, table, column, unique):
-            idx = self._index_name(table, column, unique)
-            if unique:
-                cursor.execute('CREATE UNIQUE INDEX %s ON %s(%s)' % (idx, table,
-                                                                     column))
-            else:
-                cursor.execute('CREATE INDEX %s ON %s(%s)' % (idx, table,
-                                                              column))
+            cursor.execute(self.sql_create_index(table, column, unique))
             
     def drop_index(self, cursor, table, column, unique=False):
         if self.index_exists(cursor, table, column, unique):
