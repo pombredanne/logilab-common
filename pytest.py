@@ -265,7 +265,10 @@ class PyTester(object):
         if dirname:
             os.chdir(dirname)
         modname = osp.basename(filename)[:-3]
-        print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
+        try:
+            print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
+        except TypeError: # < py 2.4 bw compat
+            print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70)
         try:
             try:
                 tstart, cstart = time(), clock()

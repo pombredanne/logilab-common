@@ -124,23 +124,25 @@ class _GenericAdvFuncHelper:
         }
 
 
-    @classmethod
+    #@classmethod
     def register_function(cls, funcdef):
         if isinstance(funcdef, basestring) :
             funcdef = FunctionDescr(funcdef.upper())
         assert not funcdef.name in cls.FUNCTIONS, \
                '%s is already registered' % funcdef.name
         cls.FUNCTIONS[funcdef.name] = funcdef
-
-    @classmethod
+    register_function = classmethod(register_function)
+    
+    #@classmethod
     def function_description(cls, funcname):
         """return the description (`FunctionDescription`) for a RQL function"""
         try:
             return cls.FUNCTIONS[funcname.upper()]
         except KeyError:
             raise UnsupportedFunction(funcname)
+    function_description = classmethod(function_description)
     
-    # @obsolete('use users_support attribute')
+    #@obsolete('use users_support attribute')
     def support_users(self):
         """return True if the DBMS support users (this is usually
         not true for in memory DBMS)
@@ -148,7 +150,7 @@ class _GenericAdvFuncHelper:
         return self.users_support
     support_user = obsolete('use users_support attribute')(support_users)
     
-    # @obsolete('use groups_support attribute')    
+    #@obsolete('use groups_support attribute')    
     def support_groups(self):
         """return True if the DBMS support groups"""
         return self.groups_support
