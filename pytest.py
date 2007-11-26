@@ -468,6 +468,8 @@ def parseargs():
                       "to skip several patterns, use commas")
     parser.add_option('-q', '--quiet', callback=rebuild_cmdline,
                       action="callback", help="Minimal output")
+    parser.add_option('-P', '--profile', default=None, dest='profile',
+                      help="Profile execution and store data in the given file")
 
     try:
         from logilab.devtools.lib.coverage import Coverage
@@ -523,14 +525,22 @@ def run():
         tester = DjangoTester(cvg)
     else:
         tester = PyTester(cvg)
+    if explicitfile:
+        cmd, args = tester.testfile, (explicitfile,)
+    elif options.testdir:
+        cmd, args = tester.testonedir, (options.testdir, options.exitfirst)
+    else:
+        cmd, args = tester.testall, (options.exitfirst,)
     try:
         try:
-            if explicitfile:
-                tester.testfile(explicitfile)
-            elif options.testdir:
-                tester.testonedir(options.testdir, options.exitfirst)
+            if options.profile:
+                import hotshot
+                prof = hotshot.Profile(options.profile)
+                prof.runcall(cmd, *args)
+                prof.close()
+                print 'profile data saved in', options.profile
             else:
-                tester.testall(options.exitfirst)
+                 cmd(*args)           
         except SystemExit:
             raise
         except:
