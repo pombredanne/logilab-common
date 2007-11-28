@@ -53,6 +53,7 @@ def cached(callableobj, keyarg=None):
                 _cache[key] = callableobj(self, *args, **kwargs)
             return _cache[key]
         return cache_wrapper2
+
     def cache_wrapper3(self, *args):
         cache = '_%s_cache_' % callableobj.__name__
         #print 'cache3?', cache, self, args
@@ -100,6 +101,7 @@ class wproperty(object):
     def __get__(self, obj, cls):
         assert obj is not None
         return getattr(obj, self.attrname)
+
 
 class classproperty(object):
     def __init__(self, get):

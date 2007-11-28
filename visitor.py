@@ -16,14 +16,12 @@
 a generic visitor abstract implementation
 """
 
-__revision__ = "$Id: visitor.py,v 1.14 2006-02-18 03:17:16 ludal Exp $"
-
 def no_filter(_):
     return 1
 
 
 # Iterators ###################################################################
-class FilteredIterator:
+class FilteredIterator(object):
 
     def __init__(self, node, list_func, filter_func=None):
         self._next = [(node, 0)]
@@ -39,7 +37,7 @@ class FilteredIterator:
 
 
 # Base Visitor ################################################################
-class Visitor:
+class Visitor(object):
 
     def __init__(self, iterator_class, filter_func=None):
         self._iter_class = iterator_class

@@ -34,7 +34,7 @@ EX_NODE_NOT_FOUND = "No such node as '%s'"
 
 # Base node ###################################################################
 
-class Node :
+class Node(object):
     """a basic tree node, caracterised by an id"""
 
     def __init__(self, nid=None) :
