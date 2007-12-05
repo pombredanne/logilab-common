@@ -53,6 +53,7 @@ from logilab.common.deprecation import class_renamed, deprecated_function, \
      obsolete
 from logilab.common.compat import set, enumerate
 from logilab.common.modutils import load_module_from_name
+from logilab.common.debugger import Debugger
 
 __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 
@@ -271,35 +272,6 @@ def _count(n, word):
     
 
 ## PostMortem Debug facilities #####
-from pdb import Pdb
-class Debugger(Pdb):
-    def __init__(self, tcbk):
-        Pdb.__init__(self)
-        self.reset()
-        while tcbk.tb_next is not None:
-            tcbk = tcbk.tb_next
-        self._tcbk = tcbk
-        self._histfile = osp.join(os.environ["HOME"], ".pdbhist")
-        
-    def setup_history_file(self):
-        if readline is not None:
-            try:
-                readline.read_history_file(self._histfile)
-            except IOError:
-                pass
-
-    def start(self):
-        self.interaction(self._tcbk.tb_frame, self._tcbk)
-
-    def setup(self, frame, tcbk):
-        self.setup_history_file()
-        Pdb.setup(self, frame, tcbk)
-
-    def set_quit(self):
-        if readline is not None:
-            readline.write_history_file(self._histfile)
-        Pdb.set_quit(self)
-
 def start_interactive_mode(debuggers, descrs):
     """starts an interactive shell so that the user can inspect errors
     """
