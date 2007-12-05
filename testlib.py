@@ -644,6 +644,12 @@ Examples:
 
 
     def runTests(self):
+        if hasattr(self.module, 'setup_module'):
+            try:
+                self.module.setup_module()
+            except Exception, exc:
+                print 'setup_module error:', exc
+                sys.exit(1)
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
                                                   exitfirst=self.exitfirst,
                                                   capture=self.capture,
@@ -651,6 +657,12 @@ Examples:
                                                   pdbmode=self.pdbmode,
                                                   cvg=self.cvg)
         result = self.testRunner.run(self.test)
+        if hasattr(self.module, 'teardown_module'):
+            try:
+                self.module.teardown_module()
+            except Exception, exc:
+                print 'teardown_module error:', exc
+                sys.exit(1)
         if os.environ.get('PYDEBUG'):
             warn("PYDEBUG usage is deprecated, use -i / --pdb instead", DeprecationWarning)
             self.pdbmode = True
