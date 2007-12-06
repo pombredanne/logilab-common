@@ -379,7 +379,7 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         """return the list of indices of a database, only for the given table if specified"""
         sql = "SELECT indexname FROM pg_indexes"
         if table:
-            sql += " WHERE tablename='%s'" % table
+            sql += " WHERE LOWER(tablename)='%s'" % table.lower()
         cursor.execute(sql)
         return [r[0] for r in cursor.fetchall()]
 
@@ -405,7 +405,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
         """return the list of indices of a database, only for the given table if specified"""
         sql = "SELECT name FROM sqlite_master WHERE type='index'"
         if table:
-            sql += " AND tbl_name='%s'" % table
+            sql += " AND LOWER(tbl_name)='%s'" % table.lower()
         cursor.execute(sql)
         return [r[0] for r in cursor.fetchall()]
 
