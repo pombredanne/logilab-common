@@ -442,6 +442,8 @@ class _MySqlDBAdapter(DBAPIAdapter):
         # hack to differentiate mediumtext (String) and tinyblob/longblog
         # (Password/Bytes) which are all sharing the same type code :(
         if typecode == self.BINARY:
+            if hasattr(value, 'tostring'): # may be an array
+                value = value.tostring()
             maxsize = description[3]
             if maxsize == 16777215: # mediumtext (2**24 - 1)
                 if isinstance(value, str):
