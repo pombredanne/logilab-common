@@ -3,7 +3,8 @@ ChangeLog for logilab.common
 
  --
     * pytest: new --profile option
-	
+    * db: mysql support fixes
+
 2007-11-26  --  0.25.0
     * adbh:
       - list_tables implementation for sqlite
