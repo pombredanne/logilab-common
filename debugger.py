@@ -89,30 +89,52 @@ class Debugger(Pdb):
             readline.write_history_file(self._histfile)
         Pdb.set_quit(self)
 
+    def complete_p(self, text, line, begin_idx, end_idx):
+        """provide variable names completion for the ``p`` command"""
+        namespace = dict(self.curframe.f_globals)
+        namespace.update(self.curframe.f_locals)
+        if '.' in text:
+            return self.attr_matches(text, namespace)
+        return [varname for varname in namespace if varname.startswith(text)]
 
-#     def getvariables(self):
-#         frame = self.curframe
-#         if frame:
-#             print '=======>', frame.f_globals.keys() + frame.f_globals.keys()
-#             return frame.f_globals.keys() + frame.f_globals.keys()
-#         return []
-       
-#     def completenames(self, text, *ignored):
-#         basenames = Pdb.completenames(text, *ignored)
-#         return sorted(basenames + self.getvariables)
 
-#     ## completion
-#     def complete(self, text, state):
-#         """Return the next possible completion for 'text'.
+    def attr_matches(self, text, namespace):
+        """implementation coming from rlcompleter.Completer.attr_matches
+        Compute matches when text contains a dot.
 
-#         If a command has not been entered, then complete against command list.
-#         Otherwise try to call complete_<command> to get list of completions.
-#         """
-#         print '===> completing', text, state
-#         xxx = Pdb.complete(self, text, state)
-#         print 'got', xxx
-#         return xxx
-        
+        Assuming the text is of the form NAME.NAME....[NAME], and is
+        evaluatable in self.namespace, it will be evaluated and its attributes
+        (as revealed by dir()) are used as possible completions.  (For class
+        instances, class members are also considered.)
+
+        WARNING: this can still invoke arbitrary C code, if an object
+        with a __getattr__ hook is evaluated.
+
+        """
+        import re
+        m = re.match(r"(\w+(\.\w+)*)\.(\w*)", text)
+        if not m:
+            return
+        expr, attr = m.group(1, 3)
+        object = eval(expr, namespace)
+        words = dir(object)
+        if hasattr(object,'__class__'):
+            words.append('__class__')
+            words = words + self.get_class_members(object.__class__)
+        matches = []
+        n = len(attr)
+        for word in words:
+            if word[:n] == attr and word != "__builtins__":
+                matches.append("%s.%s" % (expr, word))
+        return matches
+    
+    def get_class_members(self, klass):
+        """implementation coming from rlcompleter.get_class_members"""
+        ret = dir(klass)
+        if hasattr(klass,'__bases__'):
+            for base in klass.__bases__:
+                ret = ret + self.get_class_members(base)
+        return ret
         
     ## specific / overidden commands 
     def do_list(self, arg):
