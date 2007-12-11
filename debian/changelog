@@ -1,3 +1,9 @@
+logilab-common (0.25.1-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Thénault <Sylvain.Thenault@logilab.fr>  Tue, 11 Dec 2007 10:52:26 +0100
+
 logilab-common (0.25.0-1) unstable; urgency=low
 
   * new upstream release

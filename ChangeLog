@@ -1,10 +1,12 @@
 ChangeLog for logilab.common
 ============================
 
- --
-    * pytest: new --profile option
+2007-12-11  --  0.25.1
+    * pytest: new --profile option, setup module / teardown module hook,
+	      other fixes and enhancements
     * db: mysql support fixes
-
+    * adbh: fix postgres list_indices implementation
+	
 2007-11-26  --  0.25.0
     * adbh:
       - list_tables implementation for sqlite
