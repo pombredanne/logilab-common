@@ -445,7 +445,11 @@ class _MySqlDBAdapter(DBAPIAdapter):
             if hasattr(value, 'tostring'): # may be an array
                 value = value.tostring()
             maxsize = description[3]
-            if maxsize == 16777215: # mediumtext (2**24 - 1)
+            # mediumtext can hold up to (2**24 - 1) characters (16777215)
+            # but if utf8 is set, each character is stored on 3 bytes words,
+            # so we have to test for 3 * (2**24 - 1)  (i.e. 50331645)
+            # XXX: what about other encodings ??
+            if maxsize in (16777215, 50331645): # mediumtext (2**24 - 1)
                 if isinstance(value, str):
                     return unicode(value, encoding)
                 return value
