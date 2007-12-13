@@ -86,6 +86,8 @@ class _GenericAdvFuncHelper:
     """    
     # DBMS resources descriptors and accessors
     
+    needs_from_clause = False
+    
     users_support = True
     groups_support = True
     ilike_support = True
@@ -392,6 +394,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     """
     # modifiable but should not be shared
     FUNCTIONS = _GenericAdvFuncHelper.FUNCTIONS.copy()
+    
     users_support = groups_support = False
     ilike_support = False
     
@@ -413,6 +416,8 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 class _MyAdvFuncHelper(_GenericAdvFuncHelper):
     """Postgres helper, taking advantage of postgres SEQUENCE support
     """
+    needs_from_clause = True
+
     # modifiable but should not be shared
     FUNCTIONS = _GenericAdvFuncHelper.FUNCTIONS.copy() 
     TYPE_MAPPING = _GenericAdvFuncHelper.TYPE_MAPPING.copy()
