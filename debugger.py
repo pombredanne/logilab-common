@@ -152,7 +152,15 @@ class Debugger(Pdb):
         else:
             Pdb.do_list(self, arg)
     do_l = do_list
+
+    def do_open(self, arg):
+        """opens source file corresponding to the current stack level"""
+        filename = self.curframe.f_code.co_filename
+        lineno = self.curframe.f_lineno
+        cmd = 'emacsclient --no-wait +%s %s' % (lineno, filename)
+        os.system(cmd)
         
+    do_o = do_open
 
 
 def pm():
