@@ -1,6 +1,7 @@
 ChangeLog for logilab.common
 ============================
- --
+
+2007-12-20  --  0.25.2
     * adbh: new needs_from_clause variable on db helper
 	
 2007-12-11  --  0.25.1
