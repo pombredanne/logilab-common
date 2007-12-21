@@ -1,5 +1,5 @@
 # -*- coding: iso-8859-1 -*-
-# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2003-2008 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -17,7 +17,7 @@
 """Python modules manipulation utility functions.
 
 :author:    Logilab
-:copyright: 2003-2006 LOGILAB S.A. (Paris, FRANCE)
+:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 
 
@@ -58,6 +58,27 @@ class NoSourceFile(Exception):
     """exception raised when we are not able to get a python
     source file for a precompiled file
     """
+
+class LazyObject(object):
+    def __init__(self, module, obj):
+        self.module = module
+        self.obj = obj
+        self._imported = None
+        
+    def __getobj(self):
+        if self._imported is None:
+           self._imported = getattr(load_module_from_name(self.module),
+                                    self.obj)
+        return self._imported
+    
+    def __getattribute__(self, attr):
+        try:
+            return super(LazyObject, self).__getattribute__(attr)
+        except AttributeError, ex:
+            return getattr(self.__getobj(), attr)
+        
+    def __call__(self, *args, **kwargs):
+        return self.__getobj()(*args, **kwargs)
 
 
 def load_module_from_name(dotted_name, path=None, use_sys=1):
