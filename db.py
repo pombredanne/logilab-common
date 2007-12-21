@@ -400,6 +400,8 @@ class _PySqlite2Adapter(DBAPIAdapter):
         return self._wrap_if_needed(PySqlite2CnxWrapper(cnx))
     
     def process_value(self, value, description, encoding='utf-8', binarywrap=None):
+        if not binarywrap is None and isinstance(value, self._native_module.Binary):
+            return binarywrap(value)
         return value # no type code support, can't do anything
 
     
