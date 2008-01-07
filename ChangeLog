@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
 
- --
+2008-01-07  --  0.26.0
     * db: binarywrap support
     * modutils: new LazyObject class
 	
