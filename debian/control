@@ -6,7 +6,7 @@ Uploaders: David Douard <david.douard@logilab.fr>
 Build-Depends: debhelper (>= 5.0.38)
 Build-Depends-Indep: python (>=2.3.5-7), python-central (>=0.5.6)
 XS-Python-Version: all
-Homepage: http://www.logilab.org/Project/name/logilab-common
+Homepage: http://www.logilab.org/project/logilab-common
 Standards-Version: 3.7.3
 
 Package: python-logilab-common
