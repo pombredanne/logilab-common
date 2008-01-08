@@ -5,7 +5,7 @@ __revision__ = '$Id: unittest_testlib.py,v 1.5 2006-02-09 22:37:46 nico Exp $'
 import unittest
 import os
 import sys
-from os.path import join, dirname, isdir, isfile
+from os.path import join, dirname, isdir, isfile, abspath
 from cStringIO import StringIO
 import tempfile
 import shutil
@@ -170,6 +170,39 @@ class TestlibTC(TestCase):
         self.assertEquals(exc.args, ('foo',))
         
 
+    def test_default_datadir(self):
+        expected_datadir = join(dirname(abspath(__file__)), 'data')
+        self.assertEquals(self.datadir, expected_datadir)
+        self.assertEquals(self.datapath('foo'), join(expected_datadir, 'foo'))
+
+    def test_custom_datadir(self):
+        class MyTC(TestCase):
+            datadir = 'foo'
+            def test_1(self): pass
+
+        # class' custom datadir
+        tc = MyTC('test_1')
+        self.assertEquals(tc.datapath('bar'), join('foo', 'bar'))
+        # instance's custom datadir
+        tc.datadir = 'spam'
+        self.assertEquals(tc.datapath('bar'), join('spam', 'bar'))        
+
+
+    def test_cached_datadir(self):
+        """test datadir is cached on the class"""
+        class MyTC(TestCase):
+            def test_1(self): pass
+                
+        expected_datadir = join(dirname(abspath(__file__)), 'data')
+        tc = MyTC('test_1')
+        self.assertEquals(tc.datadir, expected_datadir)
+        # changing module should not change the datadir
+        MyTC.__module__ = 'os'
+        self.assertEquals(tc.datadir, expected_datadir)
+        # even on new instances
+        tc2 = MyTC('test_1')
+        self.assertEquals(tc2.datadir, expected_datadir)
+        
 
 
 class GenerativeTestsTC(TestCase):
