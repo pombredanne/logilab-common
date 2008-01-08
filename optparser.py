@@ -64,6 +64,9 @@ class OptionParser(optparse.OptionParser):
             if cmd in ('-h', '--help'):
                 self.print_main_help()
                 sys.exit(0)
+            elif self.version is not None and cmd == "--version":
+                self.print_version()
+                sys.exit(0)
             self.error('unknow command')
         self.prog = '%s %s' % (self.prog, cmd)
         mod_or_f, help = self._commands[cmd]
