@@ -54,6 +54,7 @@ from logilab.common.deprecation import class_renamed, deprecated_function, \
 from logilab.common.compat import set, enumerate
 from logilab.common.modutils import load_module_from_name
 from logilab.common.debugger import Debugger
+from logilab.common.decorators import cached
 
 __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 
@@ -796,6 +797,19 @@ def parse_generative_args(params):
 
     return args, kwargs
 
+
+class ClassGetProperty(object):
+    """this is a simple property-like class but for
+    class attributes.
+    """
+    
+    def __init__(self, getter):
+        self.getter = getter
+
+    def __get__(self, obj, objtype):
+        return self.getter(objtype)
+
+
 class TestCase(unittest.TestCase):
     """unittest.TestCase with some additional methods"""
 
@@ -817,6 +831,21 @@ class TestCase(unittest.TestCase):
         self._err = []
         self._current_test_descr = None
 
+    def datadir(cls):
+        """helper attribute holding the standard test's data directory
+        
+        NOTE: this is a logilab's standard
+        """
+        print 'yo'
+        mod = __import__(cls.__module__)
+        return osp.join(osp.dirname(osp.abspath(mod.__file__)), 'data')
+    # cache it (use a class method to cache on class since TestCase is
+    # instantiated for each test run)
+    datadir = ClassGetProperty(cached(datadir))
+
+    def datapath(self, fname):
+        """joins the object's datadir and `fname`"""
+        return osp.join(self.datadir, fname)
 
     def set_description(self, descr):
         """sets the current test's description.
