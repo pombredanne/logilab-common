@@ -836,7 +836,6 @@ class TestCase(unittest.TestCase):
         
         NOTE: this is a logilab's standard
         """
-        print 'yo'
         mod = __import__(cls.__module__)
         return osp.join(osp.dirname(osp.abspath(mod.__file__)), 'data')
     # cache it (use a class method to cache on class since TestCase is
