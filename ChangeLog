@@ -1,10 +1,12 @@
 ChangeLog for logilab.common
 ============================
 
-2008-01-08  --  0.26.1
+2008-01-10  --  0.26.1
     * optparser: support --version at main command level
     * testlib: added man page for pytest
-
+    * textutils: fix a bug in normalize_[rest_]paragraph which may cause
+      infinite loop if an indent string containing some spaces is given
+	
 2008-01-07  --  0.26.0
     * db: binarywrap support
     * modutils: new LazyObject class

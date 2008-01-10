@@ -70,6 +70,22 @@ aller discuter avec les autres si c'est utile ou necessaire.""")
         self.assertEquals(ulines(tu.normalize_rest_paragraph("""**nico**: toto""")),
                           """**nico**: toto""")
 
+    def test_normalize_rest_paragraph2(self):
+        self.assertEquals(ulines(tu.normalize_rest_paragraph(""".. _tdm: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
+.. _extrait: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Extrait-du-livre/.20_d6eed0be-0d36-4384-be59-2dd09e081012_0_0.pdf""", indent='> ')),
+                          """> .. _tdm:
+> http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
+> .. _extrait:
+> http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Extrait-du-livre/.20_d6eed0be-0d36-4384-be59-2dd09e081012_0_0.pdf""")
+        
+    def test_normalize_paragraph2(self):
+        self.assertEquals(ulines(tu.normalize_paragraph(""".. _tdm: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
+.. _extrait: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Extrait-du-livre/.20_d6eed0be-0d36-4384-be59-2dd09e081012_0_0.pdf""", indent='> ')),
+                          """> .. _tdm:
+> http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
+> .. _extrait:
+> http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Extrait-du-livre/.20_d6eed0be-0d36-4384-be59-2dd09e081012_0_0.pdf""")
+
 class NormalizeParagraphTC(TestCase):
 
     def test_known_values(self):
