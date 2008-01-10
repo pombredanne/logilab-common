@@ -13,7 +13,7 @@
 """Some text manipulation utility functions.
 
 :author:    Logilab
-:copyright: 2003-2007 LOGILAB S.A. (Paris, FRANCE)
+:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 
 :group text formatting: normalize_text, normalize_paragraph, pretty_match,\
@@ -156,10 +156,11 @@ def normalize_paragraph(text, line_len=80, indent=''):
       indentation string
     """
     text = _NORM_SPACES_RGX.sub(' ', text)
+    line_len = line_len - len(indent)
     lines = []
     while text:
-        aline, text = splittext(indent + text.strip(), line_len)
-        lines.append(aline)
+        aline, text = splittext(text.strip(), line_len)
+        lines.append(indent + aline)
     return linesep.join(lines)
     
 def normalize_rest_paragraph(text, line_len=80, indent=''):
@@ -185,20 +186,21 @@ def normalize_rest_paragraph(text, line_len=80, indent=''):
     """
     toreport = ''
     lines = []
+    line_len = line_len - len(indent)
     for line in text.splitlines():
-        line = indent + toreport + _NORM_SPACES_RGX.sub(' ', line.strip())
+        line = toreport + _NORM_SPACES_RGX.sub(' ', line.strip())
         toreport = ''
         while len(line) > line_len:
             # too long line, need split
             line, toreport = splittext(line, line_len)
-            lines.append(line)
+            lines.append(indent + line)
             if toreport:
-                line = indent + toreport + ' '
+                line = toreport + ' '
                 toreport = ''
             else:
                 line = ''
         if line:
-            lines.append(line.strip())
+            lines.append(indent + line.strip())
     return linesep.join(lines)
 
 def splittext(text, line_len):
