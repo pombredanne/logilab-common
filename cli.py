@@ -1,3 +1,6 @@
+# Copyright (c) 2003-2008 LOGILAB S.A. (Paris, FRANCE).
+# http://www.logilab.fr/ -- mailto:contact@logilab.fr
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
 # Foundation; either version 2 of the License, or (at your option) any later
@@ -10,17 +13,36 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-""" Copyright (c) 2002-2003 LOGILAB S.A. (Paris, FRANCE).
- http://www.logilab.fr/ -- mailto:contact@logilab.fr
-
- 
- Command line interface helper classes.
+"""Command line interface helper classes.
  
  It provides some default commands, a help system, a default readline
  configuration with completion and persistent history
-"""
 
-__revision__ = "$Id: cli.py,v 1.16 2005-05-10 12:31:04 adim Exp $"
+Exemple usage:
+
+    class BookShell(CLIHelper):
+
+        def __init__(self):
+            # quit and help are builtins
+            # CMD_MAP keys are commands, values are topics
+            self.CMD_MAP['pionce'] = _("Sommeil")
+            self.CMD_MAP['ronfle'] = _("Sommeil")
+            CLIHelper.__init__(self)
+
+        help_do_pionce = ("pionce", "pionce duree", _("met ton corps en veille"))
+        def do_pionce(self):
+            print 'nap is good'
+
+        help_do_ronfle = ("ronfle", "ronfle volume", _("met les autres en veille"))
+        def do_ronfle(self):
+            print 'fuuuuuuuuuuuu rhhhhhrhrhrrh'
+
+    cl = BookShell()
+
+:author:    Logilab
+:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
+:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
+"""
 
 
 import __builtin__
