@@ -117,12 +117,14 @@ class _GenericAdvFuncHelper:
         'Password' : 'bytea',
         'Bytes' :    'bytea',
         # FIXME: still there for use from erudi, should be moved out
+        # XXX think it can be safely removed now
         'COUNT' : 'integer',
         'MIN' :   'integer',
         'MAX' :   'integer',
         'SUM' :   'integer',
         'LOWER' : 'text',
         'UPPER' : 'text',
+        'LENGTH' :'integer',
         }
 
 
