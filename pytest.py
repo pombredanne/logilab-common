@@ -109,7 +109,7 @@ def this_is_a_testdir(dirpath):
     return osp.basename(dirpath) in ('test', 'tests', 'unittests')
 
 
-def autopath(projdir=os.getcwd()):
+def project_root(projdir=os.getcwd()):
     """try to find project's root and add it to sys.path"""
     curdir = osp.abspath(projdir)
     previousdir = curdir
@@ -120,9 +120,6 @@ def autopath(projdir=os.getcwd()):
             break
         previousdir = curdir
         curdir = newdir
-    else:
-        sys.path.insert(0, curdir)
-    sys.path.insert(0, '')
     return previousdir
 
 
@@ -509,13 +506,13 @@ def parseargs():
 
 
 def run():
-    rootdir = autopath()
     options, newargs, explicitfile = parseargs()
     # mock a new command line
     sys.argv[1:] = newargs
     covermode = getattr(options, 'coverage', None)
     cvg = None
     if covermode:
+        rootdir = project_root()
         # control_import_coverage(rootdir)
         from logilab.devtools.lib.coverage import Coverage
         cvg = Coverage([rootdir])
