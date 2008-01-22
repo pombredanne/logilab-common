@@ -131,7 +131,7 @@ def normalize_text(text, line_len=80, indent='', rest=False):
     result = []
     for text in _BLANKLINES_RGX.split(text):
         result.append(normp(text, line_len, indent))
-    return ('%s%s' % (linesep, linesep)).join(result)
+    return ('%s%s%s' % (linesep, indent, linesep)).join(result)
 
 
 def normalize_paragraph(text, line_len=80, indent=''):

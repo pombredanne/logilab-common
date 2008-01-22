@@ -10,14 +10,13 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-""" Copyright (c) 2002-2003 LOGILAB S.A. (Paris, FRANCE).
- http://www.logilab.fr/ -- mailto:contact@logilab.fr
+"""Help to generate SQL string usable by the Python DB-API
 
-
-Help to generate SQL string usable by the Python DB-API
+:author:    Logilab
+:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
+:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 """
-
-__revision__ = "$Id: sqlgen.py,v 1.11 2005-11-22 13:13:02 syt Exp $"
+__docformat__ = "restructuredtext en"
 
 
 # SQLGenerator ################################################################
@@ -135,7 +134,7 @@ class SQLGenerator :
         params :  dictionnary that will be used as in cursor.execute(sql,params)
 
         >>> s = SQLGenerator()
-        >>> s.update('test',{'id':'001','nom':'dupont'},['id'])
+        >>> s.update('test', {'id':'001','nom':'dupont'}, ['id'])
         'UPDATE test SET nom = %(nom)s WHERE id = %(id)s'
         >>> s.update('test',{'id':'001','nom':'dupont','prenom':'jean'},['id'])
         'UPDATE test SET nom = %(nom)s, prenom = %(prenom)s WHERE id = %(id)s'

@@ -347,6 +347,7 @@ class _PySqlite2Adapter(DBAPIAdapter):
             def adapt_mxdatetimedelta(mxd):
                 return mxd.strftime('%H:%M:%S')
             sqlite.register_adapter(DateTimeDeltaType, adapt_mxdatetimedelta)
+            
             def convert_mxdate(ustr):
                 return strptime(ustr, '%Y-%m-%d %H:%M:%S')
             sqlite.register_converter('date', convert_mxdate)
