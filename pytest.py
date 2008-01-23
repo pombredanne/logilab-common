@@ -511,6 +511,8 @@ def run():
     sys.argv[1:] = newargs
     covermode = getattr(options, 'coverage', None)
     cvg = None
+    if not '' in sys.path:
+        sys.path.insert(0, '')    
     if covermode:
         rootdir = project_root()
         # control_import_coverage(rootdir)
