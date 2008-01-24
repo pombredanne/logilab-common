@@ -149,6 +149,8 @@ class Debugger(Pdb):
                                self.curframe.f_lineno)
             except KeyboardInterrupt:
                 pass
+            except IOError:
+                Pdb.do_list(self, arg)
         else:
             Pdb.do_list(self, arg)
     do_l = do_list
