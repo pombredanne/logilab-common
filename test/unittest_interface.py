@@ -55,7 +55,16 @@ class ExtendTC(TestCase):
         extend(C1, IFace3)
         self.failUnless(C1.__implements__ is c1impl)
         self.failUnless(D.__implements__ is dimpl)
-        
+
+
+    def test_nonregr_implements_baseinterface(self):
+        class SubIFace(IFace1): pass
+        class X(object):
+            __implements__ = (SubIFace,)
+
+        self.failUnless(SubIFace.is_implemented_by(X))
+        self.failUnless(IFace1.is_implemented_by(X))
+
 
 if __name__ == '__main__':
     unittest_main()

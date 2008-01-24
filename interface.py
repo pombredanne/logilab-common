@@ -41,7 +41,7 @@ def implements(obj, interface):
     if not isinstance(kimplements, (list, tuple)):
         kimplements = (kimplements,)
     for implementedinterface in kimplements:
-        if issubclass(interface, implementedinterface):
+        if issubclass(implementedinterface, interface):
             return True
     return False
 
