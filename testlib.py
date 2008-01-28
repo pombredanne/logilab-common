@@ -1122,11 +1122,18 @@ class TestCase(unittest.TestCase):
         """compares two files using difflib"""
         self.assertStreamEqual(file(fname1), file(fname2), junk)
             
-    def assertIsInstance(self, obj, klass, msg=None):
+    def assertIsInstance(self, obj, klass, msg=None, strict=False):
         """compares two files using difflib"""
         if msg is None:
-            msg = '%s is not an instance of %s but of %s' % (obj, klass, type(obj))
-        self.assert_(isinstance(obj, klass), msg)
+            if strict:
+                msg = '%s is not of class %s but of %s'
+            else:
+                msg = '%s is not an instance of %s but of %s'
+            msg = msg % (obj, klass, type(obj))
+        if strict:
+            self.assert_(obj.__class__ is klass, msg)
+        else:
+            self.assert_(isinstance(obj, klass), msg)
 
 
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
