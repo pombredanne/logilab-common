@@ -35,6 +35,8 @@ from logilab.common import STD_BLACKLIST
 def chown(path, login=None, group=None):
     """same as `os.chown` function but accepting user login or group name as
     argument. If login or group is omitted, it's left unchanged.
+
+    Note: you must own the file to chown it (or be root). Otherwise OSError is raised. 
     """
     if login is None:
         uid = -1
