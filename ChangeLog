@@ -2,8 +2,9 @@ ChangeLog for logilab.common
 ============================
 
  --
+    * shellutils: new `chmod` function
     * testlib: new `strict` argument to assertIsInstance
-    * __init__: new attrdict and nullobject classes
+    * __init__: new `attrdict` and `nullobject` classes
 	
 2008-01-25  --  0.27.0
     * deprecation: new class_moved utility function
