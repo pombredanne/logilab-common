@@ -2,7 +2,8 @@ ChangeLog for logilab.common
 ============================
 
  --
-    * shellutils: new `chmod` function
+    * date: new `add_days_worked` function
+    * shellutils: new `chown` function
     * testlib: new `strict` argument to assertIsInstance
     * __init__: new `attrdict` and `nullobject` classes
 	
