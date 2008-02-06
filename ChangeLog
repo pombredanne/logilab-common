@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
 
- --
+2008-02-05  --  0.28.0
     * date: new `add_days_worked` function
     * shellutils: new `chown` function
     * testlib: new `strict` argument to assertIsInstance

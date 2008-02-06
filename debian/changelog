@@ -1,3 +1,9 @@
+logilab-common (0.28.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Adrien.DiMascio <Adrien.DiMascio@logilab.fr>  Tue, 05 Feb 2008 11:41:55 +0100
+
 logilab-common (0.27.0-1) unstable; urgency=low
 
   * new upstream release
