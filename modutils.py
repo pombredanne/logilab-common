@@ -227,6 +227,8 @@ def file_from_modpath(modpath, path=None, context_file=None):
     :param modpath:
       splitted module's name (i.e name of a module or package splitted
       on '.')
+      (this means explicit relative imports that start with dots have
+      empty strings in this list!)
 
     :type path: list or None
     :param path:
@@ -302,9 +304,20 @@ def get_module_part(dotted_name, context_file=None):
                 raise ImportError(dotted_name)
             return parts[0]
         # don't use += or insert, we want a new list to be created !
-    for i in range(len(parts)):
+    path = None
+    starti = 0
+    if parts[0] == '':
+        assert context_file is not None, \
+                'explicit relative import, but no context_file?'
+        path = [] # prevent resolving the import non-relatively
+        starti = 1
+    while parts[starti] == '': # for all further dots: change context
+        starti += 1
+        context_file = dirname(context_file)
+    for i in range(starti, len(parts)):
         try:
-            file_from_modpath(parts[:i+1], context_file=context_file)
+            file_from_modpath(parts[starti:i+1],
+                    path=path, context_file=context_file)
         except ImportError:
             if not i >= max(1, len(parts) - 2):
                 raise
@@ -540,7 +553,7 @@ def _module_file(modpath, path=None):
     :type modpath: list or tuple
     :param modpath:
       splitted module's name (i.e name of a module or package splitted
-      on '.')
+      on '.'), with leading empty strings for explicit relative import
 
     :type path: list or None
     :param path:
