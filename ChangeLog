@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+-- 
+    * modutils: included Stefan Rank's patch to deal with 2.4 relative import
+
 2008-02-05  --  0.28.0
     * date: new `add_days_worked` function
     * shellutils: new `chown` function
