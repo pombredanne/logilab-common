@@ -18,7 +18,6 @@ scripts
 :copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 """
-
 __docformat__ = "restructuredtext en"
 
 import os        

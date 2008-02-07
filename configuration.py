@@ -878,9 +878,8 @@ def merge_options(options):
     for i in range(len(options)-1, -1, -1):
         optname, optdict = options[i]
         if optname in alloptions:
-            options.pop(alloptions[optname][1])
-            alloptions[optname][0].update(optdict)
-            alloptions[optname][1] = i
+            options.pop(i)
+            alloptions[optname].update(optdict)
         else:
-            alloptions[optname] = [optdict, i]
+            alloptions[optname] = optdict
     return tuple(options)

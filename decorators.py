@@ -1,6 +1,3 @@
-# Copyright (c) 2006-2007 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
-#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
 # Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +10,13 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""this module contains some function/method decorators"""
+"""this module contains some function/method decorators
+
+:author:    Logilab
+:copyright: 2006-2008 LOGILAB S.A. (Paris, FRANCE)
+:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
+"""
+__docformat__ = "restructuredtext en"
 
 # XXX rewrite so we can use the decorator syntax when keyarg has to be specified
 
