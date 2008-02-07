@@ -109,7 +109,7 @@ def this_is_a_testdir(dirpath):
     return osp.basename(dirpath) in ('test', 'tests', 'unittests')
 
 
-def autopath(projdir=os.getcwd()):
+def project_root(projdir=os.getcwd()):
     """try to find project's root and add it to sys.path"""
     curdir = osp.abspath(projdir)
     previousdir = curdir
@@ -120,9 +120,6 @@ def autopath(projdir=os.getcwd()):
             break
         previousdir = curdir
         curdir = newdir
-    else:
-        sys.path.insert(0, curdir)
-    sys.path.insert(0, '')
     return previousdir
 
 
@@ -265,7 +262,10 @@ class PyTester(object):
         if dirname:
             os.chdir(dirname)
         modname = osp.basename(filename)[:-3]
-        print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
+        try:
+            print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
+        except TypeError: # < py 2.4 bw compat
+            print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70)
         try:
             try:
                 tstart, cstart = time(), clock()
@@ -274,12 +274,13 @@ class PyTester(object):
                 ttime, ctime = (tend - tstart), (cend - cstart)
                 self.report.feed(filename, testprog.result, ttime, ctime)
                 return testprog
-            except SystemExit:
+            except (KeyboardInterrupt, SystemExit):
                 raise
             except Exception, exc:
                 self.report.failed_to_test_module(filename)
                 print 'unhandled exception occured while testing', modname
-                print 'error: %s' % exc
+                import traceback
+                traceback.print_exc()
                 return None                
         finally:
             if dirname:
@@ -464,6 +465,8 @@ def parseargs():
                       "to skip several patterns, use commas")
     parser.add_option('-q', '--quiet', callback=rebuild_cmdline,
                       action="callback", help="Minimal output")
+    parser.add_option('-P', '--profile', default=None, dest='profile',
+                      help="Profile execution and store data in the given file")
 
     try:
         from logilab.devtools.lib.coverage import Coverage
@@ -503,30 +506,40 @@ def parseargs():
 
 
 def run():
-    rootdir = autopath()
     options, newargs, explicitfile = parseargs()
     # mock a new command line
     sys.argv[1:] = newargs
     covermode = getattr(options, 'coverage', None)
     cvg = None
+    if not '' in sys.path:
+        sys.path.insert(0, '')    
     if covermode:
+        rootdir = project_root()
         # control_import_coverage(rootdir)
         from logilab.devtools.lib.coverage import Coverage
         cvg = Coverage([rootdir])
         cvg.erase()
         cvg.start()
-    if options.django:
+    if DJANGO_FOUND and options.django:
         tester = DjangoTester(cvg)
     else:
         tester = PyTester(cvg)
+    if explicitfile:
+        cmd, args = tester.testfile, (explicitfile,)
+    elif options.testdir:
+        cmd, args = tester.testonedir, (options.testdir, options.exitfirst)
+    else:
+        cmd, args = tester.testall, (options.exitfirst,)
     try:
         try:
-            if explicitfile:
-                tester.testfile(explicitfile)
-            elif options.testdir:
-                tester.testonedir(options.testdir, options.exitfirst)
+            if options.profile:
+                import hotshot
+                prof = hotshot.Profile(options.profile)
+                prof.runcall(cmd, *args)
+                prof.close()
+                print 'profile data saved in', options.profile
             else:
-                tester.testall(options.exitfirst)
+                 cmd(*args)           
         except SystemExit:
             raise
         except:

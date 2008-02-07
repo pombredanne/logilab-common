@@ -81,6 +81,18 @@ def union(list1, list2):
     return tmp.keys()
 
 
+class attrdict(dict):
+    """a dictionary whose keys are also accessible as attributes"""
+    def __getattr__(self, attr):
+        try:
+            return self[attr]
+        except KeyError:
+            raise AttributeError(attr)
+        
+class nullobject(object):
+    def __nonzero__(self):
+        return False
+
 # XXX move in a specific module
 
 def flatten(iterable, tr_func=None, results=None):

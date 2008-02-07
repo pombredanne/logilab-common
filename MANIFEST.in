@@ -6,3 +6,4 @@ include bin/pytest
 include bin/pytest.bat
 recursive-include test/data *.py *.txt *.msg *.ini
 recursive-include doc/html *
+include doc/pytest.1

@@ -56,8 +56,11 @@ else:
         'paques2007'    : '2007-04-09',
         'ascension2007' : '2007-05-17',
         'pentecote2007' : '2007-05-28',
-        }
 
+        'paques2008'    : '2008-03-24',
+        'ascension2008' : '2008-05-01',
+        'pentecote2008' : '2008-05-12',
+        }
 
     def get_national_holidays(begin, end):
         """return french national days off between begin and end"""
@@ -68,6 +71,16 @@ else:
                          for datestr in FRENCH_FIXED_HOLIDAYS.values()]
         return [day for day in holidays if begin <= day < end]
 
+
+    def add_days_worked(start, days):
+        """adds date but try to only take days worked into account"""
+        weeks, plus = divmod(days, 5)
+        end = start+(weeks * 7) + plus
+        if end.day_of_week > 4:
+            end += 2       
+        end += len([x for x in get_national_holidays(start, end+1)
+                    if x.day_of_week < 5])
+        return end
 
 
 def date_range(begin, end, step=STEP):
@@ -81,3 +94,4 @@ def date_range(begin, end, step=STEP):
     while date < end :
         yield date
         date += step
+

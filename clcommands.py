@@ -69,7 +69,7 @@ def pop_arg(args_list, expected_size_after=0, msg="Missing argument"):
         value = args_list.pop(0)
     except IndexError:
         raise BadCommandUsage(msg)
-    if len(args_list) > expected_size_after:
+    if expected_size_after is not None and len(args_list) > expected_size_after:
         raise BadCommandUsage('Too much arguments')
     return value
 
@@ -94,7 +94,7 @@ Type "%prog <command> --help" for more information about a specific
 command. Available commands are :\n''')
     doc = doc.replace('%prog', basename(sys.argv[0]))
     print 'usage:', doc
-    max_len = max(len(cmd) for cmd in commands)
+    max_len = max([len(cmd) for cmd in commands]) # list comprehension for py 2.3 support
     padding = ' '*max_len
     for command in commands:
         cmd = _COMMANDS[command]

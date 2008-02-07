@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2006 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2005-2008 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 
 # This program is free software; you can redistribute it and/or modify it under
@@ -56,6 +56,18 @@ def class_renamed(old_name, new_class, message=None):
         return DeprecatedClass
 
 
+def class_moved(new_class, old_name=None, message=None):
+    """nice wrapper around class_renamed when a class has been moved into
+    another module
+    """
+    if old_name is None:
+        old_name = new_class.__name__
+    if message is None:
+        message = 'class %s is now available as %s.%s' % (
+            old_name, new_class.__module__, new_class.__name__)
+    return class_renamed(old_name, new_class, message)
+
+
 def deprecated_function(new_func, message=None):
     """creates a function which fires a DeprecationWarning when used
 
@@ -74,7 +86,18 @@ def deprecated_function(new_func, message=None):
         return new_func(*args, **kwargs)
     return deprecated
 
+
 def moved(modpath, objname):
+    """use to tell that a callable has been moved to a new module.
+
+    It returns a callable wrapper, so that when its called a warning is printed
+    telling where the object can be found, import is done (and not before) and
+    the actual object is called.
+
+    NOTE: the usage is somewhat limited on classes since it will fail if the
+    wrapper is use in a class ancestors list, use the `class_moved` function
+    instead (which has no lazy import feature though).
+    """
     def callnew(*args, **kwargs):
         message = "this object has been moved, it's now %s.%s" % (
             modpath, objname)

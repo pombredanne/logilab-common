@@ -1,5 +1,5 @@
-# -*- encoding: iso-8859-1 -*-
-# Copyright (c) 2006 LOGILAB S.A. (Paris, FRANCE).
+# -*- coding: iso-8859-1 -*-
+# Copyright (c) 2007 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,10 @@ import logging
 
 from logilab.common.textutils import colorize_ansi
 
+def xxx_cyan(record):
+    if 'XXX' in record.message:
+        return 'cyan'
+
 class ColorFormatter(logging.Formatter):
     """
     A color Formatter for the logging standard module.
@@ -31,7 +35,7 @@ class ColorFormatter(logging.Formatter):
     By default, colorize CRITICAL and ERROR in red, WARNING in orange
     and INFO in yellow.
 
-    self.colors is customizable via the constructor.
+    self.colors is customizable via the 'color' constructor argument (dictionnary).
 
     self.colorfilters is a list of functions that get the LogRecord
     and return a color name or None.
@@ -40,13 +44,15 @@ class ColorFormatter(logging.Formatter):
     def __init__(self, fmt=None, datefmt=None, colors=None):
         logging.Formatter.__init__(self, fmt, datefmt)
         self.colorfilters = []
-        self.colors = colors or {'CRITICAL': 'red',
-                                 'ERROR': 'red',
-                                 'WARNING': 'orange',
-                                 'INFO': 'yellow',
-                                 }
-        assert isinstance(self.colors, dict)
-        
+        self.colors = {'CRITICAL': 'red',
+                       'ERROR': 'red',
+                       'WARNING': 'magenta',
+                       'INFO': 'yellow',
+                       }
+        if colors is not None:
+            assert isinstance(colors, dict)
+            self.colors.update(colors)            
+                               
     def format(self, record):
         msg = logging.Formatter.format(self, record)
         if record.levelname in self.colors:
@@ -58,3 +64,20 @@ class ColorFormatter(logging.Formatter):
                 if color: 
                     return colorize_ansi(msg, color)
         return msg
+
+def set_color_formatter(logger=None, **kw):
+    """
+    Install a color formatter on the 'logger'. If not given, it will
+    defaults to the default logger.
+
+    Any additional keyword will be passed as-is to the ColorFormatter
+    constructor.
+    """
+    if logger is None:
+        logger = logging.getLogger()
+        if not logger.handlers:
+            logging.basicConfig()
+    format_msg = logger.handlers[0].formatter._fmt
+    fmt = ColorFormatter(format_msg, **kw)
+    fmt.colorfilters.append(xxx_cyan)
+    logger.handlers[0].setFormatter(fmt)

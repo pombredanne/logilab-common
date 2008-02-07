@@ -46,7 +46,7 @@ class CompatTCMixIn:
     def test_removed_builtins(self):
         """tests that builtins are actually uncallable"""
         for builtin in self.BUILTINS:
-            self.assertRaises(NameError, eval, builtin)
+            self.assertRaises(NameError, eval, builtin, {})
 
     def test_removed_modules(self):
         """tests that builtins are actually emtpy"""

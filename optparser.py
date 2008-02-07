@@ -1,4 +1,4 @@
-# -*- encoding: iso-8859-15 -*-
+# -*- coding: iso-8859-15 -*-
 # Copyright (c) 2006 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
@@ -63,6 +63,9 @@ class OptionParser(optparse.OptionParser):
         if cmd not in self._commands:
             if cmd in ('-h', '--help'):
                 self.print_main_help()
+                sys.exit(0)
+            elif self.version is not None and cmd == "--version":
+                self.print_version()
                 sys.exit(0)
             self.error('unknow command')
         self.prog = '%s %s' % (self.prog, cmd)

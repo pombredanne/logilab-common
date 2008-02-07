@@ -30,7 +30,7 @@ def target_info_from_filename(filename):
 
 class DotBackend:
     """Dot File backend"""
-    def __init__(self, graphname, rankdir=None, size=None, ratio=None):
+    def __init__(self, graphname, rankdir=None, size=None, ratio=None, charset='utf-8'):
         self.graphname = graphname
         self.lines = []
         self._source = None
@@ -41,6 +41,10 @@ class DotBackend:
             self.emit('ratio=%s' % ratio)
         if size:
             self.emit('size="%s"' % size)
+        if charset:
+            assert charset.lower() in ('utf-8', 'iso-8859-1', 'latin1'), \
+                   'unsupported charset %s' % charset
+            self.emit('charset="%s"' % charset)
 
     def get_source(self):
         """returns self._source"""

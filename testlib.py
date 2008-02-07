@@ -53,6 +53,8 @@ from logilab.common.deprecation import class_renamed, deprecated_function, \
      obsolete
 from logilab.common.compat import set, enumerate
 from logilab.common.modutils import load_module_from_name
+from logilab.common.debugger import Debugger
+from logilab.common.decorators import cached
 
 __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 
@@ -271,35 +273,6 @@ def _count(n, word):
     
 
 ## PostMortem Debug facilities #####
-from pdb import Pdb
-class Debugger(Pdb):
-    def __init__(self, tcbk):
-        Pdb.__init__(self)
-        self.reset()
-        while tcbk.tb_next is not None:
-            tcbk = tcbk.tb_next
-        self._tcbk = tcbk
-        self._histfile = osp.join(os.environ["HOME"], ".pdbhist")
-        
-    def setup_history_file(self):
-        if readline is not None:
-            try:
-                readline.read_history_file(self._histfile)
-            except IOError:
-                pass
-
-    def start(self):
-        self.interaction(self._tcbk.tb_frame, self._tcbk)
-
-    def setup(self, frame, tcbk):
-        self.setup_history_file()
-        Pdb.setup(self, frame, tcbk)
-
-    def set_quit(self):
-        if readline is not None:
-            readline.write_history_file(self._histfile)
-        Pdb.set_quit(self)
-
 def start_interactive_mode(debuggers, descrs):
     """starts an interactive shell so that the user can inspect errors
     """
@@ -350,19 +323,6 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.pdbmode = pdbmode
         self.cvg = cvg
         self.pdbclass = Debugger
-
-##     def startTest(self, test):
-##         "Called when the given test is about to be run"
-##         if self.cvg:
-##             self.cvg.start()
-##         return super(SkipAwareTestResult, self).startTest(test)
-
-##     def stopTest(self, test):
-##         "Called when the given test has been run"
-##         ret = super(SkipAwareTestResult, self).startTest(test)
-##         if self.cvg:
-##             self.cvg.stop()
-##         return ret
         
     def _create_pdb(self, test_descr):
         if self.pdbmode:
@@ -706,6 +666,12 @@ Examples:
 
 
     def runTests(self):
+        if hasattr(self.module, 'setup_module'):
+            try:
+                self.module.setup_module()
+            except Exception, exc:
+                print 'setup_module error:', exc
+                sys.exit(1)
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
                                                   exitfirst=self.exitfirst,
                                                   capture=self.capture,
@@ -715,6 +681,12 @@ Examples:
                                                   test_pattern=self.test_pattern,
                                                   skipped_patterns=self.skipped_patterns)
         result = self.testRunner.run(self.test)
+        if hasattr(self.module, 'teardown_module'):
+            try:
+                self.module.teardown_module()
+            except Exception, exc:
+                print 'teardown_module error:', exc
+                sys.exit(1)
         if os.environ.get('PYDEBUG'):
             warn("PYDEBUG usage is deprecated, use -i / --pdb instead", DeprecationWarning)
             self.pdbmode = True
@@ -853,7 +825,18 @@ class InnerTest(tuple):
         instance = tuple.__new__(cls, data)
         instance.name = name
         return instance
+
+class ClassGetProperty(object):
+    """this is a simple property-like class but for
+    class attributes.
+    """
     
+    def __init__(self, getter):
+        self.getter = getter
+
+    def __get__(self, obj, objtype):
+        return self.getter(objtype)
+
 
 class TestCase(unittest.TestCase):
     """unittest.TestCase with some additional methods"""
@@ -876,6 +859,20 @@ class TestCase(unittest.TestCase):
         self._err = []
         self._current_test_descr = None
 
+    def datadir(cls):
+        """helper attribute holding the standard test's data directory
+        
+        NOTE: this is a logilab's standard
+        """
+        mod = __import__(cls.__module__)
+        return osp.join(osp.dirname(osp.abspath(mod.__file__)), 'data')
+    # cache it (use a class method to cache on class since TestCase is
+    # instantiated for each test run)
+    datadir = ClassGetProperty(cached(datadir))
+
+    def datapath(self, fname):
+        """joins the object's datadir and `fname`"""
+        return osp.join(self.datadir, fname)
 
     def set_description(self, descr):
         """sets the current test's description.
@@ -1162,12 +1159,43 @@ class TestCase(unittest.TestCase):
         """compares two files using difflib"""
         self.assertStreamEqual(file(fname1), file(fname2), junk)
             
-    def assertIsInstance(self, obj, klass, msg=None):
+    def assertIsInstance(self, obj, klass, msg=None, strict=False):
         """compares two files using difflib"""
         if msg is None:
-            msg = '%s is not an instance of %s' % (obj, klass)
-        self.assert_(isinstance(obj, klass), msg)
+            if strict:
+                msg = '%s is not of class %s but of %s'
+            else:
+                msg = '%s is not an instance of %s but of %s'
+            msg = msg % (obj, klass, type(obj))
+        if strict:
+            self.assert_(obj.__class__ is klass, msg)
+        else:
+            self.assert_(isinstance(obj, klass), msg)
 
+
+    def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
+        """override default failUnlessRaise method to return the raised
+        exception instance.
+        
+        Fail unless an exception of class excClass is thrown
+        by callableObj when invoked with arguments args and keyword
+        arguments kwargs. If a different type of exception is
+        thrown, it will not be caught, and the test case will be
+        deemed to have suffered an error, exactly as for an
+        unexpected exception.
+        """
+        try:
+            callableObj(*args, **kwargs)
+        except excClass, exc:
+            return exc
+        else:
+            if hasattr(excClass, '__name__'):
+                excName = excClass.__name__
+            else:
+                excName = str(excClass)
+            raise self.failureException, "%s not raised" % excName
+
+    assertRaises = failUnlessRaises
 
 import doctest
 

@@ -5,7 +5,7 @@
 # adapted by Logilab for automatic generation by debianize
 # (part of the devtools project, http://www.logilab.org/projects/devtools)
 #
-# Copyright (c) 2003-2005 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2003-2008 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 
 # Uncomment this to turn on verbose mode.
@@ -34,8 +34,6 @@ install: build
 	python setup.py -q install --no-compile --prefix=debian/python-logilab-common/usr/ --install-headers=debian/python-logilab-common/usr/include/ --install-scripts=debian/python-logilab-common/usr/bin
 	# remove test directory (installed in in the doc directory)
 	rm -rf debian/python-logilab-common/usr/lib/python*/site-packages/logilab/common/test
-	# install tests
-	(cd test && find . -type f -not \( -path '*/CVS/*' -or -name '*.pyc' \) -exec install -D --mode=644 {} ../debian/python-logilab-common/usr/share/doc/python-logilab-common/test/{} \;)
 
 
 # Build architecture-independent files here.

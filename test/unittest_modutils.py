@@ -85,13 +85,13 @@ class file_from_modpath_tc(TestCase):
     if it exists"""
     
     def test_knownValues_file_from_modpath_1(self):
-        self.assertEqual(modutils.file_from_modpath(['logilab', 'common', 'modutils']),
-                         modutils.__file__.replace('.pyc', '.py'))
+        self.assertEqual(path.realpath(modutils.file_from_modpath(['logilab', 'common', 'modutils'])),
+                         path.realpath(modutils.__file__.replace('.pyc', '.py')))
     
     def test_knownValues_file_from_modpath_2(self):
         from os import path
-        self.assertEqual(modutils.file_from_modpath(['os', 'path']).replace('.pyc', '.py'),
-                         path.__file__.replace('.pyc', '.py'))
+        self.assertEqual(path.realpath(modutils.file_from_modpath(['os', 'path']).replace('.pyc', '.py')),
+                         path.realpath(path.__file__.replace('.pyc', '.py')))
     
     def test_knownValues_file_from_modpath_3(self):
         try:
@@ -100,8 +100,8 @@ class file_from_modpath_tc(TestCase):
         except ImportError:
             pass
         else:
-            self.assertEqual(modutils.file_from_modpath(['xml', 'dom', 'ext']).replace('.pyc', '.py'),
-                             ext.__file__.replace('.pyc', '.py'))
+            self.assertEqual(path.realpath(modutils.file_from_modpath(['xml', 'dom', 'ext']).replace('.pyc', '.py')),
+                             path.realpath(ext.__file__.replace('.pyc', '.py')))
     
     def test_knownValues_file_from_modpath_4(self):
         self.assertEqual(modutils.file_from_modpath(['sys']),

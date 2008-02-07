@@ -1,4 +1,4 @@
-# Copyright (c) 2002-2006 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2002-2007 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -13,11 +13,28 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""Helpers to get a DBAPI2 compliant database connection.
+"""This modules contains wrappers to get actually replaceable DBAPI2 compliant
+modules and database connection whatever the database and client lib used.
+
+Currently support:
+
+- postgresql (pgdb, psycopg, psycopg2, pyPgSQL)
+- mysql (MySQLdb)
+- sqlite (pysqlite2, sqlite, sqlite3)
+
+just use the `get_connection` function from this module to get a
+wrapped connection.  If multiple drivers for a database are available,
+you can control which one you want to use using the
+`set_prefered_driver` function.
+
+Additional helpers are also provided for advanced functionalities such
+as listing existing users or databases, creating database... Get the
+helper for your database using the `get_adv_func_helper` function.
 """
 
 import sys
 import re
+from warnings import warn
 
 from logilab.common.deprecation import obsolete
 try:
@@ -169,7 +186,26 @@ class DBAPIAdapter:
     def __getattr__(self, attrname):
         return getattr(self._native_module, attrname)
 
-
+    def process_value(self, value, description, encoding='utf-8', binarywrap=None):
+        typecode = description[1]
+        assert typecode is not None, self # dbapi module isn't supporting type codes, override to return value directly
+        if typecode == self.STRING:
+            if isinstance(value, str):
+                return unicode(value, encoding, 'replace')
+        elif typecode == self.BOOLEAN:
+            return bool(value)
+        elif typecode == self.BINARY and not binarywrap is None:
+            return binarywrap(value)
+##                 elif typecode == dbapimod.DATETIME:
+##                     pass
+##                 elif typecode == dbapimod.NUMBER:
+##                     pass
+##                 else:
+##                     self.warning("type -%s- unknown for %r (%s) ",
+##                         typecode, value, type(value))
+        return value
+        
+    
 # Postgresql #########################################################
 
 class _PgdbAdapter(DBAPIAdapter):
@@ -208,7 +244,6 @@ class _PsycopgAdapter(DBAPIAdapter):
         cnx.set_isolation_level(1)
         return self._wrap_if_needed(cnx)
     
-
 class _Psycopg2Adapter(_PsycopgAdapter):
     """Simple Psycopg2 Adapter to DBAPI (cnx_string differs from classical ones)
     """
@@ -312,6 +347,7 @@ class _PySqlite2Adapter(DBAPIAdapter):
             def adapt_mxdatetimedelta(mxd):
                 return mxd.strftime('%H:%M:%S')
             sqlite.register_adapter(DateTimeDeltaType, adapt_mxdatetimedelta)
+            
             def convert_mxdate(ustr):
                 return strptime(ustr, '%Y-%m-%d %H:%M:%S')
             sqlite.register_converter('date', convert_mxdate)
@@ -336,16 +372,22 @@ class _PySqlite2Adapter(DBAPIAdapter):
             """cursor adapting usual dict format to pysqlite named format
             in SQL queries
             """
+            def _replace_parameters(self, sql, kwargs):
+                if isinstance(kwargs, dict):
+                    return re.sub(r'%\(([^\)]+)\)s', r':\1', sql)
+                # XXX dumb
+                return re.sub(r'%s', r'?', sql)
+                    
             def execute(self, sql, kwargs=None):
-                if kwargs is not None:
-                    sql = re.sub(r'%\(([^\)]+)\)s', r':\1', sql)
-                    self.__class__.__bases__[0].execute(self, sql, kwargs)
-                else:
+                if kwargs is None:
                     self.__class__.__bases__[0].execute(self, sql)
+                else:
+                    self.__class__.__bases__[0].execute(self, self._replace_parameters(sql, kwargs), kwargs)
                     
             def executemany(self, sql, kwargss):
-                sql = re.sub(r'%\(([^\)]+)\)s', r':\1', sql)
-                self.__class__.__bases__[0].executemany(self, sql, kwargss)
+                if not isinstance(kwargss, (list, tuple)):
+                    kwargss = tuple(kwargss)
+                self.__class__.__bases__[0].executemany(self, self._replace_parameters(sql, kwargss[0]), kwargss)
                     
         class PySqlite2CnxWrapper:
             def __init__(self, cnx):
@@ -353,11 +395,15 @@ class _PySqlite2Adapter(DBAPIAdapter):
                 
             def cursor(self):
                 return self._cnx.cursor(PySqlite2Cursor)
-            
             def __getattr__(self, attrname):
                 return getattr(self._cnx, attrname)
         cnx = sqlite.connect(database, detect_types=sqlite.PARSE_DECLTYPES)
         return self._wrap_if_needed(PySqlite2CnxWrapper(cnx))
+    
+    def process_value(self, value, description, encoding='utf-8', binarywrap=None):
+        if not binarywrap is None and isinstance(value, self._native_module.Binary):
+            return binarywrap(value)
+        return value # no type code support, can't do anything
 
     
 class _SqliteAdapter(DBAPIAdapter):
@@ -378,8 +424,9 @@ class _SqliteAdapter(DBAPIAdapter):
 class _MySqlDBAdapter(DBAPIAdapter):
     """Simple mysql Adapter to DBAPI
     """
+    BOOLEAN = 'XXX' # no specific type code for boolean
     def connect(self, host='', database='', user='', password='', port=None,
-                unicode=False):
+                unicode=True):
         """Handles mysqldb connexion format
         the unicode named argument asks to use Unicode objects for strings
         in result sets and query parameters
@@ -387,179 +434,60 @@ class _MySqlDBAdapter(DBAPIAdapter):
         kwargs = {'host' : host or '', 'db' : database,
                   'user' : user, 'passwd' : password,
                   'use_unicode' : unicode}
+        # MySQLdb doesn't support None port
         if port:
-            # MySqlDb requires port to be an integer
-            kwargs['port'] = port
-        return self._native_module.connect(**kwargs)
+            kwargs['port'] = int(port)
+        cnx = self._native_module.connect(**kwargs)
+        return self._wrap_if_needed(cnx)
 
+    def process_value(self, value, description, encoding='utf-8', binarywrap=None):
+        typecode = description[1]
+        # hack to differentiate mediumtext (String) and tinyblob/longblog
+        # (Password/Bytes) which are all sharing the same type code :(
+        if typecode == self.BINARY:
+            if hasattr(value, 'tostring'): # may be an array
+                value = value.tostring()
+            maxsize = description[3]
+            # mediumtext can hold up to (2**24 - 1) characters (16777215)
+            # but if utf8 is set, each character is stored on 3 bytes words,
+            # so we have to test for 3 * (2**24 - 1)  (i.e. 50331645)
+            # XXX: what about other encodings ??
+            if maxsize in (16777215, 50331645): # mediumtext (2**24 - 1)
+                if isinstance(value, str):
+                    return unicode(value, encoding)
+                return value
+            #if maxsize == 255: # tinyblob (2**8 - 1)
+            #    return value
+            if binarywrap is None:
+                return value
+            return binarywrap(value)
+        return DBAPIAdapter.process_value(self, value, description, encoding, binarywrap)
 
-## Helpers for DBMS specific advanced or non standard functionalities #########
+    def type_code_test(self, cursor):
+        print '*'*80
+        print 'module type codes'
+        for typename in ('STRING', 'BOOLEAN', 'BINARY', 'DATETIME', 'NUMBER'):
+            print typename, getattr(self, typename)
+        try:
+            cursor.execute("""CREATE TABLE _type_code_test(
+            varchar_field varchar(50),
+            text_field text unicode, 
+            mtext_field mediumtext,
+            binary_field tinyblob,
+            blob_field blob,
+            lblob_field longblob
+            )""")
+            cursor.execute("INSERT INTO _type_code_test VALUES ('1','2','3','4', '5', '6')")
+            cursor.execute("SELECT * FROM _type_code_test")
+            descr = cursor.description
+            print 'db fields type codes'
+            for i, name in enumerate(('varchar', 'text', 'mediumtext',
+                                      'binary', 'blob', 'longblob')):
+                print name, descr[i]
+        finally:
+            cursor.execute("DROP TABLE _type_code_test")
+            
 
-class _GenericAdvFuncHelper:
-    """Generic helper, trying to provide generic way to implement
-    specific functionnalities from others DBMS
-
-    An exception is raised when the functionality is not emulatable
-    """
-    # DBMS resources descriptors and accessors
-    
-    users_support = True
-    groups_support = True
-    ilike_support = True
-    
-    @obsolete('use users_support attribute')
-    def support_users(self):# XXX deprecated
-        """return True if the DBMS support users (this is usually
-        not true for in memory DBMS)
-        """
-        return self.users_support
-    
-    @obsolete('use groups_support attribute')    
-    def support_groups(self):
-        """return True if the DBMS support groups"""
-        return self.groups_support
-
-    def system_database(self):
-        """return the system database for the given driver"""
-        raise NotImplementedError('not supported by this DBMS')
-    
-    def backup_command(self, dbname, dbhost, dbuser, dbpassword, backupfile,
-                       keepownership=True):
-        """return a command to backup the given database"""
-        raise NotImplementedError('not supported by this DBMS')
-    
-    def restore_commands(self, dbname, dbhost, dbuser, backupfile,
-                         encoding='UTF8', keepownership=True, drop=True):
-        raise NotImplementedError('not supported by this DBMS')
-    
-    # helpers to standardize SQL according to the database
-    
-    def sql_current_date(self):
-        return 'CURRENT_DATE'
-    
-    def sql_current_time(self):
-        return 'CURRENT_TIME'
-    
-    def sql_current_timestamp(self):
-        return 'CURRENT_TIMESTAMP'
-    
-    def sql_create_sequence(self, seq_name):
-        return '''CREATE TABLE %s (last INTEGER);
-INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
-    
-    def sql_drop_sequence(self, seq_name):
-        return 'DROP TABLE %s;' % seq_name
-    
-    def sqls_increment_sequence(self, seq_name):
-        return ('UPDATE %s SET last=last+1;' % seq_name,
-                'SELECT last FROM %s;' % seq_name)
-
-    def sql_temporary_table(self, table_name, table_schema,
-                            drop_on_commit=True):
-        return "CREATE TEMPORARY TABLE %s (%s);" % (table_name,
-                                                    table_schema)
-    
-    def sql_drop_unique_constraint(self, table, column):
-        # XXX postgres specific ?
-        return 'ALTER TABLE %s DROP CONSTRAINT %s_%s_key' % (
-            table, table, column)
-    
-    def increment_sequence(self, cursor, seq_name):
-        for sql in self.sqls_increment_sequence(seq_name):
-            cursor.execute(sql)
-        return cursor.fetchone()[0]
-    
-    def list_users(self, cursor, username=None):
-        if not self.users_support:
-            return None
-        if username is None:
-            return ()
-        return None
-
-    
-class _PGAdvFuncHelper(_GenericAdvFuncHelper):
-    """Postgres helper, taking advantage of postgres SEQUENCE support
-    """
-    
-    def system_database(self):
-        """return the system database for the given driver"""
-        return 'template1'
-    
-    def backup_command(self, dbname, dbhost, dbuser, backupfile,
-                       keepownership=True):
-        """return a command to backup the given database"""
-        cmd = ['pg_dump -Fc']
-        if dbhost:
-            cmd.append('--host=%s' % dbhost)
-        if dbuser:
-            cmd.append('--username=%s' % dbuser)
-        if not keepownership:
-            cmd.append('--no-owner')
-        cmd.append('--file=%s' % backupfile)
-        cmd.append(dbname)
-        return ' '.join(cmd)
-    
-    def restore_commands(self, dbname, dbhost, dbuser, backupfile,
-                         encoding='UTF8', keepownership=True, drop=True):
-        """return a command to restore a backup the given database"""
-        cmds = []
-        if drop:
-            cmd = dbcmd('dropdb', dbhost, dbuser)
-            cmd.append(dbname)
-            cmds.append(' '.join(cmd))
-        cmd = dbcmd('createdb -T template0 -E %s' % encoding, dbhost, dbuser)
-        cmd.append(dbname)
-        cmds.append(' '.join(cmd))
-        cmd = dbcmd('pg_restore -Fc', dbhost, dbuser)
-        cmd.append('--dbname %s' % dbname)
-        if not keepownership:
-            cmd.append('--no-owner')
-        cmd.append(backupfile)
-        cmds.append(' '.join(cmd))
-        return cmds
-                
-    def sql_create_sequence(self, seq_name):
-        return 'CREATE SEQUENCE %s;' % seq_name
-    
-    def sql_drop_sequence(self, seq_name):
-        return 'DROP SEQUENCE %s;' % seq_name
-    
-    def sqls_increment_sequence(self, seq_name):
-        return ("SELECT nextval('%s');" % seq_name,)
-    
-    def sql_temporary_table(self, table_name, table_schema,
-                            drop_on_commit=True):
-        if not drop_on_commit:
-            return "CREATE TEMPORARY TABLE %s (%s);" % (table_name,
-                                                        table_schema)    
-        return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
-                                                                   table_schema)
-
-    def list_users(self, cursor, username=None):
-        if username is None:
-            return cursor.execute("SELECT usename FROM pg_user")
-        return cursor.execute("SELECT usename FROM pg_user WHERE usename=%(user)s",
-                              {'user': username})
-
-def dbcmd(cmd, dbhost, dbuser):
-    cmd = [cmd]
-    if dbhost:
-        cmd.append('--host=%s' % dbhost)
-    if dbuser:
-        cmd.append('--username=%s' % dbuser)
-    return cmd
-
-class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
-    """Generic helper, trying to provide generic way to implement
-    specific functionnalities from others DBMS
-
-    An exception is raised when the functionality is not emulatable
-    """
-    
-    users_support = groups_support = False
-    ilike_support = False
-    
-    
 
 ## Drivers, Adapters and helpers registries ###################################
 
@@ -613,10 +541,6 @@ class _AdapterDirectory(dict):
 
 ADAPTER_DIRECTORY = _AdapterDirectory(_ADAPTERS)
 del _AdapterDirectory
-    
-ADV_FUNC_HELPER_DIRECTORY = {'postgres': _PGAdvFuncHelper(),
-                             'sqlite': _SqliteAdvFuncHelper(),
-                             None: _GenericAdvFuncHelper()}
 
 
 ## Main functions #############################################################
@@ -638,11 +562,6 @@ def set_prefered_driver(database, module, _drivers=PREFERED_DRIVERS):
     except ValueError:
         raise UnknownDriver('Unknown module %s for %s' % (module, database))
     modules.insert(0, module)
-
-def get_adv_func_helper(driver):
-    """returns an advanced function helper for the given driver"""
-    return ADV_FUNC_HELPER_DIRECTORY.get(driver,
-                                         ADV_FUNC_HELPER_DIRECTORY[None])
     
 def get_dbapi_compliant_module(driver, prefered_drivers = None, quiet = False,
                                pywrap = False):
@@ -654,6 +573,7 @@ def get_dbapi_compliant_module(driver, prefered_drivers = None, quiet = False,
             msg = 'No Adapter found for %s, returning native module'
             print >> sys.stderr, msg % err.objname
         mod = err.adapted_obj
+    from logilab.common.adbh import get_adv_func_helper
     mod.adv_func_helper = get_adv_func_helper(driver)
     return mod
 
@@ -679,3 +599,7 @@ def get_connection(driver='postgres', host='', database='', user='',
     if port:
         port = int(port)
     return adapted_module.connect(host, database, user, password, port=port)
+
+
+from logilab.common.deprecation import moved
+get_adv_func_helper = moved('logilab.common.adbh', 'get_adv_func_helper')

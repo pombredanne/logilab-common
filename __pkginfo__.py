@@ -1,4 +1,4 @@
-# Copyright (c) 2003-2007 LOGILAB S.A. (Paris, FRANCE).
+# Copyright (c) 2003-2008 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 
 # This program is free software; you can redistribute it and/or modify it under
@@ -17,11 +17,11 @@
 
 distname = 'logilab-common'
 modname = 'common'
-numversion = (0, 22, 2)
+numversion = (0, 28, 0)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
-copyright = '''Copyright (c) 2003-2007 LOGILAB S.A. (Paris, FRANCE).
+copyright = '''Copyright (c) 2003-2008 LOGILAB S.A. (Paris, FRANCE).
 http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
 
 author = "Logilab"
@@ -44,7 +44,7 @@ modules,
   * logging"""
 
 
-web = "http://www.logilab.org/Project/name/%s" % distname
+web = "http://www.logilab.org/project/%s" % distname
 ftp = "ftp://ftp.logilab.org/pub/%s" % modname
 mailinglist = "mailto://python-projects@lists.logilab.org"
 

@@ -1,4 +1,67 @@
-logilab-common (0.22.1-2) unstable; urgency=low
+logilab-common (0.28.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Adrien.DiMascio <Adrien.DiMascio@logilab.fr>  Tue, 05 Feb 2008 11:41:55 +0100
+
+logilab-common (0.27.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Thénault <Sylvain.Thenault@logilab.fr>  Fri, 25 Jan 2008 11:10:21 +0100
+
+logilab-common (0.26.1-1) unstable; urgency=low
+
+  * new upstream release
+  * updated standards to 3.7.3
+  * Fixed Homepage header
+  * tests are no longer installed in the doc package
+
+ -- Alexandre Fayolle <afayolle@debian.org>  Tue, 10 Jan 2008 09:38:22 +0100
+
+logilab-common (0.26.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Thénault <Sylvain.Thenault@logilab.fr>  Mon, 07 Jan 2008 16:05:45 +0100
+
+logilab-common (0.25.2-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Thénault <Sylvain.Thenault@logilab.fr>  Thu, 20 Dec 2007 16:52:11 +0100
+
+logilab-common (0.25.1-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Thénault <Sylvain.Thenault@logilab.fr>  Tue, 11 Dec 2007 10:52:26 +0100
+
+logilab-common (0.25.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Thénault <Sylvain.Thenault@logilab.fr>  Mon, 26 Nov 2007 10:41:46 +0100
+
+logilab-common (0.24.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Thénault <sylvain.thenault@logilab.fr>  Mon, 29 Oct 2007 10:31:28 +0100
+
+logilab-common (0.23.1-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Thénault <sylvain.thenault@logilab.fr>  Tue, 23 Oct 2007 21:16:41 +0200
+
+logilab-common (0.23.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Sylvain Thénault <sylvain.thenault@logilab.fr>  Wed, 17 Oct 2007 17:09:02 +0200
+
+logilab-common (0.22.2-1) unstable; urgency=low
 
   * new upstream release
 

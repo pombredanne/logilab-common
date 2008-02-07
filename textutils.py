@@ -1,6 +1,3 @@
-# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
-#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
 # Foundation; either version 2 of the License, or (at your option) any later
@@ -16,7 +13,7 @@
 """Some text manipulation utility functions.
 
 :author:    Logilab
-:copyright: 2003-2006 LOGILAB S.A. (Paris, FRANCE)
+:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 
 :group text formatting: normalize_text, normalize_paragraph, pretty_match,\
@@ -48,7 +45,42 @@ unquote, colorize_ansi
 __docformat__ = "restructuredtext en"
 
 import re
+from unicodedata import normalize as _uninormalize
 from os import linesep
+
+
+MANUAL_UNICODE_MAP = {
+    u'\xa1': u'!',    # INVERTED EXCLAMATION MARK
+    u'\u0142': u'l',  # LATIN SMALL LETTER L WITH STROKE
+    u'\u2044': u'/',  # FRACTION SLASH
+    u'\xc6': u'AE',   # LATIN CAPITAL LETTER AE
+    u'\xa9': u'(c)',  # COPYRIGHT SIGN
+    u'\xab': u'"',    # LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+    u'\xe6': u'ae',   # LATIN SMALL LETTER AE
+    u'\xae': u'(r)',  # REGISTERED SIGN
+    u'\u0153': u'oe', # LATIN SMALL LIGATURE OE
+    u'\u0152': u'OE', # LATIN CAPITAL LIGATURE OE
+    u'\xd8': u'O',    # LATIN CAPITAL LETTER O WITH STROKE
+    u'\xf8': u'o',    # LATIN SMALL LETTER O WITH STROKE
+    u'\xbb': u'"',    # RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+    u'\xdf': u'ss',   # LATIN SMALL LETTER SHARP S
+    }
+
+def unormalize(ustring, ignorenonascii=False):
+    """replace diacritical characters with their corresponding ascii characters
+    """
+    res = []
+    for letter in ustring[:]:
+        try:
+            replacement = MANUAL_UNICODE_MAP[letter]
+        except KeyError:
+            if ord(letter) >= 2**8:
+                if ignorenonascii:
+                    continue
+                raise ValueError("can't deal with non-ascii based characters")
+            replacement = _uninormalize('NFD', letter)[0]
+        res.append(replacement)
+    return u''.join(res)
 
 def unquote(string):
     """remove optional quotes (simple or double) from the string
@@ -99,7 +131,7 @@ def normalize_text(text, line_len=80, indent='', rest=False):
     result = []
     for text in _BLANKLINES_RGX.split(text):
         result.append(normp(text, line_len, indent))
-    return ('%s%s' % (linesep, linesep)).join(result)
+    return ('%s%s%s' % (linesep, indent, linesep)).join(result)
 
 
 def normalize_paragraph(text, line_len=80, indent=''):
@@ -124,10 +156,11 @@ def normalize_paragraph(text, line_len=80, indent=''):
       indentation string
     """
     text = _NORM_SPACES_RGX.sub(' ', text)
+    line_len = line_len - len(indent)
     lines = []
     while text:
-        aline, text = splittext(indent + text.strip(), line_len)
-        lines.append(aline)
+        aline, text = splittext(text.strip(), line_len)
+        lines.append(indent + aline)
     return linesep.join(lines)
     
 def normalize_rest_paragraph(text, line_len=80, indent=''):
@@ -153,20 +186,21 @@ def normalize_rest_paragraph(text, line_len=80, indent=''):
     """
     toreport = ''
     lines = []
+    line_len = line_len - len(indent)
     for line in text.splitlines():
-        line = indent + toreport + _NORM_SPACES_RGX.sub(' ', line.strip())
+        line = toreport + _NORM_SPACES_RGX.sub(' ', line.strip())
         toreport = ''
         while len(line) > line_len:
             # too long line, need split
             line, toreport = splittext(line, line_len)
-            lines.append(line)
+            lines.append(indent + line)
             if toreport:
-                line = indent + toreport + ' '
+                line = toreport + ' '
                 toreport = ''
             else:
                 line = ''
         if line:
-            lines.append(line.strip())
+            lines.append(indent + line.strip())
     return linesep.join(lines)
 
 def splittext(text, line_len):

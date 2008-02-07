@@ -1,22 +1,25 @@
-# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
-
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
 # Foundation; either version 2 of the License, or (at your option) any later
 # version.
-
+#
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 """
 Some shell/term utilities, useful to write some python scripts instead of shell
 scripts
+
+:author:    Logilab
+:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
+:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 """
+
+__docformat__ = "restructuredtext en"
 
 import os        
 import glob
@@ -24,9 +27,35 @@ import shutil
 import sys
 import tempfile
 import time
-from os.path import exists, isdir, basename, join, walk
+from os.path import exists, isdir, islink, basename, join, walk
 
 from logilab.common import STD_BLACKLIST
+
+
+def chown(path, login=None, group=None):
+    """same as `os.chown` function but accepting user login or group name as
+    argument. If login or group is omitted, it's left unchanged.
+
+    Note: you must own the file to chown it (or be root). Otherwise OSError is raised. 
+    """
+    if login is None:
+        uid = -1
+    else:
+        try:
+            uid = int(login)
+        except ValueError:
+            import pwd
+            uid = pwd.getpwname(login).pw_uid
+    if group is None:
+        gid = -1
+    else:
+        try:
+            gid = int(group)
+        except ValueError:
+            import grp
+            gid = grp.getgrname(group).gr_gid
+    os.chown(path, uid, gid)
+        
 
 def mv(source, destination, _action=shutil.move):
     """a shell like mv, supporting wildcards
@@ -54,7 +83,9 @@ def rm(*files):
     """
     for wfile in files:
         for filename in glob.glob(wfile):
-            if isdir(filename):
+            if islink(filename):
+                os.remove(filename)
+            elif isdir(filename):
                 shutil.rmtree(filename)
             else:
                 os.remove(filename)

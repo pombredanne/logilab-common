@@ -53,6 +53,7 @@ def cached(callableobj, keyarg=None):
                 _cache[key] = callableobj(self, *args, **kwargs)
             return _cache[key]
         return cache_wrapper2
+
     def cache_wrapper3(self, *args):
         cache = '_%s_cache_' % callableobj.__name__
         #print 'cache3?', cache, self, args
@@ -100,3 +101,21 @@ class wproperty(object):
     def __get__(self, obj, cls):
         assert obj is not None
         return getattr(obj, self.attrname)
+
+
+class classproperty(object):
+    def __init__(self, get):
+        self.get = get
+    def __get__(self, inst, cls):
+        return self.get(cls)
+
+from time import clock
+def timed(f):
+    def wrap(*args, **kwargs):
+        t = clock()
+        #for i in range(100):
+        res = f(*args, **kwargs)
+        print '%s time: %.9f' % (f.__name__, clock() - t)
+        return res
+    return wrap
+
