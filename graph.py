@@ -89,14 +89,15 @@ class DotBackend:
     def emit_edge(self, name1, name2, **props):
         """emits edge from <name1> to <name2>
         
-        authorized props: label, style, color, dir, weight
+        authorized props: see http://www.graphviz.org/doc/info/attrs.html
         """
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
         self.emit('edge [%s];' % ", ".join(attrs))
         self.emit('%s -> %s' % (normalize_node_id(name1), normalize_node_id(name2)))
 
     def emit_node(self, name, **props):
-        """authorized props: shape, label, color, fillcolor, style"""
+        """authorized props: see http://www.graphviz.org/doc/info/attrs.html
+        """
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
         self.emit('%s [%s];' % (normalize_node_id(name), ", ".join(attrs)))
 
@@ -118,7 +119,7 @@ class GraphGenerator:
             props = propshdlr.node_properties(node)
             self.backend.emit_node(nodeid, **props)
         for subjnode, objnode, edge in visitor.edges():
-            props = propshdlr.edge_properties(edge)
+            props = propshdlr.edge_properties(edge, subjnode, objnode)
             self.backend.emit_edge(subjnode, objnode, **props)
         return self.backend.generate(outputfile)
 
