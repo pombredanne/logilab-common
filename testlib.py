@@ -316,18 +316,22 @@ class SkipAwareTestResult(unittest._TextTestResult):
                                                   descriptions, verbosity)
         self.skipped = []
         self.debuggers = []
-        self.descrs = []
+        self.fail_descrs = []
+        self.error_descrs = []
         self.exitfirst = exitfirst
         self.capture = capture
         self.printonly = printonly
         self.pdbmode = pdbmode
         self.cvg = cvg
         self.pdbclass = Debugger
-        
-    def _create_pdb(self, test_descr):
+
+    def descrs_for(self, flavour):
+        return getattr(self, '%s_descrs' % flavour.lower())
+    
+    def _create_pdb(self, test_descr, flavour):
         if self.pdbmode:
             self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
-            self.descrs.append(test_descr)
+        self.descrs_for(flavour).append(test_descr)
         
     def addError(self, test, err):
         exc_type, exc, tcbk = err
@@ -336,17 +340,19 @@ class SkipAwareTestResult(unittest._TextTestResult):
         else:
             if self.exitfirst:
                 self.shouldStop = True
+            descr = self.getDescription(test)
             super(SkipAwareTestResult, self).addError(test, err)
-            self._create_pdb(self.getDescription(test))
+            self._create_pdb(descr, 'error')
 
     def addFailure(self, test, err):
         if self.exitfirst:
             self.shouldStop = True
+        descr = self.getDescription(test)
         super(SkipAwareTestResult, self).addFailure(test, err)
-        self._create_pdb(self.getDescription(test))
+        self._create_pdb(descr, 'fail')
 
     def addSkipped(self, test, reason):
-        self.skipped.append((test, reason))
+        self.skipped.append((test, self.getDescription(test), reason))
         if self.showAll:
             self.stream.writeln("SKIPPED")
         elif self.dots:
@@ -357,15 +363,15 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.printSkippedList()
         
     def printSkippedList(self):
-        for test, err in self.skipped:
+        for test, descr, err in self.skipped:
             self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % ('SKIPPED', self.getDescription(test)))
+            self.stream.writeln("%s: %s" % ('SKIPPED', descr))
             self.stream.writeln("\t%s" % err)
 
     def printErrorList(self, flavour, errors):
-        for test, err in errors:
+        for descr, (test, err) in zip(self.descrs_for(flavour), errors):
             self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % (flavour,self.getDescription(test)))
+            self.stream.writeln("%s: %s" % (flavour, descr))
             self.stream.writeln(self.separator2)
             self.stream.writeln("%s" % err)
             try:
