@@ -273,9 +273,11 @@ def _count(n, word):
     
 
 ## PostMortem Debug facilities #####
-def start_interactive_mode(debuggers, descrs):
+def start_interactive_mode(result):
     """starts an interactive shell so that the user can inspect errors
     """
+    debuggers = result.debuggers
+    descrs = result.error_descrs + result.fail_descrs
     if len(debuggers) == 1:
         # don't ask for test name if there's only one failure
         debuggers[0].start()
@@ -283,7 +285,8 @@ def start_interactive_mode(debuggers, descrs):
         while True:
             testindex = 0
             print "Choose a test to debug:"
-            print "\n".join(['\t%s : %s' % (i, descr) for i, descr in enumerate(descrs)])
+            # order debuggers in the same way than errors were printed
+            print "\n".join(['\t%s : %s' % (i, descr) for i, (_, descr) in enumerate(descrs)])
             print "Type 'exit' (or ^D) to quit"
             print
             try:
@@ -294,7 +297,7 @@ def start_interactive_mode(debuggers, descrs):
                 else:
                     try:
                         testindex = int(todebug)
-                        debugger = debuggers[testindex]
+                        debugger = debuggers[descrs[testindex][0]]
                     except (ValueError, IndexError):
                         print "ERROR: invalid test number %r" % (todebug,)
                     else:
@@ -329,9 +332,9 @@ class SkipAwareTestResult(unittest._TextTestResult):
         return getattr(self, '%s_descrs' % flavour.lower())
     
     def _create_pdb(self, test_descr, flavour):
+        self.descrs_for(flavour).append( (len(self.debuggers), test_descr) )
         if self.pdbmode:
             self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
-        self.descrs_for(flavour).append(test_descr)
         
     def addError(self, test, err):
         exc_type, exc, tcbk = err
@@ -369,7 +372,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
             self.stream.writeln("\t%s" % err)
 
     def printErrorList(self, flavour, errors):
-        for descr, (test, err) in zip(self.descrs_for(flavour), errors):
+        for (_, descr), (test, err) in zip(self.descrs_for(flavour), errors):
             self.stream.writeln(self.separator1)
             self.stream.writeln("%s: %s" % (flavour, descr))
             self.stream.writeln(self.separator2)
@@ -697,7 +700,7 @@ Examples:
             warn("PYDEBUG usage is deprecated, use -i / --pdb instead", DeprecationWarning)
             self.pdbmode = True
         if result.debuggers and self.pdbmode:
-            start_interactive_mode(result.debuggers, result.descrs)
+            start_interactive_mode(result)
         if not self.batchmode:
             sys.exit(not result.wasSuccessful())
         self.result = result
