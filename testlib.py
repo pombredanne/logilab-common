@@ -51,7 +51,7 @@ except ImportError:
 
 from logilab.common.deprecation import class_renamed, deprecated_function, \
      obsolete
-from logilab.common.compat import set, enumerate
+from logilab.common.compat import set, enumerate, any
 from logilab.common.modutils import load_module_from_name
 from logilab.common.debugger import Debugger
 from logilab.common.decorators import cached
@@ -424,11 +424,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         self.skipped_patterns = skipped_patterns
 
     def _this_is_skipped(self, testedname):
-        for pattern in self.skipped_patterns:
-            if pattern in testedname:
-                return True
-        return False
-
+        return any( (pat in testedname) for pat in self.skipped_patterns )
 
     def _runcondition(self, test, skipgenerator=True):
         if isinstance(test, InnerTest):
@@ -460,12 +456,10 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         except ValueError:
             return self.test_pattern in testname
     
-        
     def _makeResult(self):
         return SkipAwareTestResult(self.stream, self.descriptions, self.verbosity,
                                    self.exitfirst, self.capture, self.printonly,
                                    self.pdbmode, self.cvg)
-
 
     def run(self, test):
         "Run the given test case or test suite."
@@ -526,6 +520,14 @@ class NonStrictTestLoader(unittest.TestLoader):
     """
     suiteClass = TestSuite
 
+    def __init__(self):
+        self.skipped_patterns = []
+
+    def loadTestsFromNames(self, names, module=None):
+        suites = []
+        for name in names:
+            suites.extend(self.loadTestsFromName(name, module))
+        return self.suiteClass(suites)
 
     def _collect_tests(self, module):
         tests = {}
@@ -533,6 +535,8 @@ class NonStrictTestLoader(unittest.TestLoader):
             if (issubclass(type(obj), (types.ClassType, type)) and
                  issubclass(obj, unittest.TestCase)):
                 classname = obj.__name__
+                if self._this_is_skipped(classname):
+                    continue
                 methodnames = []
                 # obj is a TestCase class
                 for attrname in dir(obj):
@@ -543,13 +547,6 @@ class NonStrictTestLoader(unittest.TestLoader):
                 # keep track of class (obj) for convenience
                 tests[classname] = (obj, methodnames)
         return tests
-
-    def loadTestsFromNames(self, names, module=None):
-        suites = []
-        for name in names:
-            suites.extend(self.loadTestsFromName(name, module))
-        return self.suiteClass(suites)
-
 
     def loadTestsFromSuite(self, module, suitename):
         try:
@@ -562,7 +559,6 @@ class NonStrictTestLoader(unittest.TestLoader):
         # _tests explicitly
         return suite._tests
     
-
     def loadTestsFromName(self, name, module=None):
         parts = name.split('.')
         if module is None or len(parts) > 2:
@@ -594,8 +590,19 @@ class NonStrictTestLoader(unittest.TestLoader):
                 collected = [klass(methodname) for methodname in methodnames]
         return collected
 
+    def _this_is_skipped(self, testedname):
+        return any( (pat in testedname) for pat in self.skipped_patterns )
 
+    def getTestCaseNames(self, testCaseClass):
+        """Return a sorted sequence of method names found within testCaseClass
+        """
+        is_skipped = self._this_is_skipped
+        if is_skipped(testCaseClass.__name__):
+            return []
+        testnames = super(NonStrictTestLoader, self).getTestCaseNames(testCaseClass)
+        return [testname for testname in testnames if not is_skipped(testname)]
 
+    
 class SkipAwareTestProgram(unittest.TestProgram):
     # XXX: don't try to stay close to unittest.py, use optparse
     USAGE = """\
@@ -655,6 +662,7 @@ Examples:
                     self.printonly = re.compile(value)
                 if opt in ('-s', '--skip'):
                     self.skipped_patterns = [pat.strip() for pat in value.split(',')]
+            self.testLoader.skipped_patterns = self.skipped_patterns
             if self.printonly is not None:
                 self.capture += 1
             if len(args) == 0 and self.defaultTest is None:

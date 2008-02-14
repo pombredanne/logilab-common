@@ -437,6 +437,18 @@ class TestLoaderTC(TestCase):
         for pattern, expected_count in data:
             yield self.assertRunCount, pattern, MyMod, expected_count
 
+    def tests_nonregr_class_skipped_option(self):
+        class MyMod:
+            class MyTestCase(TestCase):
+                def test_foo(self): pass
+                def test_bar(self): pass
+            class FooTC(TestCase):
+                def test_foo(self): pass
+        self.assertRunCount('foo', MyMod, 2)
+        self.assertRunCount(None, MyMod, 3)
+        self.loader.skipped_patterns = self.runner.skipped_patterns = ['FooTC']
+        self.assertRunCount('foo', MyMod, 1)
+        self.assertRunCount(None, MyMod, 2)
     
 
 def bootstrap_print(msg, output=sys.stdout):
