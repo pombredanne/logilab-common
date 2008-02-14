@@ -24,7 +24,7 @@ Description: useful miscellaneous modules used by Logilab projects
   * generating of SQL queries
   * running unit tests
   * manipulating tree structures
-  * accessing RDBMS (currently postgreSQL, mysql and sqlite)
+  * accessing RDBMS (currently postgreSQL, MySQL and sqlite)
   * generating text and HTML reports
   * logging
 
