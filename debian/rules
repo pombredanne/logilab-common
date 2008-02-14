@@ -48,7 +48,8 @@ binary-indep: build install
 	dh_installdocs -i README changelog.gz
 	dh_installman -i
 	dh_link -i
-	dh_compress -i -X.py -X.ini -X.xml -Xtest
+	dh_compress -i -X.py -X.ini -X.xml -Xtest  
+	gzip -9 debian/python-logilab-common/usr/share/man/man1/pytest.1
 	dh_fixperms -i
 	dh_installdeb -i
 	dh_gencontrol -i 
