@@ -1,12 +1,12 @@
 ChangeLog for logilab.common
 ============================
 
---
+2008-02-15  --  0.28.1
     * testlib: introduce InnerTest class to name generative tests, fix
       generative tests description storage
     * pytest: fix -s option
     * modutils: included Stefan Rank's patch to deal with 2.4 relative import
-    * configuration: don't give option's keywords not recognized by optparse, 
+    * configuration: don't give option's keywords not recognized by optparse,
       fix merge_options function
 
 2008-02-05  --  0.28.0
