@@ -667,7 +667,7 @@ class OptionsProviderMixIn:
         elif optdict.get('inputlevel', 0) > inputlevel:
             self.set_option(option, default, opt_dict=optdict)
             return
-        elif optdict['type'] == 'password':
+        elif optdict['type'] == 'password' or default is None:
             defaultstr = ': '
         else:
             defaultstr = '(default: %s): ' % format_option_value(optdict, default)
