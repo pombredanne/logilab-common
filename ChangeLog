@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * adbh: mysql doesn't support ILIKE, implement list_indices for mysql
+    * db: mysql adapter use mx DateTime when available, fix unicode handling
+	
 2008-02-15  --  0.28.1
     * testlib: introduce InnerTest class to name generative tests, fix
       generative tests description storage
