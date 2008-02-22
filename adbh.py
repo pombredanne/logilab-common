@@ -418,9 +418,10 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 
     
 class _MyAdvFuncHelper(_GenericAdvFuncHelper):
-    """Postgres helper, taking advantage of postgres SEQUENCE support
+    """MySQL helper, taking advantage of postgres SEQUENCE support
     """
     needs_from_clause = True
+    ilike_support = False # insensitive search by default
 
     # modifiable but should not be shared
     FUNCTIONS = _GenericAdvFuncHelper.FUNCTIONS.copy() 
@@ -494,6 +495,16 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
         """return the list of tables of a database"""
         cursor.execute("SHOW TABLES")
         return [r[0] for r in cursor.fetchall()]
+
+    def list_indices(self, cursor, table=None):
+        """return the list of indices of a database, only for the given table if specified"""
+        if table:
+            cursor.execute("SHOW INDEX FROM %s" % table)
+            return [r[2] for r in cursor.fetchall()]
+        allindices = []
+        for table in self.list_tables(cursor):
+            allindices += self.list_indices(cursor, table)
+        return allindices
 
 
     

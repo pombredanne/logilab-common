@@ -425,8 +425,30 @@ class _MySqlDBAdapter(DBAPIAdapter):
     """Simple mysql Adapter to DBAPI
     """
     BOOLEAN = 'XXX' # no specific type code for boolean
+
+    def __init__(self, native_module, pywrap=False):
+        DBAPIAdapter.__init__(self, native_module, pywrap)
+        self._init_module()
+
+    def _init_module(self):
+        """initialize mysqldb to use mx.DateTime for date and timestamps"""
+        natmod = self._native_module
+        if hasattr(natmod, '_lc_initialized'):
+            return
+        natmod._lc_initialized = 1
+        # date/time types handling
+        if HAS_MX_DATETIME:
+            from MySQLdb import times
+            from mx import DateTime as mxdt
+            times.Date = times.date = mxdt.Date
+            times.Time = times.time = mxdt.Time
+            times.Timestamp = times.datetime = mxdt.DateTime
+            times.TimeDelta = times.timedelta = mxdt.TimeDelta
+            times.DateTimeType = mxdt.DateTimeType
+            times.DateTimeDeltaType = mxdt.DateTimeDeltaType
+            
     def connect(self, host='', database='', user='', password='', port=None,
-                unicode=True):
+                unicode=True, charset='utf8'):
         """Handles mysqldb connexion format
         the unicode named argument asks to use Unicode objects for strings
         in result sets and query parameters
@@ -438,6 +460,10 @@ class _MySqlDBAdapter(DBAPIAdapter):
         if port:
             kwargs['port'] = int(port)
         cnx = self._native_module.connect(**kwargs)
+        if unicode:
+            if charset.lower() == 'utf-8':
+                charset = 'utf8'
+            cnx.set_character_set(charset)
         return self._wrap_if_needed(cnx)
 
     def process_value(self, value, description, encoding='utf-8', binarywrap=None):
