@@ -44,7 +44,7 @@ def chown(path, login=None, group=None):
             uid = int(login)
         except ValueError:
             import pwd
-            uid = pwd.getpwname(login).pw_uid
+            uid = pwd.getpwnam(login).pw_uid
     if group is None:
         gid = -1
     else:
