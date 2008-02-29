@@ -43,8 +43,9 @@ def class_renamed(old_name, new_class, message=None):
     >>>
     """
     clsdict = {}
-    if message is not None:
-        clsdict['__deprecation_warning__'] = message
+    if message is None:
+        message = '%s is deprecated' % old_name
+    clsdict['__deprecation_warning__'] = message
     try:
         # new-style class
         return deprecated(old_name, (new_class,), clsdict)
