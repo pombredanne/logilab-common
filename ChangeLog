@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
 
- --
+2008-03-05  --  0.29.0
     * adbh: mysql doesn't support ILIKE, implement list_indices for mysql
     * db: mysql adapter use mx DateTime when available, fix unicode handling
 	
