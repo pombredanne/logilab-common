@@ -65,6 +65,7 @@ class DateTC(TestCase):
         x = now()
         self.assertEquals(nb(x,x), 0)
         self.assertEquals(nb(x,x+0.5), 1)
+        self.assertRaises(AssertionError, nb, x, x-1)
     
 if __name__ == '__main__':
     unittest_main()

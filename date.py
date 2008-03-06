@@ -84,6 +84,7 @@ else:
         return end
 
     def nb_open_days(start, end):
+        assert start <= end
         days = int(math.ceil((end - start).days))
         weeks, plus = divmod(days, 7)
         if start.day_of_week > end.day_of_week:
