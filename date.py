@@ -16,6 +16,7 @@
 
 """date manipulation helper functions"""
 
+import math
 
 try:
     from mx.DateTime import RelativeDateTime, strptime
@@ -82,7 +83,27 @@ else:
                     if x.day_of_week < 5])
         return end
 
+    def nb_open_days(start, end):
+        days = int(math.ceil((end - start).days))
+        weeks, plus = divmod(days, 7)
+        if start.day_of_week > end.day_of_week:
+            plus -= 2
+        elif end.day_of_week == 6:
+            plus -= 1
+        open_days = weeks * 5 + plus
+        nb_week_holidays = len([x for x in get_national_holidays(start,
+                                                                 end+1)
+                                if x.day_of_week < 5])
+        return open_days  - nb_week_holidays
 
+    #def nb_open_days(start, end):
+    #    """ brute-force version """
+    #    days = [x for x in date_range(start, end) if x.day_of_week < 5]
+    #    nb_week_holidays = len([x for x in get_national_holidays(start,
+    #                                                             end+1)
+    #                            if x.day_of_week < 5])
+    #    return len(days) - nb_week_holidays
+    
 def date_range(begin, end, step=STEP):
     """
     enumerate dates between begin and end dates.

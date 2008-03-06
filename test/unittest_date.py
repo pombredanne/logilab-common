@@ -8,10 +8,10 @@ from logilab.common.date import date_range
 
 try:
     from mx.DateTime import Date, RelativeDate
-    from logilab.common.date import endOfMonth, add_days_worked
+    from logilab.common.date import endOfMonth, add_days_worked, nb_open_days
 except ImportError:
     from datetime import date as Date
-    endOfMonth = add_days_worked = None
+    endOfMonth = add_days_worked = nb_open_days = None
 
 class DateTC(TestCase):
     
@@ -48,7 +48,20 @@ class DateTC(TestCase):
         # skip holiday + week-end
         self.assertEquals(add(Date(2008, 4, 30), 2), Date(2008, 5, 4))
 
-
+    def test_nb_open_days(self):
+        if nb_open_days is None:
+            self.skip('mx.DateTime is not installed')
+        nb = nb_open_days
+        self.assertEquals(nb(Date(2008, 3, 4), Date(2008, 3, 7)), 3) 
+        self.assertEquals(nb(Date(2008, 3, 4), Date(2008, 3, 5)), 1) 
+        self.assertEquals(nb(Date(2008, 3, 7), Date(2008, 3, 10)), 1) 
+        self.assertEquals(nb(Date(2008, 3, 7), Date(2008, 3, 17)), 6) 
+        self.assertEquals(nb(Date(2008, 3, 18), Date(2008, 3, 26)), 5) 
+        self.assertEquals(nb(Date(2008, 3, 7), Date(2008, 3, 8)), 1) 
+        self.assertEquals(nb(Date(2008, 3, 7), Date(2008, 3, 9)), 1) 
+        self.assertEquals(nb(Date(2008, 3, 8), Date(2008, 3, 9)), 0) 
+        self.assertEquals(nb(Date(2008, 3, 8), Date(2008, 3, 10)), 0) 
+        self.assertEquals(nb(Date(2008, 3, 8), Date(2008, 3, 11)), 1) 
     
 if __name__ == '__main__':
     unittest_main()
