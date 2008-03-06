@@ -7,7 +7,7 @@ from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.date import date_range
 
 try:
-    from mx.DateTime import Date, RelativeDate
+    from mx.DateTime import Date, RelativeDate, now
     from logilab.common.date import endOfMonth, add_days_worked, nb_open_days
 except ImportError:
     from datetime import date as Date
@@ -62,6 +62,9 @@ class DateTC(TestCase):
         self.assertEquals(nb(Date(2008, 3, 8), Date(2008, 3, 9)), 0) 
         self.assertEquals(nb(Date(2008, 3, 8), Date(2008, 3, 10)), 0) 
         self.assertEquals(nb(Date(2008, 3, 8), Date(2008, 3, 11)), 1) 
+        x = now()
+        self.assertEquals(nb(x,x), 0)
+        self.assertEquals(nb(x,x+0.5), 1)
     
 if __name__ == '__main__':
     unittest_main()
