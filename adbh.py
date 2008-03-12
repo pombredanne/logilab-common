@@ -438,19 +438,19 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
                        keepownership=True):
         """return a command to backup the given database"""
         # XXX compress
-        return 'mysqldump -h %s -u %s -r %s %s' % (dbhost, dbuser, backupfile, dbname)
+        return 'mysqldump -h %s -u %s -p -r %s %s' % (dbhost, dbuser, backupfile, dbname)
     
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
         """return a list of commands to restore a backup the given database"""
         cmds = []
         if drop:
-            cmd = 'echo "DROP DATABASE %s;" | mysql -h %s -u %s' % (dbname, dbhost, dbuser)
+            cmd = 'echo "DROP DATABASE %s;" | mysql -h %s -u %s -p' % (dbname, dbhost, dbuser)
             cmds.append(cmd)
-        cmd = 'echo "%s;" | mysql -h %s -u %s' % (self.sql_create_database(dbname, encoding),
+        cmd = 'echo "%s;" | mysql -h %s -u %s -p' % (self.sql_create_database(dbname, encoding),
                                                   dbhost, dbuser)
         cmds.append(cmd)
-        cmd = pgdbcmd('mysql -h %s -u %s < %s' % (dbname, dbhost, dbuser, backupfile))
+        cmd = pgdbcmd('mysql -h %s -u %s -p < %s' % (dbname, dbhost, dbuser, backupfile))
         cmds.append(cmd)
         return cmds
                 
