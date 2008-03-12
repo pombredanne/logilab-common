@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+2008-03-12  --  0.29.1
+    * date: new nb_open_days function counting worked days between two date
+    * adbh: add -p option to mysql commands to ask for password
+	
 2008-03-05  --  0.29.0
     * adbh: mysql doesn't support ILIKE, implement list_indices for mysql
     * db: mysql adapter use mx DateTime when available, fix unicode handling
