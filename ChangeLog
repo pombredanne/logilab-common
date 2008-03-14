@@ -1,5 +1,6 @@
 ChangeLog for logilab.common
 ============================
+	
 --
     * db: remember logged user on the connection
 	

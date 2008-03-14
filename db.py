@@ -94,8 +94,10 @@ def _import_driver_module(driver, drivers, imported_elements=None, quiet=True):
 
 ## Connection and cursor wrappers #############################################
         
-class PyConnection:
-    """A simple connection wrapper in python (useful for profiling)"""
+class SimpleConnectionWrapper:
+    """A simple connection wrapper in python to decorated C-level connections
+    with additional attributes
+    """
     def __init__(self, cnx):
         """Wraps the original connection object"""
         self._cnx = cnx
@@ -103,7 +105,7 @@ class PyConnection:
     # XXX : Would it work if only __getattr__ was defined 
     def cursor(self):
         """Wraps cursor()"""
-        return PyCursor(self._cnx.cursor())
+        return self._cnx.cursor()
 
     def commit(self):
         """Wraps commit()"""
@@ -119,6 +121,20 @@ class PyConnection:
 
     def __getattr__(self, attrname):
         return getattr(self._cnx, attrname)    
+
+class PyConnection(SimpleConnectionWrapper):
+    """A simple connection wrapper in python, generating wrapper for cursors as
+    well (useful for profiling)
+    """
+    def __init__(self, cnx):
+        """Wraps the original connection object"""
+        self._cnx = cnx
+        
+    def cursor(self):
+        """Wraps cursor()"""
+        return PyCursor(self._cnx.cursor())
+
+
 
 class PyCursor:
     """A simple cursor wrapper in python (useful for profiling)"""
@@ -179,7 +195,12 @@ class DBAPIAdapter:
         """
         if self._pywrap:
             cnx = PyConnection(cnx)
-        cnx.logged_user = user
+        try:
+            cnx.logged_user = user
+        except AttributeError:
+            # C or __slots__ object
+            cnx = SimpleConnectionWrapper(cnx)
+            cnx.logged_user = user            
         return cnx
     
     def __getattr__(self, attrname):
