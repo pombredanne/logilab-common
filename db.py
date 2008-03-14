@@ -397,7 +397,7 @@ class _PySqlite2Adapter(DBAPIAdapter):
             def __getattr__(self, attrname):
                 return getattr(self._cnx, attrname)
         cnx = sqlite.connect(database, detect_types=sqlite.PARSE_DECLTYPES)
-        return self._wrap_if_needed(PySqlite2CnxWrapper(cnx))
+        return self._wrap_if_needed(PySqlite2CnxWrapper(cnx), user)
     
     def process_value(self, value, description, encoding='utf-8', binarywrap=None):
         if not binarywrap is None and isinstance(value, self._native_module.Binary):
