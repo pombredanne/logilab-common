@@ -105,8 +105,7 @@ def moved(modpath, objname):
     instead (which has no lazy import feature though).
     """
     def callnew(*args, **kwargs):
-        message = "this object has been moved, it's now %s" % (
-            modpath, objname)
+        message = "object %s has been moved to module %s" % (objname, modpath)
         warn(message, DeprecationWarning, stacklevel=2)
         m = load_module_from_name(modpath)
         return getattr(m, objname)(*args, **kwargs)
