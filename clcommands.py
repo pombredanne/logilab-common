@@ -1,6 +1,3 @@
-# Copyright (c) 2004-2007 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
-#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
 # Foundation; either version 2 of the License, or (at your option) any later
@@ -17,6 +14,10 @@
 one command
 e.g called as "tool command [options] args..." where <options> and <args> are
 command'specific
+
+:author:    Logilab
+:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
+:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 """
 
 import sys
@@ -26,7 +27,7 @@ from logilab.common.configuration import Configuration
 
 
 DEFAULT_COPYRIGHT = '''\
-Copyright (c) 2004-2007 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+Copyright (c) 2004-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
 
 
@@ -40,6 +41,8 @@ class Command(Configuration):
     """base class for command line commands"""
     arguments = ''
     name = ''
+    # hidden from help ?
+    hidden = False
     # max/min args, None meaning unspecified
     min_args = None
     max_args = None
@@ -98,8 +101,9 @@ command. Available commands are :\n''')
     padding = ' '*max_len
     for command in commands:
         cmd = _COMMANDS[command]
-        title = cmd.__doc__.split('.')[0]
-        print ' ', (command+padding)[:max_len], title
+        if not cmd.hidden:
+            title = cmd.__doc__.split('.')[0]
+            print ' ', (command+padding)[:max_len], title
     print '\n', copyright
     sys.exit(status)
 
@@ -133,3 +137,28 @@ def main_run(args, doc):
     except BadCommandUsage, err:
         print 'ERROR: ', err
         main_usage(1, doc)
+
+
+class ListCommandsCommand(Command):
+    """list available commands, useful for bash completion."""
+    name = 'listcommands'
+    arguments = '[command]'    
+    hidden = True
+    
+    def run(self, args):
+        """run the command with its specific arguments"""
+        if args:
+            command = pop_arg(args)
+            cmd = _COMMANDS[command]
+            for optname, optdict in cmd.options:
+                print '--help'
+                print '--' + optname
+        else:
+            commands = _COMMANDS.keys()
+            commands.sort()
+            for command in commands:
+                cmd = _COMMANDS[command]
+                if not cmd.hidden:
+                    print command
+                
+register_commands([ListCommandsCommand])

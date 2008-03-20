@@ -3,6 +3,10 @@ ChangeLog for logilab.common
 	
 --
     * db: remember logged user on the connection
+    * clcommands: commands may be hidden (eg not displayed in help), generic
+      ListCommandsCommand useful to build bash completion helpers
+    * changelog: module to parse ChangeLog file as this one, backported from
+      logilab.devtools
 	
 2008-03-12  --  0.29.1
     * date: new nb_open_days function counting worked days between two date
