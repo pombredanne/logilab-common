@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
-	
---
+
+2008-03-26  --  0.30.0
     * db: remember logged user on the connection
     * clcommands: commands may be hidden (eg not displayed in help), generic
       ListCommandsCommand useful to build bash completion helpers
