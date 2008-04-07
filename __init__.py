@@ -93,7 +93,30 @@ class nullobject(object):
     def __nonzero__(self):
         return False
 
-# XXX move in a specific module
+# flatten -----
+# XXX move in a specific module and use yield instead
+# do not mix flatten and translate
+#
+# def iterable(obj):
+#    try: iter(obj)
+#    except: return False
+#    return True
+#
+# def is_string_like(obj):
+#    try: obj +''
+#    except (TypeError, ValueError): return False
+#    return True
+#
+#def is_scalar(obj):
+#    return is_string_like(obj) or not iterable(obj)
+#
+#def flatten(seq):
+#    for item in seq:
+#        if is_scalar(item): 
+#            yield item
+#        else:
+#            for subitem in flatten(item):
+#               yield subitem
 
 def flatten(iterable, tr_func=None, results=None):
     """flatten a list of list with any level
