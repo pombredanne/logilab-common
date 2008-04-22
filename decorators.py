@@ -92,7 +92,7 @@ def copy_cache(obj, funcname, cacheobj):
 
 class wproperty(object):
     """simple descriptor expecting to take a modifier function as first argument
-    and looking for a _<function name> to retreive the attribute
+    and looking for a _<function name> to retrieve the attribute
     """
     def __init__(self, setfunc):
         self.setfunc = setfunc
