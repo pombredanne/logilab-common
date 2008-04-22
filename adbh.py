@@ -89,7 +89,7 @@ class _GenericAdvFuncHelper:
     # DBMS resources descriptors and accessors
     
     needs_from_clause = False
-    
+    union_parentheses_support = True
     users_support = True
     groups_support = True
     ilike_support = True
@@ -401,6 +401,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     
     users_support = groups_support = False
     ilike_support = False
+    union_parentheses_support = False
     
     def list_tables(self, cursor):
         """return the list of tables of a database"""
