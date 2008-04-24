@@ -1092,7 +1092,7 @@ class TestCase(unittest.TestCase):
     def assertSetEquals(self, got, expected):
         """compares two iterables and shows difference between both"""
         got, expected = list(got), list(expected)
-        self.assertEquals(len(got), len(expected))
+        self.assertEquals(len(got), len(expected), '%s != %s' % (got, expected))
         got, expected = set(got), set(expected)
         if got != expected:
             missing = expected - got
@@ -1184,9 +1184,9 @@ class TestCase(unittest.TestCase):
         """compares two files using difflib"""
         if msg is None:
             if strict:
-                msg = '%s is not of class %s but of %s'
+                msg = '%r is not of class %s but of %s'
             else:
-                msg = '%s is not an instance of %s but of %s'
+                msg = '%r is not an instance of %s but of %s'
             msg = msg % (obj, klass, type(obj))
         if strict:
             self.assert_(obj.__class__ is klass, msg)
