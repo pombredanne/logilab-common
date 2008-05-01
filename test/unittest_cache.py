@@ -14,7 +14,8 @@ class CacheTestCase(TestCase):
         self.assert_(self.cache.data[1] == 'foo',"1 : 'foo' is not in cache.data")
         self.assert_(len(self.cache._usage) == 1, "lenght of usage list is not 1")
         self.assert_(self.cache._usage[-1] == 1, '1 is not the most recently used key')
-        self.assert_(self.cache._usage.sort() == self.cache.data.keys().sort(), "usage list and data keys are different")
+        self.assertSetEqual(self.cache._usage,
+                            self.cache.data.keys())# usage list and data keys are different
 
     def test_setitem2(self):
         """Checks that the setitem method works for multiple items"""
@@ -23,7 +24,8 @@ class CacheTestCase(TestCase):
         self.assert_(self.cache.data[2] == 'bar',"2 : 'bar' is not in cache.data")
         self.assert_(len(self.cache._usage) == 2, "lenght of usage list is not 2")
         self.assert_(self.cache._usage[-1] == 2, '1 is not the most recently used key')
-        self.assert_(self.cache._usage.sort() == self.cache.data.keys().sort(), "usage list and data keys are different")
+        self.assertSetEqual(self.cache._usage,
+                            self.cache.data.keys())# usage list and data keys are different
 
     def test_setitem3(self):
         """Checks that the setitem method works when replacing an element in the cache"""
@@ -32,7 +34,8 @@ class CacheTestCase(TestCase):
         self.assert_(self.cache.data[1] == 'bar',"1 : 'bar' is not in cache.data")
         self.assert_(len(self.cache._usage) == 1, "lenght of usage list is not 1")
         self.assert_(self.cache._usage[-1] == 1, '1 is not the most recently used key')
-        self.assert_(self.cache._usage.sort() == self.cache.data.keys().sort(), "usage list and data keys are different")
+        self.assertSetEqual(self.cache._usage,
+                            self.cache.data.keys())# usage list and data keys are different
 
     def test_recycling1(self):
         """Checks the removal of old elements"""
@@ -42,11 +45,14 @@ class CacheTestCase(TestCase):
         self.cache[4] = 'foz'
         self.cache[5] = 'fuz'
         self.cache[6] = 'spam'
-        self.assert_(not self.cache.data.has_key(1), 'key 1 has not been suppressed from the cache dictionnary')
-        self.assert_(1 not in self.cache._usage, 'key 1 has not been suppressed from the cache LRU list')
+        self.assert_(not self.cache.data.has_key(1),
+                     'key 1 has not been suppressed from the cache dictionnary')
+        self.assert_(1 not in self.cache._usage,
+                     'key 1 has not been suppressed from the cache LRU list')
         self.assert_(len(self.cache._usage) == 5, "lenght of usage list is not 5")
         self.assert_(self.cache._usage[-1] == 6, '6 is not the most recently used key')
-        self.assert_(self.cache._usage.sort() == self.cache.data.keys().sort(), "usage list and data keys are different")
+        self.assertSetEqual(self.cache._usage,
+                            self.cache.data.keys())# usage list and data keys are different
 
     def test_recycling2(self):
         """Checks that accessed elements get in the front of the list"""
@@ -57,7 +63,8 @@ class CacheTestCase(TestCase):
         a = self.cache[1]
         self.assert_(a == 'foo')
         self.assert_(self.cache._usage[-1] == 1, '1 is not the most recently used key')
-        self.assert_(self.cache._usage.sort() == self.cache.data.keys().sort(), "usage list and data keys are different")
+        self.assertSetEqual(self.cache._usage,
+                            self.cache.data.keys())# usage list and data keys are different
 
     def test_delitem(self):
         """Checks that elements are removed from both element dict and element
@@ -67,7 +74,8 @@ class CacheTestCase(TestCase):
         del self.cache['foo']
         self.assert_('foo' not in self.cache.data.keys(),"Element 'foo' was not removed cache dictionnary")
         self.assert_('foo' not in self.cache._usage,"Element 'foo' was not removed usage list")
-        self.assert_(self.cache._usage.sort() == self.cache.data.keys().sort(), "usage list and data keys are different")
+        self.assertSetEqual(self.cache._usage,
+                            self.cache.data.keys())# usage list and data keys are different
 
 
     def test_nullsize(self):
