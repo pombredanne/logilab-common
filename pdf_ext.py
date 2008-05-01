@@ -23,6 +23,9 @@ to merge fdf and pdf:
 without flatten, one could further edit the resulting form.
 with flatten, everything is turned into text.
 """
+# XXX seems very unix specific
+# TODO: check availability of pdftk at import 
+
 
 import os
 
