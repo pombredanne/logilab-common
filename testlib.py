@@ -501,18 +501,6 @@ class starargs(tuple):
         return tuple.__new__(cls, args)
 
 
-def is_testsuite(obj):
-    """convenience function which tests if `obj` is a TestSuite factory
-    """
-    if callable(obj):
-        try:
-            test = obj()
-            if isinstance(test, unittest.TestSuite):
-                return True
-        except TypeError:
-            return False
-        return False
-
 
 class NonStrictTestLoader(unittest.TestLoader):
     """
@@ -574,7 +562,7 @@ class NonStrictTestLoader(unittest.TestLoader):
         # python2.3 does not implement __iter__ on suites, we need to return
         # _tests explicitly
         return suite._tests
-
+    
     def loadTestsFromName(self, name, module=None):
         parts = name.split('.')
         if module is None or len(parts) > 2:
@@ -586,8 +574,7 @@ class NonStrictTestLoader(unittest.TestLoader):
         collected = []
         if len(parts) == 1:
             pattern = parts[0]
-            obj = getattr(module, pattern, None)
-            if is_testsuite(obj) and pattern not in tests:
+            if callable(getattr(module, pattern, None)) and pattern not in tests:
                 # consider it as a suite
                 return self.loadTestsFromSuite(module, pattern)
             if pattern in tests:

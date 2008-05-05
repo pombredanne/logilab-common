@@ -388,34 +388,8 @@ class TestLoaderTC(TestCase):
                 ]
         for pattern, expected_count in data:
             yield self.assertRunCount, pattern, MyMod, expected_count
-
-    def test_pattern_and_variable_conflict(self):
-        class MyMod:
-            today = staticmethod(lambda: None)
-            class MyTestCase(TestCase):
-                def test_today(self): pass
-        data = [('today', 1)]
-        for pattern, expected_count in data:
-            yield self.assertRunCount, pattern, MyMod, expected_count
             
-
-    def test_testsuite_handling(self):
-        class MyMod:
-            class MyTestCase(TestCase):
-                def test_x(self): pass
-                def test_y(self): pass
-                def test_z(self): pass
-            def suite():
-                suite = TestSuite()
-                suite.addTest(MyMod.MyTestCase('test_x'))
-                suite.addTest(MyMod.MyTestCase('test_y'))
-                return suite
-            suite = staticmethod(suite) # make it easily callable
-        data = [('MyTestCase.test_y', 1)]
-        data = [('suite', 2)]
-        for pattern, expected_count in data:
-            yield self.assertRunCount, pattern, MyMod, expected_count
-                
+        
     def test_collect_everything_and_skipped_patterns(self):
         testdata = [ (['foo1'], 3), (['foo'], 2),
                      (['foo', 'bar'], 0),
