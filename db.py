@@ -540,7 +540,7 @@ class _MySqlDBAdapter(DBAPIAdapter):
 PREFERED_DRIVERS = {
     "postgres" : [ 'psycopg2', 'psycopg', 'pgdb', 'pyPgSQL.PgSQL', ],
     "mysql" : [ 'MySQLdb', ], # 'pyMySQL.MySQL, ],
-    "sqlite" : ['sqlite3', 'pysqlite2.dbapi2', 'sqlite', ],
+    "sqlite" : ['pysqlite2.dbapi2', 'sqlite', 'sqlite3',],
     }
 
 _ADAPTERS = {
