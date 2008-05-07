@@ -1282,7 +1282,7 @@ class DocTest(TestCase):
     without this hack
     """
     skipped = ()
-    def __call__(self, result=None, runcondition=None):
+    def __call__(self, result=None, runcondition=None, options=None):
         try:
             finder = DocTestFinder(skipped=self.skipped)
             if sys.version_info >= (2, 4):
