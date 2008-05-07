@@ -400,11 +400,11 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
 
 class TestSuite(unittest.TestSuite):
-    def run(self, result, runcondition=None):
+    def run(self, result, runcondition=None, options=None):
         for test in self._tests:
             if result.shouldStop:
                 break
-            test(result, runcondition)
+            test(result, runcondition, options)
         return result
     
     # python2.3 compat
@@ -416,7 +416,8 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
     def __init__(self, stream=sys.stderr, verbosity=1,
                  exitfirst=False, capture=False, printonly=None,
-                 pdbmode=False, cvg=None, test_pattern=None, skipped_patterns=()):
+                 pdbmode=False, cvg=None, test_pattern=None, skipped_patterns=(),
+                 options=None):
         super(SkipAwareTextTestRunner, self).__init__(stream=stream,
                                                       verbosity=verbosity)
         self.exitfirst = exitfirst
@@ -426,6 +427,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         self.cvg = cvg
         self.test_pattern = test_pattern
         self.skipped_patterns = skipped_patterns
+        self.options = options
 
     def _this_is_skipped(self, testedname):
         return any([(pat in testedname) for pat in self.skipped_patterns])
@@ -469,7 +471,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         "Run the given test case or test suite."
         result = self._makeResult()
         startTime = time.time()
-        test(result, self._runcondition)
+        test(result, self._runcondition, self.options)
         stopTime = time.time()
         timeTaken = stopTime - startTime
         result.printErrors()
@@ -629,9 +631,11 @@ Examples:
   %(progName)s MyTestCase                    - run all 'test*' test methods
                                                in MyTestCase
 """
-    def __init__(self, module='__main__', defaultTest=None, batchmode=False, cvg=None):
+    def __init__(self, module='__main__', defaultTest=None, batchmode=False,
+                 cvg=None, options=None):
         self.batchmode = batchmode
         self.cvg = cvg
+        self.options = options
         super(SkipAwareTestProgram, self).__init__(
             module=module, defaultTest=defaultTest,
             testLoader=NonStrictTestLoader())
@@ -689,7 +693,7 @@ Examples:
     def runTests(self):
         if hasattr(self.module, 'setup_module'):
             try:
-                self.module.setup_module()
+                self.module.setup_module(self.options)
             except Exception, exc:
                 print 'setup_module error:', exc
                 sys.exit(1)
@@ -700,11 +704,12 @@ Examples:
                                                   pdbmode=self.pdbmode,
                                                   cvg=self.cvg,
                                                   test_pattern=self.test_pattern,
-                                                  skipped_patterns=self.skipped_patterns)
+                                                  skipped_patterns=self.skipped_patterns,
+                                                  options=self.options)
         result = self.testRunner.run(self.test)
         if hasattr(self.module, 'teardown_module'):
             try:
-                self.module.teardown_module()
+                self.module.teardown_module(self.options)
             except Exception, exc:
                 print 'teardown_module error:', exc
                 sys.exit(1)
@@ -804,10 +809,10 @@ def capture_stderr(printonly=None):
 
 
 def unittest_main(module='__main__', defaultTest=None,
-                  batchmode=False, cvg=None):
+                  batchmode=False, cvg=None, options=None):
     """use this functon if you want to have the same functionality
     as unittest.main"""
-    return SkipAwareTestProgram(module, defaultTest, batchmode, cvg)
+    return SkipAwareTestProgram(module, defaultTest, batchmode, cvg, options)
 
 class TestSkipped(Exception):
     """raised when a test is skipped"""
@@ -879,6 +884,7 @@ class TestCase(unittest.TestCase):
         self._out = []
         self._err = []
         self._current_test_descr = None
+        self._options_ = None
 
     def datadir(cls):
         """helper attribute holding the standard test's data directory
@@ -963,7 +969,11 @@ class TestCase(unittest.TestCase):
     def _get_test_method(self):
         return getattr(self, self.__testMethodName)
 
-    def __call__(self, result=None, runcondition=None):
+
+    def optval(self, option, default=None):
+        return getattr(self._options_, option, default)
+
+    def __call__(self, result=None, runcondition=None, options=None):
         """rewrite TestCase.__call__ to support generative tests
         This is mostly a copy/paste from unittest.py (i.e same
         variable names, same logic, except for the generative tests part)
@@ -974,6 +984,7 @@ class TestCase(unittest.TestCase):
         # if self.capture is True here, it means it was explicitly specified
         # in the user's TestCase class. If not, do what was asked on cmd line
         self.capture = self.capture or getattr(result, 'capture', False)
+        self._options_ = options
         self._printonly = getattr(result, 'printonly', None)
         # if result.cvg:
         #     result.cvg.start()

@@ -1,4 +1,47 @@
-"""%prog [OPTIONS] [testfile [testpattern]]
+"""pytest is a tool that eases test running and debugging.
+
+To be able to use pytest, you should either write tests using
+the logilab.common.testlib's framework or the unittest module of the
+Python's standard library.
+
+You can customize pytest's behaviour by defining a ``pytestconf.py`` file
+somewhere in your test directory. In this file, you can add options or
+change the way tests are run.
+
+To add command line options, you must define a ``update_parser`` function in
+your ``pytestconf.py`` file. The function must accept a single parameter
+that will be the OptionParser's instance to customize.
+
+If you wish to customize the tester, you'll have to define a class named
+``CustomPyTester``. This class should extend the default `PyTester` class
+defined in the pytest module. Take a look at the `PyTester` and `DjangoTester`
+classes for more information about what can be done.
+
+
+For instance, if you wish to add a custom -l option to specify a loglevel, you
+could define the following ``pytestconf.py`` file ::
+
+    import logging
+    from logilab.common.pytest import PyTester
+    
+    def update_parser(parser):
+        parser.add_option('-l', '--loglevel', dest='loglevel', action='store',
+                          choices=('debug', 'info', 'warning', 'error', 'critical'),
+                          default='critical', help="the default log level possible choices are "
+                          "('debug', 'info', 'warning', 'error', 'critical')")
+        return parser
+    
+    
+    class CustomPyTester(PyTester):
+        def __init__(self, cvg, options):
+            super(CustomPyTester, self).__init__(cvg, options)
+            loglevel = options.loglevel.upper()
+            logger = logging.getLogger('erudi')
+            logger.setLevel(logging.getLevelName(loglevel))
+
+"""
+
+PYTEST_DOC = """%prog [OPTIONS] [testfile [testpattern]]
 
 examples:
 
@@ -35,6 +78,7 @@ try:
 except ImportError:
     DJANGO_FOUND = False
 
+CONF_FILE = 'pytestconf.py'
 
 ## coverage hacks, do not read this, do not read this, do not read this
 
@@ -109,10 +153,25 @@ def this_is_a_testdir(dirpath):
     return osp.basename(dirpath) in ('test', 'tests', 'unittests')
 
 
-def project_root(projdir=os.getcwd()):
+def load_pytest_conf(path, parser):
+    """loads a ``pytestconf.py`` file and update default parser
+    and / or tester.
+    """
+    namespace = {}
+    execfile(path, namespace)
+    if 'update_parser' in namespace:
+        namespace['update_parser'](parser)
+    return namespace.get('CustomPyTester', PyTester)
+
+
+def project_root(parser, projdir=os.getcwd()):
     """try to find project's root and add it to sys.path"""
     curdir = osp.abspath(projdir)
     previousdir = curdir
+    testercls = PyTester
+    conf_file_path = osp.join(curdir, CONF_FILE)
+    if osp.isfile(conf_file_path):
+        testercls = load_pytest_conf(conf_file_path, parser)
     while this_is_a_testdir(curdir) or \
               osp.isfile(osp.join(curdir, '__init__.py')):
         newdir = osp.normpath(osp.join(curdir, os.pardir))
@@ -120,7 +179,10 @@ def project_root(projdir=os.getcwd()):
             break
         previousdir = curdir
         curdir = newdir
-    return previousdir
+        conf_file_path = osp.join(curdir, CONF_FILE)
+        if osp.isfile(conf_file_path):
+            testercls = load_pytest_conf(conf_file_path, parser)
+    return previousdir, testercls
 
 
 class GlobalTestReport(object):
@@ -173,9 +235,11 @@ class GlobalTestReport(object):
                                                    len(self.errmodules))
             descr = ', '.join(['%s [%s/%s]' % info for info in self.errmodules])
             line3 = '\nfailures: %s' % descr
-        else:
+        elif modulesok:
             line2 = 'All %s modules OK' % modulesok
             line3 = ''
+        else:
+            return ''
         return '%s\n%s%s' % (', '.join(line1), line2, line3)
 
 
@@ -210,11 +274,11 @@ def remove_local_modules_from_sys(testdir):
 class PyTester(object):
     """encaspulates testrun logic"""
     
-    def __init__(self, cvg):
+    def __init__(self, cvg, options):
         self.tested_files = []
         self.report = GlobalTestReport()
         self.cvg = cvg
-
+        self.options = options
 
     def show_report(self):
         """prints the report and returns appropriate exitcode"""
@@ -269,7 +333,8 @@ class PyTester(object):
         try:
             try:
                 tstart, cstart = time(), clock()
-                testprog = testlib.unittest_main(modname, batchmode=batchmode, cvg=self.cvg)
+                testprog = testlib.unittest_main(modname, batchmode=batchmode, cvg=self.cvg,
+                                                 options=self.options)
                 tend, cend = time(), clock()
                 ttime, ctime = (tend - tstart), (cend - cstart)
                 self.report.feed(filename, testprog.result, ttime, ctime)
@@ -289,10 +354,6 @@ class PyTester(object):
 
 
 class DjangoTester(PyTester):
-
-    def __init__(self, cvg):
-        super(DjangoTester, self).__init__(cvg)
-
 
     def load_django_settings(self, dirname):
         """try to find project's setting and load it"""
@@ -409,25 +470,23 @@ class DjangoTester(PyTester):
                 os.chdir(here)
 
 
-
-def parseargs():
-    """Parse the command line and return (options processed), (options to pass to
-    unittest_main()), (explicitfile or None).
+def make_parser():
+    """creates the OptionParser instance
     """
     from optparse import OptionParser
-    parser = OptionParser(usage=__doc__)
+    parser = OptionParser(usage=PYTEST_DOC)
 
-    newargs = []
+    parser.newargs = []
     def rebuild_cmdline(option, opt, value, parser):
         """carry the option to unittest_main"""
-        newargs.append(opt)
+        parser.newargs.append(opt)
         
 
     def rebuild_and_store(option, opt, value, parser):
         """carry the option to unittest_main and store
         the value on current parser
         """
-        newargs.append(opt)
+        parser.newargs.append(opt)
         setattr(parser.values, option.dest, True)
 
     # pytest options
@@ -480,7 +539,13 @@ def parseargs():
         parser.add_option('-J', '--django', dest='django', default=False,
                           action="store_true",
                           help='use pytest for django test cases')
+    return parser
 
+
+def parseargs(parser):
+    """Parse the command line and return (options processed), (options to pass to
+    unittest_main()), (explicitfile or None).
+    """
     # parse the command line
     options, args = parser.parse_args()
     if options.pdb and getattr(options, 'coverage', False):
@@ -495,6 +560,7 @@ def parseargs():
         explicitfile = None
     # someone wants DBC
     testlib.ENABLE_DBC = options.dbc
+    newargs = parser.newargs
     if options.printonly:
         newargs.extend(['--printonly', options.printonly])
     if options.skipped:
@@ -502,28 +568,30 @@ def parseargs():
     # append additional args to the new sys.argv and let unittest_main
     # do the rest
     newargs += args
-    return options, newargs, explicitfile 
+    return options, explicitfile 
+
 
 
 def run():
-    options, newargs, explicitfile = parseargs()
+    parser = make_parser()
+    rootdir, testercls = project_root(parser)
+    options, explicitfile = parseargs(parser)
     # mock a new command line
-    sys.argv[1:] = newargs
+    sys.argv[1:] = parser.newargs
     covermode = getattr(options, 'coverage', None)
     cvg = None
     if not '' in sys.path:
         sys.path.insert(0, '')    
     if covermode:
-        rootdir = project_root()
         # control_import_coverage(rootdir)
         from logilab.devtools.lib.coverage import Coverage
         cvg = Coverage([rootdir])
         cvg.erase()
         cvg.start()
     if DJANGO_FOUND and options.django:
-        tester = DjangoTester(cvg)
+        tester = DjangoTester(cvg, options)
     else:
-        tester = PyTester(cvg)
+        tester = testercls(cvg, options)
     if explicitfile:
         cmd, args = tester.testfile, (explicitfile,)
     elif options.testdir:
