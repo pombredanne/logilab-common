@@ -427,6 +427,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         self.cvg = cvg
         self.test_pattern = test_pattern
         self.skipped_patterns = skipped_patterns
+        self.options = options
 
     def _this_is_skipped(self, testedname):
         return any([(pat in testedname) for pat in self.skipped_patterns])
