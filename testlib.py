@@ -884,6 +884,7 @@ class TestCase(unittest.TestCase):
         self._out = []
         self._err = []
         self._current_test_descr = None
+        self._options_ = None
 
     def datadir(cls):
         """helper attribute holding the standard test's data directory
@@ -967,6 +968,7 @@ class TestCase(unittest.TestCase):
 
     def _get_test_method(self):
         return getattr(self, self.__testMethodName)
+
 
     def optval(self, option, default=None):
         return getattr(self._options_, option, default)
@@ -1291,7 +1293,7 @@ class DocTest(TestCase):
     without this hack
     """
     skipped = ()
-    def __call__(self, result=None, runcondition=None):
+    def __call__(self, result=None, runcondition=None, options=None):
         try:
             finder = DocTestFinder(skipped=self.skipped)
             if sys.version_info >= (2, 4):

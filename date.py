@@ -19,7 +19,7 @@
 import math
 
 try:
-    from mx.DateTime import RelativeDateTime, strptime
+    from mx.DateTime import RelativeDateTime, strptime, Date
     STEP = 1
 except ImportError:
     from warnings import warn
@@ -65,11 +65,15 @@ else:
 
     def get_national_holidays(begin, end):
         """return french national days off between begin and end"""
+        begin = Date(begin.year, begin.month, begin.day)
+        end = Date(end.year, end.month, end.day)
         holidays = [strptime(datestr, '%Y-%m-%d')
                     for datestr in FRENCH_MOBILE_HOLIDAYS.values()]
         for year in xrange(begin.year, end.year+1):
-            holidays += [strptime(datestr % year, '%Y-%m-%d')
-                         for datestr in FRENCH_FIXED_HOLIDAYS.values()]
+            for datestr in FRENCH_FIXED_HOLIDAYS.values():
+                date = strptime(datestr % year, '%Y-%m-%d')
+                if date not in holidays:
+                    holidays.append(date)
         return [day for day in holidays if begin <= day < end]
 
 
@@ -77,10 +81,12 @@ else:
         """adds date but try to only take days worked into account"""
         weeks, plus = divmod(days, 5)
         end = start+(weeks * 7) + plus
-        if end.day_of_week > 4:
-            end += 2       
+        if end.day_of_week >= 5: # saturday or sunday
+            end += 2
         end += len([x for x in get_national_holidays(start, end+1)
                     if x.day_of_week < 5])
+        if end.day_of_week >= 5: # saturday or sunday
+            end += 2
         return end
 
     def nb_open_days(start, end):
@@ -92,19 +98,11 @@ else:
         elif end.day_of_week == 6:
             plus -= 1
         open_days = weeks * 5 + plus
-        nb_week_holidays = len([x for x in get_national_holidays(start,
-                                                                 end+1)
-                                if x.day_of_week < 5])
+        nb_week_holidays = len([x for x in get_national_holidays(start, end+1)
+                                if x.day_of_week < 5 and x < end])
         return open_days  - nb_week_holidays
 
-    #def nb_open_days(start, end):
-    #    """ brute-force version """
-    #    days = [x for x in date_range(start, end) if x.day_of_week < 5]
-    #    nb_week_holidays = len([x for x in get_national_holidays(start,
-    #                                                             end+1)
-    #                            if x.day_of_week < 5])
-    #    return len(days) - nb_week_holidays
-    
+
 def date_range(begin, end, step=STEP):
     """
     enumerate dates between begin and end dates.
