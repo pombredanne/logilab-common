@@ -39,6 +39,15 @@ could define the following ``pytestconf.py`` file ::
             logger = logging.getLogger('erudi')
             logger.setLevel(logging.getLevelName(loglevel))
 
+
+In your TestCase class you can then get the value of a specific option with
+the ``optval`` method::
+    
+    class MyTestCase(TestCase):
+        def test_foo(self):
+            loglevel = self.optval('loglevel')
+            # ...
+            
 """
 
 PYTEST_DOC = """%prog [OPTIONS] [testfile [testpattern]]
