@@ -80,6 +80,9 @@ class IN(FunctionDescr):
 class LENGTH(FunctionDescr):
     rtype = 'Int'
 
+class DATE(FunctionDescr):
+    rtype = 'Date'
+
 class _GenericAdvFuncHelper:
     """Generic helper, trying to provide generic way to implement
     specific functionnalities from others DBMS
@@ -103,6 +106,7 @@ class _GenericAdvFuncHelper:
         # transformation functions
         'UPPER': UPPER, 'LOWER': LOWER,
         'LENGTH': LENGTH,
+        'DATE': DATE,
         # keyword function
         'IN': IN
         }
@@ -118,15 +122,6 @@ class _GenericAdvFuncHelper:
         'Interval' : 'interval',
         'Password' : 'bytea',
         'Bytes' :    'bytea',
-        # FIXME: still there for use from erudi, should be moved out
-        # XXX think it can be safely removed now
-        'COUNT' : 'integer',
-        'MIN' :   'integer',
-        'MAX' :   'integer',
-        'SUM' :   'integer',
-        'LOWER' : 'text',
-        'UPPER' : 'text',
-        'LENGTH' :'integer',
         }
 
 
