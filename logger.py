@@ -18,7 +18,7 @@ everything on stdout, the other using syslog.
 """
 
 from warnings import warn
-warn('logger module is deprecated and will disappear in a near release. \
+warn('logger module is deprecated and will disappear in a future release. \
 use logging module instead.',
      DeprecationWarning, stacklevel=1)
 

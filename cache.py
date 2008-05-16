@@ -46,7 +46,7 @@ class Cache:
         if not self._usage:
             self._usage.append(key)
         
-        if self._usage[-1] != key:
+        elif self._usage[-1] != key:
             try:
                 self._usage.remove(key)
             except ValueError:
@@ -57,6 +57,8 @@ class Cache:
                     del self.data[self._usage[0]]
                     del self._usage[0]
             self._usage.append(key)
+        else:
+            pass # key is already the most recently used key
 
             
     def __getitem__(self, key):

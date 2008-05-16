@@ -18,7 +18,7 @@
 
 from warnings import warn
 warn('this module has been moved into logilab.astng and will disappear from \
-logilab.common in a near release',
+logilab.common in a future release',
      DeprecationWarning, stacklevel=1)
 
 __author__ = u"Sylvain Thenault"

@@ -30,26 +30,35 @@ Provided modules
 
 Here is a brief description of the available modules :
 
+* adbh.py:
+  helper functions for using database advanced. Supported RDBMS
+include PostgreSQL, MySQL and sqlite. See also db.py. 
+
 * astutils:
-  Some utilities function to manipulate Python's AST.
+  Deprecated module. Use logilab.astng. 
 
 * bind.py :
+  Deprecated module. 
   Provides a way to optimize globals in certain functions by binding
   their names to values provided in a dictionnary.
 
 * cache.py :
   A cache implementation with a least recently used algorithm.
 
+* clcommands.py:
+  helper functions for command line programs handling different
+  subcommands
+
 * cli.py :
-  Command line interface helper classes.
+  Command line interface helper classes (for interactive programs
+  using the command line)
 
 * compat.py: 
   Transparent compatibility layer between different python version
-  (actually 2.2 vs 2.3 for now)
 
 * configuration.py :
   Two mix-in classes to handle configuration from both command line 
-  (using optik) and configuration file.
+  (using optik/optparse) and configuration file.
 
 * corbautils.py:
   Usefull functions for use with the OmniORB CORBA library.
@@ -57,49 +66,94 @@ Here is a brief description of the available modules :
 * daemon.py :
   A daemon mix-in class.
 
-* db.py :
-  A generic method to get a database connection. 
+* date.py:
+  date manipulation helper functions
 
-* html.py :
-  Return an html formatted traceback from python exception infos.
+* db.py :
+  A generic method to get a database connection. See also adbh.py.
+
+* debugger.py:
+  pdb customization
+
+* decorators.py:
+  useful decorators (cached, timed...)
+
+* deprecation.py:
+  mark functions / classes as deprecated or moved
 
 * fileutils.py :
   Some file / file path manipulation utilities.
+
+* graph.py:
+  graph manipulations, dot file generation
+
+* html.py :
+  Deprecated module
+  Return an html formatted traceback from python exception infos.
 
 * interface.py
   Bases class for interfaces.
 
 * logger.py :
+  Deprecated module : use logging from stdlib. 
   Define a logger interface and two concrete loggers : one which prints
   everything on stdout, the other using syslog.
+
+* logging_ext.py:
+  extensions to stdlib's logging module
+
+* logservice.py:
+  Deprecated module. Use logging from stdlib. 
 
 * modutils.py :
   Module manipulation utilities.
 
+* monclient.py:
+  Deprecated module
+
+* monserver.py:
+  Deprecated module
+
 * optik_ext :
   Add an abstraction level to transparently import optik classes from
   optparse (python >= 2.3) or the optik package. It also defines two
-  new option types : regexp and csv.
+  new option types (regexp, csv, color, date...)
+
+* optparser.py:
+  extend optparse's OptionParser to support commands 
 
 * patricia.py :
   A Python implementation of PATRICIA trie (Practical Algorithm to
   Retrieve Information Coded in Alphanumeric).
 
-* shellutils:
+* pdf_ext.py:
+  pdf and fdf file manipulations, with pdftk. 
+
+* pytest.py:
+  unittest runner. See testlib
+
+* shellutils.py:
   Some utilities to replace shell scripts with python scripts.
 
 * sqlgen.py :
   Helper class to generate SQL strings to use with python's DB-API.
 
+* table.py:
+  manage tabular data (supports column and row names, sorting, grouping...
+
 * testlib.py :
   Generic tests execution methods.
 
 * textutils.py:
-  Some text manipulation utilities.
+  Some text manipulation utilities (ansi colorization, line wrapping,
+  rest support...)
 
 * tree.py :
   Base class to represent tree structure, and some others to make it
   works with the visitor implementation (see below).
+
+* umessage.py:
+  unicode email support
 
 * ureports:
   Provides a way to create simple reports using python objects
@@ -118,12 +172,14 @@ Here is a brief description of the available modules :
   distutils syntax. Note that you can use this to install files that
   are not twisted plugins in any package directory of your application.
 
+* xmlrpcutils.py:
+  Auth support for XML RPC
 
 Comments, support, bug reports
 ------------------------------
 Use the python-projects@logilab.org mailing list. Since we do not have
 publicly available bug tracker yet, bug reports should be emailed
-there too. 
+there too.
 
 You can subscribe to this mailing list at
 http://www.logilab.org/mailinglists/python_projects/mailinglist_register_form

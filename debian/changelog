@@ -1,6 +1,12 @@
+logilab-common (0.31.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Nicolas Chauvat <Nicolas.Chauvat@logilab.fr>  Thu, 08 May 2008 14:37:41 +0200
+
 logilab-common (0.30.0-2) unstable; urgency=low
 
-  * upload to debian
+  * upload to debian
 
  -- Alexandre Fayolle <afayolle@debian.org>  Mon, 21 Apr 2008 17:24:28 +0200
 

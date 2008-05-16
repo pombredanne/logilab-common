@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""some wrapper around tools introduced into python 2.3, making them available
-in python 2.2
+"""some wrapper around some builtins introduced in python 2.3, 2.4 and
+2.5, making them available in for earlier versions of python.
 """
 from __future__ import generators
 

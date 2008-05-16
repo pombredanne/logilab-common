@@ -20,6 +20,7 @@ command'specific
 :contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
 """
 
+# XXX : merge with optparser ? 
 import sys
 from os.path import basename
 
