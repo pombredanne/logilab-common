@@ -156,6 +156,11 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.tc.assertStreamEqual, stream1, stream2)
         
     def test_text_equality(self):
+        self.assertRaises(AssertionError, self.tc.assertTextEqual, "toto", 12)
+        self.assertRaises(AssertionError, self.tc.assertTextEqual, "toto", None)
+        self.assertRaises(AssertionError, self.tc.assertTextEqual, 3.12, u"toto")
+        self.assertRaises(AssertionError, self.tc.assertTextEqual, None, u"toto")
+        
         foo = join(dirname(__file__), 'data', 'foo.txt')
         spam = join(dirname(__file__), 'data', 'spam.txt')        
         text1 = file(foo).read()

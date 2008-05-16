@@ -1097,7 +1097,7 @@ class TestCase(unittest.TestCase):
         if d1:
             msgs.append('d2 is lacking %r' % d1)
         if msgs:
-            self.fail('\n'.join(msgs))
+            self.fail(''.join(msgs))
     assertDictEqual = assertDictEquals
 
     def assertSetEquals(self, got, expected, msg=None):
@@ -1183,6 +1183,13 @@ class TestCase(unittest.TestCase):
         
     def assertTextEquals(self, text1, text2, junk=None):
         """compare two multiline strings (using difflib and splitlines())"""
+        msg = []
+        if not isinstance(text1, basestring):
+            msg.append('text1 is not a string (%s)'%(type(text1)))
+        if not isinstance(text2, basestring):
+            msg.append('text2 is not a string (%s)'%(type(text2)))
+        if msg:
+            self.fail('\n'.join(msg))
         self._difftext(text1.splitlines(True), text2.splitlines(True), junk)
     assertTextEqual = assertTextEquals
             
