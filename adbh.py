@@ -441,12 +441,13 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
         """return a list of commands to restore a backup the given database"""
         cmds = []
         if drop:
-            cmd = 'echo "DROP DATABASE %s;" | mysql -h %s -u %s -p' % (dbname, dbhost, dbuser)
+            cmd = 'echo "DROP DATABASE %s;" | mysql -h %s -u %s -p' % (
+                dbname, dbhost, dbuser)
             cmds.append(cmd)
-        cmd = 'echo "%s;" | mysql -h %s -u %s -p' % (self.sql_create_database(dbname, encoding),
-                                                  dbhost, dbuser)
+        cmd = 'echo "%s;" | mysql -h %s -u %s -p' % (
+            self.sql_create_database(dbname, encoding), dbhost, dbuser)
         cmds.append(cmd)
-        cmd = pgdbcmd('mysql -h %s -u %s -p < %s' % (dbname, dbhost, dbuser, backupfile))
+        cmd = 'mysql -h %s -u %s -p < %s' % (dbname, dbhost, dbuser, backupfile)
         cmds.append(cmd)
         return cmds
                 

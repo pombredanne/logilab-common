@@ -15,9 +15,9 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 """Text formatting drivers for ureports"""
 
-
-from logilab.common.ureports import BaseWriter
 from logilab.common.textutils import linesep
+from logilab.common.ureports import BaseWriter
+
 
 TITLE_UNDERLINES = ['', '=', '-', '`', '.', '~', '^']
 BULLETS = ['*', '-']

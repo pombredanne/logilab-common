@@ -27,6 +27,7 @@ from StringIO import StringIO as UStringIO
 
 from logilab.common.textutils import linesep
 
+
 def get_nodes(node, klass):
     """return an iterator on all children node of the given klass"""
     for child in node.children:
