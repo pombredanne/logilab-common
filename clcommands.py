@@ -32,6 +32,10 @@ Copyright (c) 2004-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
 
 
+DEFAULT_DOC = '''\
+Type "%prog <command> --help" for more information about a specific
+command. Available commands are :\n'''
+
 class BadCommandUsage(Exception):
     """Raised when an unknown command is used or when a command is not
     correctly used
@@ -86,16 +90,21 @@ def register_commands(commands):
         _COMMANDS[command_klass.name] = command_klass
 
 
-def main_usage(status=0, __doc__=None, copyright=DEFAULT_COPYRIGHT):
+def main_usage(status=0, __doc__=DEFAULT_DOC, copyright=DEFAULT_COPYRIGHT):
     """display usage for the main program (ie when no command supplied)
     and exit
     """
     commands = _COMMANDS.keys()
     commands.sort()
-    doc = __doc__ % ('<command>', '<command arguments>',
-                     '''\
+    doc = __doc__
+    if doc != DEFAULT_DOC:
+        try:
+            doc = __doc__ % ('<command>', '<command arguments>',
+                             '''\
 Type "%prog <command> --help" for more information about a specific
 command. Available commands are :\n''')
+        except TypeError:
+            print 'could not find the "command", "arguments" and "default" slots'
     doc = doc.replace('%prog', basename(sys.argv[0]))
     print 'usage:', doc
     max_len = max([len(cmd) for cmd in commands]) # list comprehension for py 2.3 support
@@ -125,7 +134,7 @@ def cmd_run(cmdname, *args):
         print command.help()
 
         
-def main_run(args, doc):
+def main_run(args, doc=DEFAULT_DOC):
     """command line tool"""
     try:
         arg = args.pop(0)
