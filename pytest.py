@@ -300,7 +300,8 @@ class PyTester(object):
         """walks trhough current working directory, finds something
         which can be considered as a testdir and runs every test there
         """
-        for dirname, dirs, files in os.walk(os.getcwd()):
+        here = os.getcwd()
+        for dirname, dirs, _ in os.walk(here):
             for skipped in ('CVS', '.svn', '.hg'):
                 if skipped in dirs:
                     dirs.remove(skipped)
@@ -310,7 +311,11 @@ class PyTester(object):
                 # we found a testdir, let's explore it !
                 self.testonedir(dirname, exitfirst)
                 dirs[:] = []
-
+        if self.report.ran == 0:
+            # if no test was found during the visit, consider
+            # the local directory as a test directory even if
+            # it doesn't have a traditional test directory name
+            self.testonedir(here)
  
     def testonedir(self, testdir, exitfirst=False):
         """finds each testfile in the `testdir` and runs it"""
