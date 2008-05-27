@@ -1085,7 +1085,7 @@ class TestCase(unittest.TestCase):
         If the two dict differ, the first difference is shown in the error
         message
         """
-        d1 = d1.copy()
+        d1 = dict(d1)
         msgs = []
         for key, value in d2.items():
             try:
@@ -1169,6 +1169,35 @@ class TestCase(unittest.TestCase):
     assertXMLStringValid = deprecated_function(
         assertXMLStringWellFormed, 'assertXMLStringValid renamed to more precise assertXMLStringWellFormed')
 
+    def assertXMLEqualsTuple(self,element,tup):
+        """compare an ElementTree Element to a tuple formatted as follow:
+        (tagname,[attrib[,children[,text[,tail]]]])"""
+        # check tag
+        self.assertTextEquals(element.tag, tup[0])
+        # check attrib
+        if len(element.attrib) or len(tup)>1:
+            if len(tup)<=1:
+                self.fail( "tuple %s has no attributes (%s expected)"%(tup,dict(element.attrib)))
+            self.assertDictEquals(element.attrib, tup[1])
+        # check childrend
+        if len(element) or len(tup)>2:
+            if len(tup)<=2:
+                self.fail( "tuple %s has no children (%i expected)"%(tup,len(element)))
+            if len(element) != len(tup[2]):
+                self.fail( "tuple %s has %i children%s (%i expected)"%(tup, len(tup[2]),
+                        ('','s')[len(tup[2])>1],len(element)))
+            for index in xrange(len(tup[2])):
+                self.assertXMLEqualsTuple(element[index], tup[2][index])
+        #check text
+        if element.text or len(tup)>3:
+            if len(tup)<=3:
+                self.fail( "tuple %s has no text value (%r expected)"%(tup,element.text))
+            self.assertTextEquals(element.text, tup[3])
+        #check tail
+        if element.tail or len(tup)>4:
+            if len(tup)<=4:
+                self.fail( "tuple %s has no tail value (%r expected)"%(tup,element.tail))
+            self.assertTextEquals(element.tail, tup[4])
 
     def _difftext(self, lines1, lines2, junk=None):
         junk = junk or (' ', '\t')

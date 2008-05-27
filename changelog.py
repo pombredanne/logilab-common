@@ -64,7 +64,11 @@ class Version(tuple):
     """
     def __new__(klass, versionstr):
         if isinstance(versionstr, basestring):
-            parsed = [int(i) for i in versionstr.split('.')]
+            versionstr = versionstr.strip(' :')
+            try:
+                parsed = [int(i) for i in versionstr.split('.')]
+            except ValueError, ex:
+                raise ValueError("invalid literal for version '%s' (%s)"%(versionstr,ex))
         else:
             parsed = versionstr
         return tuple.__new__(klass, parsed)
