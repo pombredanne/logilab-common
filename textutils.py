@@ -245,11 +245,11 @@ def get_csv(string, sep=','):
     """
     return [word.strip() for word in string.split(sep) if word.strip()]
 
-_BLANK_URE = '(\s|,)+'
+_BLANK_URE = r'(\s|,)+'
 _BLANK_RE = re.compile(_BLANK_URE)
-__VALUE_URE = '-?(([0-9]+\.[0-9]*)|((0x?)?[0-9]+))'
-__UNITS_URE = '[a-zA-Z]+'
-_VALUE_RE = re.compile('(?P<value>%s)(?P<unit>%s)?'%(__VALUE_URE,__UNITS_URE))
+__VALUE_URE = r'-?(([0-9]+\.[0-9]*)|((0x?)?[0-9]+))'
+__UNITS_URE = r'[a-zA-Z]+'
+_VALUE_RE = re.compile(r'(?P<value>%s)(?P<unit>%s)?'%(__VALUE_URE,__UNITS_URE))
 
 BYTE_UNITS = {
     "KB": 1024,
@@ -260,7 +260,7 @@ BYTE_UNITS = {
 
 TIME_UNITS = {
     "ms": 0.0001,
-    "m": 60,
+    "min": 60,
     "h": 60 * 60,
     "d": 60 * 60 *24,
 }
