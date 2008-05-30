@@ -245,6 +245,71 @@ def get_csv(string, sep=','):
     """
     return [word.strip() for word in string.split(sep) if word.strip()]
 
+_BLANK_URE = '(\s|,)+'
+_BLANK_RE = re.compile(_BLANK_URE)
+__VALUE_URE = '-?(([0-9]+\.[0-9]*)|((0x?)?[0-9]+))'
+__UNITS_URE = '[a-zA-Z]+'
+_VALUE_RE = re.compile('(?P<value>%s)(?P<unit>%s)?'%(__VALUE_URE,__UNITS_URE))
+
+BYTE_UNITS = {
+    "KB": 1024,
+    "MB": 1024 ** 2,
+    "GB": 1024 ** 3,
+    "TB": 1024 ** 4,
+}
+
+TIME_UNITS = {
+    "ms": 0.0001,
+    "m": 60,
+    "h": 60 * 60,
+    "d": 60 * 60 *24,
+}
+
+def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
+    value_reg=_VALUE_RE):
+    """parse the string applying the units define in units
+    eg: "1.5m",{'m',60} -> 80
+        
+    :type string: str or unicode
+    :param string: the string to parse
+
+    :type units: dict (or any object with __getitem__ using basestring key)
+    :param units: a dict mapping a unit string repr to its value
+
+    :type inter: type
+    :param inter: used to parse every intermediate value (need __sum__)
+    :default inter: final value
+
+    :type inter: type
+    :param inter: used to build the final object after summing them all
+    :default inter: float
+    
+    :type blank_reg: regexp
+    :param blank_reg: should match eveyr blank char to ignore.
+    :default blank_reg: (\s|,)+ # match blank space and coma
+    
+    :type value_reg: regexp with "value" and optional "unit" group
+    :param value_reg: match a value and it's unit into the 
+    :default value_reg: (-?(((0x?)?[0-9]+)|([0-9]+\\.[0-9]*)))([a-zA-Z]+)?
+        match any number 
+    """
+    if inter is None:
+        inter = final
+
+    
+    string = _BLANK_RE.sub('',string)
+    values = []
+    for match in value_reg.finditer(string):
+        dic = match.groupdict()
+        #import sys
+        #print >> sys.stderr, dic
+        lit, unit = dic["value"], dic.get("unit")
+        value = inter(lit)
+        if unit is not None:
+            value *= units[unit]
+        values.append(value)
+
+    return final(sum(values))
 
 _LINE_RGX = re.compile('\r\n|\r+|\n')
 

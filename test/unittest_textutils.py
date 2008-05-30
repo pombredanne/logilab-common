@@ -103,6 +103,65 @@ class GetCsvTC(TestCase):
     def test_known(self):
         self.assertEquals(tu.get_csv('a, b,c '), ['a', 'b', 'c'])
 
+class UnitsTC(TestCase):
+
+    def setUp(self):
+        self.units = {
+            'm':60,
+            'KB':1024,
+            'MB':1024*1024,
+            }
+
+    def test_empty_base(self):
+        self.assertEquals(tu.apply_units('17', {}), 17)
+    
+    def test_empty_inter(self):
+        def inter(value):
+            return int(float(value)) * 2
+        result = tu.apply_units('12.4', {}, inter=inter)
+        self.assertEquals(result, 12 * 2)
+        self.assertIsInstance(result, float)
+    
+    def test_empty_final(self):
+        # int('12.4') raise value error
+        self.assertRaises(ValueError, tu.apply_units,'12.4', {}, final=int)
+    
+    def test_empty_inter_final(self):
+        result = tu.apply_units('12.4', {}, inter=float,final=int)
+        self.assertEquals(result, 12)
+        self.assertIsInstance(result, int)
+    
+    def test_blank_base(self):
+        result = tu.apply_units(' 42  ', {}, final=int)
+        self.assertEquals(result, 42)
+    
+    def test_blank_space(self):
+        result = tu.apply_units(' 1 337 ', {}, final=int)
+        self.assertEquals(result, 1337)
+
+    def test_blank_coma(self):
+        result = tu.apply_units(' 4,298.42 ', {})
+        self.assertEquals(result, 4298.42)
+
+    def test_blank_mixed(self):
+        result = tu.apply_units('45, 317, 337', {},final=int)
+        self.assertEquals(result, 45317337)
+
+    def test_unit_singleunit_singleletter(self):
+        result = tu.apply_units('15m', self.units)
+        self.assertEquals(result, 15 * self.units['m'] )
+
+    def test_unit_singleunit_multipleletter(self):
+        result = tu.apply_units('47KB', self.units)
+        self.assertEquals(result, 47 * self.units['KB'] )
+        
+    def test_unit_multipleunit(self):
+        result = tu.apply_units('47KB 1.5MB', self.units)
+        self.assertEquals(result, 47 * self.units['KB'] + 1.5 * self.units['MB'])
+        
+    def test_unit_with_blank(self):
+        result = tu.apply_units('1 000 KB', self.units)
+        self.assertEquals(result, 1000 * self.units['KB'])
     
 RGX = re.compile('abcd')
 class PrettyMatchTC(TestCase):
