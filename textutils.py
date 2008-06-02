@@ -252,7 +252,7 @@ __UNITS_URE = r'[a-zA-Z]+'
 _VALUE_RE = re.compile(r'(?P<value>%s)(?P<unit>%s)?'%(__VALUE_URE,__UNITS_URE))
 
 BYTE_UNITS = {
-     "B": 1
+     "B": 1,
     "KB": 1024,
     "MB": 1024 ** 2,
     "GB": 1024 ** 3,
