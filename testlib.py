@@ -1251,6 +1251,9 @@ class TestCase(unittest.TestCase):
         else:
             self.assert_(isinstance(obj, klass), msg)
 
+    def assertIs(self, obj, other, msg=None):
+        """compares identity of two reference"""
+        self.assert_(obj is other, "%r is not %r"%(obj,other))
 
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
         """override default failUnlessRaise method to return the raised
