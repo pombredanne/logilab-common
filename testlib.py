@@ -33,6 +33,7 @@ import difflib
 import types
 from warnings import warn
 from compiler.consts import CO_GENERATOR
+from ConfigParser import NoSectionError, NoOptionError
 try:
     import readline
 except ImportError:
@@ -1377,15 +1378,18 @@ class MockConfigParser:
         
     def get(self, section, option):
         """return option in section"""
-        return self.options[section][option]
+        try:
+            sec = self.options[section]
+            try:
+                return sec[option]
+            except KeyError:
+                raise NoOptionError(option, section)
+        except KeyError:
+            raise NoSectionError(option)
 
     def has_option(self, section, option):
         """ask if option exists in section"""
-        try:
-            return self.get(section, option) or 1
-        except KeyError:
-            return 0
-    
+        return section in self.options and option in self.options[section]
 
 class MockConnection:
     """fake DB-API 2.0 connexion AND cursor (i.e. cursor() return self)"""
