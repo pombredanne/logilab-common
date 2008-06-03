@@ -2,9 +2,9 @@ ChangeLog for logilab.common
 ============================
 
   --  
+    * testlib: added a assertIs test assertion
     * textutils: add the apply_unit fonction
     * testlib: added a assertXMLEqualsTuple test assertion
-    * vcslib: urlview support for HG
 
     * added a assertIs test
 2008-05-08  --  0.31.0
