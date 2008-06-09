@@ -27,8 +27,8 @@ TODO: _ advanced search
 """
 
 from warnings import warn
-warn('this module is deprecated and will disappear in a near release',
-     DeprecationWarning, stacklevel=1)
+warn('logilab.common.patricia module is deprecated and will disappear in a near release',
+     DeprecationWarning, stacklevel=2)
 
 __revision__ = "$Id: patricia.py,v 1.5 2003-10-31 14:18:32 syt Exp $"
 

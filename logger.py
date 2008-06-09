@@ -18,9 +18,9 @@ everything on stdout, the other using syslog.
 """
 
 from warnings import warn
-warn('logger module is deprecated and will disappear in a future release. \
+warn('logilab.common.logger module is deprecated and will disappear in a future release. \
 use logging module instead.',
-     DeprecationWarning, stacklevel=1)
+     DeprecationWarning, stacklevel=2)
 
 __revision__ = "$Id: logger.py,v 1.18 2006-02-03 14:17:42 adim Exp $"
 
