@@ -1,12 +1,12 @@
 ChangeLog for logilab.common
 ============================
 
-  --  
+2008-09-08  --  0.32.0
     * testlib: added a assertIs test assertion
     * textutils: add the apply_unit fonction
     * testlib: added a assertXMLEqualsTuple test assertion
-
     * added a assertIs test
+
 2008-05-08  --  0.31.0
     * improved documentation and error messages
     * testlib: support a msg argument on more assertions, pysqlite2 as default

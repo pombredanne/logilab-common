@@ -32,7 +32,7 @@ Here is a brief description of the available modules :
 
 * adbh.py:
   helper functions for using database advanced. Supported RDBMS
-include PostgreSQL, MySQL and sqlite. See also db.py. 
+  include PostgreSQL, MySQL and sqlite. See also db.py. 
 
 * astutils:
   Deprecated module. Use logilab.astng. 
