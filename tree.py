@@ -43,6 +43,9 @@ class Node(object):
         self.parent = None
         self.children = []
 
+    def __iter__(self):
+        return iter(self.children)
+
     def __str__(self, indent=0):
         s = ['%s%s %s' % (' '*indent, self.__class__.__name__, self.id)]
         indent += 2
