@@ -1,4 +1,6 @@
 # modified copy of some functions from test/regrtest.py from PyXml
+# disable camel case warning
+# pylint: disable-msg=C0103
 """Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
 http://www.logilab.fr/ -- mailto:contact@logilab.fr  
 
@@ -34,10 +36,6 @@ import types
 from warnings import warn
 from compiler.consts import CO_GENERATOR
 from ConfigParser import NoSectionError, NoOptionError
-try:
-    import readline
-except ImportError:
-    readline = None
 
 # PRINT_ = file('stdout.txt', 'w').write
 
@@ -52,7 +50,9 @@ except ImportError:
 
 from logilab.common.deprecation import class_renamed, deprecated_function, \
      obsolete
+# pylint: disable-msg=W0622
 from logilab.common.compat import set, enumerate, any
+# pylint: enable-msg=W0622
 from logilab.common.modutils import load_module_from_name
 from logilab.common.debugger import Debugger
 from logilab.common.decorators import cached
@@ -135,14 +135,15 @@ def main(testdir=None, exitafter=True):
         prof.close()
     else:
         start_time, start_ctime = time.time(), time.clock()
-        good, bad, skipped, all_result = run_tests(tests, quiet, verbose, None, capture)
+        good, bad, skipped, all_result = run_tests(tests, quiet, verbose, None,
+            capture)
         end_time, end_ctime = time.time(), time.clock()
     if not quiet:
         print '*'*80
         if all_result:
-            print 'Ran %s test cases in %0.2fs (%0.2fs CPU)' % (all_result.testsRun,
-                                                                end_time - start_time,
-                                                                end_ctime - start_ctime), 
+            print 'Ran %s test cases in %0.2fs (%0.2fs CPU)' % (
+                all_result.testsRun, end_time - start_time,
+                end_ctime - start_ctime), 
             if all_result.errors:
                 print ', %s errors' % len(all_result.errors),
             if all_result.failures:
@@ -287,7 +288,8 @@ def start_interactive_mode(result):
             testindex = 0
             print "Choose a test to debug:"
             # order debuggers in the same way than errors were printed
-            print "\n".join(['\t%s : %s' % (i, descr) for i, (_, descr) in enumerate(descrs)])
+            print "\n".join(['\t%s : %s' % (i, descr) for i, (_, descr)
+                in enumerate(descrs)])
             print "Type 'exit' (or ^D) to quit"
             print
             try:
@@ -300,7 +302,7 @@ def start_interactive_mode(result):
                         testindex = int(todebug)
                         debugger = debuggers[descrs[testindex][0]]
                     except (ValueError, IndexError):
-                        print "ERROR: invalid test number %r" % (todebug,)
+                        print "ERROR: invalid test number %r" % (todebug, )
                     else:
                         debugger.start()
             except (EOFError, KeyboardInterrupt):
@@ -338,7 +340,8 @@ class SkipAwareTestResult(unittest._TextTestResult):
             self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
         
     def addError(self, test, err):
-        exc_type, exc, tcbk = err
+        """err ==  (exc_type, exc, tcbk)"""
+        exc_type, exc, _ = err # 
         if exc_type == TestSkipped:
             self.addSkipped(test, exc)
         else:
@@ -367,7 +370,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.printSkippedList()
         
     def printSkippedList(self):
-        for test, descr, err in self.skipped:
+        for _, descr, err in self.skipped: # test, descr, err
             self.stream.writeln(self.separator1)
             self.stream.writeln("%s: %s" % ('SKIPPED', descr))
             self.stream.writeln("\t%s" % err)
@@ -385,18 +388,22 @@ class SkipAwareTestResult(unittest._TextTestResult):
             else:
                 if output:
                     self.stream.writeln(self.separator2)
-                    self.stream.writeln("captured stdout".center(len(self.separator2)))
+                    self.stream.writeln("captured stdout".center(
+                        len(self.separator2)))
                     self.stream.writeln(self.separator2)
                     self.stream.writeln(output)
                 else:
-                    self.stream.writeln('no stdout'.center(len(self.separator2)))
+                    self.stream.writeln('no stdout'.center(
+                        len(self.separator2)))
                 if errput:
                     self.stream.writeln(self.separator2)
-                    self.stream.writeln("captured stderr".center(len(self.separator2)))
+                    self.stream.writeln("captured stderr".center(
+                        len(self.separator2)))
                     self.stream.writeln(self.separator2)
                     self.stream.writeln(errput)
                 else:
-                    self.stream.writeln('no stderr'.center(len(self.separator2)))
+                    self.stream.writeln('no stderr'.center(
+                        len(self.separator2)))
 
 
 
@@ -417,8 +424,8 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
     def __init__(self, stream=sys.stderr, verbosity=1,
                  exitfirst=False, capture=False, printonly=None,
-                 pdbmode=False, cvg=None, test_pattern=None, skipped_patterns=(),
-                 options=None):
+                 pdbmode=False, cvg=None, test_pattern=None,
+                 skipped_patterns=(), options=None):
         super(SkipAwareTextTestRunner, self).__init__(stream=stream,
                                                       verbosity=verbosity)
         self.exitfirst = exitfirst
@@ -464,9 +471,9 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
             return self.test_pattern in testname
     
     def _makeResult(self):
-        return SkipAwareTestResult(self.stream, self.descriptions, self.verbosity,
-                                   self.exitfirst, self.capture, self.printonly,
-                                   self.pdbmode, self.cvg)
+        return SkipAwareTestResult(self.stream, self.descriptions,
+                                   self.verbosity, self.exitfirst, self.capture,
+                                   self.printonly, self.pdbmode, self.cvg)
 
     def run(self, test):
         "Run the given test case or test suite."
@@ -577,18 +584,21 @@ class NonStrictTestLoader(unittest.TestLoader):
         collected = []
         if len(parts) == 1:
             pattern = parts[0]
-            if callable(getattr(module, pattern, None)) and pattern not in tests:
+            if callable(getattr(module, pattern, None)
+                    )  and pattern not in tests:
                 # consider it as a suite
                 return self.loadTestsFromSuite(module, pattern)
             if pattern in tests:
                 # case python unittest_foo.py MyTestTC
                 klass, methodnames = tests[pattern]
                 for methodname in methodnames:
-                    collected = [klass(methodname) for methodname in methodnames]
+                    collected = [klass(methodname)
+                        for methodname in methodnames]
             else:
                 # case python unittest_foo.py something
                 for klass, methodnames in tests.values():
-                    collected += [klass(methodname) for methodname in methodnames]
+                    collected += [klass(methodname)
+                        for methodname in methodnames]
         elif len(parts) == 2:
             # case "MyClass.test_1"
             classname, pattern = parts
@@ -606,7 +616,8 @@ class NonStrictTestLoader(unittest.TestLoader):
         is_skipped = self._this_is_skipped
         if is_skipped(testCaseClass.__name__):
             return []
-        testnames = super(NonStrictTestLoader, self).getTestCaseNames(testCaseClass)
+        testnames = super(NonStrictTestLoader, self).getTestCaseNames(
+                testCaseClass)
         return [testname for testname in testnames if not is_skipped(testname)]
 
     
@@ -621,7 +632,8 @@ Options:
   -i, --pdb        Enable test failure inspection
   -x, --exitfirst  Exit on first failure
   -c, --capture    Captures and prints standard out/err only on errors
-  -p, --printonly  Only prints lines matching specified pattern (implies capture)
+  -p, --printonly  Only prints lines matching specified pattern
+                   (implies capture)
   -s, --skip       skip test matching this pattern (no regexp for now)
   -q, --quiet      Minimal output
 
@@ -651,32 +663,34 @@ Examples:
         import getopt
         try:
             options, args = getopt.getopt(argv[1:], 'hHvixqcp:s:',
-                                          ['help','verbose','quiet', 'pdb',
+                                          ['help', 'verbose', 'quiet', 'pdb',
                                            'exitfirst', 'capture', 'printonly=',
                                            'skip='])
             for opt, value in options:
-                if opt in ('-h','-H','--help'):
+                if opt in ('-h', '-H', '--help'):
                     self.usageExit()
                 if opt in ('-i', '--pdb'):
                     self.pdbmode = True
                 if opt in ('-x', '--exitfirst'):
                     self.exitfirst = True
-                if opt in ('-q','--quiet'):
+                if opt in ('-q', '--quiet'):
                     self.verbosity = 0
-                if opt in ('-v','--verbose'):
+                if opt in ('-v', '--verbose'):
                     self.verbosity = 2
                 if opt in ('-c', '--capture'):
                     self.capture += 1
                 if opt in ('-p', '--printonly'):
                     self.printonly = re.compile(value)
                 if opt in ('-s', '--skip'):
-                    self.skipped_patterns = [pat.strip() for pat in value.split(',')]
+                    self.skipped_patterns = [pat.strip() for pat in
+                        value.split(', ')]
             self.testLoader.skipped_patterns = self.skipped_patterns
             if self.printonly is not None:
                 self.capture += 1
             if len(args) == 0 and self.defaultTest is None:
                 suitefunc = getattr(self.module, 'suite', None)
-                if isinstance(suitefunc, (types.FunctionType, types.MethodType)):
+                if isinstance(suitefunc, (types.FunctionType,
+                        types.MethodType)):
                     self.test = self.module.suite()
                 else:
                     self.test = self.testLoader.loadTestsFromModule(self.module)
@@ -685,7 +699,7 @@ Examples:
                 self.test_pattern = args[0]
                 self.testNames = args
             else:
-                self.testNames = (self.defaultTest,)
+                self.testNames = (self.defaultTest, )
             self.createTests()
         except getopt.error, msg:
             self.usageExit(msg)
@@ -699,14 +713,14 @@ Examples:
                 print 'setup_module error:', exc
                 sys.exit(1)
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
-                                                  exitfirst=self.exitfirst,
-                                                  capture=self.capture,
-                                                  printonly=self.printonly,
-                                                  pdbmode=self.pdbmode,
-                                                  cvg=self.cvg,
-                                                  test_pattern=self.test_pattern,
-                                                  skipped_patterns=self.skipped_patterns,
-                                                  options=self.options)
+                                        exitfirst=self.exitfirst,
+                                        capture=self.capture,
+                                        printonly=self.printonly,
+                                        pdbmode=self.pdbmode,
+                                        cvg=self.cvg,
+                                        test_pattern=self.test_pattern,
+                                        skipped_patterns=self.skipped_patterns,
+                                        options=self.options)
         result = self.testRunner.run(self.test)
         if hasattr(self.module, 'teardown_module'):
             try:
@@ -715,7 +729,8 @@ Examples:
                 print 'teardown_module error:', exc
                 sys.exit(1)
         if os.environ.get('PYDEBUG'):
-            warn("PYDEBUG usage is deprecated, use -i / --pdb instead", DeprecationWarning)
+            warn("PYDEBUG usage is deprecated, use -i / --pdb instead",
+                DeprecationWarning)
             self.pdbmode = True
         if result.debuggers and self.pdbmode:
             start_interactive_mode(result)
@@ -761,7 +776,7 @@ class FDCapture:
         
     def restore(self):
         """restore original fd and returns captured output"""
-        # hack hack hack
+        #XXX: hack hack hack
         self.tmpfile.flush()
         try:
             ref_file = getattr(sys, '__%s__' % self.attr)
@@ -785,7 +800,8 @@ def _capture(which='stdout', printonly=None):
     """private method, should not be called directly
     (cf. capture_stdout() and capture_stderr())
     """
-    assert which in ('stdout', 'stderr'), "Can only capture stdout or stderr, not %s" % which
+    assert which in ('stdout', 'stderr'
+        ), "Can only capture stdout or stderr, not %s" % which
     if which == 'stdout':
         fd = 1
     else:
@@ -861,7 +877,8 @@ class ClassGetProperty(object):
     def __init__(self, getter):
         self.getter = getter
 
-    def __get__(self, obj, objtype):
+    def __get__(self, obj, objtype): # pylint: disable-msg=W0613
+        "__get__(objn objtype) -> objtype"
         return self.getter(objtype)
 
 
@@ -887,7 +904,7 @@ class TestCase(unittest.TestCase):
         self._current_test_descr = None
         self._options_ = None
 
-    def datadir(cls):
+    def datadir(cls): # pylint: disable-msg=E0213 
         """helper attribute holding the standard test's data directory
         
         NOTE: this is a logilab's standard
@@ -911,29 +928,34 @@ class TestCase(unittest.TestCase):
 
     # override default's unittest.py feature
     def shortDescription(self):
-	"""override default unitest shortDescription to handle correctly
-	generative tests
-	"""
+        """override default unitest shortDescription to handle correctly
+        generative tests
+        """
         if self._current_test_descr is not None:
-	    return self._current_test_descr
-	return super(TestCase, self).shortDescription()
+            return self._current_test_descr
+        return super(TestCase, self).shortDescription()
 
     
     def captured_output(self):
+        """return a two tuple with standard output and error stripped"""
         return self._captured_stdout.strip(), self._captured_stderr.strip()
 
     def _start_capture(self):
+        """start_capture if enable"""
         if self.capture:
             self.start_capture()
 
     def _stop_capture(self):
+        """stop_capture and restore previous output"""
         self._force_output_restore()
     
     def start_capture(self, printonly=None):
+        """start_capture"""
         self._out.append(capture_stdout(printonly or self._printonly))
         self._err.append(capture_stderr(printonly or self._printonly))
 
     def printonly(self, pattern, flags=0):
+        """set the pattern of line to print"""
         rgx = re.compile(pattern, flags)
         if self._out:
             self._out[-1].printonly = rgx
@@ -942,6 +964,7 @@ class TestCase(unittest.TestCase):
             self.start_capture(printonly=rgx)
         
     def stop_capture(self):
+        """stop output and error capture"""
         if self._out:
             _out = self._out.pop()
             _err = self._err.pop()
@@ -949,6 +972,7 @@ class TestCase(unittest.TestCase):
         return '', ''
     
     def _force_output_restore(self):
+        """remove all capture set"""
         while self._out:
             self._captured_stdout += self._out.pop().restore()
             self._captured_stderr += self._err.pop().restore()
@@ -968,10 +992,12 @@ class TestCase(unittest.TestCase):
         return True
 
     def _get_test_method(self):
+        """return the test method"""
         return getattr(self, self.__testMethodName)
 
 
     def optval(self, option, default=None):
+        """return the option value or default if the option is not define"""
         return getattr(self._options_, option, default)
 
     def __call__(self, result=None, runcondition=None, options=None):
@@ -998,7 +1024,8 @@ class TestCase(unittest.TestCase):
                 return
             # generative tests
             if is_generator(testMethod.im_func):
-                success = self._proceed_generative(result, testMethod, runcondition)
+                success = self._proceed_generative(result, testMethod,
+                    runcondition)
             else:
                 status = self._proceed(result, testMethod)
                 success = (status == 0)
@@ -1020,11 +1047,13 @@ class TestCase(unittest.TestCase):
         success = True
         try:
             for params in testfunc():
-                if runcondition and not runcondition(testfunc, skipgenerator=False):
-                    if not (isinstance(params, InnerTest) and runcondition(params)):
+                if runcondition and not runcondition(testfunc,
+                        skipgenerator=False):
+                    if not (isinstance(params, InnerTest)
+                            and runcondition(params)):
                         continue
                 if not isinstance(params, (tuple, list)):
-                    params = (params,)
+                    params = (params, )
                 func = params[0]
                 args, kwargs = parse_generative_args(params[1:])
                 # increment test counter manually
@@ -1073,30 +1102,33 @@ class TestCase(unittest.TestCase):
         return 0
             
     def defaultTestResult(self):
+        """return a new instance of the defaultTestResult"""
         return SkipAwareTestResult()
 
     def skip(self, msg=None):
+        """mark a test as skipped for the <msg> reason"""
         msg = msg or 'test was skipped'
         raise TestSkipped(msg)
     skipped_test = deprecated_function(skip)
     
-    def assertDictEquals(self, d1, d2):
+    def assertDictEquals(self, dict1, dict2):
         """compares two dicts
 
         If the two dict differ, the first difference is shown in the error
         message
         """
-        d1 = dict(d1)
+        dict1 = dict(dict1)
         msgs = []
-        for key, value in d2.items():
+        for key, value in dict2.items():
             try:
-                if d1[key] != value:
-                    msgs.append('%r != %r for key %r' % (d1[key], value, key))
-                del d1[key]
+                if dict1[key] != value:
+                    msgs.append('%r != %r for key %r' % (dict1[key], value,
+                        key))
+                del dict1[key]
             except KeyError:
                 msgs.append('missing %r key' % key)
-        if d1:
-            msgs.append('d2 is lacking %r' % d1)
+        if dict1:
+            msgs.append('dict2 is lacking %r' % dict1)
         if msgs:
             self.fail(''.join(msgs))
     assertDictEqual = assertDictEquals
@@ -1119,34 +1151,35 @@ class TestCase(unittest.TestCase):
             self.fail(msg)
     assertSetEqual = assertSetEquals
 
-    def assertListEquals(self, l1, l2, msg=None):
+    def assertListEquals(self, list_1, list_2, msg=None):
         """compares two lists
 
         If the two list differ, the first difference is shown in the error
         message
         """
-        _l1 = l1[:]
-        for i, value in enumerate(l2):
+        _l1 = list_1[:]
+        for i, value in enumerate(list_2):
             try:
                 if _l1[0] != value:
                     from pprint import pprint
-                    pprint(l1)
-                    pprint(l2)
+                    pprint(list_1)
+                    pprint(list_2)
                     self.fail('%r != %r for index %d' % (_l1[0], value, i))
                 del _l1[0]
             except IndexError:
                 if msg is None:
-                    msg = 'l1 has only %d elements, not %s (at least %r missing)'% (i, len(l2), value)
+                    msg = 'list_1 has only %d elements, not %s '\
+                        '(at least %r missing)'% (i, len(list_2), value)
                 self.fail(msg)
         if _l1:
             if msg is None:
-                msg = 'l2 is lacking %r' % _l1
+                msg = 'list_2 is lacking %r' % _l1
             self.fail(msg)
     assertListEqual = assertListEquals
     
-    def assertLinesEquals(self, l1, l2, msg=None):
+    def assertLinesEquals(self, list_1, list_2, msg=None):
         """assert list of lines are equal"""
-        self.assertListEquals(l1.splitlines(), l2.splitlines(), msg)
+        self.assertListEquals(list_1.splitlines(), list_2.splitlines(), msg)
     assertLineEqual = assertLinesEquals
 
     def assertXMLWellFormed(self, stream, msg=None):
@@ -1160,7 +1193,7 @@ class TestCase(unittest.TestCase):
                 msg = 'XML stream not well formed'
             self.fail(msg)
     assertXMLValid = deprecated_function(assertXMLWellFormed,
-                                         'assertXMLValid renamed to more precise assertXMLWellFormed')
+         'assertXMLValid renamed to more precise assertXMLWellFormed')
 
     def assertXMLStringWellFormed(self, xml_string, msg=None):
         """asserts the XML string is well-formed (no DTD conformance check)"""
@@ -1168,36 +1201,43 @@ class TestCase(unittest.TestCase):
         self.assertXMLWellFormed(stream, msg)
         
     assertXMLStringValid = deprecated_function(
-        assertXMLStringWellFormed, 'assertXMLStringValid renamed to more precise assertXMLStringWellFormed')
+        assertXMLStringWellFormed,
+        'assertXMLStringValid renamed to more precise assertXMLStringWellFormed'
+        )
 
-    def assertXMLEqualsTuple(self,element,tup):
+    def assertXMLEqualsTuple(self, element, tup):
         """compare an ElementTree Element to a tuple formatted as follow:
-        (tagname,[attrib[,children[,text[,tail]]]])"""
+        (tagname, [attrib[, children[, text[, tail]]]])"""
         # check tag
         self.assertTextEquals(element.tag, tup[0])
         # check attrib
         if len(element.attrib) or len(tup)>1:
             if len(tup)<=1:
-                self.fail( "tuple %s has no attributes (%s expected)"%(tup,dict(element.attrib)))
+                self.fail( "tuple %s has no attributes (%s expected)"%(tup,
+                    dict(element.attrib)))
             self.assertDictEquals(element.attrib, tup[1])
         # check childrend
         if len(element) or len(tup)>2:
             if len(tup)<=2:
-                self.fail( "tuple %s has no children (%i expected)"%(tup,len(element)))
+                self.fail( "tuple %s has no children (%i expected)"%(tup,
+                    len(element)))
             if len(element) != len(tup[2]):
-                self.fail( "tuple %s has %i children%s (%i expected)"%(tup, len(tup[2]),
-                        ('','s')[len(tup[2])>1],len(element)))
+                self.fail( "tuple %s has %i children%s (%i expected)"%(tup,
+                    len(tup[2]),
+                        ('', 's')[len(tup[2])>1], len(element)))
             for index in xrange(len(tup[2])):
                 self.assertXMLEqualsTuple(element[index], tup[2][index])
         #check text
         if element.text or len(tup)>3:
             if len(tup)<=3:
-                self.fail( "tuple %s has no text value (%r expected)"%(tup,element.text))
+                self.fail( "tuple %s has no text value (%r expected)"%(tup,
+                    element.text))
             self.assertTextEquals(element.text, tup[3])
         #check tail
         if element.tail or len(tup)>4:
             if len(tup)<=4:
-                self.fail( "tuple %s has no tail value (%r expected)"%(tup,element.tail))
+                self.fail( "tuple %s has no tail value (%r expected)"%(tup,
+                    element.tail))
             self.assertTextEquals(element.tail, tup[4])
 
     def _difftext(self, lines1, lines2, junk=None):
@@ -1254,7 +1294,7 @@ class TestCase(unittest.TestCase):
 
     def assertIs(self, obj, other, msg=None):
         """compares identity of two reference"""
-        self.assert_(obj is other, "%r is not %r"%(obj,other))
+        self.assert_(obj is other, "%r is not %r"%(obj, other), msg)
 
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
         """override default failUnlessRaise method to return the raised
@@ -1333,7 +1373,8 @@ class DocTest(TestCase):
     without this hack
     """
     skipped = ()
-    def __call__(self, result=None, runcondition=None, options=None):
+    def __call__(self, result=None, runcondition=None, options=None):\
+            # pylint: disable-msg=W0613
         try:
             finder = DocTestFinder(skipped=self.skipped)
             if sys.version_info >= (2, 4):
@@ -1400,18 +1441,25 @@ class MockConnection:
         self.results = results
         
     def cursor(self):
+        """Mock cursor method"""
         return self
     def execute(self, query, args=None):
+        """Mock execute method"""
         self.received.append( (query, args) )
     def fetchone(self):
+        """Mock fetchone method"""
         return self.results[0]
     def fetchall(self):
+        """Mock fetchall method"""
         return self.results
     def commit(self):
+        """Mock commiy method"""
         self.states.append( ('commit', len(self.received)) )
     def rollback(self):
+        """Mock rollback method"""
         self.states.append( ('rollback', len(self.received)) )
     def close(self):
+        """Mock close method"""
         pass
 
 MockConnexion = class_renamed('MockConnexion', MockConnection)
@@ -1477,7 +1525,8 @@ def enable_dbc(*args):
         from logilab.aspects.weaver import weaver
         from logilab.aspects.lib.contracts import ContractAspect
     except ImportError:
-        sys.stderr.write('Warning: logilab.aspects is not available. Contracts disabled.')
+        sys.stderr.write(
+            'Warning: logilab.aspects is not available. Contracts disabled.')
         return False
     for arg in args:
         weaver.weave_module(arg, ContractAspect)
