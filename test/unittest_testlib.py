@@ -208,7 +208,11 @@ class TestlibTC(TestCase):
         tc2 = MyTC('test_1')
         self.assertEquals(tc2.datadir, expected_datadir)
         
-
+    def test_is(self):
+        obj_1 = []
+        obj_2 = []
+        self.assertIs(obj_1,obj_1)
+        self.assertRaises(AssertionError, self.assertIs, obj_1, obj_2)
 
 class GenerativeTestsTC(TestCase):
     
