@@ -1422,7 +1422,7 @@ class MockConfigParser(ConfigParser):
             self.add_section(section)
             for key, value in pairs.iteritems():
                 self.set(section,key,value)
-    def write(self, _)
+    def write(self, _):
         raise NotImplementedError()
 
 
