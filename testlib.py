@@ -35,7 +35,7 @@ import difflib
 import types
 from warnings import warn
 from compiler.consts import CO_GENERATOR
-from ConfigParser import NoSectionError, NoOptionError
+from ConfigParser import ConfigParser
 
 # PRINT_ = file('stdout.txt', 'w').write
 
@@ -1413,26 +1413,15 @@ class MockSMTP:
         """ignore quit"""
 
 
-class MockConfigParser:
+class MockConfigParser(ConfigParser):
     """fake ConfigParser.ConfigParser"""
     
     def __init__(self, options):
-        self.options = options
-        
-    def get(self, section, option):
-        """return option in section"""
-        try:
-            sec = self.options[section]
-            try:
-                return sec[option]
-            except KeyError:
-                raise NoOptionError(option, section)
-        except KeyError:
-            raise NoSectionError(option)
-
-    def has_option(self, section, option):
-        """ask if option exists in section"""
-        return section in self.options and option in self.options[section]
+        ConfigParser.__init__(self)
+        for section, pairs in options.iteritems():
+            self.add_section(section)
+            for key, value in pairs.iteritems():
+                self.set(section,key,value)
 
 class MockConnection:
     """fake DB-API 2.0 connexion AND cursor (i.e. cursor() return self)"""
