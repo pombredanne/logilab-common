@@ -1,3 +1,9 @@
+logilab-common (0.32.0-2) unstable; urgency=low
+
+  * add missing python:Depends and python:Provides fields in control file
+
+ -- Sylvain Thenault <sylvain.thenault@logilab.fr>  Fri, 13 Jun 2008 15:41:21 +0200
+
 logilab-common (0.32.0-1) unstable; urgency=low
 
   * new upstream release
