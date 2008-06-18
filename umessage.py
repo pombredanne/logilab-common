@@ -1,6 +1,7 @@
 """unicode email support"""
 
 import email
+from encodings import search_function
 from email.Utils import parseaddr, parsedate
 from email.Header import decode_header
 
@@ -58,9 +59,9 @@ class UMessage:
                 return payload
 
             charset = message.get_content_charset() or 'iso-8859-1'
-            if charset == 'unknown-8bit':
+            if search_function(charset) is None:
                 charset = 'iso-8859-1'
-            return unicode(payload or '', charset)
+            return unicode(payload or '', charset, "replace")
         else:
             payload = UMessage(message.get_payload(index, decode))
         return payload
