@@ -1,6 +1,7 @@
 """unicode email support"""
 
 import email
+from encodings import search_function
 from email.Utils import parseaddr, parsedate
 from email.Header import decode_header
 
@@ -58,9 +59,9 @@ class UMessage:
                 return payload
 
             charset = message.get_content_charset() or 'iso-8859-1'
-            if charset == 'unknown-8bit':
+            if search_function(charset) is None:
                 charset = 'iso-8859-1'
-            return unicode(payload or '', charset)
+            return unicode(payload or '', charset, "replace")
         else:
             payload = UMessage(message.get_payload(index, decode))
         return payload
@@ -109,16 +110,25 @@ class UMessage:
             persons.append((name, mail))
         return persons
     
-    def date(self):
+    def date(self, alternative_source=False):
         """return a mx.DateTime object for the email's date or None if no date is
         set or if it can't be parsed
         """
         value = self.get('date')
-        if value:
+        if value is None and alternative_source:
+            unix_from = self.message.get_unixfrom()
+            if unix_from is not None:
+                try:
+                    value = unix_from.split(" ", 2)[2]
+                except IndexError:
+                    pass
+            
+        if value is not None:
             datetuple = parsedate(value)
             if datetuple:
                 return DateTime(*datetuple[:6])
-        return None
+        else:
+            return None
 
     
 
