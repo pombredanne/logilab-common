@@ -1134,7 +1134,7 @@ class TestCase(unittest.TestCase):
     assertDictEqual = assertDictEquals
 
     def assertSetEquals(self, got, expected, msg=None):
-        """compares two iterables and shows difference between both"""
+        """compares two set and shows difference between both"""
         got, expected = list(got), list(expected)
         if msg is None:
 	        msg1 = '%s != %s' % (got, expected)
@@ -1296,7 +1296,26 @@ class TestCase(unittest.TestCase):
         if msg is None:
             msg = "%r is not %r"%(obj, other)
         self.assert_(obj is other, msg)
+    
+    
+    def assertIsNot(self, obj, other, msg=None):
+        """compares identity of two reference"""
+        if msg is None:
+            msg = "%r is %r"%(obj, other)
+        self.assert_(obj is not other, msg )
 
+    def assertNone(self, obj, msg=None):
+        """assert obj is None"""
+        if msg is None:
+            msg = "param is not None"
+        self.assert_( obj is None, msg )
+    
+    def assertNotNone(self, obj, msg=None):
+        """assert obj is not None"""
+        if msg is None:
+            msg = "param is None"
+        self.assert_( obj is not None, msg )
+    
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
         """override default failUnlessRaise method to return the raised
         exception instance.

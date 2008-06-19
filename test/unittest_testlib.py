@@ -213,6 +213,20 @@ class TestlibTC(TestCase):
         obj_2 = []
         self.assertIs(obj_1,obj_1)
         self.assertRaises(AssertionError, self.assertIs, obj_1, obj_2)
+    
+    def test_isnot(self):
+        obj_1 = []
+        obj_2 = []
+        self.assertIsNot(obj_1,obj_2)
+        self.assertRaises(AssertionError, self.assertIsNot, obj_1, obj_1)
+
+    def test_none(self):
+        self.assertNone(None)
+        self.assertRaises(AssertionError, self.assertNone, object())
+
+    def test_none(self):
+        self.assertNotNone(object())
+        self.assertRaises(AssertionError, self.assertNotNone, None)
 
 class GenerativeTestsTC(TestCase):
     
