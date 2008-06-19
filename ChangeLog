@@ -7,6 +7,7 @@ ChangeLog for logilab.common
     * testlib: added a assertXMLEqualsTuple test assertion
     * added a assertIs test
 
+    * add assertIsNot, assertNone and assertNotNone assertion
 2008-05-08  --  0.31.0
     * improved documentation and error messages
     * testlib: support a msg argument on more assertions, pysqlite2 as default
