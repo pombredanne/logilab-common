@@ -1134,7 +1134,7 @@ class TestCase(unittest.TestCase):
     assertDictEqual = assertDictEquals
 
     def assertSetEquals(self, got, expected, msg=None):
-        """compares two set and shows difference between both"""
+        """compares two iterable and shows difference between both"""
         got, expected = list(got), list(expected)
         if msg is None:
 	        msg1 = '%s != %s' % (got, expected)
@@ -1307,13 +1307,13 @@ class TestCase(unittest.TestCase):
     def assertNone(self, obj, msg=None):
         """assert obj is None"""
         if msg is None:
-            msg = "param is not None"
+            msg = "reference to %r when None expected"%(obj,)
         self.assert_( obj is None, msg )
     
     def assertNotNone(self, obj, msg=None):
         """assert obj is not None"""
         if msg is None:
-            msg = "param is None"
+            msg = "unexpected reference to None"
         self.assert_( obj is not None, msg )
     
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
