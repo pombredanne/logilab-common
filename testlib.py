@@ -489,16 +489,23 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                             (run, run != 1 and "s" or "", timeTaken))
         self.stream.writeln()
         if not result.wasSuccessful():
-            self.stream.write("FAILED (")
-            failed, errored = map(len, (result.failures, result.errors))
-            if failed:
-                self.stream.write("failures=%d" % failed)
-            if errored:
-                if failed: self.stream.write(", ")
-                self.stream.write("errors=%d" % errored)
-            self.stream.writeln(")")
+            self.stream.write("FAILED")
         else:
-            self.stream.writeln("OK")
+            self.stream.write("OK")
+        failed, errored, skipped = map(len, (result.failures, result.errors,
+             result.skipped))
+        
+        det_results = []
+        for name, value in (("failures", result.failures),
+                            ("errors",result.errors),
+                            ("skipped", result.skipped)):
+            if value:
+                det_results.append("%s=%i" % (name, len(value)))
+        if det_results:
+            self.stream.write(" (")
+            self.stream.write(', '.join(det_results))
+            self.stream.write(")")
+        self.stream.writeln("")
         return result
 
 
