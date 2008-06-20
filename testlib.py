@@ -1262,7 +1262,7 @@ class TestCase(unittest.TestCase):
         self._difftext(text1.splitlines(True), text2.splitlines(True), junk)
     assertTextEqual = assertTextEquals
             
-    def assertStreamEqual(self, stream1, stream2, junk=None):
+    def assertStreamEquals(self, stream1, stream2, junk=None):
         """compare two streams (using difflib and readlines())"""
         # if stream2 is stream2, readlines() on stream1 will also read lines
         # in stream2, so they'll appear different, although they're not
@@ -1274,6 +1274,7 @@ class TestCase(unittest.TestCase):
         # ocmpare
         self._difftext(stream1.readlines(), stream2.readlines(), junk)
             
+    assertStreamEqual = assertStreamEquals
     def assertFileEqual(self, fname1, fname2, junk=(' ', '\t')):
         """compares two files using difflib"""
         self.assertStreamEqual(file(fname1), file(fname2), junk)
