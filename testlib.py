@@ -1248,7 +1248,7 @@ class TestCase(unittest.TestCase):
             read.append(line)
             # lines that don't start with a ' ' are diff ones
             if not line.startswith(' '):
-                self.fail(''.join(read + list(result)))
+                self.fail(''.join(['Texts differ\n']+read + list(result)))
         
     def assertTextEquals(self, text1, text2, junk=None):
         """compare two multiline strings (using difflib and splitlines())"""
