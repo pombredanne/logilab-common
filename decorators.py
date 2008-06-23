@@ -112,7 +112,9 @@ class classproperty(object):
     def __get__(self, inst, cls):
         return self.get(cls)
 
+
 from time import clock
+
 def timed(f):
     def wrap(*args, **kwargs):
         t = clock()
@@ -121,4 +123,20 @@ def timed(f):
         print '%s time: %.9f' % (f.__name__, clock() - t)
         return res
     return wrap
+
+
+def locked(acquire, release):
+    """decorator taking two methods to acquire/release a lock as argument,
+    returning a decorator function which will call the inner method after
+    having called acquire(self) et will call release(self) afterwards.
+    """
+    def decorator(f):
+        def wrapper(self, *args, **kwargs):
+            acquire(self)
+            try:
+                return f(self, *args, **kwargs)
+            finally:
+                release(self)
+        return wrapper
+    return decorator
 
