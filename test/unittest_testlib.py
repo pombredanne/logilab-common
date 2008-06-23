@@ -116,30 +116,37 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.tc.assertXMLStringWellFormed, invalid)
 
 
-    def test_set_equality_for_lists(self):
+    def test_unordered_equality_for_lists(self):
         l1 = [0, 1, 2]
         l2 = [1, 2, 3]
-        self.assertRaises(AssertionError, self.tc.assertSetEqual, l1, l2)
-        self.tc.assertSetEqual(l1, l1)
-        self.tc.assertSetEqual([], [])
+        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, l1, l2)
+        self.tc.assertUnorderedIterableEquals(l1, l1)
+        self.tc.assertUnorderedIterableEquals([], [])
         l1 = [0, 1, 1]
         l2 = [0, 1]
-        self.assertRaises(AssertionError, self.tc.assertSetEqual, l1, l2)
-        self.tc.assertSetEqual(l1, l1)
+        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, l1, l2)
+        self.tc.assertUnorderedIterableEquals(l1, l1)
 
 
-    def test_set_equality_for_dicts(self):
+    def test_unordered_equality_for_dicts(self):
         d1 = {'a' : 1, 'b' : 2}
         d2 = {'a' : 1}
-        self.assertRaises(AssertionError, self.tc.assertSetEqual, d1, d2)
-        self.tc.assertSetEqual(d1, d1)
-        self.tc.assertSetEqual({}, {})
+        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, d1, d2)
+        self.tc.assertUnorderedIterableEquals(d1, d1)
+        self.tc.assertUnorderedIterableEquals({}, {})
 
-    def test_set_equality_for_iterables(self):
-        self.assertRaises(AssertionError, self.tc.assertSetEqual, xrange(5), xrange(6))
-        self.tc.assertSetEqual(xrange(5), range(5))
-        self.tc.assertSetEqual([], ())
+    def test_unordered_equality_for_iterables(self):
+        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, xrange(5), xrange(6))
+        self.tc.assertUnorderedIterableEquals(xrange(5), range(5))
+        self.tc.assertUnorderedIterableEquals([], ())
 
+    def test_unordered_equality_for_dicts(self):
+        s1 = set('ab')
+        s2 = set('a')
+        self.assertRaises(AssertionError, self.tc.assertSetEquals, s1, s2)
+        self.tc.assertSetEquals(s1, s1)
+        self.tc.assertSetEquals(set(), set())
+    
     def test_file_equality(self):
         foo = join(dirname(__file__), 'data', 'foo.txt')
         spam = join(dirname(__file__), 'data', 'spam.txt')        

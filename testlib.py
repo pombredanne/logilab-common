@@ -1140,7 +1140,9 @@ class TestCase(unittest.TestCase):
             self.fail(''.join(msgs))
     assertDictEqual = assertDictEquals
 
-    def assertSetEquals(self, got, expected, msg=None):
+
+
+    def assertUnorderedIterableEquals(self, got, expected, msg=None):
         """compares two iterable and shows difference between both"""
         got, expected = list(got), list(expected)
         if msg is None:
@@ -1155,6 +1157,24 @@ class TestCase(unittest.TestCase):
             if msg is None:
                 msg = '\tunexpected: %s\n\tmissing: %s' % (unexpected, missing)
             self.fail(msg)
+
+    assertUnorderedIterableEqual = assertUnorderedIterableEquals
+
+    def assertSetEquals(self,got,expected, msg=None):
+        if not(isinstance(got, set) or isinstance(expected, set)):
+            warn("the assertSetEquals function if now intended for set only."\
+                "use assertUnorderedIterableEquals instead.",
+                DeprecationWarning, 2)
+            return self.assertUnorderedIterableEquals(got,expected, msg)
+        
+        missing = expected - got
+        unexpected = got - expected
+        if missing or unexpected:
+            if msg is None:
+                msg = '\tunexpected: %s\n\tmissing: %s' % (unexpected, missing)
+            self.fail(msg)
+
+
     assertSetEqual = assertSetEquals
 
     def assertListEquals(self, list_1, list_2, msg=None):
