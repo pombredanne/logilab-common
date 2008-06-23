@@ -1146,7 +1146,7 @@ class TestCase(unittest.TestCase):
         """compares two iterable and shows difference between both"""
         got, expected = list(got), list(expected)
         if msg is None:
-	        msg1 = '%s != %s' % (got, expected)
+	        msg1 = '%s != %s' % (sorted(got), sorted(expected))
         else:
             msg1 = msg
         self.assertEquals(len(got), len(expected), msg1)
