@@ -93,8 +93,8 @@ class CacheTestCase(TestCase):
         self.assertEqual(len(null_cache), 0, 'Cache should be empty !')
         # Assert null_cache['foo'] raises a KeyError
         self.assertRaises(KeyError, null_cache.__getitem__, 'foo')
-        # Deleting element should not raise error
-        del null_cache['foo']
+        # Deleting element raises a KeyError
+        self.assertRaises(KeyError, null_cache.__delitem__, 'foo')
     
 
 if __name__ == "__main__":
