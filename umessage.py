@@ -110,7 +110,7 @@ class UMessage:
             persons.append((name, mail))
         return persons
     
-    def date(self, alternative_source=False):
+    def date(self, alternative_source=False, return_str=False):
         """return a mx.DateTime object for the email's date or None if no date is
         set or if it can't be parsed
         """
@@ -126,6 +126,8 @@ class UMessage:
             datetuple = parsedate(value)
             if datetuple:
                 return DateTime(*datetuple[:6])
+            elif not return_str:
+                return None
         return value
 
     
