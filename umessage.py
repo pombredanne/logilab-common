@@ -122,13 +122,11 @@ class UMessage:
                     value = unix_from.split(" ", 2)[2]
                 except IndexError:
                     pass
-            
         if value is not None:
             datetuple = parsedate(value)
             if datetuple:
                 return DateTime(*datetuple[:6])
-        else:
-            return None
+        return value
 
     
 

@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
 
- --
+  --  
     * decorators: new @locked decorator
     * cache: make it thread safe, changed behaviour so that when cache size is 0
       and __delitem__ is called, a KeyError is raised (more consistent)
@@ -9,6 +9,7 @@ ChangeLog for logilab.common
       - added assertIsNot, assertNone and assertNotNone assertion
       - added assertUnorderedIterableEquals
 	
+    * umessage.date() return unparsage string as is instead of None
 2008-09-08  --  0.32.0
     * textutils: add the apply_unit fonction
     * testlib:
