@@ -33,6 +33,7 @@ import traceback
 import unittest
 import difflib
 import types
+from operator import itemgetter
 from warnings import warn
 from compiler.consts import CO_GENERATOR
 from ConfigParser import ConfigParser
@@ -1302,9 +1303,76 @@ class TestCase(unittest.TestCase):
         self._difftext(stream1.readlines(), stream2.readlines(), junk)
             
     assertStreamEqual = assertStreamEquals
-    def assertFileEqual(self, fname1, fname2, junk=(' ', '\t')):
+    def assertFileEquals(self, fname1, fname2, junk=(' ', '\t')):
         """compares two files using difflib"""
         self.assertStreamEqual(file(fname1), file(fname2), junk)
+    assertFileEqual = assertFileEquals
+   
+    
+    def assertDirEquals(self, path_a, path_b):
+        """compares two files using difflib"""
+        assert osp.exists(path_a), "%s doesn't exists" % path_a
+        assert osp.exists(path_b), "%s doesn't exists" % path_b
+
+        all_a = [ (ipath[len(path_a):].lstrip('/'), idirs, ifiles) 
+                    for ipath, idirs, ifiles in os.walk(path_a)]
+        all_a.sort(key=itemgetter(0))
+        
+        all_b = [ (ipath[len(path_b):].lstrip('/'), idirs, ifiles) 
+                    for ipath, idirs, ifiles in os.walk(path_b)]
+        all_b.sort(key=itemgetter(0))
+        
+        iter_a, iter_b = iter(all_a), iter(all_b)
+        partial_iter = True
+        ipath_a, idirs_a, ifiles_a = data_a = None, None, None
+        while True:
+            try:
+                ipath_a, idirs_a, ifiles_a = datas_a = iter_a.next()
+                partial_iter = False
+                ipath_b, idirs_b, ifiles_b = datas_b = iter_b.next()
+                partial_iter = True
+
+
+                self.assert_(ipath_a == ipath_b,
+                    "unexpected %s in %s while looking %s from %s" % 
+                    (ipath_a, path_a, ipath_b, path_b))
+
+
+                errors = {}
+                sdirs_a = set(idirs_a)
+                sdirs_b = set(idirs_b)
+                errors["unexpected directories"] = sdirs_a - sdirs_b
+                errors["missing directories"] = sdirs_b - sdirs_a
+
+                sfiles_a = set(ifiles_a)
+                sfiles_b = set(ifiles_b)
+                errors["unexpected files"] = sfiles_a - sfiles_b
+                errors["missing files"] = sfiles_b - sfiles_a
+
+
+                msgs = [ "%s: %s"% (name, items) 
+                    for name, items in errors.iteritems() if items]
+                
+                if msgs:
+                    msgs.insert(0,"%s and %s differ :" % (
+                        osp.join(path_a, ipath_a),
+                        osp.join(path_b, ipath_b),
+                        ))
+                    self.fail("\n".join(msgs))
+
+                for files in (ifiles_a, ifiles_b):
+                    files.sort()
+
+                for index, path in enumerate(ifiles_a):
+                    self.assertFileEquals(osp.join(path_a, ipath_a, path),
+                        osp.join(path_b, ipath_b, ifiles_b[index]))
+
+            except StopIteration:
+                break
+
+
+    assertDirEqual = assertDirEquals
+
             
     def assertIsInstance(self, obj, klass, msg=None, strict=False):
         """compares two files using difflib"""

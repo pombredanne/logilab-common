@@ -152,7 +152,24 @@ class TestlibTC(TestCase):
         spam = join(dirname(__file__), 'data', 'spam.txt')        
         self.assertRaises(AssertionError, self.tc.assertFileEqual, foo, spam)
         self.tc.assertFileEqual(foo, foo)
-
+    
+    def test_dir_equality(self):
+        ref = join(dirname(__file__), 'data', 'reference_dir')
+        same = join(dirname(__file__), 'data', 'same_dir')
+        subdir_differ = join(dirname(__file__), 'data', 'subdir_differ_dir')
+        file_differ = join(dirname(__file__), 'data', 'file_differ_dir')
+        content_differ = join(dirname(__file__), 'data', 'content_differ_dir')
+        ed1 = join(dirname(__file__), 'data', 'empty_dir_1')
+        ed2 = join(dirname(__file__), 'data', 'empty_dir_2')        
+        self.assertDirEquals(ed1, ed2)
+        self.assertDirEquals(ref, ref)
+        self.assertDirEquals( ref, same)
+        self.assertRaises(AssertionError, self.assertDirEquals, ed1, ref)
+        self.assertRaises(AssertionError, self.assertDirEquals, ref, ed2)
+        self.assertRaises(AssertionError, self.assertDirEquals, subdir_differ, ref)
+        self.assertRaises(AssertionError, self.assertDirEquals, file_differ, ref)
+        self.assertRaises(AssertionError, self.assertDirEquals, ref, content_differ)
+        
     def test_stream_equality(self):
         foo = join(dirname(__file__), 'data', 'foo.txt')
         spam = join(dirname(__file__), 'data', 'spam.txt')        

@@ -12,6 +12,7 @@ ChangeLog for logilab.common
     * compat: adds a max function taking 'key' as keyword argument
 
     * escape rest when printing for default value
+    * add an assertDirEquals method for TestCase
 2008-09-08  --  0.32.0
     * textutils: add the apply_unit fonction
     * testlib:
