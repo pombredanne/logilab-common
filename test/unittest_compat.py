@@ -9,11 +9,13 @@ import pprint
 class CompatTCMixIn:
     MODNAMES = {}
     BUILTINS = []
+    ALTERED_BUILTINS = {}
     
     def setUp(self):
         self.builtins_backup = {}
         self.modules_backup = {}
         self.remove_builtins()
+        self.alter_builtins()
         self.remove_modules()
     
     def tearDown(self):
@@ -35,6 +37,13 @@ class CompatTCMixIn:
             if func is not None:
                 self.builtins_backup[builtin] = func
                 delattr(__builtin__, builtin)
+                # setattr(__builtin__, 'builtin_%s' % builtin, func)
+    def alter_builtins(self):
+        for builtin, func in self.ALTERED_BUILTINS.iteritems():
+            old_func = getattr(__builtin__, builtin, None)
+            if func is not None:
+                self.builtins_backup[builtin] = old_func
+                setattr(__builtin__, builtin, func)
                 # setattr(__builtin__, 'builtin_%s' % builtin, func)
                 
     def remove_modules(self):
@@ -147,9 +156,18 @@ class Py24CompatTC(CompatTCMixIn, TestCase):
 
 
 
+class _MaxFaker(object):
+    def __init__(self, func):
+        self.func = func
+    def fake(self,*args,**kargs):
+        if kargs:
+            raise TypeError("max() takes no keyword argument")
+        return self.func(*args)
+        
 
 class Py25CompatTC(CompatTCMixIn, TestCase):
     BUILTINS = ('any', 'all',)
+    ALTERED_BUILTINS = {'max': _MaxFaker(max).fake}
 
     def test_any(self):
         from logilab.common.compat import any
@@ -180,7 +198,25 @@ class Py25CompatTC(CompatTCMixIn, TestCase):
         self.assertEquals(all(irange), False)
         self.assertEquals(irange.next(), 1)
 
+    def test_max(self):
+        from logilab.common.compat import max
+    
+        # old apy
+        self.assertEquals(max("fdjkmhsgmdfhsg"),'s')
+        self.assertEquals(max(1,43,12,45,1337,34,2), 1337)
+        self.assertRaises(TypeError,max)
+        self.assertRaises(TypeError,max,1)
+        self.assertRaises(ValueError,max,[])
+        self.assertRaises(TypeError,max,bob=None)
 
+        # new apy
+        self.assertEquals(max("shorter","longer",key=len),"shorter")
+        self.assertEquals(max(((1,1),(2,3,5),(8,13,21)),key=len),(2,3,5))
+        self.assertEquals(max(((1,1),(42,),(2,3,5),(8,13,21)),key=max),(42,))
+        self.assertRaises(TypeError,max,key=None)
+        self.assertRaises(TypeError,max,1,key=len)
+        self.assertRaises(ValueError,max,[],key=max)
+        self.assertRaises(TypeError,max,"shorter","longer",key=len,kathy=None)
 
 if __name__ == '__main__':
     unittest_main()

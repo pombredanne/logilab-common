@@ -8,9 +8,9 @@ ChangeLog for logilab.common
     * testlib:
       - added assertIsNot, assertNone and assertNotNone assertion
       - added assertUnorderedIterableEquals
-	
     * umessage.date() return unparsage string as is instead of None
-	
+    * compat: adds a max function taking 'key' as keyword argument
+
 2008-09-08  --  0.32.0
     * textutils: add the apply_unit fonction
     * testlib:

@@ -22,6 +22,8 @@ from __future__ import generators
 
 from warnings import warn
 
+import __builtin__
+
 from logilab.common.deprecation import class_renamed
 
 try:
@@ -187,6 +189,44 @@ except NameError:
         l2 = list(l)
         l2.reverse()
         return l2
+
+try: #
+    max = max
+    max(("ab","cde"),key=len)
+except TypeError:
+    def max( *args, **kargs):
+        if len(args) == 0:
+            raise TypeError("max expected at least 1 arguments, got 0")
+        key= kargs.pop("key", None)
+        #default implementation
+        if key is None:
+            return __builtin__.max(*args,**kargs)
+
+        for karg in kargs:
+            raise TypeError("unexpected keyword argument %s for function max") % karg
+
+        if len(args) == 1:
+            items = iter(args[0])
+        else:
+            items = iter(args)
+        
+        try:
+            best_item = items.next()
+            best_value = key(best_item)
+        except StopIteration:
+            raise ValueError("max() arg is an empty sequence")
+        
+        for item in items:
+            value = key(item)
+            if value > best_value:
+                best_item = item
+                best_value = value
+
+        return best_item
+
+
+
+
 
 # Python2.5 builtins
 try:
