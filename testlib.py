@@ -1168,11 +1168,13 @@ class TestCase(unittest.TestCase):
                 DeprecationWarning, 2)
             return self.assertUnorderedIterableEquals(got,expected, msg)
         
-        missing = expected - got
-        unexpected = got - expected
-        if missing or unexpected:
+        items={}
+        items['missing'] = expected - got
+        items['unexpected'] = got - expected
+        if any(items.itervalues()):
             if msg is None:
-                msg = '\tunexpected: %s\n\tmissing: %s' % (unexpected, missing)
+                msg = '\n'.join('\t%s: %s' % (key,value)
+                    for key, value in items.iteritems() if value)
             self.fail(msg)
 
 
