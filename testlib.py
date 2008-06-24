@@ -1267,7 +1267,7 @@ class TestCase(unittest.TestCase):
                     element.tail))
             self.assertTextEquals(element.tail, tup[4])
 
-    def _difftext(self, lines1, lines2, junk=None):
+    def _difftext(self, lines1, lines2, junk=None, msg_prefix='Texts differ'):
         junk = junk or (' ', '\t')
         # result is a generator
         result = difflib.ndiff(lines1, lines2, charjunk=lambda x: x in junk)
@@ -1276,7 +1276,7 @@ class TestCase(unittest.TestCase):
             read.append(line)
             # lines that don't start with a ' ' are diff ones
             if not line.startswith(' '):
-                self.fail(''.join(['Texts differ\n']+read + list(result)))
+                self.fail(''.join(['%s\n'%msg_prefix]+read + list(result)))
         
     def assertTextEquals(self, text1, text2, junk=None):
         """compare two multiline strings (using difflib and splitlines())"""
@@ -1290,7 +1290,8 @@ class TestCase(unittest.TestCase):
         self._difftext(text1.splitlines(True), text2.splitlines(True), junk)
     assertTextEqual = assertTextEquals
             
-    def assertStreamEquals(self, stream1, stream2, junk=None):
+    def assertStreamEquals(self, stream1, stream2, junk=None,
+        msg_prefix='Stream differ'):
         """compare two streams (using difflib and readlines())"""
         # if stream2 is stream2, readlines() on stream1 will also read lines
         # in stream2, so they'll appear different, although they're not
@@ -1300,12 +1301,14 @@ class TestCase(unittest.TestCase):
         stream1.seek(0)
         stream2.seek(0)
         # ocmpare
-        self._difftext(stream1.readlines(), stream2.readlines(), junk)
+        self._difftext(stream1.readlines(), stream2.readlines(), junk,
+             msg_prefix)
             
     assertStreamEqual = assertStreamEquals
     def assertFileEquals(self, fname1, fname2, junk=(' ', '\t')):
         """compares two files using difflib"""
-        self.assertStreamEqual(file(fname1), file(fname2), junk)
+        self.assertStreamEqual(file(fname1), file(fname2), junk,
+            msg_prefix='Files differs\n-:%s\n+:%s\n'%(fname1, fname2))
     assertFileEqual = assertFileEquals
    
     
