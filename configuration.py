@@ -300,7 +300,9 @@ def rest_format_section(stream, section, options, doc=None):
         if help:
             print >> stream, normalize_text(help, line_len=79, indent='  ')
         if value:
-            print >> stream, '  Default: %s' % format_option_value(optdict, value)
+            print >> stream, ''
+            print >> stream, '  Default: ``%s``' % str(
+                format_option_value(optdict, value)).replace("`` ","```` ``")
 
 
 class OptionsManagerMixIn(object):
