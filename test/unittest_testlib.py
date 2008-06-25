@@ -5,7 +5,7 @@ __revision__ = '$Id: unittest_testlib.py,v 1.5 2006-02-09 22:37:46 nico Exp $'
 import unittest
 import os
 import sys
-from os.path import join, dirname, isdir, isfile, abspath
+from os.path import join, dirname, isdir, isfile, abspath, exists
 from cStringIO import StringIO
 import tempfile
 import shutil
@@ -65,8 +65,18 @@ class TestlibTC(TestCase):
 
     capture = True
     
+    def mkdir(self,path):
+        if not exists(path):
+            self._dirs.add(path)
+            os.mkdir(path)
+
     def setUp(self):
         self.tc = MockTestCase()
+        self._dirs = set()
+
+    def tearDown(self):
+        while(self._dirs):
+            shutil.rmtree(self._dirs.pop(), ignore_errors=True)
 
     def test_dict_equals(self):
         """tests TestCase.assertDictEquals"""
@@ -160,7 +170,11 @@ class TestlibTC(TestCase):
         file_differ = join(dirname(__file__), 'data', 'file_differ_dir')
         content_differ = join(dirname(__file__), 'data', 'content_differ_dir')
         ed1 = join(dirname(__file__), 'data', 'empty_dir_1')
-        ed2 = join(dirname(__file__), 'data', 'empty_dir_2')        
+        ed2 = join(dirname(__file__), 'data', 'empty_dir_2')
+
+        for path in (ed1, ed2, join(subdir_differ,'unexpected')):
+            self.mkdir(path)
+
         self.assertDirEquals(ed1, ed2)
         self.assertDirEquals(ref, ref)
         self.assertDirEquals( ref, same)
