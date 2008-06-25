@@ -1,20 +1,21 @@
 ChangeLog for logilab.common
 ============================
 
-  --  
+2008-06-25  --  0.33.0
     * decorators: new @locked decorator
     * cache: make it thread safe, changed behaviour so that when cache size is 0
       and __delitem__ is called, a KeyError is raised (more consistent)
     * testlib:
       - added assertIsNot, assertNone and assertNotNone assertion
       - added assertUnorderedIterableEquals
-    * umessage.date() return unparsage string as is instead of None
-    * compat: adds a max function taking 'key' as keyword argument
+      - added assertDirEquals
+      - various failure ouput improvement
+    * umessage: umessage.date() mayreturn unparsage string as is instead of None
+    * compat: adds a max function taking 'key' as keyword argument as in 2.5
 
-    * escape rest when printing for default value
-    * add an assertDirEquals method for TestCase
+    * configuration: escape rest when printing for default value
 
-2008-09-08  --  0.32.0
+2008-06-08  --  0.32.0
     * textutils: add the apply_unit fonction
     * testlib:
       - added a assertXMLEqualsTuple test assertion
