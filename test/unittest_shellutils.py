@@ -7,25 +7,25 @@ from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.fileutils import *
 
-DATA_DIR = 'data'
+DATA_DIR = join('data','find_test')
 
 class FindTC(TestCase):
     def test_include(self):
-        files = find(DATA_DIR, '.py')
+        files = set(find(DATA_DIR, '.py'))
         self.assertSetEqual(files,
-                            [join('data', f) for f in ['__init__.py', 'module.py',
+                            set([join(DATA_DIR, f) for f in ['__init__.py', 'module.py',
                                                        'module2.py', 'noendingnewline.py',
-                                                       'nonregr.py', join('sub', 'momo.py')]])
-        files = find(DATA_DIR, ('.py',), blacklist=('sub',))
+                                                       'nonregr.py', join('sub', 'momo.py')]]))
+        files = set(find(DATA_DIR, ('.py',), blacklist=('sub',)))
         self.assertSetEqual(files,
-                            [join('data', f) for f in ['__init__.py', 'module.py',
+                            set([join(DATA_DIR, f) for f in ['__init__.py', 'module.py',
                                                        'module2.py', 'noendingnewline.py',
-                                                       'nonregr.py']])
+                                                       'nonregr.py']]))
         
     def test_exclude(self):
-        files = find(DATA_DIR, ('.py', '.pyc'), exclude=True)
+        files = set(find(DATA_DIR, ('.py', '.pyc'), exclude=True))
         self.assertSetEqual(files,
-                            [join('data', f) for f in ['foo.txt',
+                            set([join(DATA_DIR, f) for f in ['foo.txt',
                                                        'newlines.txt',
                                                        'normal_file.txt',
                                                        'test.ini',
@@ -34,7 +34,7 @@ class FindTC(TestCase):
                                                        'spam.txt',
                                                        join('sub', 'doc.txt'),
                                                        'write_protected_file.txt',
-                                                       ]])
+                                                       ]]))
         
 #    def test_exclude_base_dir(self):
 #        self.assertEquals(files_by_ext(DATA_DIR, include_exts=('.py',), exclude_dirs=(DATA_DIR,)),
