@@ -1173,7 +1173,7 @@ class TestCase(unittest.TestCase):
         items['unexpected'] = got - expected
         if any(items.itervalues()):
             if msg is None:
-                msg = '\n'.join('\t%s: %s' % (key,value)
+                msg = '\n'.join('%s:\n\t%s' % (key,"\n\t".join(value))
                     for key, value in items.iteritems() if value)
             self.fail(msg)
 
