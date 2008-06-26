@@ -20,8 +20,9 @@ try:
 except NameError:
     __file__ = sys.argv[0]
 
-from logilab.common.testlib import TestCase, unittest_main
+from logilab.common.testlib import TestCase as TLTestCase, unittest_main
 from logilab.common import modutils
+from logilab.common.compat import set
 
 from os import path
 from logilab import common
@@ -29,6 +30,18 @@ from logilab.common import tree
 
 sys.path.insert(0, path.dirname(__file__))
 DATADIR = path.join(path.dirname(__file__), 'data')
+
+
+class TestCase(TLTestCase):
+    def setUp(self):
+        super(TestCase,self).setUp()
+        sys.path.remove(common.__path__[0])
+
+    def tearDown(self):
+        sys.path.insert(0, common.__path__[0])
+        super(TestCase,self).tearDown()
+
+
 
 class load_module_from_name_tc(TestCase):
     """ load a python module from it's name """
@@ -148,6 +161,7 @@ class is_standard_module_tc(TestCase):
     
 class is_relative_tc(TestCase):
     
+
     def test_knownValues_is_relative_1(self):
         self.assertEqual(modutils.is_relative('modutils', common.__path__[0]), True)
 
@@ -164,12 +178,13 @@ class get_modules_tc(TestCase):
         """given a directory return a list of all available python modules, even
         in subdirectories
         """
-        import data
-        modules = modutils.get_modules('data', data.__path__[0])
+        import data.find_test as data
+        mod_path = ("data", 'find_test')
+        modules = modutils.get_modules(path.join(*mod_path), data.__path__[0])
         modules.sort()
-        self.assertEqual(modules,
-                         ['data.module', 'data.module2', 'data.noendingnewline',
-                          'data.nonregr'])
+        self.assertSetEquals(set(modules),
+            set([ '.'.join(mod_path + (mod, )) for mod in 'module', 'module2',
+            'noendingnewline', 'nonregr']))
 
 
 class get_modules_files_tc(TestCase):
@@ -179,10 +194,10 @@ class get_modules_files_tc(TestCase):
         in subdirectories
         """
         import data
-        modules = modutils.get_module_files(DATADIR, data.__path__[0])
+        modules = modutils.get_module_files(path.join(DATADIR,'find_test'), data.__path__[0])
         modules.sort()
         self.assertEqual(modules,
-                         [path.join(DATADIR, x) for x in ['__init__.py', 'module.py', 'module2.py', 'noendingnewline.py', 'nonregr.py']])
+                         [path.join(DATADIR, 'find_test', x) for x in ['__init__.py', 'module.py', 'module2.py', 'noendingnewline.py', 'nonregr.py']])
 
     def test_load_module_set_attribute(self):
         import logilab.common.fileutils
