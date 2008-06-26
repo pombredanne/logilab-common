@@ -193,7 +193,7 @@ class ProgressBar(object):
     
     def __init__(self, nbops, size=20., stream=sys.stdout):
         self._dotevery = max(nbops / size, 1)
-        self._fstr = '\r[%-20s]'
+        self._fstr = '\r[%%-%ss]' % size
         self._dotcount, self._dots = 1, []
         self._stream = stream
 
@@ -201,7 +201,7 @@ class ProgressBar(object):
         """update the progression bar"""
         self._dotcount += 1
         if self._dotcount >= self._dotevery:
-            self._dotcount = 1
+            self._dotcount = 0
             self._dots.append('.')
             self._stream.write(self._fstr % ''.join(self._dots))
             self._stream.flush()
