@@ -108,8 +108,8 @@ class ChangeLogEntry(object):
         for msg in self.messages:
             stream.write('%s%s %s\n' % (INDENT, BULLET, msg[0]))
             stream.write(''.join(msg[1:]))
-        if self.messages[-1][0].strip():
             stream.write('\n')
+        stream.write('\n\n')
 
 class ChangeLog(object):
     """object representation of a whole ChangeLog file"""
