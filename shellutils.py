@@ -197,10 +197,13 @@ class ProgressBar(object):
         self._total = nbops
         self._size = size
         self._current = 0
+        self._progress = 0
 
     def update(self):
         """update the progression bar"""
         self._current += 1
         progress = int((float(self._current)/float(self._total))*self._size)
-        self._stream.write(self._fstr % ('.' * progress) )
-        self._stream.flush()
+        if progress > self._progress:
+            self._progress = progress
+            self._stream.write(self._fstr % ('.' * progress) )
+            self._stream.flush()
