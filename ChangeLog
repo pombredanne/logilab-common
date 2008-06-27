@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+  --  
+    * changelog propertly adds new line at the end of each entry
+
 2008-06-25  --  0.33.0
     * decorators: new @locked decorator
     * cache: make it thread safe, changed behaviour so that when cache size is 0
@@ -12,7 +15,6 @@ ChangeLog for logilab.common
       - various failure ouput improvement
     * umessage: umessage.date() mayreturn unparsage string as is instead of None
     * compat: adds a max function taking 'key' as keyword argument as in 2.5
-
     * configuration: escape rest when printing for default value
 
 2008-06-08  --  0.32.0
@@ -32,15 +34,15 @@ ChangeLog for logilab.common
       ListCommandsCommand useful to build bash completion helpers 
     * changelog: module to parse ChangeLog file as this one, backported from
       logilab.devtools
-	
+
 2008-03-12  --  0.29.1
     * date: new nb_open_days function counting worked days between two date
     * adbh: add -p option to mysql commands to ask for password
-	
+
 2008-03-05  --  0.29.0
     * adbh: mysql doesn't support ILIKE, implement list_indices for mysql
     * db: mysql adapter use mx DateTime when available, fix unicode handling
-	
+
 2008-02-18  --  0.28.2
     * testlib: restore python2.3 compatiblity
 
@@ -57,58 +59,52 @@ ChangeLog for logilab.common
     * shellutils: new `chown` function
     * testlib: new `strict` argument to assertIsInstance
     * __init__: new `attrdict` and `nullobject` classes
-	
+
 2008-01-25  --  0.27.0
     * deprecation: new class_moved utility function
     * interface: fix subinterface handling
 
-	
 2008-01-10  --  0.26.1
     * optparser: support --version at main command level
     * testlib: added man page for pytest
     * textutils: fix a bug in normalize{_,_rest_}paragraph which may cause
       infinite loop if an indent string containing some spaces is given
-	
+
 2008-01-07  --  0.26.0
     * db: binarywrap support
     * modutils: new LazyObject class
 
-	
 2007-12-20  --  0.25.2
     * adbh: new needs_from_clause variable on db helper
-	
+
 2007-12-11  --  0.25.1
     * pytest: new --profile option, setup module / teardown module hook,
 	      other fixes and enhancements
     * db: mysql support fixes
     * adbh: fix postgres list_indices implementation
-	
+
 2007-11-26  --  0.25.0
     * adbh:
       - list_tables implementation for sqlite
       - new list_indices, create_index, drop_index methods
     * restore python < 2.4 compat
 
-	
 2007-10-29  --  0.24.0
     * decorators: new classproperty decorator
     * adbh: new module containing advanced db helper which were in the "db"
       module, with additional registered procedures handling 
 
-	
 2007-10-23  --  0.23.1
     * modutils: fix load_module_from_* (even with use_sys=False, it should
       try to get outer packages from sys.modules)
 
 2007-10-17  --  0.23.0
     * db:
-	
       - mark support_users and support_groups methods as obsolete in
         favor of users_support and groups_support attributes
       - new ilike_support property on dbms helpers
       - extended db helper api
       - completed mysql support
-	
     * textutils: new unormalize function to normalize diacritical chars by
       their ascii equivalent
     * modutils: new load_module_from_file shortcut function
@@ -117,7 +113,6 @@ ChangeLog for logilab.common
     * interface: new extend function to dynamically add an implemented interface
       to a new style class	
 
-	
 2007-06-25  --  0.22.2
     * new 'typechanged' action for configuration.read_old_config
 
@@ -136,7 +131,6 @@ ChangeLog for logilab.common
       advanced helpers
     * deprecation: new `obsolete` decorator
 
-	
 2007-02-12  --  0.21.3
     * fixed cached decorator to use __dict__ instead of attribute lookup,
       avoiding potential bugs with inheritance when using cached class 
@@ -152,14 +146,12 @@ ChangeLog for logilab.common
     * textutils: new 'rest' argument to normalize_text to better deal with
       ReST formated text
     * some packaging fixes
-	
+
 2006-11-14  --  0.21.0
     * db:
-	
       - new optional keepownership argument to backup|restore_database methods
       - only register mxDatetime converters on psycopg2 adapter if
         mx.DateTime is available
-	
     * moved some stuff which was in common __init__ file into specific
       module. At this occasion new "decorators" and "deprecation" modules
       has been added
@@ -182,7 +174,6 @@ ChangeLog for logilab.common
     * fileutils.get_by_ext, filetutils.get_mode, fileutils.ensure_mode
     * umessage: more robust charset handling
 
-
 2006-11-03  --  0.20.2
     * fileutils: new remove_dead_links function
     * date: add missing strptime import
@@ -193,7 +184,7 @@ ChangeLog for logilab.common
       - fixed get_payload encoding bug
     * db: default postgres module is now psycopg2, which has been customized
       to return mx.Datetime objects for date/time related types
-	
+
 2006-10-27  --  0.20.0
     * db:
       - fixed date handling
@@ -201,7 +192,6 @@ ChangeLog for logilab.common
     * configuration: basic deprecated config handling support
     * new implementation of pytest
     * backport a dot backend from yams into a new "graph" module
-
 
 2006-10-03  --  0.19.3
     * fixed bug in textutils.normalise_[text|paragraph] with unsplitable
@@ -220,16 +210,14 @@ ChangeLog for logilab.common
 
 2006-09-22  --  0.19.1
     * db:
-	
       - fixed bug when querying boolean on sqlite using python's bool type
       - fixed time handling and added an adapter for DateTimeDeltaType
       - added "drop_on_commit" argument to create_temporary_table on db helper
       - added missing implementation of executemany on pysqlite2 wrapper to 
         support pyargs correctly like execute
-	
     * optik_ext: fixed "named" type option to support csv values and to return
       a dictionary
-	
+
 2006-09-05  --  0.19.0
     * new umessage module which provides a class similar to the standard
       email.Message class but returning unicode strings
@@ -241,19 +229,16 @@ ChangeLog for logilab.common
     * add pytest option to enable design-by-contract using aspects
     * some enhancements to the configuration module
 
-
 2006-08-09  --  0.18.0
     * added -c / --capture option to testlib.unittest_main
     * fixed bugs in lgc.configuration
     * optparser: added a OptionParser that extends optparse's with commands
-
 
 2006-07-13  --  0.17.0
     * python2.5 compatibility (testlib.py + compat.py)
     * testlib.assertListEquals return all errors at once
     * new "password" option type in optik_ext
     * configuration: refactored to support interactive input of a configuration
-	
 
 2006-06-08  --  0.16.1
     * testlib: improved test collections
@@ -261,26 +246,21 @@ ChangeLog for logilab.common
 
 2006-05-19  --  0.16.0
     * testlib:
-	
       - added a set of command line options (PYDEBUG is deprecated,
         use the -i/--pdb option, and added -x/--exitfirst option)
       - added support for generative tests
-	
     * db:
-	
       - fix get_connection parameter order and host/port handling
       - added .sql_temporary_table method to advanced func helpers
       - started a psycopg2 adapter
-	
     * configuration: enhanced to handle default value in help and man pages
       generation (require python >= 2.4)
 
-	
 2006-04-25  --  0.15.1
     * db: add missing port handling to get_connection function and
       dbapimodule.connect methods
     * testlib: various fixes and minor improvments
-	
+
 2006-03-28  --  0.15.0
     * added "cached" decorator and a simple text progression bar into __init__
     * added a simple text progress bar into __init__
@@ -288,35 +268,30 @@ ChangeLog for logilab.common
     * db: added pysqllite2 support, preconfigured to handle timestamp using
       mxDatetime and to correctly handle boolean types
 
-	
 2006-03-06  --  0.14.1
     * backported file support and add LOG_CRIT to builtin in logservice module
-	
+
 2006-02-28  --  0.14.0
     * renamed assertXML*Valid to assertXML*WellFormed and deprecated the old name
     * fixed modutils.load_module_from_*
 
-	
 2006-02-03  --  0.13.1
     * fix some tests, patch contributed by  Marien Zwart
     * added ability to log into a file with make_logger()
-	
+
 2006-01-06  --  0.13.0
     * testlib: ability to skip a test
     * configuration:
-	
       - cleaner configuration file generation
       - refactoring so that we can have more control on file
         configuration loading using read_config_file and load_config_file
         instead of load_file_configuration
-	
     * modutils: fix is_relative to return False when from_file is a file
       located somewhere in sys.path
     * ureport: new "escaped" attribute on Text nodes, controling html escaping
     * compat: make set iterable and support more other set operations...
     * removed the astng sub-package, since it's now self-distributed as
       logilab-astng
-
 
 2005-09-06  --  0.12.0
     * shellutils: bug fix in mv()
@@ -326,11 +301,9 @@ ChangeLog for logilab.common
     * table: new methods and some optimizations
     * tree: added some deprecation warnings
 
-
 2005-07-25  --  0.11.0
     * db: refactoring, added sqlite support, new helpers to support DBMS
       specific features
-
 
 2005-07-07  --  0.10.1
     * configuration: added basic man page generation feature
@@ -345,59 +318,48 @@ ChangeLog for logilab.common
     * astng.builder: handle classmethod and staticmethod as decorator,
       handle data descriptors when building from living objects
     * ureports:
-	
       - new docbook formatter
       - handle ReST like urls in the text writer
       - new build_summary utility function
 
-	
 2005-04-14  --  0.9.3
     * optik_ext: add man page generation based on optik/optparse options
       definition
     * modutils: new arguments to get_source_file to handle files without
       extensions
     * astng: fix problem with the manager and python 2.2 (optik related)
-	
+
 2005-02-16  --  0.9.2
     * textutils:
-	
       - added epydoc documentation
       - new sep argument to the get_csv function
       - fix pb with normalize_* functions on windows platforms
-
     * fileutils:
-	
       - added epydoc documentation
       - fixed bug in get_by_ext (renamed files_by_ext) with the
         exclude_dirs argument
-
     * configuration:
-
       - fixed a bug in configuration file generation on windows platforms
       - better test coverage
-	
     * fixed testlib.DocTest which wasn't working anymore with recent
       versions of pyunit
     * added "context_file" argument to file_from_modpath to avoid
       possible relative import problems
     * astng: use the new context_file argument from Node.resolve()
-	
+
 2005-02-04  --  0.9.1
     * astng:
-	
       - remove buggy print
       - fixed builder to deal with builtin methods
       - fixed raw_building.build_function with python 2.4
-	
     * modutils: code cleanup, some reimplementation based on "imp",
       better handling of windows specific extensions, epydoc documentation
     * fileutils: new exclude_dirs argument to the get_by_ext function
     * testlib: main() support -p option to run test in a profiled mode
     * generated documentation for modutils in the doc/ subdirectory
-	
+
 2005-01-20  --  0.9.0
     * astng:
-	
       - refactoring of some huge methods
       - fix interface resolving when __implements__ is defined in a parent
         class in another module
@@ -408,18 +370,14 @@ ChangeLog for logilab.common
         building instead of exec'ing the statement
       - fix possible AttributeError with Function.type 
       - manager.astng_from_file fallback to astng_from_module if possible
-	
     * textutils: fix bug in normalize_paragraph, unquote handle empty string
       correctly
     * modutils:
-
       - use a cache in has_module to speed up things when heavily used
       - fix file_from_modpath to handle pyxml and os.path
-
     * configuration: fix problem with serialization/deserialization of empty
       string
 
-	  
 2005-01-04  --  0.8.0
     * modutils: a lot of fixes/rewrite on various functions to avoid
       unnecessary imports, sys.path pollution, and other bugs (notably
@@ -431,16 +389,13 @@ ChangeLog for logilab.common
     * logger: unicode support
     * fileutils: get_by_ext also ignore ".svn" directories, not only "CVS"
 
-
 2004-11-03  --  0.7.1
     * astng:
-	
       - don't raise a syntax error on files missing a trailing \n.
       - fix utils.is_abstract (was causing an unexpected exception if a
         string exception was raised).
       - fix utils.get_implemented.
       - fix file based manager's cache problem.
-
     * textutils: fixed normalize_text / normalize_paragraph functions
 
 2004-10-11  --  0.7.0
@@ -456,7 +411,6 @@ ChangeLog for logilab.common
     * fileutils: new ensure_mode function
     * compat: support for sum and enumerate
 
-
 2004-09-23  --  0.6.0
     * db: added DBAPIAdapter
     * textutils: fix in pretty_match causing malformated messages in pylint
@@ -467,7 +421,6 @@ ChangeLog for logilab.common
       some new methods on astng nodes
     * compat: new module for a transparent compatibility layer between
       different python version (actually 2.2 vs 2.3 for now)
-
 
 2004-07-08  --  0.5.2
     * astng: fix another bug in klassnode.ancestors() method...
@@ -503,7 +456,6 @@ ChangeLog for logilab.common
       and new "system_database" function returning the system database name
       for different DBMS.
     * configuration: better group control
-
 
 2004-02-20  --  0.4.5
     * db: it's now possible to fix the modules search order. By default call
@@ -549,7 +501,6 @@ ChangeLog for logilab.common
     * added next_sbling and previous_sibling methods to Node
     * fix get_cycles
 
-
 2003-10-14  --  0.3.5
     * fixed null size cache bug
     * added 'sort_by_column*' methods for tables
@@ -584,7 +535,6 @@ ChangeLog for logilab.common
     * enhancement of the configuration module
     * new option type "named" in optik_the ext module
 
-
 2003-06-18  --  0.2.2
     * astng bug fixes
 
@@ -597,7 +547,6 @@ ChangeLog for logilab.common
     * add the astng sub-package
     * miscellaneous fixes
 
-
 2003-04-17  --  0.1.2
     * add the stringio module
     * minor fixes
@@ -608,3 +557,4 @@ ChangeLog for logilab.common
 
 2003-02-17  --  0.1.0
     * initial revision
+

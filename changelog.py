@@ -108,7 +108,8 @@ class ChangeLogEntry(object):
         for msg in self.messages:
             stream.write('%s%s %s\n' % (INDENT, BULLET, msg[0]))
             stream.write(''.join(msg[1:]))
-
+        if self.messages[-1][0].strip():
+            stream.write('\n')
 
 class ChangeLog(object):
     """object representation of a whole ChangeLog file"""
@@ -175,7 +176,7 @@ class ChangeLog(object):
                 self.title = '%s%s' % (self.title, line)
             elif sline and sline[0] == BULLET:
                 last.add_message(sline[1:].strip())
-            elif last.messages:
+            elif sline and last.messages:
                 last.complete_latest_message(line)
             else:
                 self.additional_content += line
