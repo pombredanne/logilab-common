@@ -447,7 +447,7 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
         cmd = 'echo "%s;" | mysql -h %s -u %s -p' % (
             self.sql_create_database(dbname, encoding), dbhost, dbuser)
         cmds.append(cmd)
-        cmd = 'mysql -h %s -u %s -p %s < %s' % (dbname, dbhost, dbuser, backupfile)
+        cmd = 'mysql -h %s -u %s -p %s < %s' % (dbhost, dbuser, dbname, backupfile)
         cmds.append(cmd)
         return cmds
                 
