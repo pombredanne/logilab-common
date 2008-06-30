@@ -48,6 +48,7 @@ import sys
 from stat import S_IWRITE
 
 BULLET = '*'
+SUBBULLET = '-'
 INDENT = '    '
 
 class NoEntry(Exception):
@@ -93,22 +94,39 @@ class ChangeLogEntry(object):
         
     def add_message(self, msg):
         """add a new message"""
-        self.messages.append([msg])
+        self.messages.append(([msg],[]))
 
     def complete_latest_message(self, msg_suite):
         """complete the latest added message
         """
         if not self.messages:
-            print >> sys.stderr, 'Ignoring %r (unexpected format)' % msg_suite
-        self.messages[-1].append(msg_suite)
+            raise ValueError('unable to complete last message as there is no previous message)')
+        if self.messages[-1][1]: # sub messages
+            self.messages[-1][1][-1].append(msg_suite)
+        else: # message
+            self.messages[-1][0].append(msg_suite)
+
+    def add_sub_message(self, sub_msg, key=None):
+        if not self.messages:
+            raise ValueError('unable to complete last message as there is no previous message)')
+        if key is None:
+            self.messages[-1][1].append([sub_msg])
+        else:
+            raise NotImplementedError("sub message to specific key are not impemented yet")
 
     def write(self, stream=sys.stdout):
         """write the entry to file """
         stream.write('%s  --  %s\n' % (self.date or '', self.version or ''))
-        for msg in self.messages:
+        for msg, sub_msgs in self.messages:
             stream.write('%s%s %s\n' % (INDENT, BULLET, msg[0]))
             stream.write(''.join(msg[1:]))
+            if sub_msgs:
+                stream.write('\n')
+            for sub_msg in sub_msgs:
+                stream.write('%s%s %s\n' % (INDENT * 2, SUBBULLET, sub_msg[0]))
+                stream.write(''.join(sub_msg[1:]))
             stream.write('\n')
+
         stream.write('\n\n')
 
 class ChangeLog(object):
@@ -161,24 +179,35 @@ class ChangeLog(object):
         except IOError:
             return
         last = None
+        expect_sub = False
         for line in stream.readlines():
             sline = line.strip()
             words = sline.split()
+            # if new entry
             if len(words) == 1 and words[0] == '--':
+                expect_sub = False
                 last = self.entry_class()
                 self.add_entry(last)
+            # if old entry
             elif len(words) == 3 and words[1] == '--':
+                expect_sub = False
                 last = self.entry_class(words[0], words[2])
                 self.add_entry(last)
-            elif last is None:
-                if not sline:
-                    continue
+            # if title
+            elif sline and last is None:
                 self.title = '%s%s' % (self.title, line)
+            # if new entry
             elif sline and sline[0] == BULLET:
+                expect_sub = False
                 last.add_message(sline[1:].strip())
+            # if new sub_entry
+            elif expect_sub and sline and sline[0] == SUBBULLET:
+                last.add_sub_message(sline[1:].strip())
+            # if new line for current entry
             elif sline and last.messages:
                 last.complete_latest_message(line)
             else:
+                expect_sub = True
                 self.additional_content += line
         stream.close()
         
@@ -197,3 +226,4 @@ class ChangeLog(object):
         stream.write(self.format_title())
         for entry in self.entries:
             entry.write(stream)
+

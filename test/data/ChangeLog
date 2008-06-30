@@ -10,6 +10,11 @@ ChangeLog for logilab.devtools
     * import the version control library from oobrother extended with code
       from devtools / apycot
 
+    * Singing in the rain:
+
+        - I'm
+        - singing in the rain
+
     * Big change:
 
         - small change
@@ -17,6 +22,8 @@ ChangeLog for logilab.devtools
         - multiline change
           really ?
         - Eat your vegetable and brush after every meals
+
+
 
 2004-02-13  --  0.4.5
     * fix debianize to handle dependencies to python standalone package
