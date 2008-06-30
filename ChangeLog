@@ -164,6 +164,7 @@ ChangeLog for logilab.common
 
 2007-10-17  --  0.23.0
     * db:
+      
       - mark support_users and support_groups methods as obsolete in
         favor of users_support and groups_support attributes
       - new ilike_support property on dbms helpers
@@ -241,6 +242,7 @@ ChangeLog for logilab.common
 
 2006-11-14  --  0.21.0
     * db:
+      
       - new optional keepownership argument to backup|restore_database methods
       - only register mxDatetime converters on psycopg2 adapter if
         mx.DateTime is available
@@ -339,6 +341,7 @@ ChangeLog for logilab.common
 
 2006-09-22  --  0.19.1
     * db:
+      
       - fixed bug when querying boolean on sqlite using python's bool type
       - fixed time handling and added an adapter for DateTimeDeltaType
       - added "drop_on_commit" argument to create_temporary_table on db helper
@@ -398,6 +401,7 @@ ChangeLog for logilab.common
 
 2006-05-19  --  0.16.0
     * testlib:
+      
       - added a set of command line options (PYDEBUG is deprecated,
         use the -i/--pdb option, and added -x/--exitfirst option)
       - added support for generative tests
@@ -455,6 +459,7 @@ ChangeLog for logilab.common
     * testlib: ability to skip a test
 
     * configuration:
+      
       - cleaner configuration file generation
       - refactoring so that we can have more control on file
         configuration loading using read_config_file and load_config_file
@@ -531,11 +536,13 @@ ChangeLog for logilab.common
 
 2005-02-16  --  0.9.2
     * textutils:
+      
       - added epydoc documentation
       - new sep argument to the get_csv function
       - fix pb with normalize_* functions on windows platforms
 
     * fileutils:
+      
       - added epydoc documentation
       - fixed bug in get_by_ext (renamed files_by_ext) with the
         exclude_dirs argument
@@ -556,6 +563,7 @@ ChangeLog for logilab.common
 
 2005-02-04  --  0.9.1
     * astng:
+      
       - remove buggy print
       - fixed builder to deal with builtin methods
       - fixed raw_building.build_function with python 2.4
@@ -573,6 +581,7 @@ ChangeLog for logilab.common
 
 2005-01-20  --  0.9.0
     * astng:
+      
       - refactoring of some huge methods
       - fix interface resolving when __implements__ is defined in a parent
         class in another module
@@ -588,6 +597,7 @@ ChangeLog for logilab.common
       correctly
 
     * modutils:
+      
       - use a cache in has_module to speed up things when heavily used
       - fix file_from_modpath to handle pyxml and os.path
 
@@ -615,6 +625,7 @@ ChangeLog for logilab.common
 
 2004-11-03  --  0.7.1
     * astng:
+      
       - don't raise a syntax error on files missing a trailing \n.
       - fix utils.is_abstract (was causing an unexpected exception if a
         string exception was raised).
