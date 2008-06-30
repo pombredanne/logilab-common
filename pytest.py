@@ -65,9 +65,10 @@ pytest --coverage test_foo.py
   (only if logilab.devtools is available)
 """
 
-import os, sys
+import os, sys, re
 import os.path as osp
 from time import time, clock
+
 
 from logilab.common.fileutils import abspath_listdir
 from logilab.common import testlib
@@ -148,18 +149,15 @@ else:
 
 
 
+TESTFILE_RE = re.compile("^((unit)?test.*|smoketest)\.py$")
 def this_is_a_testfile(filename):
     """returns True if `filename` seems to be a test file"""
-    filename = osp.basename(filename)
-    return ((filename.startswith('unittest')
-             or filename.startswith('test')
-             or filename.startswith('smoketest')) 
-            and filename.endswith('.py'))
+    return TESTFILE_RE.match(osp.basename(filename))
     
-
+TESTDIR_RE = re.compile("^(unit)?tests?$")
 def this_is_a_testdir(dirpath):
     """returns True if `filename` seems to be a test directory"""
-    return osp.basename(dirpath) in ('test', 'tests', 'unittests')
+    return TESTDIR_RE.match(osp.basename(dirpath))
 
 
 def load_pytest_conf(path, parser):
@@ -306,12 +304,13 @@ class PyTester(object):
                 if skipped in dirs:
                     dirs.remove(skipped)
             basename = osp.basename(dirname)
-            if basename in ('test', 'tests'):
+            if this_is_a_testdir(basename):
                 print "going into", dirname
                 # we found a testdir, let's explore it !
                 self.testonedir(dirname, exitfirst)
                 dirs[:] = []
         if self.report.ran == 0:
+            print "no test dir found testing here:", here
             # if no test was found during the visit, consider
             # the local directory as a test directory even if
             # it doesn't have a traditional test directory name

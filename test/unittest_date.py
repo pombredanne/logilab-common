@@ -11,7 +11,8 @@ try:
     from logilab.common.date import endOfMonth, add_days_worked, nb_open_days, \
          get_national_holidays
 except ImportError:
-    from datetime import date as Date
+    from datetime import date as Date, datetime as DateTime, timedelta as RelativeDateTime
+    now = DateTime.now
     get_national_holidays = endOfMonth = add_days_worked = nb_open_days = None
 
 class DateTC(TestCase):

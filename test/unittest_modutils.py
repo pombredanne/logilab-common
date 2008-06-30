@@ -35,10 +35,13 @@ DATADIR = path.join(path.dirname(__file__), 'data')
 class TestCase(TLTestCase):
     def setUp(self):
         super(TestCase,self).setUp()
-        sys.path.remove(common.__path__[0])
+        self.__common_in_path = common.__path__[0] in sys.path
+        if self.__common_in_path:
+            sys.path.remove(common.__path__[0])
 
     def tearDown(self):
-        sys.path.insert(0, common.__path__[0])
+        if self.__common_in_path:
+            sys.path.insert(0, common.__path__[0])
         super(TestCase,self).tearDown()
 
 

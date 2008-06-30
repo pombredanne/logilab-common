@@ -191,8 +191,8 @@ def release_lock(lock_file):
 class ProgressBar(object):
     """a simple text progression bar"""
     
-    def __init__(self, nbops, size=20., stream=sys.stdout):
-        self._fstr = '\r[%%-%ss]' % size
+    def __init__(self, nbops, size=20, stream=sys.stdout):
+        self._fstr = '\r[%%-%ss]' % int(size)
         self._stream = stream
         self._total = nbops
         self._size = size
@@ -205,5 +205,9 @@ class ProgressBar(object):
         progress = int((float(self._current)/float(self._total))*self._size)
         if progress > self._progress:
             self._progress = progress
-            self._stream.write(self._fstr % ('.' * progress) )
-            self._stream.flush()
+            self.refresh()
+
+    def refresh(self):
+        """refresh the progression bar display"""
+        self._stream.write(self._fstr % ('.' * min(self._progress, self._size)) )
+        self._stream.flush()
