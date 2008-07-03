@@ -1301,7 +1301,8 @@ class TestCase(unittest.TestCase):
             if not line.startswith(' '):
                 self.fail(''.join(['%s\n'%msg_prefix]+read + list(result)))
         
-    def assertTextEquals(self, text1, text2, junk=None):
+    def assertTextEquals(self, text1, text2, junk=None,
+            msg_prefix='Text differ'):
         """compare two multiline strings (using difflib and splitlines())"""
         msg = []
         if not isinstance(text1, basestring):
@@ -1310,11 +1311,12 @@ class TestCase(unittest.TestCase):
             msg.append('text2 is not a string (%s)'%(type(text2)))
         if msg:
             self.fail('\n'.join(msg))
-        self._difftext(text1.splitlines(True), text2.splitlines(True), junk)
+        self._difftext(text1.splitlines(True), text2.splitlines(True), junk, 
+            msg_prefix)
     assertTextEqual = assertTextEquals
             
     def assertStreamEquals(self, stream1, stream2, junk=None,
-        msg_prefix='Stream differ'):
+            msg_prefix='Stream differ'):
         """compare two streams (using difflib and readlines())"""
         # if stream2 is stream2, readlines() on stream1 will also read lines
         # in stream2, so they'll appear different, although they're not
