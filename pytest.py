@@ -98,7 +98,7 @@ class TraceController(object):
 
     def pause_tracing(cls):
         if not cls.nesting:
-            cls.tracefunc = getattr(sys, '__settrace__', sys.settrace)
+            cls.tracefunc = staticmethod(getattr(sys, '__settrace__', sys.settrace))
             cls.oldtracer = getattr(sys, '__tracer__', None)
             sys.__notrace__ = True
             cls.tracefunc(None)
