@@ -1,8 +1,7 @@
-import unittest
 from os.path import join, dirname
 from cStringIO import StringIO
 
-from logilab.common.testlib import TestCase
+from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.changelog import ChangeLog
 
@@ -16,3 +15,6 @@ class ChangeLogTC(TestCase):
         cl.write(out)
         self.assertStreamEquals(open(self.cl_file), out)
                           
+
+if __name__ == '__main__':
+    unittest_main()
