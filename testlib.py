@@ -429,17 +429,18 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
 
 
-class TestSuite(unittest.TestSuite):
-    def run(self, result, runcondition=None, options=None):
-        for test in self._tests:
-            if result.shouldStop:
-                break
-            test(result, runcondition, options)
-        return result
+def run(self, result, runcondition=None, options=None):
+    for test in self._tests:
+        if result.shouldStop:
+            break
+        test(result, runcondition, options)
+    return result
+unittest.TestSuite.run = run
     
-    # python2.3 compat
-    def __call__(self, *args, **kwds):
-        return self.run(*args, **kwds)
+# python2.3 compat
+def __call__(self, *args, **kwds):
+    return self.run(*args, **kwds)
+unittest.TestSuite.__call__ = __call__
 
 
 class SkipAwareTextTestRunner(unittest.TextTestRunner):
@@ -561,7 +562,6 @@ class NonStrictTestLoader(unittest.TestLoader):
     python test_foo.py test_foo1 will run test_foo1
     python test_foo.py test_bar will run FooTC.test_bar1 and BarTC.test_bar2
     """
-    suiteClass = TestSuite
 
     def __init__(self):
         self.skipped_patterns = []
