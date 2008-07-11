@@ -674,10 +674,11 @@ Examples:
                                                in MyTestCase
 """
     def __init__(self, module='__main__', defaultTest=None, batchmode=False,
-                 cvg=None, options=None):
+                 cvg=None, options=None, outstream=sys.stderr):
         self.batchmode = batchmode
         self.cvg = cvg
         self.options = options
+        self.outstream = outstream
         super(SkipAwareTestProgram, self).__init__(
             module=module, defaultTest=defaultTest,
             testLoader=NonStrictTestLoader())
@@ -742,6 +743,7 @@ Examples:
                 print 'setup_module error:', exc
                 sys.exit(1)
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
+                                                  stream=self.outstream,
                                         exitfirst=self.exitfirst,
                                         capture=self.capture,
                                         printonly=self.printonly,
@@ -855,10 +857,12 @@ def capture_stderr(printonly=None):
 
 
 def unittest_main(module='__main__', defaultTest=None,
-                  batchmode=False, cvg=None, options=None):
+                  batchmode=False, cvg=None, options=None,
+                  outstream=sys.stderr):
     """use this functon if you want to have the same functionality
     as unittest.main"""
-    return SkipAwareTestProgram(module, defaultTest, batchmode, cvg, options)
+    return SkipAwareTestProgram(module, defaultTest, batchmode,
+                                cvg, options, outstream)
 
 class TestSkipped(Exception):
     """raised when a test is skipped"""

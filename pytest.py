@@ -338,17 +338,24 @@ class PyTester(object):
         if dirname:
             os.chdir(dirname)
         modname = osp.basename(filename)[:-3]
+        if batchmode:
+            from cStringIO import StringIO
+            outstream = StringIO()
+        else:
+            outstream = sys.stderr
         try:
-            print >> sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
+            print >> outstream, ('  %s  ' % osp.basename(filename)).center(70, '=')
         except TypeError: # < py 2.4 bw compat
-            print >> sys.stderr, ('  %s  ' % osp.basename(filename)).center(70)
+            print >> outstream, ('  %s  ' % osp.basename(filename)).center(70)
         try:
             try:
                 tstart, cstart = time(), clock()
                 testprog = testlib.unittest_main(modname, batchmode=batchmode, cvg=self.cvg,
-                                                 options=self.options)
+                                                 options=self.options, outstream=outstream)
                 tend, cend = time(), clock()
                 ttime, ctime = (tend - tstart), (cend - cstart)
+                if testprog.result.testsRun and batchmode:
+                    print >> sys.stderr, outstream.getvalue()
                 self.report.feed(filename, testprog.result, ttime, ctime)
                 return testprog
             except (KeyboardInterrupt, SystemExit):
