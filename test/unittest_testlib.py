@@ -17,7 +17,10 @@ try:
 except NameError:
     __file__ = sys.argv[0]
     
-from logilab.common.testlib import TestCase, TestSuite, SkipAwareTextTestRunner
+
+from unittest import TestSuite
+
+from logilab.common.testlib import TestCase, SkipAwareTextTestRunner
 from logilab.common.testlib import mock_object, NonStrictTestLoader, create_files
 from logilab.common.testlib import capture_stdout, unittest_main, InnerTest
 from logilab.common.testlib import with_tempdir
