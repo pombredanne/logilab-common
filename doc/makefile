@@ -11,7 +11,7 @@ all: apydoc
 #        ${MKHTML} ${MKHTMLOPTS} $<
 
 apydoc:
-	epydoc --html -n "Logilab's common library" ..
+		epydoc --html -v --graph all --no-private --exclude="__pkginfo__" --exclude="setup" -n "Logilab's common library" ../
 
 clean:
 	rm -f *.html
