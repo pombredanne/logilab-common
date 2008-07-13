@@ -1,7 +1,10 @@
-"""Table management module
-"""
+"""Table management module.
 
-__revision__ = '$Id: table.py,v 1.18 2006-04-09 22:30:53 nico Exp $'
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
+"""
+__docformat__ = "restructuredtext en"
 
 from warnings import warn
 

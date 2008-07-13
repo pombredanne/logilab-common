@@ -1,30 +1,17 @@
-# Copyright (c) 2000-2002 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""
-utilities functions to generate file readable with Georg Sander's vcg
+"""Functions to generate files readable with Georg Sander's vcg
 (Visualization of Compiler Graphs).
 
 You can download vcg at http://rw4.cs.uni-sb.de/~sander/html/gshome.html
 Note that vcg exists as a debian package.
 
-See the documentation of vcg for explanation about the different value that
-maybe used for the functions parameters
-"""
+See vcg's documentation for explanation about the different values that
+maybe used for the functions parameters.
 
-__revision__ = "$Id: vcgutils.py,v 1.6 2003-12-10 08:15:09 syt Exp $"
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
+"""
+__docformat__ = "restructuredtext en"
 
 import string
 
@@ -125,7 +112,7 @@ EDGE_ATTRS = {
 # Misc utilities ###############################################################
 
 def latin_to_vcg(st):
-    """convert latin characters using vcg escape sequence
+    """Convert latin characters using vcg escape sequence.
     """
     for char in st:
         if char not in string.ascii_letters:
@@ -139,7 +126,7 @@ def latin_to_vcg(st):
 
 
 class VCGPrinter:
-    """a vcg graph writer
+    """A vcg graph writer.
     """
     
     def __init__(self, output_stream):

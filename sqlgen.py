@@ -1,34 +1,22 @@
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""Help to generate SQL string usable by the Python DB-API
+"""Help to generate SQL strings usable by the Python DB-API.
 
-:author:    Logilab
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
-:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
+:author: Logilab
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
 __docformat__ = "restructuredtext en"
-
 
 # SQLGenerator ################################################################
 
 class SQLGenerator :
     """
-    Helper class to generate SQL strings to use with python's DB-API
+    Helper class to generate SQL strings to use with python's DB-API.
     """
 
     def where(self, keys, addon=None) :
         """
-        keys : list of keys
+        :param keys: list of keys
         
         >>> s = SQLGenerator()
         >>> s.where(['nom'])
@@ -45,7 +33,7 @@ class SQLGenerator :
 
     def set(self, keys) :
         """
-        keys : list of keys
+        :param keys: list of keys
         
         >>> s = SQLGenerator()
         >>> s.set(['nom'])
@@ -57,8 +45,8 @@ class SQLGenerator :
 
     def insert(self, table, params) :
         """
-        table : name of the table
-        params :  dictionnary that will be used as in cursor.execute(sql,params)
+        :param table: name of the table
+        :param params:  dictionnary that will be used as in cursor.execute(sql,params)
         
         >>> s = SQLGenerator()
         >>> s.insert('test',{'nom':'dupont'})
@@ -73,8 +61,8 @@ class SQLGenerator :
 
     def select(self, table, params) :
         """
-        table : name of the table
-        params :  dictionnary that will be used as in cursor.execute(sql,params)
+        :param table: name of the table
+        :param params:  dictionnary that will be used as in cursor.execute(sql,params)
 
         >>> s = SQLGenerator()
         >>> s.select('test',{})
@@ -92,11 +80,11 @@ class SQLGenerator :
 
     def adv_select(self, model, tables, params, joins=None) :
         """
-        model  : list of columns to select
-        tables : list of tables used in from
-        params   :  dictionnary that will be used as in cursor.execute(sql, params)
-        joins  : optional list of restriction statements to insert in the where
-                 clause. Usually used to perform joins.
+        :param model:  list of columns to select
+        :param tables: list of tables used in from
+        :param params: dictionnary that will be used as in cursor.execute(sql, params)
+        :param joins:  optional list of restriction statements to insert in the
+          where clause. Usually used to perform joins.
 
         >>> s = SQLGenerator()
         >>> s.adv_select(['column'],[('test', 't')], {})
@@ -115,8 +103,8 @@ class SQLGenerator :
 
     def delete(self, table, params) :
         """
-        table : name of the table
-        params :  dictionnary that will be used as in cursor.execute(sql,params)
+        :param table: name of the table
+        :param params: dictionnary that will be used as in cursor.execute(sql,params)
 
         >>> s = SQLGenerator()
         >>> s.delete('test',{'nom':'dupont'})
@@ -130,8 +118,8 @@ class SQLGenerator :
 
     def update(self, table, params, unique) :
         """
-        table : name of the table
-        params :  dictionnary that will be used as in cursor.execute(sql,params)
+        :param table: name of the table
+        :param params: dictionnary that will be used as in cursor.execute(sql,params)
 
         >>> s = SQLGenerator()
         >>> s.update('test', {'id':'001','nom':'dupont'}, ['id'])
@@ -146,7 +134,7 @@ class SQLGenerator :
 
 class BaseTable:
     """
-    Another helper class to ease SQL table manipulation
+    Another helper class to ease SQL table manipulation.
     """
     # table_name = "default"
     # supported types are s/i/d
@@ -217,8 +205,8 @@ def name_fields(cursor, records) :
     list of dictionnaries (one for each record) whose keys are column names and
     values are records' values.
 
-    cursor : cursor used to execute the query
-    records : list returned by fetch*()
+    :param cursor: cursor used to execute the query
+    :param records: list returned by fetch*()
     """
     result = []
     for record in records :

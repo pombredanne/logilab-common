@@ -1,28 +1,22 @@
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-""" Copyright (c) 2003-2007 LOGILAB S.A. (Paris, FRANCE).
- http://www.logilab.fr/ -- mailto:contact@logilab.fr
-
-manipulate pdf and fdf files. pdftk recommended.
+"""Manipulate pdf and fdf files (pdftk recommended).
 
 Notes regarding pdftk, pdf forms and fdf files (form definition file) 
 fields names can be extracted with:
+
     pdftk orig.pdf generate_fdf output truc.fdf
-to merge fdf and pdf:      
+
+to merge fdf and pdf:
+
     pdftk orig.pdf fill_form test.fdf output result.pdf [flatten]
+    
 without flatten, one could further edit the resulting form.
 with flatten, everything is turned into text.
+
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
+__docformat__ = "restructuredtext en"
 # XXX seems very unix specific
 # TODO: check availability of pdftk at import 
 

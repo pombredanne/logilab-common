@@ -1,14 +1,17 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 """This module implements a TCP server in a separate thread that
 allows *one* client to connect and provides a command line interpreter
-allowing the remote client to explore the process on the fly
+allowing the remote client to explore the process on the fly.
+
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
+__docformat__ = "restructuredtext en"
 
 from warnings import warn
 warn('this module is deprecated and will disappear in a near release',
      DeprecationWarning, stacklevel=1)
-
-__revision__ = '$Id: monserver.py,v 1.2 2005-11-22 13:13:02 syt Exp $'
 
 import threading
 import SocketServer
@@ -17,14 +20,13 @@ import code
 import sys
 import time
 
-
-# NOTES: ce module étant utilisé pour l'introspection, il peut
-# être utile de fournir dans les locales de l'interpreteur des
-# objets déjà initialisés (par exemple le module __main__ ou
-# bien __main__.*) ou encore des objets servant à l'introspection
+# NOTES: ce module Ã©tant utilisÃ© pour l'introspection, il peut
+# Ãªtre utile de fournir dans les locales de l'interpreteur des
+# objets dÃ©jÃ  initialisÃ©s (par exemple le module __main__ ou
+# bien __main__.*) ou encore des objets servant Ã  l'introspection
 # comme on en trouve dans pymonitor (qui prend la liste des objets
 # maintenus par le garbage collector) ou a des statistiques
-# pour faire des opérations du style:
+# pour faire des opÃ©rations du style:
 # inspector.count_types( MyClass )
 # inspector.list_types( MyClass ) etc...
 

@@ -1,4 +1,10 @@
-"""unicode email support"""
+"""Unicode email support (extends email from stdlib).
+
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
+"""
+__docformat__ = "restructuredtext en"
 
 import email
 from encodings import search_function
@@ -32,7 +38,8 @@ def message_from_string(string):
         return ''
     
 class UMessage:
-    """Encapsulates an email.Message instance and returns only unicode objects"""
+    """Encapsulates an email.Message instance and returns only unicode objects.
+    """
 
     def __init__(self, message):
         self.message = message
@@ -129,7 +136,3 @@ class UMessage:
             elif not return_str:
                 return None
         return value
-
-    
-
-    

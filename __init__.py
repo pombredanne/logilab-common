@@ -1,32 +1,21 @@
-# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""Logilab common libraries:
+"""Logilab common library.
 
-a set of common functionnalities shared among logilab projects
-
+A set of common functionnalities shared by Logilab's projects.
 
 :type STD_BLACKLIST: tuple
-:var STD_BLACKLIST:
-  directories ignored by default by the functions in this package which have
-  to recurse into directories
+:var STD_BLACKLIST: directories ignored by default by the functions in
+  this package which have to recurse into directories
 
 :type IGNORED_EXTENSIONS: tuple
-:var IGNORED_EXTENSIONS:
-  file extensions that may usually be ignored
+:var IGNORED_EXTENSIONS: file extensions that may usually be ignored
+
+:organization: Logilab
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
+__docformat__ = "restructuredtext en"
+from logilab.common.__pkginfo__ import version as __version__
 
 STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 

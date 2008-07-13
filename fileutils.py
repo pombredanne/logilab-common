@@ -1,27 +1,15 @@
-# Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""Some file / file path manipulation utilities.
+"""File and file-path manipulation utilities.
 
 :group path manipulation: first_level_directory, relative_path, is_binary,\
 get_by_ext, remove_dead_links
 :group file manipulation: norm_read, norm_open, lines, stream_lines, lines,\
 write_open_mode, ensure_fs_mode, export
 :sort: path manipulation, file manipulation
-"""
 
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
+"""
 __docformat__ = "restructuredtext en"
 
 import sys
@@ -37,7 +25,7 @@ from logilab.common import STD_BLACKLIST as BASE_BLACKLIST, IGNORED_EXTENSIONS
 from logilab.common.shellutils import find
 
 def first_level_directory(path):
-    """return the first level directory of a path
+    """Return the first level directory of a path.
     
     >>> first_level_directory('home/syt/work')
     'home'
@@ -62,7 +50,7 @@ def first_level_directory(path):
     return head
 
 def abspath_listdir(path):
-    """lists path's content using absolute paths
+    """Lists path's content using absolute paths.
 
     >>> os.listdir('/home')
     ['adim', 'alf', 'arthur', 'auc']    
@@ -74,8 +62,8 @@ def abspath_listdir(path):
 
     
 def is_binary(filename):
-    """return true if filename may be a binary file, according to it's
-    extension
+    """Return true if filename may be a binary file, according to it's
+    extension.
 
     :type filename: str
     :param filename: the name of the file
@@ -92,7 +80,7 @@ def is_binary(filename):
 
 
 def write_open_mode(filename):
-    """return the write mode that should used to open file
+    """Return the write mode that should used to open file.
 
     :type filename: str
     :param filename: the name of the file
@@ -106,8 +94,8 @@ def write_open_mode(filename):
 
 
 def ensure_fs_mode(filepath, desired_mode=S_IWRITE):
-    """check that the given file has the given mode(s) set, else try to
-    set it
+    """Check that the given file has the given mode(s) set, else try to
+    set it.
 
     :type filepath: str
     :param filepath: path of the file
@@ -123,8 +111,8 @@ def ensure_fs_mode(filepath, desired_mode=S_IWRITE):
         
 
 class ProtectedFile(file):
-    """a special file-object class that automatically that automatically
-    does a 'chmod +w' when needed
+    """A special file-object class that automatically that automatically
+    does a 'chmod +w' when needed.
 
     XXX: for now, the way it is done allows 'normal file-objects' to be
     created during the ProtectedFile object lifetime.
@@ -169,12 +157,12 @@ class ProtectedFile(file):
 
 
 class UnresolvableError(Exception):
-    """exception raised by relative path when it's unable to compute relative
-    path between two paths
+    """Exception raised by relative path when it's unable to compute relative
+    path between two paths.
     """
 
 def relative_path(from_file, to_file):
-    """try to get a relative path from from `from_file` to `to_file`
+    """Try to get a relative path from from `from_file` to `to_file`
     (path will be absolute if to_file is an absolute file). This function
     is useful to create link in `from_file` to `to_file`. This typical use
     case is used in this function description.
@@ -246,7 +234,7 @@ _HAS_UNIV_OPEN = version_info[:2] >= (2, 3)
 del version_info
 
 def norm_read(path):
-    """return the content of the file with normalized line feeds
+    """Return the content of the file with normalized line feeds.
 
     :type path: str
     :param path: path to the file to read
@@ -260,7 +248,7 @@ def norm_read(path):
 
 
 def norm_open(path):
-    """return a stream for a file with content with normalized line feeds
+    """Return a stream for a file with content with normalized line feeds.
 
     :type path: str
     :param path: path to the file to open
@@ -274,7 +262,7 @@ def norm_open(path):
 
       
 def lines(path, comments=None):
-    """return a list of non empty lines in the file located at `path`
+    """Return a list of non empty lines in the file located at `path`.
 
     :type path: str
     :param path: path to the file
@@ -298,7 +286,7 @@ def lines(path, comments=None):
 
 
 def stream_lines(stream, comments=None):
-    """return a list of non empty lines in the given `stream`
+    """Return a list of non empty lines in the given `stream`.
 
     :type stream: object implementing 'xreadlines' or 'readlines'
     :param stream: file like object
@@ -330,9 +318,9 @@ def stream_lines(stream, comments=None):
 def export(from_dir, to_dir,
            blacklist=BASE_BLACKLIST, ignore_ext=IGNORED_EXTENSIONS,
            verbose=0):
-    """make a mirror of `from_dir` in `to_dir`, omitting directories and
+    """Make a mirror of `from_dir` in `to_dir`, omitting directories and
     files listed in the black list or ending with one of the given
-    extensions
+    extensions.
 
     :type from_dir: str
     :param from_dir: directory to export
@@ -387,7 +375,7 @@ def export(from_dir, to_dir,
 
 
 def remove_dead_links(directory, verbose=0):
-    """recursivly traverse directory and remove all dead links
+    """Recursivly traverse directory and remove all dead links.
 
     :type directory: str
     :param directory: directory to cleanup
@@ -412,7 +400,7 @@ from warnings import warn
 
 def files_by_ext(directory, include_exts=None, exclude_exts=None,
                  exclude_dirs=BASE_BLACKLIST):
-    """return a list of files in a directory matching (or not) some
+    """Return a list of files in a directory matching (or not) some
     extensions: you should either give the `include_exts` argument (and
     only files ending with one of the listed extensions will be
     considered) or the `exclude_exts` argument (and only files not
@@ -442,7 +430,7 @@ def files_by_ext(directory, include_exts=None, exclude_exts=None,
     return find(directory, exclude_exts, exclude=True, blacklist=exclude_dirs)
 
 def include_files_by_ext(directory, include_exts, exclude_dirs=BASE_BLACKLIST):
-    """return a list of files in a directory matching some extensions
+    """Return a list of files in a directory matching some extensions.
 
     :type directory: str
     :param directory: directory where files should be searched
@@ -461,7 +449,7 @@ def include_files_by_ext(directory, include_exts, exclude_dirs=BASE_BLACKLIST):
     return find(directory, include_exts, blacklist=exclude_dirs)
 
 def exclude_files_by_ext(directory, exclude_exts, exclude_dirs=BASE_BLACKLIST):
-    """return a list of files in a directory not matching some extensions
+    """Return a list of files in a directory not matching some extensions.
 
     :type directory: str
     :param directory: directory where files should be searched

@@ -1,13 +1,10 @@
-""" Copyright (c) 2002-2003 LOGILAB S.A. (Paris, FRANCE).
-http://www.logilab.fr/ -- mailto:contact@logilab.fr
-
-Distutils extensions for twisted framework.
+"""Distutils extensions for twisted framework.
 
 This module enables the installation of plugins.tml files using standard
 distutils syntax. It adds the following commands to the standard
 setup.py commands:
-* build_twisted_plugins: build (i.e. copy) plugins
-* install_twisted_plugins: install plugins
+ * build_twisted_plugins: build (i.e. copy) plugins
+ * install_twisted_plugins: install plugins
 
 Additionally, the following commands have been modified to deal with
 plugins files:
@@ -30,8 +27,13 @@ if __name__ == '__main__':
 
 Note that you can use this to install files that are not twisted plugins in any
 package directory of your application.
+
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
-#
+__docformat__ = "restructuredtext en"
+
 # (c) 2002 Alexandre Fayolle <alexandre.fayolle@free.fr>
 # This module is heavily based on code copied from the python distutils
 # framework, especially distutils.command.build_script,
@@ -44,14 +46,10 @@ package directory of your application.
 # to do so <wink>.
 #
 # Happy twisting!
-#
-
 
 from warnings import warn
 warn('this module is deprecated and will disappear in a near release',
      DeprecationWarning, stacklevel=1)
-
-__revision__ = "$Id: twisted_distutils.py,v 1.4 2003-09-12 11:54:48 syt Exp $"
 
 from distutils.core import Distribution, Command
 from distutils.command.install import install

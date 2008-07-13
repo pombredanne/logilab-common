@@ -1,22 +1,10 @@
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""
-Some shell/term utilities, useful to write some python scripts instead of shell
-scripts
+"""shell/term utilities, useful to write some python scripts instead of shell
+scripts.
 
 :author:    Logilab
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
-:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
 __docformat__ = "restructuredtext en"
 
@@ -32,7 +20,7 @@ from logilab.common import STD_BLACKLIST
 
 
 def chown(path, login=None, group=None):
-    """same as `os.chown` function but accepting user login or group name as
+    """Same as `os.chown` function but accepting user login or group name as
     argument. If login or group is omitted, it's left unchanged.
 
     Note: you must own the file to chown it (or be root). Otherwise OSError is raised. 
@@ -57,7 +45,7 @@ def chown(path, login=None, group=None):
         
 
 def mv(source, destination, _action=shutil.move):
-    """a shell like mv, supporting wildcards
+    """A shell-like mv, supporting wildcards.
     """
     sources = glob.glob(source)
     if len(sources) > 1:
@@ -78,7 +66,7 @@ def mv(source, destination, _action=shutil.move):
                 source, destination, ex))
         
 def rm(*files):
-    """a shell like rm, supporting wildcards
+    """A shell-like rm, supporting wildcards.
     """
     for wfile in files:
         for filename in glob.glob(wfile):
@@ -90,13 +78,13 @@ def rm(*files):
                 os.remove(filename)
     
 def cp(source, destination):
-    """a shell like cp, supporting wildcards
+    """A shell-like cp, supporting wildcards.
     """
     mv(source, destination, _action=shutil.copy)
 
 
 def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
-    """recursivly find files ending with the given extensions from the directory
+    """Recursivly find files ending with the given extensions from the directory.
 
     :type directory: str
     :param directory:
@@ -155,7 +143,7 @@ def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
 
 class Execute:
     """This is a deadlock safe version of popen2 (no stdin), that returns
-    an object with errorlevel, out and err
+    an object with errorlevel, out and err.
     """
     
     def __init__(self, command):
@@ -170,7 +158,7 @@ class Execute:
 
 
 def acquire_lock(lock_file, max_try=10, delay=10):
-    """acquire a lock represented by a file on the file system"""
+    """Acquire a lock represented by a file on the file system."""
     count = 0
     while max_try <= 0 or count < max_try:
         if not exists(lock_file):
@@ -184,12 +172,12 @@ def acquire_lock(lock_file, max_try=10, delay=10):
     stream.close()
     
 def release_lock(lock_file):
-    """release a lock represented by a file on the file system"""
+    """Release a lock represented by a file on the file system."""
     os.remove(lock_file)
 
 
 class ProgressBar(object):
-    """a simple text progression bar"""
+    """A simple text progression bar."""
     
     def __init__(self, nbops, size=20, stream=sys.stdout):
         self._fstr = '\r[%%-%ss]' % int(size)
@@ -200,7 +188,7 @@ class ProgressBar(object):
         self._progress = 0
 
     def update(self):
-        """update the progression bar"""
+        """Update the progression bar."""
         self._current += 1
         progress = int((float(self._current)/float(self._total))*self._size)
         if progress > self._progress:
@@ -208,6 +196,6 @@ class ProgressBar(object):
             self.refresh()
 
     def refresh(self):
-        """refresh the progression bar display"""
+        """Refresh the progression bar display."""
         self._stream.write(self._fstr % ('.' * min(self._progress, self._size)) )
         self._stream.flush()

@@ -1,24 +1,14 @@
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""provides helper functions to handle a command line tool providing more than
-one command
+"""Helper functions to support command line tools providing more than
+one command.
+
 e.g called as "tool command [options] args..." where <options> and <args> are
 command'specific
 
-:author:    Logilab
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE)
-:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
+:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
+__docformat__ = "restructuredtext en"
 
 # XXX : merge with optparser ? 
 import sys
@@ -38,12 +28,12 @@ command. Available commands are :\n'''
 
 class BadCommandUsage(Exception):
     """Raised when an unknown command is used or when a command is not
-    correctly used
+    correctly used.
     """
 
 
 class Command(Configuration):
-    """base class for command line commands"""
+    """Base class for command line commands."""
     arguments = ''
     name = ''
     # hidden from help ?

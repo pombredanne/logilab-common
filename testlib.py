@@ -1,29 +1,31 @@
-# modified copy of some functions from test/regrtest.py from PyXml
-# disable camel case warning
-# pylint: disable-msg=C0103
-"""Copyright (c) 2003-2006 LOGILAB S.A. (Paris, FRANCE).
-http://www.logilab.fr/ -- mailto:contact@logilab.fr  
-
-Run tests.
+"""Run tests.
 
 This will find all modules whose name match a given prefix in the test
-directory, and run them.  Various command line options provide
+directory, and run them. Various command line options provide
 additional facilities.
 
 Command line options:
 
--v: verbose -- run tests in verbose mode with output to stdout
--q: quiet -- don't print anything except if a test fails
--t: testdir -- directory where the tests will be found
--x: exclude -- add a test to exclude
--p: profile -- profiled execution
--c: capture -- capture standard out/err during tests
--d: dbc     -- enable design-by-contract
+ -v: verbose -- run tests in verbose mode with output to stdout
+ -q: quiet -- don't print anything except if a test fails
+ -t: testdir -- directory where the tests will be found
+ -x: exclude -- add a test to exclude
+ -p: profile -- profiled execution
+ -c: capture -- capture standard out/err during tests
+ -d: dbc     -- enable design-by-contract
 
 If no non-option arguments are present, prefixes used are 'test',
 'regrtest', 'smoketest' and 'unittest'.
 
+:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
+__docformat__ = "restructuredtext en"
+# modified copy of some functions from test/regrtest.py from PyXml
+# disable camel case warning
+# pylint: disable-msg=C0103
+
 import sys
 import os, os.path as osp
 import re

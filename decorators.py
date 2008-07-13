@@ -1,20 +1,8 @@
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""this module contains some function/method decorators
+"""A few useful function/method decorators.
 
-:author:    Logilab
-:copyright: 2006-2008 LOGILAB S.A. (Paris, FRANCE)
-:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
+:copyright: 2006-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
 __docformat__ = "restructuredtext en"
 
@@ -24,7 +12,7 @@ from time import clock
 # XXX rewrite so we can use the decorator syntax when keyarg has to be specified
 
 def cached(callableobj, keyarg=None):
-    """simple decorator to cache result of method call"""
+    """Simple decorator to cache result of method call."""
     #print callableobj, keyarg, callableobj.func_code.co_argcount
     if callableobj.func_code.co_argcount == 1 or keyarg == 0:
         
@@ -78,14 +66,14 @@ def cached(callableobj, keyarg=None):
     return cache_wrapper3
 
 def clear_cache(obj, funcname):
-    """function to clear a cache handled by the cached decorator"""
+    """Function to clear a cache handled by the cached decorator."""
     try:
         del obj.__dict__['_%s_cache_' % funcname]
     except KeyError:
         pass
 
 def copy_cache(obj, funcname, cacheobj):
-    """copy cache for <funcname> from cacheobj to obj"""
+    """Copy cache for <funcname> from cacheobj to obj."""
     cache = '_%s_cache_' % funcname
     try:
         setattr(obj, cache, cacheobj.__dict__[cache])
@@ -94,8 +82,8 @@ def copy_cache(obj, funcname, cacheobj):
 
 
 class wproperty(object):
-    """simple descriptor expecting to take a modifier function as first argument
-    and looking for a _<function name> to retrieve the attribute
+    """Simple descriptor expecting to take a modifier function as first argument
+    and looking for a _<function name> to retrieve the attribute.
     """
     def __init__(self, setfunc):
         self.setfunc = setfunc
@@ -117,8 +105,8 @@ class classproperty(object):
 
 
 class iclassmethod(object):
-    '''descriptor for method which should be available as class method if called
-    on the class or instance method if called on an instance
+    '''Descriptor for method which should be available as class method if called
+    on the class or instance method if called on an instance.
     '''
     def __init__(self, func):
         self.func = func
@@ -141,7 +129,7 @@ def timed(f):
 
 
 def locked(acquire, release):
-    """decorator taking two methods to acquire/release a lock as argument,
+    """Decorator taking two methods to acquire/release a lock as argument,
     returning a decorator function which will call the inner method after
     having called acquire(self) et will call release(self) afterwards.
     """

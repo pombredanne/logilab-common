@@ -1,6 +1,10 @@
-"""Simple interpreter client for monserver
-provides a simple readline interface.
+"""Simple interpreter client for monserver provides a simple readline interface.
+
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
+__docformat__ = "restructuredtext en"
 
 from warnings import warn
 warn('this module is deprecated and will disappear in a near release',

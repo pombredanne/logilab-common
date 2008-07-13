@@ -1,20 +1,4 @@
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-""" Copyright (c) 2002-2003 LOGILAB S.A. (Paris, FRANCE).
- http://www.logilab.fr/ -- mailto:contact@logilab.fr
-
-
-a Python implementation of PATRICIA tree
+"""A Python implementation of PATRICIA tree.
 
 PATRICIA - Practical Algorithm to Retrieve Information Coded in Alphanumeric
            D.R.Morrison (1968).
@@ -24,13 +8,16 @@ want to know what's a PATRICIA tree...
 TODO: _ advanced search
       _ profile code
       _ use mxTextTools ?
+
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
+__docformat__ = "restructuredtext en"
 
 from warnings import warn
 warn('logilab.common.patricia module is deprecated and will disappear in a near release',
      DeprecationWarning, stacklevel=2)
-
-__revision__ = "$Id: patricia.py,v 1.5 2003-10-31 14:18:32 syt Exp $"
 
 def prefix(prfx, string):
     """return the index of the first character from string which differs from

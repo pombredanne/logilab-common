@@ -1,28 +1,16 @@
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-""" Copyright (c) 2002-2003 LOGILAB S.A. (Paris, FRANCE).
- http://www.logilab.fr/ -- mailto:contact@logilab.fr
+"""A daemon mix-in class.
 
-a daemon mix-in class
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
-
-__revision__ = '$Id: daemon.py,v 1.10 2005-11-22 13:13:01 syt Exp $'
+__docformat__ = "restructuredtext en"
 
 import os, signal, sys, time
 from logilab.common.logger import make_logger, LOG_ALERT, LOG_NOTICE
 
 class DaemonMixIn:
-    """ mixin to make a daemon from watchers/queriers
+    """Mixin to make a daemon from watchers/queriers.
     """
 
     def __init__(self, configmod) :

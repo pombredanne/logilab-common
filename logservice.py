@@ -1,15 +1,17 @@
-"""log utilities
+"""Log utilities.
 
-Copyright (c) 2003-2004 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
-http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
+
+# FIXME using logging instead
 """
+__docformat__ = "restructuredtext en"
 
 from warnings import warn
 warn('logservice module is deprecated and will disappear in a near release. \
 use logging module instead.',
      DeprecationWarning, stacklevel=2)
-
-__revision__ = "$Id: logservice.py,v 1.5 2006-03-05 16:13:28 syt Exp $"
 
 from logilab.common.logger import make_logger, LOG_ERR, LOG_WARN, LOG_NOTICE, \
      LOG_INFO, LOG_CRIT, LOG_DEBUG

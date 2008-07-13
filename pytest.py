@@ -17,7 +17,6 @@ If you wish to customize the tester, you'll have to define a class named
 defined in the pytest module. Take a look at the `PyTester` and `DjangoTester`
 classes for more information about what can be done.
 
-
 For instance, if you wish to add a custom -l option to specify a loglevel, you
 could define the following ``pytestconf.py`` file ::
 
@@ -48,7 +47,12 @@ the ``optval`` method::
             loglevel = self.optval('loglevel')
             # ...
             
+
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
+__docformat__ = "restructuredtext en"
 
 PYTEST_DOC = """%prog [OPTIONS] [testfile [testpattern]]
 

@@ -1,10 +1,15 @@
-"""customized version of pdb's default debugger.
+"""Customized version of pdb's default debugger.
 
 - sets up a history file
 - uses ipython if available to colorize lines of code
 - overrides list command to search for current block instead
   of using 5 lines of context
+
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
+__docformat__ = "restructuredtext en"
 
 try:
     import readline

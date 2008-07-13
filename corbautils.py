@@ -1,6 +1,10 @@
-"""A set of utility function to ease the use of OmniORBpy."""
+"""A set of utility function to ease the use of OmniORBpy.
 
-__revision__ = '$Id: corbautils.py,v 1.2 2005-11-22 13:13:00 syt Exp $'
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
+"""
+__docformat__ = "restructuredtext en"
 
 from omniORB import CORBA, PortableServer
 import CosNaming

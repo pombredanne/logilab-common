@@ -1,26 +1,26 @@
-"""some various graph manipuliation utilities
+"""Graph manipuliation utilities.
 
 (dot generation adapted from pypy/translator/tool/make_dot.py)
 
-:organization: Logilab
-:copyright: 2003-2007 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
 """
-
 __docformat__ = "restructuredtext en"
+
 __metaclass__ = type
 
 import os.path as osp
 import os
 
 def escape(value):
-    """make <value> usable in a dot file"""
+    """Make <value> usable in a dot file."""
     lines = [line.replace('"', '\\"') for line in value.split('\n')]
     data = '\\l'.join(lines)
     return '\\n' + data
 
 def target_info_from_filename(filename):
-    """transforms /some/path/foo.png into ('/some/path', 'foo.png', 'png')"""
+    """Transforms /some/path/foo.png into ('/some/path', 'foo.png', 'png')."""
     abspath = osp.abspath(filename)
     basename = osp.basename(filename)
     storedir = osp.dirname(abspath)
@@ -29,7 +29,7 @@ def target_info_from_filename(filename):
 
 
 class DotBackend:
-    """Dot File backend"""
+    """Dot File backend."""
     def __init__(self, graphname, rankdir=None, size=None, ratio=None, charset='utf-8'):
         self.graphname = graphname
         self.lines = []
@@ -57,7 +57,8 @@ class DotBackend:
     source = property(get_source)
     
     def generate(self, outputfile=None, dotfile=None):
-        """generates a graph file
+        """Generates a graph file.
+        
         :param target: output format ('png', 'ps', etc.). If None,
                        the raw dot source will be returned
         :return: a path to the generated file
@@ -83,26 +84,26 @@ class DotBackend:
         return outputfile
 
     def emit(self, line):
-        """adds <line> to final output"""
+        """Adds <line> to final output."""
         self.lines.append(line)
 
     def emit_edge(self, name1, name2, **props):
-        """emits edge from <name1> to <name2>
+        """Emits edge from <name1> to <name2>.
         
-        authorized props: see http://www.graphviz.org/doc/info/attrs.html
+        Authorized props: see http://www.graphviz.org/doc/info/attrs.html
         """
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
         self.emit('edge [%s];' % ", ".join(attrs))
         self.emit('%s -> %s' % (normalize_node_id(name1), normalize_node_id(name2)))
 
     def emit_node(self, name, **props):
-        """authorized props: see http://www.graphviz.org/doc/info/attrs.html
+        """Authorized props: see http://www.graphviz.org/doc/info/attrs.html
         """
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
         self.emit('%s [%s];' % (normalize_node_id(name), ", ".join(attrs)))
 
 def normalize_node_id(nid):
-    """returns a suitable DOT node id for `nid`"""
+    """Returns a suitable DOT node id for `nid`."""
     return '"%s"' % nid
 
 class GraphGenerator:
