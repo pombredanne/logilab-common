@@ -1,22 +1,18 @@
-# Copyright (c) 2004-2005 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""HTML formatting drivers for ureports
-"""
+"""HTML formatting drivers for ureports.
 
-__revision__ = "$Id: html_writer.py,v 1.10 2006-03-08 09:47:29 katia Exp $"
+:copyright:
+  2004-2008 `LOGILAB S.A. <http://www.logilab.fr>`_ (Paris, FRANCE),
+  all rights reserved.
+
+:contact:
+  http://www.logilab.org/project/logilab-common --
+  mailto:python-projects@logilab.org
+
+:license:
+  `General Public License version 2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>`_
+"""
+__docformat__ = "restructuredtext en"
 
 from cgi import escape
 

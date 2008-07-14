@@ -59,8 +59,10 @@ class DotBackend:
     def generate(self, outputfile=None, dotfile=None):
         """Generates a graph file.
         
-        :param target: output format ('png', 'ps', etc.). If None,
-                       the raw dot source will be returned
+        :param outputfile: filename and path [defaults to graphname.png]
+        :param dotfile: filename and path [defaults to graphname.dot]
+        
+        :rtype: str
         :return: a path to the generated file
         """
         if outputfile is not None:

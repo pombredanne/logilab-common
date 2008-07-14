@@ -1,3 +1,4 @@
+# pylint: disable-msg=E0601,W0622,W0611
 """Wrappers around some builtins introduced in python 2.3, 2.4 and
 2.5, making them available in for earlier versions of python.
 
@@ -5,11 +6,8 @@
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
-__docformat__ = "restructuredtext en"
-
-# pylint: disable-msg=E0601,W0622,W0611
-
 from __future__ import generators
+__docformat__ = "restructuredtext en"
 
 from warnings import warn
 

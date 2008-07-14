@@ -65,7 +65,7 @@ class LazyObject(object):
 
 
 def load_module_from_name(dotted_name, path=None, use_sys=1):
-    """load a Python module from it's name
+    """Load a Python module from it's name.
 
     :type dotted_name: str
     :param dotted_name: python name of a module or package
@@ -90,7 +90,7 @@ def load_module_from_name(dotted_name, path=None, use_sys=1):
 
 
 def load_module_from_modpath(parts, path=None, use_sys=1):
-    """load a python module from it's splitted name
+    """Load a python module from it's splitted name.
 
     :type parts: list(str) or tuple(str)
     :param parts:
@@ -104,9 +104,6 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
     :type use_sys: bool
     :param use_sys:
       boolean indicating whether the sys.modules dictionary should be used or not
-
-    :param _prefix: used internally, should not be specified
-
 
     :raise ImportError: if the module or package is not found
     
@@ -141,10 +138,10 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
 
 
 def load_module_from_file(filepath, path=None, use_sys=1):
-    """load a Python module from it's path
+    """Load a Python module from it's path.
 
     :type filepath: str
-    :param dotted_name: path to the python module or package
+    :param filepath: path to the python module or package
 
     :type path: list or None
     :param path:

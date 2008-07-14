@@ -850,7 +850,7 @@ class DocbookRenderer(TableCellRenderer):
     def _render_cell_content(self, cell_content, table_style, col_index):
         """Makes the appropriate rendering for this cell content.
         Rendering properties will be searched using the
-        *table_style.get_xxx_by_index(col_index)' methods.
+        table_style.get_xxx_by_index(col_index)' methods.
         """
         try:
             align_on = self.properties['alignment']

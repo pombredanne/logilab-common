@@ -1,6 +1,4 @@
-"""Logilab common library.
-
-A set of common functionnalities shared by Logilab's projects.
+"""Logilab common library (aka Logilab's extension to the standard library).
 
 :type STD_BLACKLIST: tuple
 :var STD_BLACKLIST: directories ignored by default by the functions in
@@ -9,10 +7,17 @@ A set of common functionnalities shared by Logilab's projects.
 :type IGNORED_EXTENSIONS: tuple
 :var IGNORED_EXTENSIONS: file extensions that may usually be ignored
 
-:organization: Logilab
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
-:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
-:license: General Public License version 2 - http://www.gnu.org/licenses
+:copyright:
+  2000-2008 `LOGILAB S.A. <http://www.logilab.fr>`_ (Paris, FRANCE),
+  all rights reserved.
+
+:contact:
+  http://www.logilab.org/project/logilab-common --
+  mailto:python-projects@logilab.org
+
+:license:
+  `General Public License version 2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>`_
 """
 __docformat__ = "restructuredtext en"
 from logilab.common.__pkginfo__ import version as __version__
@@ -20,7 +25,6 @@ from logilab.common.__pkginfo__ import version as __version__
 STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 
 IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc', '~')
-
 
 
 from logilab.common.deprecation import moved
@@ -35,7 +39,7 @@ deprecated_function = moved('logilab.common.deprecation', 'deprecated_function')
 class_renamed = moved('logilab.common.deprecation', 'class_renamed')
 
 def intersection(list1, list2):
-    """return the intersection of list1 and list2"""
+    """Return the intersection of list1 and list2."""
     warn('this function is deprecated, use a set instead', DeprecationWarning,
          stacklevel=2)
     intersect_dict, result = {}, []
@@ -47,7 +51,7 @@ def intersection(list1, list2):
     return result
 
 def difference(list1, list2):
-    """return elements of list1 not in list2"""
+    """Return elements of list1 not in list2."""
     warn('this function is deprecated, use a set instead', DeprecationWarning,
          stacklevel=2)
     tmp, result = {}, []
@@ -59,7 +63,7 @@ def difference(list1, list2):
     return result
 
 def union(list1, list2):
-    """return list1 union list2"""
+    """Return list1 union list2."""
     warn('this function is deprecated, use a set instead', DeprecationWarning,
          stacklevel=2)
     tmp = {}
@@ -71,7 +75,7 @@ def union(list1, list2):
 
 
 class attrdict(dict):
-    """a dictionary whose keys are also accessible as attributes"""
+    """A dictionary for which keys are also accessible as attributes."""
     def __getattr__(self, attr):
         try:
             return self[attr]
@@ -108,10 +112,15 @@ class nullobject(object):
 #               yield subitem
 
 def flatten(iterable, tr_func=None, results=None):
-    """flatten a list of list with any level
+    """Flatten a list of list with any level.
 
-    if tr_func is not None, it should be a one argument function that'll be called
-    on each final element
+    If tr_func is not None, it should be a one argument function that'll be called
+    on each final element.
+
+    :rtype: list
+
+    >>> flatten([1, [2, 3]])
+    [1, 2, 3]
     """
     if results is None:
         results = []
@@ -129,12 +138,15 @@ def flatten(iterable, tr_func=None, results=None):
 
 def make_domains(lists):
     """
-    given a list of lists, return a list of domain for each list to produce all
-    combinaisons of possibles values
+    Given a list of lists, return a list of domain for each list to produce all
+    combinations of possibles values.
 
-    ex: (['a', 'b'], ['c','d', 'e'])
-       -> (['a', 'b', 'a', 'b', 'a', 'b'],
-           ['c', 'c', 'd', 'd', 'e', 'e'])
+    :rtype: list
+    
+    Example:
+
+    >>> make_domains(['a', 'b'], ['c','d', 'e'])
+    [['a', 'b', 'a', 'b', 'a', 'b'], ['c', 'c', 'd', 'd', 'e', 'e']]
     """
     domains = []
     for iterable in lists:

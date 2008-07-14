@@ -61,9 +61,10 @@ def class_moved(new_class, old_name=None, message=None):
 
 
 def deprecated_function(new_func, message=None):
-    """creates a function which fires a DeprecationWarning when used
+    """Creates a function which fires a DeprecationWarning when used.
 
-    For example, if <bar> is deprecated in favour of <foo> :
+    For example, if <bar> is deprecated in favour of <foo>:
+    
     >>> bar = deprecated_function(foo, 'bar is deprecated')
     >>> bar()
     sample.py:57: DeprecationWarning: bar is deprecated

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""This module implements a TCP server in a separate thread that
+"""A TCP server implemented in a separate thread that
 allows *one* client to connect and provides a command line interpreter
 allowing the remote client to explore the process on the fly.
 

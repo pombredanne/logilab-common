@@ -1,25 +1,19 @@
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""Micro reports objects
+"""Micro reports objects.
 
-A micro report is a tree of layout and content objects
+A micro report is a tree of layout and content objects.
 
+:copyright:
+  2004-2008 `LOGILAB S.A. <http://www.logilab.fr>`_ (Paris, FRANCE),
+  all rights reserved.
 
-:author:    Logilab
-:copyright: 2004-2008 LOGILAB S.A. (Paris, FRANCE)
-:contact:   http://www.logilab.fr/ -- mailto:python-projects@logilab.org
+:contact:
+  http://www.logilab.org/project/logilab-common --
+  mailto:python-projects@logilab.org
+
+:license:
+  `General Public License version 2
+  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>`_
 """
-
 __docformat__ = "restructuredtext en"
 
 from logilab.common.tree import VNode

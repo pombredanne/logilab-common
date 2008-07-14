@@ -255,8 +255,8 @@ TIME_UNITS = {
 
 def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
     value_reg=_VALUE_RE):
-    """parse the string applying the units define in units
-    eg: "1.5m",{'m',60} -> 80
+    """Parse the string applying the units defined in units
+    (eg: "1.5m",{'m',60} -> 80).
         
     :type string: str or unicode
     :param string: the string to parse
@@ -266,20 +266,12 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
 
     :type inter: type
     :param inter: used to parse every intermediate value (need __sum__)
-    :default inter: final value
-
-    :type inter: type
-    :param inter: used to build the final object after summing them all
-    :default inter: float
     
     :type blank_reg: regexp
     :param blank_reg: should match eveyr blank char to ignore.
-    :default blank_reg: (\s|,)+ # match blank space and coma
     
     :type value_reg: regexp with "value" and optional "unit" group
     :param value_reg: match a value and it's unit into the 
-    :default value_reg: (-?(((0x?)?[0-9]+)|([0-9]+\\.[0-9]*)))([a-zA-Z]+)?
-        match any number 
     """
     if inter is None:
         inter = final

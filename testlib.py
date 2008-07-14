@@ -199,11 +199,10 @@ main = obsolete("testlib.main() is obsolete, use the pytest tool instead")(main)
 
 
 def run_tests(tests, quiet, verbose, runner=None, capture=0):
-    """ execute a list of tests
-    return a 3-uple with :
-       _ the list of passed tests
-       _ the list of failed tests
-       _ the list of skipped tests
+    """Execute a list of tests.
+
+    :rtype: tuple
+    :return: tuple (list of passed tests, list of failed tests, list of skipped tests)
     """
     good = []
     bad = []
@@ -535,10 +534,10 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
 
 class keywords(dict):
-    """keyword args (**kwargs) support for generative tests"""
+    """Keyword args (**kwargs) support for generative tests."""
 
 class starargs(tuple):
-    """variable arguments (*args) for generative tests"""
+    """Variable arguments (*args) for generative tests."""
     def __new__(cls, *args):
         return tuple.__new__(cls, args)
 
@@ -546,9 +545,10 @@ class starargs(tuple):
 
 class NonStrictTestLoader(unittest.TestLoader):
     """
-    overrides default testloader to be able to omit classname when
-    specifying tests to run on command line. For example, if the file
-    test_foo.py contains ::
+    Overrides default testloader to be able to omit classname when
+    specifying tests to run on command line.
+
+    For example, if the file test_foo.py contains ::
     
         class FooTC(TestCase):
             def test_foo1(self): # ...
@@ -558,11 +558,11 @@ class NonStrictTestLoader(unittest.TestLoader):
         class BarTC(TestCase):
             def test_bar2(self): # ...
 
-    python test_foo.py will run the 3 tests in FooTC
-    python test_foo.py FooTC will run the 3 tests in FooTC
-    python test_foo.py test_foo will run test_foo1 and test_foo2
-    python test_foo.py test_foo1 will run test_foo1
-    python test_foo.py test_bar will run FooTC.test_bar1 and BarTC.test_bar2
+    'python test_foo.py' will run the 3 tests in FooTC
+    'python test_foo.py FooTC' will run the 3 tests in FooTC
+    'python test_foo.py test_foo' will run test_foo1 and test_foo2
+    'python test_foo.py test_foo1' will run test_foo1
+    'python test_foo.py test_bar' will run FooTC.test_bar1 and BarTC.test_bar2
     """
 
     def __init__(self):
@@ -1618,9 +1618,9 @@ def mock_object(**params):
 
 
 def create_files(paths, chroot):
-    """creates directories and files found in <path>
+    """Creates directories and files found in <path>.
 
-    :param path: list of relative paths to files or directories
+    :param paths: list of relative paths to files or directories
     :param chroot: the root directory in which paths will be created
 
     >>> from os.path import isdir, isfile

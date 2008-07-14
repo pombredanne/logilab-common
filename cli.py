@@ -1,9 +1,9 @@
 """Command line interface helper classes.
  
 It provides some default commands, a help system, a default readline
-configuration with completion and persistent history
+configuration with completion and persistent history.
 
-Exemple usage:
+Example::
 
     class BookShell(CLIHelper):
 
@@ -36,7 +36,7 @@ if not hasattr(__builtin__, '_'):
     
 
 def init_readline(complete_method, histfile=None):
-    """init the readline library if available"""
+    """Init the readline library if available."""
     try:
         import readline
         readline.parse_and_bind("tab: complete")
@@ -55,13 +55,13 @@ def init_readline(complete_method, histfile=None):
 
 
 class Completer :
-    """readline completer"""
+    """Readline completer."""
     
     def __init__(self, commands):
         self.list = commands
         
     def complete(self, text, state):
-        """hook called by readline when <tab> is pressed"""
+        """Hook called by readline when <tab> is pressed."""
         n = len(text)
         matches = []
         for cmd in self.list :
@@ -74,8 +74,8 @@ class Completer :
 
 
 class CLIHelper:
-    """ an abstract command line interface client which recognize commands
-    and provide an help system
+    """An abstract command line interface client which recognize commands
+    and provide an help system.
     """
     
     CMD_MAP = {'help' : _("Others"),
@@ -118,9 +118,8 @@ class CLIHelper:
                     traceback.print_exc()
 
     def handle_line(self, stripped_line):
-        """method to overload in the concrete class
-        
-        should handle lines wich are not command
+        """Method to overload in the concrete class (should handle
+        lines wich are not commands).
         """
         raise NotImplementedError()
 

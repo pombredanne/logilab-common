@@ -1,64 +1,94 @@
-"""Some classes used to handle advanced configuration in simple to
-complex applications.
+"""Classes to handle advanced configuration in simple to complex applications.
 
-It's able to load the configuration from a file and or command line
-options, to generate a sample configuration file or to display program's
-usage. It basically fill the gap between optik/optparse and ConfigParser,
-with some additional data types (available as standalone optik extension
-in the `optik_ext` module)
+Allows to load the configuration from a file or from command line
+options, to generate a sample configuration file or to display
+program's usage. Fills the gap between optik/optparse and ConfigParser
+by adding data types (which are also available as a standalone optik
+extension in the `optik_ext` module).
 
 
 Quick start: simplest usage
 ---------------------------
 
-import sys
-from logilab.common.configuration import Configuration
+.. python ::
 
-options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),
-           ('value', {'type': 'string', 'metavar': '<string>'}),
-           ('multiple', {'type': 'csv', 'default': ('yop',),
-                         'metavar': '<comma separated values>',
-                         'help': 'you can also document the option'}),
-           ('number', {'type': 'int', 'default':2, 'metavar':'<int>'}),
-           ]
-config = Configuration(options=options, name='My config')
-print config['dothis']
-print config['value']
-print config['multiple']
-print config['number']
-
-print config.help()
-
-f = open('myconfig.ini', 'w')
-f.write('''[MY CONFIG]
-number = 3
-dothis = no
-multiple = 1,2,3
-''')
-f.close()
-config.load_file_configuration('myconfig.ini')
-print config['dothis']
-print config['value']
-print config['multiple']
-print config['number']
-
-sys.argv = ['mon prog', '--value', 'bacon', '--multiple', '4,5,6',
-            'nonoptionargument']
-print config.load_command_line_configuration()
-print config['value']
-
-config.generate_config()
+  >>> import sys
+  >>> from logilab.common.configuration import Configuration
+  >>> options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),
+  ...            ('value', {'type': 'string', 'metavar': '<string>'}),
+  ...            ('multiple', {'type': 'csv', 'default': ('yop',),
+  ...                          'metavar': '<comma separated values>',
+  ...                          'help': 'you can also document the option'}),
+  ...            ('number', {'type': 'int', 'default':2, 'metavar':'<int>'}),
+  ...           ]
+  >>> config = Configuration(options=options, name='My config')
+  >>> print config['dothis']
+  True
+  >>> print config['value']
+  None
+  >>> print config['multiple']
+  ('yop',)
+  >>> print config['number']
+  2
+  >>> print config.help()
+  Usage:  [options]
+  
+  Options:
+    -h, --help            show this help message and exit
+    --dothis=<y or n>     
+    --value=<string>      
+    --multiple=<comma separated values>
+                          you can also document the option [current: none]
+    --number=<int>        
+  
+  >>> f = open('myconfig.ini', 'w')
+  >>> f.write('''[MY CONFIG]
+  ... number = 3
+  ... dothis = no
+  ... multiple = 1,2,3
+  ... ''')
+  >>> f.close()
+  >>> config.load_file_configuration('myconfig.ini')
+  >>> print config['dothis']
+  False
+  >>> print config['value']
+  None
+  >>> print config['multiple']
+  ['1', '2', '3']
+  >>> print config['number']
+  3
+  >>> sys.argv = ['mon prog', '--value', 'bacon', '--multiple', '4,5,6',
+  ...             'nonoptionargument']
+  >>> print config.load_command_line_configuration()
+  ['nonoptionargument']
+  >>> print config['value']
+  bacon
+  >>> config.generate_config()
+  # class for simple configurations which don't need the
+  # manager / providers model and prefer delegation to inheritance
+  # 
+  # configuration values are accessible through a dict like interface
+  # 
+  [MY CONFIG]
+  
+  dothis=no
+  
+  value=bacon
+  
+  # you can also document the option
+  multiple=4,5,6
+  
+  number=3
+  >>>
 
 
 :copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
-__docformat__ = "restructuredtext en"
-
 from __future__ import generators 
-
 __docformat__ = "restructuredtext en"
+
 __all__ = ('OptionsManagerMixIn', 'OptionsProviderMixIn',
            'ConfigurationMixIn', 'Configuration',
            'OptionsManager2ConfigurationAdapter')

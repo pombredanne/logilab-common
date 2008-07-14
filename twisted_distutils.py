@@ -3,27 +3,27 @@
 This module enables the installation of plugins.tml files using standard
 distutils syntax. It adds the following commands to the standard
 setup.py commands:
- * build_twisted_plugins: build (i.e. copy) plugins
- * install_twisted_plugins: install plugins
+ - build_twisted_plugins: build (i.e. copy) plugins
+ - install_twisted_plugins: install plugins
 
 Additionally, the following commands have been modified to deal with
 plugins files:
- * sdist
- * build
- * install
+ - sdist
+ - build
+ - install
 
 To use these extenstion, you should import the setup fonction from this
 module, and use it normally. To list the plugins.tml files, use the
-twisted_plugins keyword argument to the setup function:
+twisted_plugins keyword argument to the setup function::
 
-from twisted_distutils import setup # you can also import Extension if needed
+  from twisted_distutils import setup # you can also import Extension if needed
 
-if __name__ == '__main__':
-    setup(name='my_twisted_app',
-          version='1.0',
-          author='me',
-          packages=['my_package'],
-          twisted_plugins = ['my_package/plugins.tml'])
+  if __name__ == '__main__':
+      setup(name='my_twisted_app',
+            version='1.0',
+            author='me',
+            packages=['my_package'],
+            twisted_plugins = ['my_package/plugins.tml'])
 
 Note that you can use this to install files that are not twisted plugins in any
 package directory of your application.
