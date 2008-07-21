@@ -434,10 +434,20 @@ def run(self, result, runcondition=None, options=None):
     for test in self._tests:
         if result.shouldStop:
             break
-        test(result, runcondition, options)
+        try:
+            test(result, runcondition, options)
+        except TypeError:
+            # this might happen if a raw unittest.TestCase is defined
+            # and used with python (and not pytest)
+            warn("%s should extend lgc.testlib.TestCase instead of unittest.TestCase"
+                 % test)
+            test(result)
     return result
 unittest.TestSuite.run = run
-    
+
+# backward compatibility: TestSuite might be imported from lgc.testlib
+TestSuite = unittest.TestSuite
+
 # python2.3 compat
 def __call__(self, *args, **kwds):
     return self.run(*args, **kwds)
