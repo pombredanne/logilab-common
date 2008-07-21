@@ -1199,7 +1199,7 @@ class TestCase(unittest.TestCase):
     assertUnorderedIterableEqual = assertUnorderedIterableEquals
 
     def assertSetEquals(self,got,expected, msg=None):
-        if not(isinstance(got, set) or isinstance(expected, set)):
+        if not(isinstance(got, set) and isinstance(expected, set)):
             warn("the assertSetEquals function if now intended for set only."\
                 "use assertUnorderedIterableEquals instead.",
                 DeprecationWarning, 2)
