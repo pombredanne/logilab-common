@@ -37,6 +37,8 @@ class FunctionDescr(object):
     minargs = 1
     maxargs = 1
 
+    name_mapping = {}
+
     def __init__(self, name=None, rtype=rtype, aggregat=aggregat):
         if name is not None:
             name = name.upper()
@@ -44,6 +46,13 @@ class FunctionDescr(object):
         self.rtype = rtype
         self.aggregat = aggregat
 
+    def backend_name(self, backend):
+        try:
+            return self.name_mapping[backend]
+        except KeyError:
+            return self.name
+    backend_name = classmethod(backend_name)
+    
     #@classmethod
     def check_nbargs(cls, nbargs):
         if cls.minargs is not None and \
@@ -154,6 +163,10 @@ class _GenericAdvFuncHelper:
         return self.groups_support
     support_user = obsolete('use groups_support attribute')(support_groups)
 
+    def func_sqlname(self, funcname):
+        funcdef = self.function_description(funcname)
+        return funcdef.backend_name(self.backend_name)
+    
     def system_database(self):
         """return the system database for the given driver"""
         raise NotImplementedError('not supported by this DBMS')
