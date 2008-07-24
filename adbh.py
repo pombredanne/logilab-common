@@ -31,6 +31,7 @@ class metafunc(type):
 class FunctionDescr(object):
     __metaclass__ = metafunc
 
+    supported_backends = ()
     rtype = None # None <-> returned type should be the same as the first argument
     aggregat = False
     minargs = 1
@@ -86,6 +87,7 @@ class _GenericAdvFuncHelper:
     """    
     # DBMS resources descriptors and accessors
     
+    backend_name = None # overriden in subclasses ('postgres', 'sqlite', etc.)
     needs_from_clause = False
     union_parentheses_support = True
     users_support = True
@@ -155,7 +157,7 @@ class _GenericAdvFuncHelper:
     def system_database(self):
         """return the system database for the given driver"""
         raise NotImplementedError('not supported by this DBMS')
-    
+
     def backup_command(self, dbname, dbhost, dbuser, dbpassword, backupfile,
                        keepownership=True):
         """return a command to backup the given database"""
@@ -276,6 +278,7 @@ def pgdbcmd(cmd, dbhost, dbuser):
 class _PGAdvFuncHelper(_GenericAdvFuncHelper):
     """Postgres helper, taking advantage of postgres SEQUENCE support
     """
+    backend_name = 'postgres'
     # modifiable but should not be shared
     FUNCTIONS = _GenericAdvFuncHelper.FUNCTIONS.copy()
     
@@ -386,6 +389,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 
     An exception is raised when the functionality is not emulatable
     """
+    backend_name = 'sqlite'
     # modifiable but should not be shared
     FUNCTIONS = _GenericAdvFuncHelper.FUNCTIONS.copy()
     
@@ -411,6 +415,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 class _MyAdvFuncHelper(_GenericAdvFuncHelper):
     """MySQL helper, taking advantage of postgres SEQUENCE support
     """
+    backend_name = 'mysql'
     needs_from_clause = True
     ilike_support = False # insensitive search by default
 
@@ -514,3 +519,9 @@ def get_adv_func_helper(driver):
 def register_function(driver, funcdef):
     ADV_FUNC_HELPER_DIRECTORY[driver].register_function(funcdef)    
 
+# this function should be called `register_function` but the other
+# definition was defined prior to this one
+def auto_register_function(funcdef):
+    """register the function `funcdef` on supported backends"""
+    for driver in  funcdef.supported_backends:
+        register_function(driver, funcdef)
