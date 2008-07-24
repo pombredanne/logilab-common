@@ -194,39 +194,32 @@ class DBAPIAdaptersTC(TestCase):
 
 
     def test_auto_register_funcdef(self):
-        class RANDOM(FunctionDescr):
+        class MYFUNC(FunctionDescr):
             supported_backends = ('postgres', 'sqlite',)
-            rtype = 'Float'
-            minargs = maxargs = 0
-            name_mapping = {'postgres': 'RANDOM',
-                            'mysql': 'RAND',
-                            'sqlite': 'SQLITE_RANDOM'}
-        auto_register_function(RANDOM)
+            name_mapping = {'postgres': 'MYFUNC',
+                            'mysql': 'MYF',
+                            'sqlite': 'SQLITE_MYFUNC'}
+        auto_register_function(MYFUNC)
 
-        pghelper = get_adv_func_helper('postgres')
-        mshelper = get_adv_func_helper('mysql')
-        slhelper = get_adv_func_helper('sqlite')
-        self.failUnless('RANDOM' in pghelper.FUNCTIONS)
-        self.failUnless('RANDOM' in slhelper.FUNCTIONS)
-        self.failIf('RANDOM' in mshelper.FUNCTIONS)
+        self.failUnless('MYFUNC' in pghelper.FUNCTIONS)
+        self.failUnless('MYFUNC' in slhelper.FUNCTIONS)
+        self.failIf('MYFUNC' in mshelper.FUNCTIONS)
 
 
     def test_funcname_with_different_backend_names(self):
-        class RANDOM(FunctionDescr):
+        class MYFUNC(FunctionDescr):
             supported_backends = ('postgres', 'mysql', 'sqlite')
-            rtype = 'Float'
-            minargs = maxargs = 0
-            name_mapping = {'postgres': 'RANDOM',
-                            'mysql': 'RAND',
-                            'sqlite': 'SQLITE_RANDOM'}
-        auto_register_function(RANDOM)
+            name_mapping = {'postgres': 'MYFUNC',
+                            'mysql': 'MYF',
+                            'sqlite': 'SQLITE_MYFUNC'}
+        auto_register_function(MYFUNC)
 
         pghelper = get_adv_func_helper('postgres')
         mshelper = get_adv_func_helper('mysql')
         slhelper = get_adv_func_helper('sqlite')
-        self.assertEquals(pghelper.func_sqlname('RANDOM'), 'RANDOM')
-        self.assertEquals(mshelper.func_sqlname('RANDOM'), 'RAND')
-        self.assertEquals(slhelper.func_sqlname('RANDOM'), 'SQLITE_RANDOM')
+        self.assertEquals(pghelper.func_sqlname('MYFUNC'), 'MYFUNC')
+        self.assertEquals(mshelper.func_sqlname('MYFUNC'), 'MYF')
+        self.assertEquals(slhelper.func_sqlname('MYFUNC'), 'SQLITE_MYFUNC')
             
 
 if __name__ == '__main__':
