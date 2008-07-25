@@ -201,6 +201,9 @@ class DBAPIAdaptersTC(TestCase):
                             'sqlite': 'SQLITE_MYFUNC'}
         auto_register_function(MYFUNC)
 
+        pghelper = get_adv_func_helper('postgres')
+        mshelper = get_adv_func_helper('mysql')
+        slhelper = get_adv_func_helper('sqlite')
         self.failUnless('MYFUNC' in pghelper.FUNCTIONS)
         self.failUnless('MYFUNC' in slhelper.FUNCTIONS)
         self.failIf('MYFUNC' in mshelper.FUNCTIONS)
