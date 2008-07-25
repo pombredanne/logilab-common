@@ -88,6 +88,14 @@ class LENGTH(FunctionDescr):
 class DATE(FunctionDescr):
     rtype = 'Date'
 
+class RANDOM(FunctionDescr):
+    supported_backends = ('postgres', 'mysql',)
+    rtype = 'Float'
+    minargs = maxargs = 0
+    name_mapping = {'postgres': 'RANDOM',
+                    'mysql': 'RAND',
+                    }
+
 class _GenericAdvFuncHelper:
     """Generic helper, trying to provide generic way to implement
     specific functionnalities from others DBMS
@@ -113,6 +121,7 @@ class _GenericAdvFuncHelper:
         'UPPER': UPPER, 'LOWER': LOWER,
         'LENGTH': LENGTH,
         'DATE': DATE,
+        'RANDOM': RANDOM,
         # keyword function
         'IN': IN
         }
@@ -405,7 +414,8 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     backend_name = 'sqlite'
     # modifiable but should not be shared
     FUNCTIONS = _GenericAdvFuncHelper.FUNCTIONS.copy()
-    
+    FUNCTIONS.pop('RANDOM') # not defined in sqlite
+
     users_support = groups_support = False
     ilike_support = False
     union_parentheses_support = False
