@@ -30,8 +30,10 @@ def target_info_from_filename(filename):
 
 class DotBackend:
     """Dot File backend."""
-    def __init__(self, graphname, rankdir=None, size=None, ratio=None, charset='utf-8'):
+    def __init__(self, graphname, rankdir=None, size=None, ratio=None,
+            charset='utf-8', renderer='dot', additionnal_param={}):
         self.graphname = graphname
+        self.renderer = renderer
         self.lines = []
         self._source = None
         self.emit("digraph %s {" % normalize_node_id(graphname))
@@ -45,6 +47,8 @@ class DotBackend:
             assert charset.lower() in ('utf-8', 'iso-8859-1', 'latin1'), \
                    'unsupported charset %s' % charset
             self.emit('charset="%s"' % charset)
+        for param in additionnal_param.iteritems():
+            self.emit('='.join(param))
 
     def get_source(self):
         """returns self._source"""
@@ -81,7 +85,7 @@ class DotBackend:
             pdot.write(self.source)
         pdot.close()
         if target != 'dot':
-            os.system('dot -T%s %s -o%s' % (target, dot_sourcepath, outputfile))
+            os.system('%s -T%s %s -o%s' % (self.renderer, target, dot_sourcepath, outputfile))
             os.unlink(dot_sourcepath)
         return outputfile
 
