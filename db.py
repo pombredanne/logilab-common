@@ -353,7 +353,7 @@ class _PySqlite2Adapter(DBAPIAdapter):
         # decimal type handling
         from decimal import Decimal
         def adapt_decimal(data):
-            return u"%s" % data
+            return str(data)
         sqlite.register_adapter(Decimal,adapt_decimal)
 
         def convert_decimal(data):
