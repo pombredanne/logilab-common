@@ -170,7 +170,7 @@ ChangeLog for logilab.common
     * db:
 
         - mark support_users and support_groups methods as obsolete in
-        favor of users_support and groups_support attributes
+          favor of users_support and groups_support attributes
         - new ilike_support property on dbms helpers
         - extended db helper api
         - completed mysql support
@@ -249,7 +249,7 @@ ChangeLog for logilab.common
 
         - new optional keepownership argument to backup|restore_database methods
         - only register mxDatetime converters on psycopg2 adapter if
-        mx.DateTime is available
+          mx.DateTime is available
 
     * moved some stuff which was in common __init__ file into specific
       module. At this occasion new "decorators" and "deprecation" modules
@@ -350,7 +350,7 @@ ChangeLog for logilab.common
         - fixed time handling and added an adapter for DateTimeDeltaType
         - added "drop_on_commit" argument to create_temporary_table on db helper
         - added missing implementation of executemany on pysqlite2 wrapper to
-        support pyargs correctly like execute
+          support pyargs correctly like execute
 
     * optik_ext: fixed "named" type option to support csv values and to return
       a dictionary
@@ -407,7 +407,7 @@ ChangeLog for logilab.common
     * testlib:
 
         - added a set of command line options (PYDEBUG is deprecated,
-        use the -i/--pdb option, and added -x/--exitfirst option)
+          use the -i/--pdb option, and added -x/--exitfirst option)
         - added support for generative tests
 
     * db:
@@ -466,8 +466,8 @@ ChangeLog for logilab.common
 
         - cleaner configuration file generation
         - refactoring so that we can have more control on file
-        configuration loading using read_config_file and load_config_file
-        instead of load_file_configuration
+          configuration loading using read_config_file and load_config_file
+          instead of load_file_configuration
 
     * modutils: fix is_relative to return False when from_file is a file
       located somewhere in sys.path
@@ -549,7 +549,7 @@ ChangeLog for logilab.common
 
         - added epydoc documentation
         - fixed bug in get_by_ext (renamed files_by_ext) with the
-        exclude_dirs argument
+          exclude_dirs argument
 
     * configuration:
       - fixed a bug in configuration file generation on windows platforms
@@ -588,12 +588,12 @@ ChangeLog for logilab.common
 
         - refactoring of some huge methods
         - fix interface resolving when __implements__ is defined in a parent
-        class in another module
+          class in another module
         - add special code in the builder to fix problem with qt
         - new source_line method on Node
         - fix sys.path during parsing to avoid some failure when trying
-        to get imported names by `from module import *`, and use an astng
-        building instead of exec'ing the statement
+          to get imported names by `from module import *`, and use an astng
+          building instead of exec'ing the statement
         - fix possible AttributeError with Function.type
         - manager.astng_from_file fallback to astng_from_module if possible
 
@@ -632,7 +632,7 @@ ChangeLog for logilab.common
 
         - don't raise a syntax error on files missing a trailing \n.
         - fix utils.is_abstract (was causing an unexpected exception if a
-        string exception was raised).
+          string exception was raised).
         - fix utils.get_implemented.
         - fix file based manager's cache problem.
 
