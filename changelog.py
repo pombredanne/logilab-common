@@ -37,7 +37,7 @@ from stat import S_IWRITE
 
 BULLET = '*'
 SUBBULLET = '-'
-INDENT = '    '
+INDENT = ' ' * 4
 
 class NoEntry(Exception):
     """raised when we are unable to find an entry"""
