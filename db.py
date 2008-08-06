@@ -163,7 +163,8 @@ class PyCursor:
     
 class DBAPIAdapter:
     """Base class for all DBAPI adpaters"""
-
+    UNKNOWN = None
+    
     def __init__(self, native_module, pywrap=False):
         """
         :type native_module: module
@@ -171,7 +172,15 @@ class DBAPIAdapter:
         """
         self._native_module = native_module
         self._pywrap = pywrap
-
+        # optimisation: copy type codes from the native module to this instance
+        # since the .process_value method may be heavily used
+        for typecode in ('STRING', 'BOOLEAN', 'BINARY', 'DATETIME', 'NUMBER',
+                         'UNKNOWN'):
+            try:
+                setattr(self, typecode, getattr(self, typecode))
+            except AttributeError:
+                print 'WARNING: %s adapter has no %s type code' % (self, typecode)
+            
     def connect(self, host='', database='', user='', password='', port=''):
         """Wraps the native module connect method"""
         kwargs = {'host' : host, 'port' : port, 'database' : database,
@@ -197,8 +206,9 @@ class DBAPIAdapter:
         return getattr(self._native_module, attrname)
 
     def process_value(self, value, description, encoding='utf-8', binarywrap=None):
+        # if the dbapi module isn't supporting type codes, override to return value directly
         typecode = description[1]
-        assert typecode is not None, self # dbapi module isn't supporting type codes, override to return value directly
+        assert typecode is not None, self 
         if typecode == self.STRING:
             if isinstance(value, str):
                 return unicode(value, encoding, 'replace')
@@ -206,6 +216,12 @@ class DBAPIAdapter:
             return bool(value)
         elif typecode == self.BINARY and not binarywrap is None:
             return binarywrap(value)
+        elif typecode == self.UNKNOWN:
+            # may occurs on constant selection for instance (eg SELECT 'hop')
+            # with postgresql at least 
+            if isinstance(value, str):
+                return unicode(value, encoding, 'replace')
+            
 ##                 elif typecode == dbapimod.DATETIME:
 ##                     pass
 ##                 elif typecode == dbapimod.NUMBER:
@@ -253,12 +269,18 @@ class _PsycopgAdapter(DBAPIAdapter):
         cnx = self._native_module.connect(cnx_string)
         cnx.set_isolation_level(1)
         return self._wrap_if_needed(cnx, user)
+
     
 class _Psycopg2Adapter(_PsycopgAdapter):
     """Simple Psycopg2 Adapter to DBAPI (cnx_string differs from classical ones)
     """
-    BOOLEAN = 16 # XXX see additional types in psycopg2.extensions
+    # not defined in psycopg2.extensions
+    # "select typname from pg_type where oid=705";
+    UNKNOWN = 705
+    
     def __init__(self, native_module, pywrap=False):
+        from psycopg2 import extensions
+        self.BOOLEAN = extensions.BOOLEAN
         DBAPIAdapter.__init__(self, native_module, pywrap)
         self._init_psycopg2()
 
@@ -314,14 +336,16 @@ class _PgsqlAdapter(DBAPIAdapter):
 class _PySqlite2Adapter(DBAPIAdapter):
     """Simple pysqlite2 Adapter to DBAPI
     """
+    # no type code in pysqlite2
+    BINARY = 'XXX'
+    STRING = 'XXX'
+    DATETIME = 'XXX'
+    NUMBER = 'XXX'
+    BOOLEAN = 'XXX'
+    
     def __init__(self, native_module, pywrap=False):
         DBAPIAdapter.__init__(self, native_module, pywrap)
         self._init_pysqlite2()
-        # no type code in pysqlite2
-        self.BINARY = 'XXX'
-        self.STRING = 'XXX'
-        self.DATETIME = 'XXX'
-        self.NUMBER = 'XXX'
 
     def _init_pysqlite2(self):
         """initialize pysqlite2 to use mx.DateTime for date and timestamps"""
