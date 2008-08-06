@@ -1323,7 +1323,7 @@ class TestCase(unittest.TestCase):
             read.append(line)
             # lines that don't start with a ' ' are diff ones
             if not line.startswith(' '):
-                self.fail(''.join(['%s\n'%msg_prefix]+read + list(result)))
+                self.fail('\n'.join(['%s\n'%msg_prefix]+read + list(result)))
         
     def assertTextEquals(self, text1, text2, junk=None,
             msg_prefix='Text differ'):
