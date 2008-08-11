@@ -68,7 +68,7 @@ def pop_arg(args_list, expected_size_after=0, msg="Missing argument"):
     except IndexError:
         raise BadCommandUsage(msg)
     if expected_size_after is not None and len(args_list) > expected_size_after:
-        raise BadCommandUsage('Too much arguments')
+        raise BadCommandUsage('too many arguments')
     return value
 
 
