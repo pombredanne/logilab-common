@@ -12,6 +12,7 @@ __metaclass__ = type
 
 import os.path as osp
 import os
+import tempfile
 
 def escape(value):
     """Make <value> usable in a dot file."""
@@ -69,25 +70,27 @@ class DotBackend:
         :rtype: str
         :return: a path to the generated file
         """
+        name = self.graphname
+        dotfile = dotfile or ('%s.dot' % name)
         if outputfile is not None:
             storedir, basename, target = target_info_from_filename(outputfile)
+            if target != "dot":
+                pdot, dot_sourcepath = tempfile.mkstemp(".dot", name)
+            else:
+                dot_sourcepath = osp.join(storedir, dotfile)
         else:
-            storedir = '/tmp'
-            basename = '%s.png' % (self.graphname)
             target = 'png'
-            outputfile = osp.join(storedir, basename)
-        dotfile = dotfile or ('%s.dot' % self.graphname)
-        dot_sourcepath = osp.join(storedir, dotfile)
-        if target != 'dot':
-            dot_sourcepath = osp.join('/tmp', dotfile)
-        pdot = open(dot_sourcepath, 'w')
+            pdot, dot_sourcepath = tempfile.mkstemp(".dot", name)
+            ppng, outputfile = tempfile.mkstemp(".png", name)
+        pdot = open(dot_sourcepath,'w')
         if isinstance(self.source, unicode):
             pdot.write(self.source.encode('UTF8'))
         else:
             pdot.write(self.source)
         pdot.close()
         if target != 'dot':
-            os.system('%s -T%s %s -o%s' % (self.renderer, target, dot_sourcepath, outputfile))
+            os.system('%s -T%s %s -o%s' % (self.renderer, target, 
+                        dot_sourcepath, outputfile))
             os.unlink(dot_sourcepath)
         return outputfile
 
