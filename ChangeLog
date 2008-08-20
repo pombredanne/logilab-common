@@ -1,12 +1,15 @@
 ChangeLog for logilab.common
 ============================
 
-  --  
-    * changelog propertly adds new line at the end of each entry
+  --
+    * shellutils: new simple unzip function
+	
+    * changelog: properly adds new line at the end of each entry
 
-    * add a with_tempdir decorator ensuring all temporary files and dirs are removed
+    * testlib: add a with_tempdir decorator ensuring all temporary files and dirs are removed
 
-    * improve DotBackend configuration. graphiz rendered can now be selected and additionnal graph parameter used
+    * graph: improve DotBackend configuration. graphiz rendered can now be selected
+      and additionnal graph parameter used
 
     * db: support of Decimal Type
 
