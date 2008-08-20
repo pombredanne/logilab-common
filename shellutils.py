@@ -141,6 +141,20 @@ def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
     return files
 
 
+def unzip(archive, destdir):
+    import zipfile
+    if not exists(destdir):
+        os.mkdir(destdir)
+    zfobj = zipfile.ZipFile(archive)
+    for name in zfobj.namelist():
+        if name.endswith('/'):
+            os.mkdir(join(destdir, name))
+        else:
+            outfile = open(join(destdir, name), 'wb')
+            outfile.write(zfobj.read(name))
+            outfile.close()
+
+
 class Execute:
     """This is a deadlock safe version of popen2 (no stdin), that returns
     an object with errorlevel, out and err.
