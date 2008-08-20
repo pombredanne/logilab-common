@@ -78,7 +78,9 @@ class DotBackend:
             outputfile = osp.join(storedir, basename)
         dotfile = dotfile or ('%s.dot' % self.graphname)
         dot_sourcepath = osp.join(storedir, dotfile)
-        pdot = file(dot_sourcepath, 'w')
+        if target != 'dot':
+            dot_sourcepath = osp.join('/tmp', dotfile)
+        pdot = open(dot_sourcepath, 'w')
         if isinstance(self.source, unicode):
             pdot.write(self.source.encode('UTF8'))
         else:
