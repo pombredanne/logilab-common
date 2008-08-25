@@ -367,7 +367,7 @@ class OptionsManagerMixIn(object):
             for opt_name, opt_dict in non_group_spec_options:
                 args, opt_dict = self.optik_option(provider, opt_name, opt_dict)
                 self._optik_parser.add_option(*args, **opt_dict)
-                self._all_options[opt_name] = provider                
+                self._all_options[opt_name] = provider
         for gname, gdoc in groups:
             goptions = [option for option in provider.options
                         if option[1].get('group') == gname]
@@ -401,10 +401,11 @@ class OptionsManagerMixIn(object):
             opt_dict['callback'] = self.cb_set_provider_option
         for specific in ('default', 'group', 'inputlevel'):
             if opt_dict.has_key(specific):
-                del opt_dict[specific]
                 if (OPTPARSE_FORMAT_DEFAULT
                     and specific == 'default' and opt_dict.has_key('help')):
                     opt_dict['help'] += ' [current: %default]'
+                else:
+                    del opt_dict[specific]
         args = ['--' + opt_name]
         if opt_dict.has_key('short'):
             self._short_options[opt_dict['short']] = opt_name
