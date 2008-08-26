@@ -1732,7 +1732,7 @@ def tag(*args):
     """descriptor adding tag to a function"""
     def desc(func):
         assert not hasattr(func, 'tags')
-        setattr(func, 'tags', Tags(args))
+        func.tags = Tags(args)
         return func
     return desc
 
