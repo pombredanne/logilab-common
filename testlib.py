@@ -490,19 +490,32 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                 testname = '%s.%s' % (test.im_class.__name__, func.__name__)
             else:
                 return True # Not sure when this happens
+
             if is_generator(func) and skipgenerator:
-                return True # Let inner tests decide at run time
+                return self.does_match_tags(func) # Let inner tests decide at run time
+
         # print 'testname', testname, self.test_pattern
         if self._this_is_skipped(testname):
             return False # this was explicitly skipped
-        if self.test_pattern is None:
-            return True # no pattern
-        try:
-            classpattern, testpattern = self.test_pattern.split('.')
-            klass, name = testname.split('.')
-            return classpattern in klass and testpattern in name
-        except ValueError:
-            return self.test_pattern in testname
+        if self.test_pattern is not None:
+            try:
+                classpattern, testpattern = self.test_pattern.split('.')
+                klass, name = testname.split('.')
+                if classpattern not in klass or testpattern not in name:
+                    return False
+            except ValueError:
+                if self.test_pattern not in testname:
+                    return False
+
+        return self.does_match_tags(test)
+
+    def does_match_tags(self, test):
+        if self.options is not None:
+            tags_pattern = getattr(self.options, 'tags_pattern', None)
+            if tags_pattern is not None:
+                tags = getattr(test, 'tags', Tags())
+                return tags.match(tags_pattern)
+        return True # no pattern
     
     def _makeResult(self):
         return SkipAwareTestResult(self.stream, self.descriptions,
@@ -678,6 +691,8 @@ Options:
   -s, --skip       skip test matching this pattern (no regexp for now)
   -q, --quiet      Minimal output
 
+  -m, --match      Run only test whose tag match this pattern
+
 Examples:
   %(progName)s                               - run default set of tests
   %(progName)s MyTestSuite                   - run suite 'MyTestSuite'
@@ -702,12 +717,13 @@ Examples:
         self.printonly = None
         self.skipped_patterns = []
         self.test_pattern = None
+        self.tags_pattern = None
         import getopt
         try:
-            options, args = getopt.getopt(argv[1:], 'hHvixqcp:s:',
+            options, args = getopt.getopt(argv[1:], 'hHvixqcp:s:m:',
                                           ['help', 'verbose', 'quiet', 'pdb',
                                            'exitfirst', 'capture', 'printonly=',
-                                           'skip='])
+                                           'skip=', 'match='])
             for opt, value in options:
                 if opt in ('-h', '-H', '--help'):
                     self.usageExit()
@@ -726,6 +742,9 @@ Examples:
                 if opt in ('-s', '--skip'):
                     self.skipped_patterns = [pat.strip() for pat in
                         value.split(', ')]
+                if opt in ('-m', '--match'):
+                    #self.tags_pattern = value
+                    self.options["tag_pattern"] = value
             self.testLoader.skipped_patterns = self.skipped_patterns
             if self.printonly is not None:
                 self.capture += 1
@@ -1717,14 +1736,10 @@ def tag(*args):
         return func
     return desc
 
-
-
 class Tags(set):
-
+    """A set of tag able validate an expression"""
     def __getitem__(self, key):
         return key in self
-
-        
 
     def match(self, exp):
         return eval(exp, {}, self)

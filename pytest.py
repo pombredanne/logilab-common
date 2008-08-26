@@ -549,6 +549,8 @@ def make_parser():
                       action="callback", help="Minimal output")
     parser.add_option('-P', '--profile', default=None, dest='profile',
                       help="Profile execution and store data in the given file")
+    parser.add_option('-m', '--match', default=None, dest='tags_pattern',
+                      help="only execute test whose tag macht the current pattern")
 
     try:
         from logilab.devtools.lib.coverage import Coverage
@@ -591,7 +593,7 @@ def parseargs(parser):
     # append additional args to the new sys.argv and let unittest_main
     # do the rest
     newargs += args
-    return options, explicitfile 
+    return options, explicitfile
 
 
 
