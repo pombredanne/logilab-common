@@ -165,7 +165,7 @@ Options:
   --dothis=<y or n>     
   -v<string>, --value=<string>
   --multiple=<comma separated values>
-                        you can also document the option [current: none]
+                        you can also document the option [current: ('yop',)]
   --number=<int>        
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>
@@ -182,7 +182,7 @@ options:
   --dothis=<y or n>     
   -v<string>, --value=<string>
   --multiple=<comma separated values>
-                        you can also document the option [current: none]
+                        you can also document the option [current: ('yop',)]
   --number=<int>        
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>
