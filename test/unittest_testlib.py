@@ -270,6 +270,12 @@ class TestlibTC(TestCase):
         self.assertNotNone(object())
         self.assertRaises(AssertionError, self.assertNotNone, None)
 
+    def test_in(self):
+        self.assertIn("a", "dsqgaqg")
+        obj, seq = 'a', ('toto', "azf", "coin")
+        self.assertRaises(AssertionError, self.assertIn, obj, seq)
+
+
 class GenerativeTestsTC(TestCase):
     
     def setUp(self):
