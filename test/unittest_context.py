@@ -1,7 +1,7 @@
 TEST = """
 from __future__ import with_statement
 from os.path import isdir, exists
-
+import shutil
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.context import tempdir
 
@@ -15,10 +15,18 @@ class ContextTC(TestCase):
         try:
             with tempdir() as tmpdir:
                 assert exists(tmpdir)
-                raise Exception
-        except:
+                shutil.rmtree(tmpdir)
+        except OSError:
             pass
+        else:
+            self.assertTrue(False, "we should fail")
         assert not exists(tmpdir)
+        with tempdir(ignore_error=True) as tmpdir:
+            shutil.rmtree(tmpdir)
+        def rmtree_handler(func, path, excinfo):
+            self.assertTrue(issubclass(excinfo[0], OSError))
+        with tempdir(onerror=rmtree_handler) as tmpdir:
+            shutil.rmtree(tmpdir)
 try:
     unittest_main()
 except SystemExit:
