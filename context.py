@@ -3,9 +3,9 @@ import tempfile
 import shutil
 
 @contextmanager
-def tempdir():
+def tempdir(ignore_error=False, onerror=None):
     try:
         path = tempfile.mkdtemp()
         yield path
     finally:
-        shutil.rmtree(path)
+        shutil.rmtree(path, ignore_error, onerror)

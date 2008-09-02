@@ -1,9 +1,8 @@
+TEST = """
 from __future__ import with_statement
-
-import unittest
 from os.path import isdir, exists
 
-from logilab.common.testlib import TestCase
+from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.context import tempdir
 
 class ContextTC(TestCase):
@@ -20,6 +19,12 @@ class ContextTC(TestCase):
         except:
             pass
         assert not exists(tmpdir)
-
-if __name__ == '__main__':
+try:
     unittest_main()
+except SystemExit:
+    pass
+"""
+
+import sys
+if sys.version_info[:2] >= (2, 5):
+    exec(TEST)
