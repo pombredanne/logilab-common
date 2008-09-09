@@ -54,7 +54,7 @@ class DotBackend:
     def get_source(self):
         """returns self._source"""
         if self._source is None:
-            self.emit("}")
+            self.emit("}\n")
             self._source = '\n'.join(self.lines)
             del self.lines
         return self._source
@@ -104,8 +104,8 @@ class DotBackend:
         Authorized props: see http://www.graphviz.org/doc/info/attrs.html
         """
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
-        self.emit('edge [%s];' % ", ".join(attrs))
-        self.emit('%s -> %s' % (normalize_node_id(name1), normalize_node_id(name2)))
+        n_from, n_to = normalize_node_id(name1), normalize_node_id(name2)
+        self.emit('%s -> %s edge [%s];' % (n_from, n_to, ", ".join(attrs)) )
 
     def emit_node(self, name, **props):
         """Authorized props: see http://www.graphviz.org/doc/info/attrs.html
