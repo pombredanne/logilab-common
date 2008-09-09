@@ -46,6 +46,41 @@ the ``optval`` method::
         def test_foo(self):
             loglevel = self.optval('loglevel')
             # ...
+
+
+You can also tag your tag your test for fine filtering
+
+With those tag::
+
+    from logilab.common.testlib import tag, TestCase
+
+    class Exemple(TestCase):
+
+        @tag('rouge', 'carre')
+        def toto(self):
+            pass
+
+        @tag('carre', 'vert')
+        def tata(self):
+            pass
+
+        @tag('rouge')
+        def titi(test):
+            pass
+
+you can filter the function with a simpe python expression
+
+ * ``toto`` and ``titi`` match ``rouge``
+
+ * ``toto``, ``tata`` and ``titi``, match ``rouge or carre``
+
+ * ``tata`` and ``titi`` match``rouge ^ carre``
+
+ * ``titi`` match ``rouge and not carre``
+
+
+
+
             
 
 :copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
@@ -61,6 +96,7 @@ examples:
 pytest path/to/mytests.py
 pytest path/to/mytests.py TheseTests
 pytest path/to/mytests.py TheseTests.test_thisone
+pytest path/to/mytests.py -m '(not long and database) or regr'
 
 pytest one (will run both test_thisone and test_thatone)
 pytest path/to/mytests.py -s not (will skip test_notthisone)

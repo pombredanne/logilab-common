@@ -7,12 +7,13 @@ additional facilities.
 Command line options:
 
  -v: verbose -- run tests in verbose mode with output to stdout
- -q: quiet -- don't print anything except if a test fails
+ -q: quiet   -- don't print anything except if a test fails
  -t: testdir -- directory where the tests will be found
  -x: exclude -- add a test to exclude
  -p: profile -- profiled execution
  -c: capture -- capture standard out/err during tests
  -d: dbc     -- enable design-by-contract
+ -m: match   -- only run test matching the tag pattern which follow
 
 If no non-option arguments are present, prefixes used are 'test',
 'regrtest', 'smoketest' and 'unittest'.
