@@ -1180,6 +1180,9 @@ class TestCase(unittest.TestCase):
         """assert <object> are in <set>"""
         self.assert_(object in set, "%s not in %s" % (object, set))
 
+    def assertNotIn(self, object, set):
+        """assert <object> are not in <set>"""
+        self.assert_(object not in set, "%s in %s" % (object, set))
 
     def assertDictEquals(self, dict1, dict2):
         """compares two dicts

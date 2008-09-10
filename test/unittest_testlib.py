@@ -275,6 +275,10 @@ class TestlibTC(TestCase):
         obj, seq = 'a', ('toto', "azf", "coin")
         self.assertRaises(AssertionError, self.assertIn, obj, seq)
 
+    def test_not_in(self):
+        self.assertNotIn('a', ('toto', "azf", "coin"))
+        self.assertRaises(AssertionError, self.assertNotIn, 'a', "dsqgaqg")
+
 
 class GenerativeTestsTC(TestCase):
     
