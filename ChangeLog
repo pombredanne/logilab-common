@@ -1,7 +1,12 @@
 ChangeLog for logilab.common
 ============================
 
-  --
+2008-09-10  --  0.35.0
+
+    * fix #5945: wrong edge proporties in graph.DotBackend
+
+    * testlib: filter tests with tag decorator
+
     * shellutils: new simple unzip function
 	
 2008-08-07  --  0.34.0

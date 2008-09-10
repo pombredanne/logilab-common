@@ -1,3 +1,9 @@
+logilab-common (0.35.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Emile Anclin <emile.anclin@logilab.fr>  Wed, 10 Sep 2008 14:17:23 +0200
+
 logilab-common (0.34.0-1) unstable; urgency=low
 
   * new upstream release
