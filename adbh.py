@@ -257,7 +257,10 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
     def drop_index(self, cursor, table, column, unique=False):
         if self.index_exists(cursor, table, column, unique):
             idx = self._index_name(table, column, unique)
-            cursor.execute('DROP INDEX %s' % idx)
+            if unique:
+                cursor.execute('ALTER TABLE %s DROP CONSTRAINT %s' % (table, idx))
+            else:
+                cursor.execute('DROP INDEX %s' % idx)
         
     def index_exists(self, cursor, table, column, unique=False):
         idx = self._index_name(table, column, unique)
