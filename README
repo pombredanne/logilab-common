@@ -60,9 +60,6 @@ Here is a brief description of the available modules :
   Two mix-in classes to handle configuration from both command line 
   (using optik/optparse) and configuration file.
 
-* context.py :
-  One context manager (python 2.5+) to handle temporary directories.
-
 * corbautils.py:
   Usefull functions for use with the OmniORB CORBA library.
 
