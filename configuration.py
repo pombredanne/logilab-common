@@ -460,6 +460,7 @@ class OptionsManagerMixIn(object):
         """write a man page for the current configuration into the given
         stream or stdout
         """
+        self._give_optik_default_information()        
         generate_manpage(self._optik_parser, pkginfo,
                          section, stream=stream or sys.stdout)
         
@@ -564,15 +565,23 @@ class OptionsManagerMixIn(object):
                             title=title.capitalize(),
                             description=description)
         self._optik_parser.add_option_group(group)
-        
+
+    def _give_optik_default_information(self):
+        # due to configuration information, information about option's default
+        # values is not given to optik, though we should give them to it when
+        # we want to generate help, man page...
+        if OPTPARSE_FORMAT_DEFAULT:
+            optik_parser = self._optik_parser
+            for provider in self.options_providers:
+                for optname, optdict in provider.options:
+                    if optdict.get('default') is not None and 'help' in optdict:
+                        optik_option = optik_parser._long_opt['--' + optname]
+                        optik_option.help = optdict['help'] + ' [current: %default]'
+                        optik_parser.defaults[optik_option.dest] = optdict['default']
+                    
     def help(self):
         """return the usage string for available options """
-        if OPTPARSE_FORMAT_DEFAULT:
-            for optname, optdict in self.options:
-                if optdict.get('default') is not None and 'help' in optdict:
-                    optik_option = self._optik_parser._long_opt['--' + optname]
-                    optik_option.default = optdict['default']
-                    optik_option.help = optdict['help'] + ' [current: %default]'
+        self._give_optik_default_information()
         return self._optik_parser.format_help()
     
 
@@ -594,21 +603,6 @@ class Method(object):
         return getattr(self._inst, self.method)()
 
 
-class MyValues(Values):
-
-    def __setitem__(self, key, value):
-        print 'setitem', key, value
-        super(MyValues, self).__setitem__(key, value)
-        #self.__dict__[key] = value
-
-    def __setattr__(self, key, value):
-        self.__dict__[key] = value
-        if key == 'target':
-            print 'alert', value
-            #import traceback
-            #traceback.print_stack()
-
-
 class OptionsProviderMixIn(object):
     """Mixin to provide options to an OptionsManager"""
     
@@ -618,7 +612,7 @@ class OptionsProviderMixIn(object):
     options = ()
 
     def __init__(self):
-        self.config = MyValues()
+        self.config = Values()
         for option in self.options:
             try:
                 option, optdict = option

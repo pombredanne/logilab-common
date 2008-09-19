@@ -99,6 +99,7 @@ dothis=yes
 # you can also document the option
 multiple=yop
 
+# boom
 number=2
 
 choice=yo
@@ -122,6 +123,7 @@ value='    '
 # you can also document the option
 multiple=yop
 
+# boom
 number=2
 
 choice=yo
@@ -167,7 +169,7 @@ Options:
   -v<string>, --value=<string>
   --multiple=<comma separated values>
                         you can also document the option [current: ('yop',)]
-  --number=<int>        
+  --number=<int>        boom [current: 2]
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>
   --named=<key=val>     
@@ -184,7 +186,7 @@ options:
   -v<string>, --value=<string>
   --multiple=<comma separated values>
                         you can also document the option [current: ('yop',)]
-  --number=<int>        
+  --number=<int>        boom [current: 2]
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>
   --named=<key=val>     
@@ -232,6 +234,7 @@ value='    '
 # you can also document the option
 multiple=yop
 
+# boom
 number=2
 
 choice=yo
