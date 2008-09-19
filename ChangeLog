@@ -1,6 +1,13 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * configuration:
+      - fix #6011: lgc.configuration ignore customized option values
+      - fix #3278: man page generation broken	
+    * dropped context.py module which broke the debian package when
+      some python <2.5 is installed (#5979)
+	
 2008-09-10  --  0.35.0
 
     * fix #5945: wrong edge proporties in graph.DotBackend
