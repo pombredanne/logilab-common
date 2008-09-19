@@ -7,12 +7,12 @@ from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.configuration import Configuration, OptionValueError, \
      OptionsManagerMixIn, OptionsProviderMixIn, Method, read_old_config
 
-options = [('dothis', {'type':'yn', 'default': True, 'metavar': '<y or n>'}),
+options = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar': '<y or n>'}),
            ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
            ('multiple', {'type': 'csv', 'default': ('yop',),
                          'metavar': '<comma separated values>',
                          'help': 'you can also document the option'}),
-           ('number', {'type': 'int', 'default':2, 'metavar':'<int>'}),
+           ('number', {'type': 'int', 'default':2, 'metavar':'<int>', 'help': 'boom'}),
            ('choice', {'type': 'choice', 'default':'yo', 'choices': ('yo', 'ye'),
                        'metavar':'<yo|ye>'}),
            ('multiple-choice', {'type': 'multiple_choice', 'default':('yo', 'ye'),
@@ -56,6 +56,7 @@ class ConfigurationTC(TestCase):
 
     def test_load_command_line_configuration(self):
         cfg = self.cfg
+        cfg.load_file_configuration()
         args = cfg.load_command_line_configuration(['--choice', 'ye', '--number', '4',
                                                     '--multiple=1,2,3', '--dothis=n',
                                                     'other', 'arguments'])

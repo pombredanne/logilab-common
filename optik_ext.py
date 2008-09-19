@@ -189,7 +189,7 @@ class Option(BaseOption):
             value = self.convert_value(opt, value)
         except AttributeError: # py < 2.4
             value = self.check_value(opt, value)
-        if self.type == 'named': 
+        if self.type == 'named':
             existant = getattr(values, self.dest)
             if existant:
                 existant.update(value)

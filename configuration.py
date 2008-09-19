@@ -401,11 +401,7 @@ class OptionsManagerMixIn(object):
             opt_dict['callback'] = self.cb_set_provider_option
         for specific in ('default', 'group', 'inputlevel'):
             if opt_dict.has_key(specific):
-                if (OPTPARSE_FORMAT_DEFAULT
-                    and specific == 'default' and opt_dict.has_key('help')):
-                    opt_dict['help'] += ' [current: %default]'
-                else:
-                    del opt_dict[specific]
+                del opt_dict[specific]
         args = ['--' + opt_name]
         if opt_dict.has_key('short'):
             self._short_options[opt_dict['short']] = opt_name
@@ -571,6 +567,12 @@ class OptionsManagerMixIn(object):
         
     def help(self):
         """return the usage string for available options """
+        if OPTPARSE_FORMAT_DEFAULT:
+            for optname, optdict in self.options:
+                if optdict.get('default') is not None and 'help' in optdict:
+                    optik_option = self._optik_parser._long_opt['--' + optname]
+                    optik_option.default = optdict['default']
+                    optik_option.help = optdict['help'] + ' [current: %default]'
         return self._optik_parser.format_help()
     
 
@@ -591,7 +593,22 @@ class Method(object):
         assert self._inst, 'unbound method'
         return getattr(self._inst, self.method)()
 
-        
+
+class MyValues(Values):
+
+    def __setitem__(self, key, value):
+        print 'setitem', key, value
+        super(MyValues, self).__setitem__(key, value)
+        #self.__dict__[key] = value
+
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+        if key == 'target':
+            print 'alert', value
+            #import traceback
+            #traceback.print_stack()
+
+
 class OptionsProviderMixIn(object):
     """Mixin to provide options to an OptionsManager"""
     
@@ -601,7 +618,7 @@ class OptionsProviderMixIn(object):
     options = ()
 
     def __init__(self):
-        self.config = Values()
+        self.config = MyValues()
         for option in self.options:
             try:
                 option, optdict = option
