@@ -230,7 +230,8 @@ class ManHelpFormatter(HelpFormatter):
         except AttributeError:
             optstring = self.format_option_strings(option)
         if option.help:
-            help = ' '.join([l.strip() for l in option.help.splitlines()])
+            help_text = self.expand_default(option)            
+            help = ' '.join([l.strip() for l in help_text.splitlines()])
         else:
             help = ''
         return '''.IP "%s"
@@ -313,6 +314,7 @@ Please report bugs on the project\'s mailing list:
 def generate_manpage(optparser, pkginfo, section=1, stream=sys.stdout):
     """generate a man page from an optik parser"""
     formatter = ManHelpFormatter()
+    formatter.parser = optparser
     print >> stream, formatter.format_head(optparser, pkginfo, section)
     print >> stream, optparser.format_option_help(formatter)
     print >> stream, formatter.format_tail(pkginfo)

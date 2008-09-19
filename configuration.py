@@ -465,8 +465,12 @@ class OptionsManagerMixIn(object):
         """write a man page for the current configuration into the given
         stream or stdout
         """
-        generate_manpage(self._optik_parser, pkginfo,
-                         section, stream=stream or sys.stdout)
+        self._monkeypatch_expand_default()
+        try:
+            generate_manpage(self._optik_parser, pkginfo,
+                             section, stream=stream or sys.stdout)
+        finally:
+            self._unmonkeypatch_expand_default()
         
     # initialization methods ##################################################
 
@@ -561,19 +565,6 @@ class OptionsManagerMixIn(object):
                             title=title.capitalize(),
                             description=description)
         self._optik_parser.add_option_group(group)
-
-    def _give_optik_default_information(self):
-        # due to configuration information, information about option's default
-        # values is not given to optik, though we should give them to it when
-        # we want to generate help, man page...
-        if OPTPARSE_FORMAT_DEFAULT:
-            optik_parser = self._optik_parser
-            for provider in self.options_providers:
-                for optname, optdict in provider.options:
-                    if optdict.get('default') is not None and 'help' in optdict:
-                        optik_option = optik_parser._long_opt['--' + optname]
-                        optik_option.help = optdict['help'] + ' [current: %default]'
-                        optik_parser.defaults[optik_option.dest] = optdict['default']
 
     def _monkeypatch_expand_default(self):
         # monkey patch optparse to deal with our default values
