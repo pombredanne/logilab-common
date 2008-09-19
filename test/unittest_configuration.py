@@ -9,7 +9,7 @@ from logilab.common.configuration import Configuration, OptionValueError, \
 
 options = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar': '<y or n>'}),
            ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
-           ('multiple', {'type': 'csv', 'default': ('yop',),
+           ('multiple', {'type': 'csv', 'default': ('yop','yep'),
                          'metavar': '<comma separated values>',
                          'help': 'you can also document the option'}),
            ('number', {'type': 'int', 'default':2, 'metavar':'<int>', 'help': 'boom'}),
@@ -36,7 +36,7 @@ class ConfigurationTC(TestCase):
         cfg = self.cfg
         self.assertEquals(cfg['dothis'], True)
         self.assertEquals(cfg['value'], None)
-        self.assertEquals(cfg['multiple'], ('yop',))
+        self.assertEquals(cfg['multiple'], ('yop','yep'))
         self.assertEquals(cfg['number'], 2)
         self.assertEquals(cfg['choice'], 'yo')
         self.assertEquals(cfg['multiple-choice'], ('yo', 'ye'))
@@ -97,7 +97,7 @@ dothis=yes
 #value=
 
 # you can also document the option
-multiple=yop
+multiple=yop,yep
 
 # boom
 number=2
@@ -121,7 +121,7 @@ dothis=yes
 value='    '
 
 # you can also document the option
-multiple=yop
+multiple=yop,yep
 
 # boom
 number=2
@@ -168,7 +168,7 @@ Options:
   --dothis=<y or n>     
   -v<string>, --value=<string>
   --multiple=<comma separated values>
-                        you can also document the option [current: ('yop',)]
+                        you can also document the option [current: yop,yep]
   --number=<int>        boom [current: 2]
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>
@@ -185,7 +185,7 @@ options:
   --dothis=<y or n>     
   -v<string>, --value=<string>
   --multiple=<comma separated values>
-                        you can also document the option [current: ('yop',)]
+                        you can also document the option [current: yop,yep]
   --number=<int>        boom [current: 2]
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>

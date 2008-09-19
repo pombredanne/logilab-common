@@ -365,8 +365,9 @@ class OptionsManagerMixIn(object):
                                   non_group_spec_options, provider)
         else:
             for opt_name, opt_dict in non_group_spec_options:
-                args, opt_dict = self.optik_option(provider, opt_name, opt_dict)
+                args, opt_dict = self.optik_option(provider, opt_name, opt_dict)                
                 self._optik_parser.add_option(*args, **opt_dict)
+                
                 self._all_options[opt_name] = provider
         for gname, gdoc in groups:
             goptions = [option for option in provider.options
@@ -399,19 +400,19 @@ class OptionsManagerMixIn(object):
         else:
             opt_dict['action'] = 'callback'
             opt_dict['callback'] = self.cb_set_provider_option
-        for specific in ('default', 'group', 'inputlevel'):
-            # cleanup option definition dict before giving it to optik:
-            # * group and inputlevel are lgc.configuration specific information
-            # * default is handled here and *must not* be given to optik if you
-            #   want the whole machinery to work
-            if opt_dict.has_key(specific):
-                del opt_dict[specific]
+        # default is handled here and *must not* be given to optik if you
+        # want the whole machinery to work
+        if 'default' in opt_dict:
+            if OPTPARSE_FORMAT_DEFAULT and 'help' in opt_dict:
+                opt_dict['help'] += ' [current: %default]'
+            del opt_dict['default']
         args = ['--' + opt_name]
         if opt_dict.has_key('short'):
             self._short_options[opt_dict['short']] = opt_name
             args.append('-' + opt_dict['short'])
             del opt_dict['short']
         available_keys = set(self._optik_parser.option_class.ATTRS)
+        # cleanup option definition dict before giving it to optik
         for key in opt_dict.keys():
             if not key in available_keys:
                 opt_dict.pop(key)
@@ -464,7 +465,6 @@ class OptionsManagerMixIn(object):
         """write a man page for the current configuration into the given
         stream or stdout
         """
-        self._give_optik_default_information()        
         generate_manpage(self._optik_parser, pkginfo,
                          section, stream=stream or sys.stdout)
         
@@ -534,13 +534,7 @@ class OptionsManagerMixIn(object):
 
         return additional arguments
         """
-        # monkey patch optparse to deal with our default values
-        try:
-            expand_default_backup = HelpFormatter.expand_default
-            HelpFormatter.expand_default = expand_default
-        except AttributeError:
-            # python < 2.4: nothing to be done
-            pass
+        self._monkeypatch_expand_default()
         try:
             if args is None:
                 args = sys.argv[1:]
@@ -556,9 +550,7 @@ class OptionsManagerMixIn(object):
                     setattr(config, attr, value)
             return args
         finally:
-            if hasattr(HelpFormatter, 'expand_default'):
-                # unpatch optparse to avoid side effects
-                HelpFormatter.expand_default = expand_default_backup
+            self._unmonkeypatch_expand_default()
 
 
     # help methods ############################################################
@@ -582,11 +574,28 @@ class OptionsManagerMixIn(object):
                         optik_option = optik_parser._long_opt['--' + optname]
                         optik_option.help = optdict['help'] + ' [current: %default]'
                         optik_parser.defaults[optik_option.dest] = optdict['default']
-                    
+
+    def _monkeypatch_expand_default(self):
+        # monkey patch optparse to deal with our default values
+        try:
+            self.__expand_default_backup = HelpFormatter.expand_default
+            HelpFormatter.expand_default = expand_default
+        except AttributeError:
+            # python < 2.4: nothing to be done
+            pass
+    def _unmonkeypatch_expand_default(self):
+        # remove monkey patch
+        if hasattr(HelpFormatter, 'expand_default'):
+            # unpatch optparse to avoid side effects
+            HelpFormatter.expand_default = self.__expand_default_backup
+        
     def help(self):
-        """return the usage string for available options """
-        self._give_optik_default_information()
-        return self._optik_parser.format_help()
+        """return the usage string for available options """ 
+        self._monkeypatch_expand_default()
+        try:
+            return self._optik_parser.format_help()
+        finally:
+            self._unmonkeypatch_expand_default()
     
 
 class Method(object):
