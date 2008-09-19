@@ -400,6 +400,10 @@ class OptionsManagerMixIn(object):
             opt_dict['action'] = 'callback'
             opt_dict['callback'] = self.cb_set_provider_option
         for specific in ('default', 'group', 'inputlevel'):
+            # cleanup option definition dict before giving it to optik:
+            # * group and inputlevel are lgc.configuration specific information
+            # * default is handled here and *must not* be given to optik if you
+            #   want the whole machinery to work
             if opt_dict.has_key(specific):
                 del opt_dict[specific]
         args = ['--' + opt_name]
