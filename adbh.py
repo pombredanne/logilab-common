@@ -209,10 +209,17 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
     def sql_create_index(self, table, column, unique=False):
         idx = self._index_name(table, column, unique)
         if unique:
-            return 'CREATE UNIQUE INDEX %s ON %s(%s);' % (idx, table, column)
+            return 'ALTER TABLE %s ADD UNIQUE(%s)' % (table, column)
         else:
             return 'CREATE INDEX %s ON %s(%s);' % (idx, table, column)
-    
+
+    def sql_drop_index(self, table, column, unique=False):
+        idx = self._index_name(table, column, unique)
+        if unique:
+            return 'ALTER TABLE %s DROP CONSTRAINT %s' % (table, idx)
+        else:
+            return 'DROP INDEX %s' % idx
+        
     def sql_drop_sequence(self, seq_name):
         return 'DROP TABLE %s;' % seq_name
     
@@ -256,11 +263,7 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
             
     def drop_index(self, cursor, table, column, unique=False):
         if self.index_exists(cursor, table, column, unique):
-            idx = self._index_name(table, column, unique)
-            if unique:
-                cursor.execute('ALTER TABLE %s DROP CONSTRAINT %s' % (table, idx))
-            else:
-                cursor.execute('DROP INDEX %s' % idx)
+            cursor.execute(self.sql_drop_index(table, column, unique))
         
     def index_exists(self, cursor, table, column, unique=False):
         idx = self._index_name(table, column, unique)
