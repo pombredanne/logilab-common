@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * graph: new has_path method
+
 2008-10-01  --  0.35.2
     * configuration:
       - fix #6011: lgc.configuration ignore customized option values
