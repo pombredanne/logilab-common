@@ -175,3 +175,22 @@ def _get_cycles(graph_dict, vertice=None, path=None, result=None):
     except KeyError:
         pass
     path.pop()
+
+def has_path(graph_dict, fromnode, tonode, path=None):
+    """generic function taking a simple graph definition as a dictionary, with
+    node has key associated to a list of nodes directly reachable from it.
+    
+    Return None if no path exists to go from `fromnode` to `tonode`, else the
+    first path found
+    """
+    if path is None:
+        path = []
+    elif fromnode in path:
+        return False
+    path.append(fromnode)
+    for destnode in graph_dict[fromnode]:
+        if destnode == tonode or has_path(graph_dict, destnode, tonode, path):
+            return path[1:]
+    path.pop()
+    return None
+
