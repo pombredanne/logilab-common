@@ -2,20 +2,27 @@ ChangeLog for logilab.common
 ============================
 
  --
+    * graph: new has_path method
+
+2008-10-01  --  0.35.2
     * configuration:
       - fix #6011: lgc.configuration ignore customized option values
       - fix #3278: man page generation broken	
+
     * dropped context.py module which broke the debian package when
       some python <2.5 is installed (#5979)
-	
-2008-09-10  --  0.35.0
 
+
+
+2008-09-10  --  0.35.0
     * fix #5945: wrong edge proporties in graph.DotBackend
 
     * testlib: filter tests with tag decorator
 
     * shellutils: new simple unzip function
-	
+
+
+
 2008-08-07  --  0.34.0
     * changelog: properly adds new line at the end of each entry
 

@@ -428,6 +428,16 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     ilike_support = False
     union_parentheses_support = False
     
+    def sql_create_index(self, table, column, unique=False):
+        idx = self._index_name(table, column, unique)
+        if unique:
+            return 'CREATE UNIQUE INDEX %s ON %s(%s);' % (idx, table, column)
+        else:
+            return 'CREATE INDEX %s ON %s(%s);' % (idx, table, column)
+
+    def sql_drop_index(self, table, column, unique=False):
+        return 'DROP INDEX %s' % self._index_name(table, column, unique)
+    
     def list_tables(self, cursor):
         """return the list of tables of a database"""
         # filter type='table' else we get indices as well
