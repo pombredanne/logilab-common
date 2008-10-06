@@ -262,7 +262,6 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
             cursor.execute(self.sql_create_index(table, column, unique))
             
     def drop_index(self, cursor, table, column, unique=False):
-        print 'drop_index'
         if self.index_exists(cursor, table, column, unique):
             cursor.execute(self.sql_drop_index(table, column, unique))
         
