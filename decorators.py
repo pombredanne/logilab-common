@@ -8,6 +8,7 @@ __docformat__ = "restructuredtext en"
 
 from types import MethodType
 from time import clock
+import sys, re
 
 # XXX rewrite so we can use the decorator syntax when keyarg has to be specified
 
@@ -142,4 +143,27 @@ def locked(acquire, release):
                 release(self)
         return wrapper
     return decorator
+
+def require_version(version):
+    """ Compare version of python interpretor to the given one. Skip the test 
+    if older.
+    """
+    def check_require_version(f):
+        current = sys.version_info[:3]
+        version_rgx = re.compile('^(\d+)\.(\d+)\.?(\d+)?$') # version = X.Y[.Z]
+        match = re.search(version_rgx, version)
+        if match == None:
+            raise ValueError('%s is not a correct version : sould be X.Y[.Z].' % version)
+        compare = tuple([ int(x) for x in match.groups() if x ])
+        #print 'comp', current, compare
+        if current < compare:
+            #print 'version too old'
+            def new_f(self, *args, **kwargs):
+                self.skip('Need at least %s version of python. Current version is %s.' % (version, '.'.join([str(element) for element in current])))
+            new_f.__name__ = f.__name__
+            return new_f
+        else:
+            #print 'version young enough'
+            return f
+    return check_require_version
 
