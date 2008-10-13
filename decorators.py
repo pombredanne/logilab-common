@@ -149,12 +149,12 @@ def require_version(version):
     if older.
     """
     def check_require_version(f):
+        version_elements = version.split('.')
+        try:
+            compare = tuple([int(v) for v in version_elements])
+        except ValueError:
+            raise ValueError('%s is not a correct version : should be X.Y[.Z].' % version)
         current = sys.version_info[:3]
-        version_rgx = re.compile('^(\d+)\.(\d+)\.?(\d+)?$') # version = X.Y[.Z]
-        match = re.search(version_rgx, version)
-        if match == None:
-            raise ValueError('%s is not a correct version : sould be X.Y[.Z].' % version)
-        compare = tuple([ int(x) for x in match.groups() if x ])
         #print 'comp', current, compare
         if current < compare:
             #print 'version too old'
