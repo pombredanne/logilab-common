@@ -167,3 +167,18 @@ def require_version(version):
             return f
     return check_require_version
 
+def require_module(module):
+    """ Check if the given module is loaded. Skip the test if not.
+    """
+    def check_require_module(f):
+        try:
+            __import__(module)
+            #print module, 'imported'
+            return f
+        except ImportError:
+            #print module, 'can not be imported'
+            def new_f(self, *args, **kwargs):
+                self.skip('%s can not be imported.' % module)
+            new_f.__name__ = f.__name__
+            return new_f
+    return check_require_module
