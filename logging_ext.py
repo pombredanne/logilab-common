@@ -20,8 +20,8 @@ class ColorFormatter(logging.Formatter):
     """
     A color Formatter for the logging standard module.
 
-    By default, colorize CRITICAL and ERROR in red, WARNING in orange
-    and INFO in yellow.
+    By default, colorize CRITICAL and ERROR in red, WARNING in orange, INFO in
+    green and DEBUG in yellow.
 
     self.colors is customizable via the 'color' constructor argument (dictionnary).
 
@@ -35,12 +35,13 @@ class ColorFormatter(logging.Formatter):
         self.colors = {'CRITICAL': 'red',
                        'ERROR': 'red',
                        'WARNING': 'magenta',
-                       'INFO': 'yellow',
+                       'INFO': 'green',
+                       'DEBUG': 'yellow',
                        }
         if colors is not None:
             assert isinstance(colors, dict)
-            self.colors.update(colors)            
-                               
+            self.colors.update(colors)
+
     def format(self, record):
         msg = logging.Formatter.format(self, record)
         if record.levelname in self.colors:
