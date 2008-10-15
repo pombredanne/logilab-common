@@ -62,6 +62,13 @@ try:
 except ImportError:
     PYGMENTS_FOUND = False
 
+try:
+    from logilab.common import textutils
+    # only print in color if executed from a terminal
+    TEXTUTILS_FOUND = os.isatty
+except ImportError:
+    TEXTUTILS_FOUND = False
+
 from logilab.common.deprecation import class_renamed, deprecated_function, \
      obsolete
 # pylint: disable-msg=W0622
@@ -412,7 +419,12 @@ class SkipAwareTestResult(unittest._TextTestResult):
                 err = highlight(err, lexers.PythonLexer(), 
                     formatters.terminal.TerminalFormatter())
             self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % (flavour, descr))
+            if TEXTUTILS_FOUND:
+                self.stream.writeln("%s: %s" % (
+                    textutils.colorize_ansi(flavour, color='red'), descr))
+            else :
+                self.stream.writeln("%s: %s" % (flavour, descr))
+
             self.stream.writeln(self.separator2)
             self.stream.writeln("%s" % err)
             try:
@@ -547,9 +559,15 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                             (run, run != 1 and "s" or "", timeTaken))
         self.stream.writeln()
         if not result.wasSuccessful():
-            self.stream.write("FAILED")
+            if TEXTUTILS_FOUND:
+                self.stream.write(textutils.colorize_ansi("FAILED", color='red'))
+            else:
+                self.stream.write("FAILED")
         else:
-            self.stream.write("OK")
+            if TEXTUTILS_FOUND:
+                self.stream.write(textutils.colorize_ansi("OK", color='green'))
+            else:
+                self.stream.write("OK")
         failed, errored, skipped = map(len, (result.failures, result.errors,
              result.skipped))
         
