@@ -55,8 +55,9 @@ class Cache(dict):
             pass # key is already the most recently used key
             
     def __getitem__(self, key):
+        value = super(Cache, self).__getitem__(key)
         self._update_usage(key)
-        return super(Cache, self).__getitem__(key)
+        return value
     __getitem__ = locked(_acquire, _release)(__getitem__)
     
     def __setitem__(self, key, item):
@@ -79,7 +80,18 @@ class Cache(dict):
     def pop(self, key, default=_marker):
         if super(Cache, self).has_key(key):
             self._usage.remove(key)
-        if default is _marker:
-            return super(Cache, self).pop(key)
+        #if default is _marker:
+        #    return super(Cache, self).pop(key)
         return super(Cache, self).pop(key, default)
     pop = locked(_acquire, _release)(pop)
+
+    def popitem(self):
+        raise NotImplementedError()
+
+    def setdefault(self, key, default=None):
+        raise NotImplementedError()
+
+    def update(self, other):
+        raise NotImplementedError()
+
+
