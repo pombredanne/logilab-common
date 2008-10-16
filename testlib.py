@@ -409,15 +409,16 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def printErrorList(self, flavour, errors):
         for (_, descr), (test, err) in zip(self.descrs_for(flavour), errors):
-            if PYGMENTS_FOUND and isatty(self.stream):
-                err = highlight(err, lexers.PythonLexer(), 
-                    formatters.terminal.TerminalFormatter())
+            #print 'HERRRRRE', type(self.stream)
+            #if PYGMENTS_FOUND and isatty(self.stream):
+            #    err = highlight(err, lexers.PythonLexer(), 
+            #        formatters.terminal.TerminalFormatter())
             self.stream.writeln(self.separator1)
-            if os.isatty(self.stream):
-                self.stream.writeln("%s: %s" % (
-                    textutils.colorize_ansi(flavour, color='red'), descr))
-            else:
-                self.stream.writeln("%s: %s" % (flavour, descr))
+            #if os.isatty(self.stream):
+            #    self.stream.writeln("%s: %s" % (
+            #        textutils.colorize_ansi(flavour, color='red'), descr))
+            #else:
+            self.stream.writeln("%s: %s" % (flavour, descr))
 
             self.stream.writeln(self.separator2)
             self.stream.writeln(str(err))
@@ -555,15 +556,15 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                             (run, run != 1 and "s" or "", timeTaken))
         self.stream.writeln()
         if not result.wasSuccessful():
-            if os.isatty(self.stream.fileno()):
-                self.stream.write(textutils.colorize_ansi("FAILED", color='red'))
-            else:
-                self.stream.write("FAILED")
+            #if os.isatty(self.stream.fileno()):
+            #    self.stream.write(textutils.colorize_ansi("FAILED", color='red'))
+            #else:
+            self.stream.write("FAILED")
         else:
-            if os.isatty(self.stream.fileno()):
-                self.stream.write(textutils.colorize_ansi("OK", color='green'))
-            else:
-                self.stream.write("OK")
+            #if os.isatty(self.stream.fileno()):
+            #    self.stream.write(textutils.colorize_ansi("OK", color='green'))
+            #else:
+            self.stream.write("OK")
         failed, errored, skipped = map(len, (result.failures, result.errors,
              result.skipped))
         
