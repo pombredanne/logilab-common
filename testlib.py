@@ -409,18 +409,18 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def printErrorList(self, flavour, errors):
         for (_, descr), (test, err) in zip(self.descrs_for(flavour), errors):
-            if PYGMENTS_FOUND and os.isatty(self.stream.fileno()):
+            if PYGMENTS_FOUND and isatty(self.stream):
                 err = highlight(err, lexers.PythonLexer(), 
                     formatters.terminal.TerminalFormatter())
             self.stream.writeln(self.separator1)
-            if os.isatty(self.stream.fileno()):
+            if os.isatty(self.stream):
                 self.stream.writeln("%s: %s" % (
                     textutils.colorize_ansi(flavour, color='red'), descr))
             else:
                 self.stream.writeln("%s: %s" % (flavour, descr))
 
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % err)
+            self.stream.writeln(str(err))
             try:
                 output, errput = test.captured_output()
             except AttributeError:
@@ -446,6 +446,8 @@ class SkipAwareTestResult(unittest._TextTestResult):
                         len(self.separator2)))
 
 
+def isatty(stream):
+    return hasattr(stream, 'isatty') and stream.isatty()
 
 def run(self, result, runcondition=None, options=None):
     for test in self._tests:
