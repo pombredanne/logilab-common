@@ -85,6 +85,30 @@ class ConfigurationTC(TestCase):
         self.assertEquals(cfg['choice'], 'ye')
         self.assertEquals(cfg['value'], None)
         self.assertEquals(cfg['multiple-choice'], ('yo', 'ya'))
+
+    def test_generate_config(self):
+        file = os.tmpfile()
+        stream = StringIO()
+        self.cfg.generate_config(stream)
+        self.assertLinesEquals(stream.getvalue().strip(), """# test configuration
+[Test]
+
+dothis=yes
+
+#value=
+
+# you can also document the option
+multiple=yop,yep
+
+# boom
+number=2
+
+choice=yo
+
+multiple-choice=yo,ye
+
+named=key:val
+""")
         
     def test_generate_config(self):
         stream = StringIO()
