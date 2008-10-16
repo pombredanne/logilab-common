@@ -13,7 +13,7 @@ from logilab.common.decorators import locked
 
 _marker = object()
 
-class Cache:
+class Cache(dict):
     """A dictionnary like cache.
 
     inv:
@@ -22,18 +22,16 @@ class Cache:
     """
     
     def __init__(self, size=100):
+        """ Warning : Cache.__init__() != dict.__init__().
+        Constructor does not take any arguments beside size.
+        """
+        print '__init__'
         assert size >= 0, 'cache size must be >= 0 (0 meaning no caching)'
-        self.data = {}
         self.size = size
         self._usage = []
         self._lock = Lock()
+        super(Cache, self).__init__()
         
-    def __repr__(self):
-        return repr(self.data)
-
-    def __len__(self):
-        return len(self.data)
-
     def _acquire(self):
         self._lock.acquire()
 
@@ -51,54 +49,45 @@ class Cache:
                 # check the size of the dictionnary
                 # and remove the oldest item in the cache
                 if self.size and len(self._usage) >= self.size:
-                    del self.data[self._usage[0]]
+                    super(Cache, self).__delitem__(self._usage[0])
                     del self._usage[0]
             self._usage.append(key)
         else:
             pass # key is already the most recently used key
             
     def __getitem__(self, key):
-        value = self.data[key]
+        print '__getitem__'
         self._update_usage(key)
-        return value
+        return super(Cache, self).__getitem__(key)
     __getitem__ = locked(_acquire, _release)(__getitem__)
     
     def __setitem__(self, key, item):
+        print '__setitem__'
         # Just make sure that size > 0 before inserting a new item in the cache
         if self.size > 0:
-            self.data[key] = item
+            super(Cache, self).__setitem__(key, item)
             self._update_usage(key)
     __setitem__ = locked(_acquire, _release)(__setitem__)
         
     def __delitem__(self, key):
-        del self.data[key]
+        print '__delitem__'
+        super(Cache, self).__delitem__(key)
         self._usage.remove(key)
     __delitem__ = locked(_acquire, _release)(__delitem__)
     
-    def pop(self, value, default=_marker):
-        if value in self.data:
-            self._usage.remove(value)
-        if default is _marker:
-            return self.data.pop(value)
-        return self.data.pop(value, default)
-    pop = locked(_acquire, _release)(pop)
-    
     def clear(self):
-        self.data.clear()
+        print 'clear'
+        super(Cache, self).clear()
         self._usage = []
     clear = locked(_acquire, _release)(clear)
 
-    def keys(self):
-        return self.data.keys()
+    def pop(self, key, default=_marker):
+        print 'pop'
+        if super(Cache, self).has_key(key):
+            self._usage.remove(key)
+        if default is _marker:
+            return super(Cache, self).pop(key)
+        return super(Cache, self).pop(key, default)
+    pop = locked(_acquire, _release)(pop)
 
-    def items(self):
-        return self.data.items()
-
-    def values(self):
-        return self.data.values()
-
-    def has_key(self, key):
-        return self.data.has_key(key)
-    
-    __contains__ = has_key
-    
+    #__contains__ = has_key
