@@ -25,7 +25,6 @@ class Cache(dict):
         """ Warning : Cache.__init__() != dict.__init__().
         Constructor does not take any arguments beside size.
         """
-        #print '__init__'
         assert size >= 0, 'cache size must be >= 0 (0 meaning no caching)'
         self.size = size
         self._usage = []
@@ -56,13 +55,11 @@ class Cache(dict):
             pass # key is already the most recently used key
             
     def __getitem__(self, key):
-        #print '__getitem__'
         self._update_usage(key)
         return super(Cache, self).__getitem__(key)
     __getitem__ = locked(_acquire, _release)(__getitem__)
     
     def __setitem__(self, key, item):
-        #print '__setitem__'
         # Just make sure that size > 0 before inserting a new item in the cache
         if self.size > 0:
             super(Cache, self).__setitem__(key, item)
@@ -70,24 +67,19 @@ class Cache(dict):
     __setitem__ = locked(_acquire, _release)(__setitem__)
         
     def __delitem__(self, key):
-        #print '__delitem__'
         super(Cache, self).__delitem__(key)
         self._usage.remove(key)
     __delitem__ = locked(_acquire, _release)(__delitem__)
     
     def clear(self):
-        #print 'clear'
         super(Cache, self).clear()
         self._usage = []
     clear = locked(_acquire, _release)(clear)
 
     def pop(self, key, default=_marker):
-        #print 'pop'
         if super(Cache, self).has_key(key):
             self._usage.remove(key)
         if default is _marker:
             return super(Cache, self).pop(key)
         return super(Cache, self).pop(key, default)
     pop = locked(_acquire, _release)(pop)
-
-    #__contains__ = has_key
