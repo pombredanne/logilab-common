@@ -86,11 +86,11 @@ class ConfigurationTC(TestCase):
         self.assertEquals(cfg['value'], None)
         self.assertEquals(cfg['multiple-choice'], ('yo', 'ya'))
 
-    def test_generate_config(self):
-        file = os.tmpfile()
-        stream = StringIO()
-        self.cfg.generate_config(stream)
-        self.assertLinesEquals(stream.getvalue().strip(), """# test configuration
+    def test_load_configuration_file_case_insensitive(self):
+        file = tempfile.mktemp()
+        stream = open(file, 'w')
+        try:
+            stream.write("""# test configuration
 [Test]
 
 dothis=yes
@@ -109,6 +109,16 @@ multiple-choice=yo,ye
 
 named=key:val
 """)
+            self.cfg.load_file_configuration(file)
+            self.assertEquals(self.cfg['dothis'], True)
+            self.assertEquals(self.cfg['value'], None)
+            self.assertEquals(self.cfg['multiple'], ('yop','yep'))
+            self.assertEquals(self.cfg['number'], 2)
+            self.assertEquals(self.cfg['choice'], 'yo')
+            self.assertEquals(self.cfg['multiple-choice'], ('yo', 'ye'))
+            self.assertEquals(self.cfg['named'], {'key': 'val'})
+        finally:
+            os.remove(file)
         
     def test_generate_config(self):
         stream = StringIO()
