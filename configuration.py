@@ -96,7 +96,7 @@ __all__ = ('OptionsManagerMixIn', 'OptionsProviderMixIn',
 import os
 import sys
 import re
-from os.path import exists
+from os.path import exists, expanduser
 from copy import copy
 from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 
@@ -490,6 +490,8 @@ class OptionsManagerMixIn(object):
         """
         if config_file is None:
             config_file = self.config_file
+        if '~' in config_file:
+            config_file = expanduser(config_file)
         if config_file and exists(config_file):
             self._config_parser.read([config_file])
         elif not self.quiet:
