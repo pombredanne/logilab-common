@@ -6,6 +6,7 @@ class DecoratorsTC(TestCase):
     def test_require_version_good(self):
         """ should return the same function
         """
+        #raise Exception('t1')
         def func() :
             pass
         sys.version_info = (2, 5, 5, 'final', 4)
@@ -20,6 +21,7 @@ class DecoratorsTC(TestCase):
     def test_require_version_bad(self):
         """ should return a different function : skipping test
         """
+        #raise Exception('t2')
         def func() :
             pass
         sys.version_info = (2, 5, 5, 'final', 4)
@@ -34,6 +36,7 @@ class DecoratorsTC(TestCase):
     def test_require_version_exception(self):
         """ should throw a ValueError exception
         """
+        raise Exception('t3')
         def func() :
             pass
         compare = ('2.5.a', '2.a', 'azerty')
@@ -44,6 +47,7 @@ class DecoratorsTC(TestCase):
     def test_require_module_good(self):
         """ should return the same function
         """
+        #raise Exception('t4')
         def func() :
             pass
         module = 'sys'
@@ -54,6 +58,7 @@ class DecoratorsTC(TestCase):
     def test_require_module_bad(self):
         """ should return a different function : skipping test
         """
+        raise Exception('t5')
         def func() :
             pass
         modules = ('bla', 'blo', 'bli')
