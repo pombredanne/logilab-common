@@ -51,7 +51,7 @@ class CacheTestCase(TestCase):
         self.cache[4] = 'foz'
         self.cache[5] = 'fuz'
         self.cache[6] = 'spam'
-        self.assert_(not self.cache.has_key(1),
+        self.assert_(1 not in self.cache,
                      'key 1 has not been suppressed from the cache dictionnary')
         self.assert_(1 not in self.cache._usage,
                      'key 1 has not been suppressed from the cache LRU list')

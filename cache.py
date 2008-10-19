@@ -78,7 +78,7 @@ class Cache(dict):
     clear = locked(_acquire, _release)(clear)
 
     def pop(self, key, default=_marker):
-        if super(Cache, self).has_key(key):
+        if key in super(Cache, self):
             self._usage.remove(key)
         #if default is _marker:
         #    return super(Cache, self).pop(key)

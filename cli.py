@@ -101,7 +101,7 @@ class CLIHelper:
             if not s_line:
                 continue
             args = s_line.split()
-            if self.commands.has_key(args[0]):
+            if args[0] in self.commands:
                 try:
                     cmd = 'do_%s' % self.commands[args[0]]
                     getattr(self, cmd)(*args[1:])
@@ -152,9 +152,9 @@ class CLIHelper:
     
     def do_help(self, command=None) :
         """base input of the help system"""
-        if self._command_help.has_key(command):
+        if command in self._command_help:
             self._print_help(*self._command_help[command])
-        elif command is None or not self._topics.has_key(command):
+        elif command is None or command not in self._topics:
             print _("Use help <topic> or help <command>.")
             print _("Available topics are:")
             topics = self._topics.keys()

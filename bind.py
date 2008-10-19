@@ -48,7 +48,7 @@ def bind_code(co, globals):
             oparg = None
         if op == LOAD_GLOBAL:
             name = co.co_names[oparg]
-            if globals.has_key(name):
+            if name in globals:
                 k = assigned.get(name, None)
                 if k == None:
                     k = len(consts)
@@ -139,7 +139,7 @@ def analyze_code(co, globals, consts_dict, consts_list):
 
         if op == LOAD_GLOBAL:
             name = co.co_names[oparg]
-            if globals.has_key(name):
+            if name in globals:
                 k = consts_dict.get(name, None)
                 if k == None:
                     k = len(consts_list)
@@ -147,7 +147,7 @@ def analyze_code(co, globals, consts_dict, consts_list):
                     consts_list.append(globals[name])
         if op == STORE_GLOBAL:
             name = co.co_names[oparg]
-            if globals.has_key(name):
+            if name in globals:
                 modified_globals.append(name)
     return modified_globals
 

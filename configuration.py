@@ -183,7 +183,7 @@ VALIDATORS = {'string' : unquote,
               }
 
 def _call_validator(opttype, optdict, option, value):
-    if not VALIDATORS.has_key(opttype):
+    if opttype not in VALIDATORS:
         raise Exception('Unsupported type "%s"' % opttype)
     try:
         return VALIDATORS[opttype](optdict, option, value)
@@ -358,7 +358,7 @@ class OptionsManagerMixIn(object):
         else:
             self.options_providers.append(provider)
         non_group_spec_options = [option for option in provider.options
-                                  if not option[1].has_key('group')]
+                                  if 'group' not in option[1]]
         groups = getattr(provider, 'option_groups', ())
         if own_group:
             self.add_option_group(provider.name.upper(), provider.__doc__,
@@ -395,7 +395,7 @@ class OptionsManagerMixIn(object):
         use with optik/optparse
         """
         opt_dict = copy(opt_dict)
-        if opt_dict.has_key('action'):
+        if 'action' in opt_dict:
             self._nocallback_options[provider] = opt_name
         else:
             opt_dict['action'] = 'callback'
@@ -407,7 +407,7 @@ class OptionsManagerMixIn(object):
                 opt_dict['help'] += ' [current: %default]'
             del opt_dict['default']
         args = ['--' + opt_name]
-        if opt_dict.has_key('short'):
+        if 'short' in opt_dict:
             self._short_options[opt_dict['short']] = opt_name
             args.append('-' + opt_dict['short'])
             del opt_dict['short']
