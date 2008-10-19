@@ -23,7 +23,7 @@ class HTMLWriter(BaseWriter):
     """format layouts as HTML"""
     
     def __init__(self, snipet=None):
-        super(HTMLWriter, self).__init__(self)
+        super(HTMLWriter, self).__init__()
         self.snipet = snipet
         
     def handle_attrs(self, layout):
