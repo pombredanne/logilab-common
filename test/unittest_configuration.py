@@ -56,7 +56,6 @@ class ConfigurationTC(TestCase):
 
     def test_load_command_line_configuration(self):
         cfg = self.cfg
-        cfg.load_file_configuration()
         args = cfg.load_command_line_configuration(['--choice', 'ye', '--number', '4',
                                                     '--multiple=1,2,3', '--dothis=n',
                                                     'other', 'arguments'])
