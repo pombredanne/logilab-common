@@ -599,6 +599,12 @@ class OutErrCaptureTC(TestCase):
         bootstrap_print("hello")
         self.assertEquals(output.restore(), "hello")
         
+    def test_exotic_unicode_string(self):
+        class FooTC(TestCase):
+            def test_xxx(self):
+                raise Exception(u'\xe9')
+        test = FooTC('test_xxx')
+        result = self.runner.run(test)
 
 class DecoratorTC(TestCase):
     

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Run tests.
 
 This will find all modules whose name match a given prefix in the test
@@ -370,7 +371,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.descrs_for(flavour).append( (len(self.debuggers), test_descr) )
         if self.pdbmode:
             self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
-        
+
     def addError(self, test, err):
         """err ==  (exc_type, exc, tcbk)"""
         exc_type, exc, _ = err # 
@@ -409,9 +410,6 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def printErrorList(self, flavour, errors):
         for (_, descr), (test, err) in zip(self.descrs_for(flavour), errors):
-            if PYGMENTS_FOUND and isatty(self.stream):
-                err = highlight(err, lexers.PythonLexer(), 
-                    formatters.terminal.TerminalFormatter())
             self.stream.writeln(self.separator1)
             if isatty(self.stream):
                 self.stream.writeln("%s: %s" % (
@@ -420,7 +418,29 @@ class SkipAwareTestResult(unittest._TextTestResult):
                 self.stream.writeln("%s: %s" % (flavour, descr))
 
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % err.encode(sys.stdout.encoding, 'replace'))
+
+            if PYGMENTS_FOUND and isatty(self.stream):
+                # ensure `err` is a unicode string before passing it to highlight
+                if isinstance(err, str):
+                    try:
+                        # encoded str, no encoding information, try to decode
+                        err = err.decode('utf-8')
+                    except UnicodeDecodeError:
+                        err = err.decode('iso-8859-1')
+                err_color = highlight(err, lexers.PythonLexer(), 
+                    formatters.terminal.TerminalFormatter())
+                # `err_color` is a unicode string, encode it before writing
+                # to stdout
+                if hasattr(self.stream, 'encoding'):
+                    err_color = err_color.encode(self.stream.encoding)
+                else: 
+                    # rare cases where test ouput has been hijacked, pick
+                    # up a random encoding
+                    err_color = err_color.encode('utf-8')
+                self.stream.writeln(err_color)
+            else:
+                self.stream.writeln(err)
+
             try:
                 output, errput = test.captured_output()
             except AttributeError:
