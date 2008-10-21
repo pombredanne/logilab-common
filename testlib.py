@@ -1784,3 +1784,42 @@ class Tags(set):
 
     def match(self, exp):
         return eval(exp, {}, self)
+
+def require_version(version):
+    """ Compare version of python interpretor to the given one. Skip the test 
+    if older.
+    """
+    def check_require_version(f):
+        version_elements = version.split('.')
+        try:
+            compare = tuple([int(v) for v in version_elements])
+        except ValueError:
+            raise ValueError('%s is not a correct version : should be X.Y[.Z].' % version)
+        current = sys.version_info[:3]
+        #print 'comp', current, compare
+        if current < compare:
+            #print 'version too old'
+            def new_f(self, *args, **kwargs):
+                self.skip('Need at least %s version of python. Current version is %s.' % (version, '.'.join([str(element) for element in current])))
+            new_f.__name__ = f.__name__
+            return new_f
+        else:
+            #print 'version young enough'
+            return f
+    return check_require_version
+
+def require_module(module):
+    """ Check if the given module is loaded. Skip the test if not.
+    """
+    def check_require_module(f):
+        try:
+            __import__(module)
+            #print module, 'imported'
+            return f
+        except ImportError:
+            #print module, 'can not be imported'
+            def new_f(self, *args, **kwargs):
+                self.skip('%s can not be imported.' % module)
+            new_f.__name__ = f.__name__
+            return new_f
+    return check_require_module
