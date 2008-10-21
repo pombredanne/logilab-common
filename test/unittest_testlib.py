@@ -670,44 +670,6 @@ class DecoratorTC(TestCase):
         self.assertListEquals(list(os.walk(tempdir)),
             [(tempdir,[],[])])
 
-class TagTC(TestCase):
-
-    def setUp(self):
-        @tag('testing', 'bob')
-        def bob(a, b, c):
-            return (a + b) * c
-
-        self.func = bob
-
-    def test_tag_decorator(self):
-        bob = self.func
-        
-        self.assertEquals(bob(2, 3, 7), 35)
-        self.assertTrue(hasattr(bob, 'tags'))
-        self.assertSetEquals(bob.tags, set(['testing','bob']))
-
-
-    def test_tags_class(self):
-        tags = self.func.tags
-
-        self.assertTrue(tags['testing'])
-        self.assertFalse(tags['Not inside'])
-
-    def test_tags_match(self):
-        tags = self.func.tags
-
-        self.assertTrue(tags.match('testing'))
-        self.assertFalse(tags.match('other'))
-
-        self.assertFalse(tags.match('testing and coin'))
-        self.assertTrue(tags.match('testing or other'))
-
-        self.assertTrue(tags.match('not other'))
-
-        self.assertTrue(tags.match('not other or (testing and bibi)'))
-        self.assertTrue(tags.match('other or (testing and bob)'))
-
-class DecoratorsTC(TestCase):
     def test_require_version_good(self):
         """ should return the same function
         """
@@ -774,6 +736,43 @@ class DecoratorsTC(TestCase):
                 return
         print 'all modules in %s exist. Could not test %s' % (', '.join(modules), 
             sys._getframe().f_code.co_name)
+
+class TagTC(TestCase):
+
+    def setUp(self):
+        @tag('testing', 'bob')
+        def bob(a, b, c):
+            return (a + b) * c
+
+        self.func = bob
+
+    def test_tag_decorator(self):
+        bob = self.func
+        
+        self.assertEquals(bob(2, 3, 7), 35)
+        self.assertTrue(hasattr(bob, 'tags'))
+        self.assertSetEquals(bob.tags, set(['testing','bob']))
+
+
+    def test_tags_class(self):
+        tags = self.func.tags
+
+        self.assertTrue(tags['testing'])
+        self.assertFalse(tags['Not inside'])
+
+    def test_tags_match(self):
+        tags = self.func.tags
+
+        self.assertTrue(tags.match('testing'))
+        self.assertFalse(tags.match('other'))
+
+        self.assertFalse(tags.match('testing and coin'))
+        self.assertTrue(tags.match('testing or other'))
+
+        self.assertTrue(tags.match('not other'))
+
+        self.assertTrue(tags.match('not other or (testing and bibi)'))
+        self.assertTrue(tags.match('other or (testing and bob)'))
 
 if __name__ == '__main__':
     unittest_main()
