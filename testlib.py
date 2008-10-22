@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Run tests.
 
 This will find all modules whose name match a given prefix in the test
@@ -370,7 +371,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.descrs_for(flavour).append( (len(self.debuggers), test_descr) )
         if self.pdbmode:
             self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
-        
+
     def addError(self, test, err):
         """err ==  (exc_type, exc, tcbk)"""
         exc_type, exc, _ = err # 
@@ -409,9 +410,6 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def printErrorList(self, flavour, errors):
         for (_, descr), (test, err) in zip(self.descrs_for(flavour), errors):
-            if PYGMENTS_FOUND and isatty(self.stream):
-                err = highlight(err, lexers.PythonLexer(), 
-                    formatters.terminal.TerminalFormatter())
             self.stream.writeln(self.separator1)
             if isatty(self.stream):
                 self.stream.writeln("%s: %s" % (
@@ -420,11 +418,28 @@ class SkipAwareTestResult(unittest._TextTestResult):
                 self.stream.writeln("%s: %s" % (flavour, descr))
 
             self.stream.writeln(self.separator2)
-            if hasattr(sys.stdout, 'encoding'):
-                self.stream.writeln("%s" % err.encode(sys.stdout.encoding, 'replace'))
+            if PYGMENTS_FOUND and isatty(self.stream):
+                # ensure `err` is a unicode string before passing it to highlight
+                if isinstance(err, str):
+                    try:
+                        # encoded str, no encoding information, try to decode
+                        err = err.decode('utf-8')
+                    except UnicodeDecodeError:
+                        err = err.decode('iso-8859-1')
+                err_color = highlight(err, lexers.PythonLexer(), 
+                    formatters.terminal.TerminalFormatter())
+                # `err_color` is a unicode string, encode it before writing
+                # to stdout
+                if hasattr(self.stream, 'encoding'):
+                    err_color = err_color.encode(self.stream.encoding)
+                else: 
+                    # rare cases where test ouput has been hijacked, pick
+                    # up a random encoding
+                    err_color = err_color.encode('utf-8')
+                self.stream.writeln(err_color)
             else:
                 self.stream.writeln(err)
-        
+
             try:
                 output, errput = test.captured_output()
             except AttributeError:
@@ -1768,3 +1783,42 @@ class Tags(set):
 
     def match(self, exp):
         return eval(exp, {}, self)
+
+def require_version(version):
+    """ Compare version of python interpretor to the given one. Skip the test 
+    if older.
+    """
+    def check_require_version(f):
+        version_elements = version.split('.')
+        try:
+            compare = tuple([int(v) for v in version_elements])
+        except ValueError:
+            raise ValueError('%s is not a correct version : should be X.Y[.Z].' % version)
+        current = sys.version_info[:3]
+        #print 'comp', current, compare
+        if current < compare:
+            #print 'version too old'
+            def new_f(self, *args, **kwargs):
+                self.skip('Need at least %s version of python. Current version is %s.' % (version, '.'.join([str(element) for element in current])))
+            new_f.__name__ = f.__name__
+            return new_f
+        else:
+            #print 'version young enough'
+            return f
+    return check_require_version
+
+def require_module(module):
+    """ Check if the given module is loaded. Skip the test if not.
+    """
+    def check_require_module(f):
+        try:
+            __import__(module)
+            #print module, 'imported'
+            return f
+        except ImportError:
+            #print module, 'can not be imported'
+            def new_f(self, *args, **kwargs):
+                self.skip('%s can not be imported.' % module)
+            new_f.__name__ = f.__name__
+            return new_f
+    return check_require_module
