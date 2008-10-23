@@ -670,6 +670,13 @@ class DecoratorTC(TestCase):
         self.assertListEquals(list(os.walk(tempdir)),
             [(tempdir,[],[])])
 
+
+    def setUp(self):
+        self.pyversion = sys.version_info
+
+    def tearDown(self):
+        sys.version_info = self.pyversion
+
     def test_require_version_good(self):
         """ should return the same function
         """
