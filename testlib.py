@@ -855,11 +855,12 @@ Examples:
             try:
                 restartfile = open(FILE_RESTART, 'r')
                 try:
-                    succeededtests = list(elem.rstrip('\n\r') for elem in 
-                        restartfile.readlines())
-                    removeSucceededTests(self.test, succeededtests)
-                except Exception, e:
-                    raise e
+                    try:
+                        succeededtests = list(elem.rstrip('\n\r') for elem in 
+                            restartfile.readlines())
+                        removeSucceededTests(self.test, succeededtests)
+                    except Exception, e:
+                        raise e
                 finally:
                     restartfile.close()
             except Exception ,e:
@@ -1184,12 +1185,13 @@ class TestCase(unittest.TestCase):
                     try:
                         restartfile = open(FILE_RESTART, 'a')
                         try:
-                            descr = '.'.join((self.__class__.__module__, 
-                                self.__class__.__name__, 
-                                self._testMethodName))
-                            restartfile.write(descr+os.linesep)
-                        except Exception, e: 
-                            raise e
+                            try:
+                                descr = '.'.join((self.__class__.__module__, 
+                                    self.__class__.__name__, 
+                                    self._testMethodName))
+                                restartfile.write(descr+os.linesep)
+                            except Exception, e: 
+                                raise e
                         finally:
                             restartfile.close()
                     except Exception, e:
