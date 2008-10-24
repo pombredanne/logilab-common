@@ -325,6 +325,7 @@ class PyTester(object):
         self.report = GlobalTestReport()
         self.cvg = cvg
         self.options = options
+        self.firstwrite = True
 
     def show_report(self):
         """prints the report and returns appropriate exitcode"""
@@ -360,10 +361,20 @@ class PyTester(object):
         """finds each testfile in the `testdir` and runs it"""
         for filename in abspath_listdir(testdir):
             if this_is_a_testfile(filename):
+                if self.options.exitfirst and not self.options.restart:
+                    # overwrite restart file
+                    try:
+                        restartfile = open(testlib.FILE_RESTART, "w")
+                        restartfile.close()
+                    except Exception, e:
+                        print >> sys.__stderr__, "Error while overwriting \
+succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
+                        raise e
                 # run test and collect information
                 prog = self.testfile(filename, batchmode=True)
                 if exitfirst and (prog is None or not prog.result.wasSuccessful()):
                     break
+                self.firstwrite = True
         # clean local modules
         remove_local_modules_from_sys(testdir)
 
@@ -377,6 +388,15 @@ class PyTester(object):
         dirname = osp.dirname(filename)
         if dirname:
             os.chdir(dirname)
+        # overwrite restart file if it has not been done already
+        if self.options.exitfirst and not self.options.restart and self.firstwrite:
+            try:
+                restartfile = open(testlib.FILE_RESTART, "w")
+                restartfile.close()
+            except Exception, e:
+                print >> sys.__stderr__, "Error while overwriting \
+succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
+                raise e
         modname = osp.basename(filename)[:-3]
         if batchmode:
             from cStringIO import StringIO
@@ -560,9 +580,14 @@ def make_parser():
                       dest="pdb", action="callback",
                       help="Enable test failure inspection (conflicts with --coverage)")
     parser.add_option('-x', '--exitfirst', callback=rebuild_and_store,
-                      dest="exitfirst",
+                      dest="exitfirst", default=False,
                       action="callback", help="Exit on first failure "
                       "(only make sense when pytest run one test file)")
+    parser.add_option('-r', '--restart', callback=rebuild_and_store,
+                      dest="restart", default=False,
+                      action="callback",
+                      help="Restart tests from where it failed (implies exitfirst) "
+                        "(only make sense if tests previously ran with exitfirst only)")
     parser.add_option('-c', '--capture', callback=rebuild_cmdline,
                       action="callback", 
                       help="Captures and prints standard out/err only on errors "
@@ -626,6 +651,9 @@ def parseargs(parser):
         newargs.extend(['--printonly', options.printonly])
     if options.skipped:
         newargs.extend(['--skip', options.skipped])
+    # restart implies exitfirst
+    if options.restart:
+        options.exitfirst = True
     # append additional args to the new sys.argv and let unittest_main
     # do the rest
     newargs += args

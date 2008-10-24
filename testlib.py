@@ -80,6 +80,8 @@ DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
 
 ENABLE_DBC = False
 
+FILE_RESTART = ".restart"
+
 
 def with_tempdir(callable):
     """A decorator ensuring no temporary file left when the function return
@@ -118,7 +120,7 @@ def main(testdir=None, exitafter=True):
     """
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvqx:t:pcd', ['help'])
+        opts, args = getopt.getopt(sys.argv[1:], 'hvqxr:t:pcd', ['help'])
     except getopt.error, msg:
         print msg
         print __doc__
@@ -431,11 +433,11 @@ class SkipAwareTestResult(unittest._TextTestResult):
                 # `err_color` is a unicode string, encode it before writing
                 # to stdout
                 if hasattr(self.stream, 'encoding'):
-                    err_color = err_color.encode(self.stream.encoding)
+                    err_color = err_color.encode(self.stream.encoding, 'replace')
                 else: 
                     # rare cases where test ouput has been hijacked, pick
                     # up a random encoding
-                    err_color = err_color.encode('utf-8')
+                    err_color = err_color.encode('utf-8', 'replace')
                 self.stream.writeln(err_color)
             else:
                 self.stream.writeln(err)
@@ -764,9 +766,9 @@ Examples:
         self.tags_pattern = None
         import getopt
         try:
-            options, args = getopt.getopt(argv[1:], 'hHvixqcp:s:m:',
+            options, args = getopt.getopt(argv[1:], 'hHvixrqcp:s:m:',
                                           ['help', 'verbose', 'quiet', 'pdb',
-                                           'exitfirst', 'capture', 'printonly=',
+                                           'exitfirst', 'restart', 'capture', 'printonly=',
                                            'skip=', 'match='])
             for opt, value in options:
                 if opt in ('-h', '-H', '--help'):
@@ -774,6 +776,9 @@ Examples:
                 if opt in ('-i', '--pdb'):
                     self.pdbmode = True
                 if opt in ('-x', '--exitfirst'):
+                    self.exitfirst = True
+                if opt in ('-r', '--restart'):
+                    self.restart = True
                     self.exitfirst = True
                 if opt in ('-q', '--quiet'):
                     self.verbosity = 0
@@ -827,6 +832,40 @@ Examples:
                                         test_pattern=self.test_pattern,
                                         skipped_patterns=self.skipped_patterns,
                                         options=self.options)
+
+        def removeSucceededTests(obj, succTests):
+            """ Recurcive function that removes succTests from
+            a TestSuite or TestCase
+            """
+            if isinstance(obj, TestSuite):
+                removeSucceededTests(obj._tests, succTests)
+            if isinstance(obj, list):
+                for el in obj[:]:
+                    if isinstance(el, TestSuite):
+                        removeSucceededTests(el, succTests)
+                    elif isinstance(el, TestCase):
+                        descr = '.'.join((el.__class__.__module__,
+                                el.__class__.__name__,
+                                el._testMethodName))
+                        if descr in succTests:
+                            obj.remove(el)
+
+        # retrieve succeeded tests from FILE_RESTART
+        try:
+            restartfile = open(FILE_RESTART, 'r')
+            try:
+                succeededtests = list(elem.rstrip('\n\r') for elem in 
+                    restartfile.readlines())
+                removeSucceededTests(self.test, succeededtests)
+            except Exception, e:
+                raise e
+            finally:
+                restartfile.close()
+        except Exception ,e:
+            print >> sys.__stderr__, "Error while reading \
+succeeded tests into", osp.join(os.getcwd(),FILE_RESTART)
+            raise e
+
         result = self.testRunner.run(self.test)
         if hasattr(self.module, 'teardown_module'):
             try:
@@ -1140,6 +1179,23 @@ class TestCase(unittest.TestCase):
             if not self.quiet_run(result, self.tearDown):
                 return
             if success:
+                if hasattr(options, "exitfirst") and options.exitfirst:
+                    # add this test to restart file
+                    try:
+                        restartfile = open(FILE_RESTART, 'a')
+                        try:
+                            descr = '.'.join((self.__class__.__module__, 
+                                self.__class__.__name__, 
+                                self._testMethodName))
+                            restartfile.write(descr+os.linesep)
+                        except Exception, e: 
+                            raise e
+                        finally:
+                            restartfile.close()
+                    except Exception, e:
+                        print >> sys.__stderr__, "Error while saving \
+succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
+                        raise e
                 result.addSuccess(self)
         finally:
             # if result.cvg:
