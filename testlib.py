@@ -850,21 +850,21 @@ Examples:
                         if descr in succTests:
                             obj.remove(el)
 
-        # retrieve succeeded tests from FILE_RESTART
-        try:
-            restartfile = open(FILE_RESTART, 'r')
+        if self.options.restart:
+            # retrieve succeeded tests from FILE_RESTART
             try:
-                succeededtests = list(elem.rstrip('\n\r') for elem in 
-                    restartfile.readlines())
-                removeSucceededTests(self.test, succeededtests)
-            except Exception, e:
-                raise e
-            finally:
-                restartfile.close()
-        except Exception ,e:
-            print >> sys.__stderr__, "Error while reading \
+                restartfile = open(FILE_RESTART, 'r')
+                try:
+                    succeededtests = list(elem.rstrip('\n\r') for elem in 
+                        restartfile.readlines())
+                    removeSucceededTests(self.test, succeededtests)
+                except Exception, e:
+                    raise e
+                finally:
+                    restartfile.close()
+            except Exception ,e:
+                raise "Error while reading \
 succeeded tests into", osp.join(os.getcwd(),FILE_RESTART)
-            raise e
 
         result = self.testRunner.run(self.test)
         if hasattr(self.module, 'teardown_module'):
