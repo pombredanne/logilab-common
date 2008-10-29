@@ -395,6 +395,13 @@ class OptionsManagerMixIn(object):
         use with optik/optparse
         """
         opt_dict = copy(opt_dict)
+        # if yn option then create right action depending of default value
+        if "type" in opt_dict and opt_dict['type'] == "yn":
+            if "default" in opt_dict and opt_dict['default']:
+                opt_dict['action'] = "store_false"
+            else:
+                opt_dict['action'] = "store_true"
+            del opt_dict['type']
         if 'action' in opt_dict:
             self._nocallback_options[provider] = opt_name
         else:

@@ -57,7 +57,7 @@ class ConfigurationTC(TestCase):
     def test_load_command_line_configuration(self):
         cfg = self.cfg
         args = cfg.load_command_line_configuration(['--choice', 'ye', '--number', '4',
-                                                    '--multiple=1,2,3', '--dothis=n',
+                                                    '--multiple=1,2,3', '--dothis',
                                                     'other', 'arguments'])
         self.assertEquals(args, ['other', 'arguments'])
         self.assertEquals(cfg['dothis'], False)
@@ -198,7 +198,7 @@ named=key:val
 
 Options:
   -h, --help            show this help message and exit
-  --dothis=<y or n>     
+  --dothis              
   -v<string>, --value=<string>
   --multiple=<comma separated values>
                         you can also document the option [current: yop,yep]
@@ -215,7 +215,7 @@ Options:
 
 options:
   -h, --help            show this help message and exit
-  --dothis=<y or n>     
+  --dothis              
   -v<string>, --value=<string>
   --multiple=<comma separated values>
                         you can also document the option [current: yop,yep]
@@ -232,7 +232,7 @@ options:
 
 options:
   -h, --help            show this help message and exit
-  --dothis=<y or n>     
+  --dothis              
   -v<string>, --value=<string>
   --multiple=<comma separated values>
                         you can also document the option
