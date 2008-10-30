@@ -1,6 +1,21 @@
 ChangeLog for logilab.common
 ============================
 
+2008-10-30  --  0.36.0
+    * configuration:
+      - option yn is now behaving like a flag (i.e --ex : if ex.default=True and --ex in sys.args then ex.value=False)
+      - new attribute hide in option (i.e --ex : if --ex has 'hide':True then the option will not be displayed in man or --help)
+
+    * pytest:
+      - add colors in display
+      - new option --restart that skips tests that succeeded on last run
+
+    * cache: new herits from dict class
+
+    * decorators: add @require_version @require_module that skip test if decorators are not satisfied
+
+
+
 2008-10-09  --  0.35.3
     * graph: new has_path method
 
