@@ -29,7 +29,7 @@ try:
     # python >= 2.3
     from optparse import OptionParser as BaseParser, Option as BaseOption, \
          OptionGroup, OptionValueError, OptionError, Values, HelpFormatter, \
-         NO_DEFAULT
+         NO_DEFAULT, SUPPRESS_HELP 
 except ImportError:
     # python < 2.3
     from optik import OptionParser as BaseParser, Option as BaseOption, \
@@ -78,13 +78,13 @@ def check_yn(option, opt, value):
     """check a yn value
     return true for yes and false for no
     """
-    if isinstance(value, int):
-        return bool(value)
     if value in ('y', 'yes'):
         return True
     if value in ('n', 'no'):
         return False
-    msg = "option %s: invalid yn value %r, should be in (y, yes, n, no)"
+    if value in (True, False):
+        return value
+    msg = "option %s: invalid yn value %r, should be True or False"
     raise OptionValueError(msg % (opt, value))
 
 def check_named(option, opt, value):
@@ -153,6 +153,7 @@ class Option(BaseOption):
     """
     TYPES = BaseOption.TYPES + ('regexp', 'csv', 'yn', 'named', 'password',
                                 'multiple_choice', 'file', 'font', 'color')
+    ATTRS = BaseOption.ATTRS + ['hide']
     TYPE_CHECKER = copy(BaseOption.TYPE_CHECKER)
     TYPE_CHECKER['regexp'] = check_regexp
     TYPE_CHECKER['csv'] = check_csv
@@ -165,6 +166,11 @@ class Option(BaseOption):
     if HAS_MX_DATETIME:
         TYPES += ('date',)
         TYPE_CHECKER['date'] = check_date
+
+    def __init__(self, *opts, **attrs):
+        BaseOption.__init__(self, *opts, **attrs)
+        if hasattr(self, "hide") and self.hide:
+            self.help = SUPPRESS_HELP 
 
     def _check_choice(self):
         """FIXME: need to override this due to optik misdesign"""
