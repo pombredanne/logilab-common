@@ -379,7 +379,7 @@ class OptionsManagerMixIn(object):
         """
         # add section to the config file
         if group_name != "DEFAULT":
-          self._config_parser.add_section(group_name)
+            self._config_parser.add_section(group_name)
         # add option group to the command line parser
         if options:
             group = OptionGroup(self._optik_parser,
