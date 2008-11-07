@@ -162,7 +162,7 @@ def password_validator(opt_dict, name, value):
 
 def date_validator(opt_dict, name, value):
     """validate and return a mx DateTime object for option of type 'date'"""
-    return check_password(None, name, value)
+    return check_date(None, name, value)
 
 
 VALIDATORS = {'string' : unquote,
