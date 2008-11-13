@@ -80,7 +80,7 @@ DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
 
 ENABLE_DBC = False
 
-FILE_RESTART = ".restart"
+FILE_RESTART = ".pytest.restart"
 
 
 def with_tempdir(callable):
