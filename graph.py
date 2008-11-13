@@ -105,7 +105,7 @@ class DotBackend:
         """
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
         n_from, n_to = normalize_node_id(name1), normalize_node_id(name2)
-        self.emit('%s -> %s edge [%s];' % (n_from, n_to, ", ".join(attrs)) )
+        self.emit('%s -> %s [%s];' % (n_from, n_to, ", ".join(attrs)) )
 
     def emit_node(self, name, **props):
         """Authorized props: see http://www.graphviz.org/doc/info/attrs.html
