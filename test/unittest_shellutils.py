@@ -5,7 +5,7 @@ from os.path import join
 
 from logilab.common.testlib import TestCase, unittest_main
 
-from logilab.common.shellutils import find, ProgressBar
+from logilab.common.shellutils import globfind, find, ProgressBar
 from StringIO import StringIO
 
 DATA_DIR = join('data','find_test')
@@ -36,10 +36,21 @@ class FindTC(TestCase):
                                                        join('sub', 'doc.txt'),
                                                        'write_protected_file.txt',
                                                        ]]))
-        
-#    def test_exclude_base_dir(self):
-#        self.assertEquals(files_by_ext(DATA_DIR, include_exts=('.py',), exclude_dirs=(DATA_DIR,)),
-#                          [])
+
+    def test_globfind(self):
+        files = set(globfind(DATA_DIR, '*.py'))
+        self.assertSetEqual(files,
+                            set([join(DATA_DIR, f) for f in ['__init__.py', 'module.py',
+                                                       'module2.py', 'noendingnewline.py',
+                                                       'nonregr.py', join('sub', 'momo.py')]]))
+        files = set(globfind(DATA_DIR, 'mo*.py'))
+        self.assertSetEqual(files,
+                            set([join(DATA_DIR, f) for f in ['module.py', 'module2.py',
+                                                             join('sub', 'momo.py')]]))
+        files = set(globfind(DATA_DIR, 'mo*.py', blacklist=('sub',)))
+        self.assertSetEqual(files,
+                            set([join(DATA_DIR, f) for f in ['module.py', 'module2.py']]))
+
 
 class ProgressBarTC(TestCase):
     def test_refresh(self):
