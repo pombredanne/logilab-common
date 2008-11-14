@@ -1,3 +1,9 @@
+logilab-common (0.36.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Fabrice Douchant <fabrice.douchant@logilab.fr>  Thu, 30 Oct 2008 14:48:17 +0100
+
 logilab-common (0.35.3-1) unstable; urgency=low
 
   * new upstream release

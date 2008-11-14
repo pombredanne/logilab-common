@@ -29,7 +29,7 @@ try:
     # python >= 2.3
     from optparse import OptionParser as BaseParser, Option as BaseOption, \
          OptionGroup, OptionValueError, OptionError, Values, HelpFormatter, \
-         NO_DEFAULT
+         NO_DEFAULT, SUPPRESS_HELP 
 except ImportError:
     # python < 2.3
     from optik import OptionParser as BaseParser, Option as BaseOption, \
@@ -153,6 +153,7 @@ class Option(BaseOption):
     """
     TYPES = BaseOption.TYPES + ('regexp', 'csv', 'yn', 'named', 'password',
                                 'multiple_choice', 'file', 'font', 'color')
+    ATTRS = BaseOption.ATTRS + ['hide']
     TYPE_CHECKER = copy(BaseOption.TYPE_CHECKER)
     TYPE_CHECKER['regexp'] = check_regexp
     TYPE_CHECKER['csv'] = check_csv
@@ -165,6 +166,11 @@ class Option(BaseOption):
     if HAS_MX_DATETIME:
         TYPES += ('date',)
         TYPE_CHECKER['date'] = check_date
+
+    def __init__(self, *opts, **attrs):
+        BaseOption.__init__(self, *opts, **attrs)
+        if hasattr(self, "hide") and self.hide:
+            self.help = SUPPRESS_HELP 
 
     def _check_choice(self):
         """FIXME: need to override this due to optik misdesign"""

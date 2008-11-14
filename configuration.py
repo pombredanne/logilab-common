@@ -162,7 +162,7 @@ def password_validator(opt_dict, name, value):
 
 def date_validator(opt_dict, name, value):
     """validate and return a mx DateTime object for option of type 'date'"""
-    return check_password(None, name, value)
+    return check_date(None, name, value)
 
 
 VALIDATORS = {'string' : unquote,
@@ -378,7 +378,8 @@ class OptionsManagerMixIn(object):
         """add an option group including the listed options
         """
         # add section to the config file
-        self._config_parser.add_section(group_name)
+        if group_name != "DEFAULT":
+            self._config_parser.add_section(group_name)
         # add option group to the command line parser
         if options:
             group = OptionGroup(self._optik_parser,

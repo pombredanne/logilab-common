@@ -8,12 +8,13 @@ scripts.
 """
 __docformat__ = "restructuredtext en"
 
-import os        
+import os
 import glob
 import shutil
 import sys
 import tempfile
 import time
+import fnmatch
 from os.path import exists, isdir, islink, basename, join, walk
 
 from logilab.common import STD_BLACKLIST
@@ -141,6 +142,35 @@ def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
     return files
 
 
+def globfind(directory, pattern, blacklist=STD_BLACKLIST):
+    """Recursively finds files matching glob `pattern` under `directory`.
+
+    This is an alternative to `logilab.common.shellutils.find`.
+    
+    :type directory: str
+    :param directory:
+      directory where the search should start
+
+    :type pattern: basestring
+    :param pattern:
+      the glob pattern (e.g *.py, foo*.py, etc.)
+
+    :type blacklist: list or tuple
+    :param blacklist:
+      optional list of files or directory to ignore, default to the value of
+      `logilab.common.STD_BLACKLIST`
+
+    :rtype: iterator
+    :return:
+      iterator over the list of all matching files
+    """
+    for curdir, dirnames, filenames in os.walk(directory):
+        for fname in fnmatch.filter(filenames, pattern):
+            yield join(curdir, fname)
+        for skipped in blacklist:
+            if skipped in dirnames:
+                dirnames.remove(skipped)
+
 def unzip(archive, destdir):
     import zipfile
     if not exists(destdir):
@@ -153,7 +183,6 @@ def unzip(archive, destdir):
             outfile = open(join(destdir, name), 'wb')
             outfile.write(zfobj.read(name))
             outfile.close()
-
 
 class Execute:
     """This is a deadlock safe version of popen2 (no stdin), that returns

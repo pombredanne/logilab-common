@@ -583,7 +583,7 @@ def make_parser():
                       dest="exitfirst", default=False,
                       action="callback", help="Exit on first failure "
                       "(only make sense when pytest run one test file)")
-    parser.add_option('-r', '--restart', callback=rebuild_and_store,
+    parser.add_option('-R', '--restart', callback=rebuild_and_store,
                       dest="restart", default=False,
                       action="callback",
                       help="Restart tests from where it failed (implies exitfirst) "
