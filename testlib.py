@@ -38,6 +38,7 @@ import unittest
 import difflib
 import types
 import tempfile
+import math
 from shutil import rmtree
 from operator import itemgetter
 from warnings import warn
@@ -1592,6 +1593,12 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         if msg is None:
             msg = "unexpected reference to None"
         self.assert_( obj is not None, msg )
+
+    def assertFloatEquals(self, obj, other, prec=1e-5, msg=None):
+        """compares two floats"""
+        if msg is None:
+            msg = "%r != %r" % (obj, other)
+        self.assert_(math.fabs(obj - other) < prec)
     
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
         """override default failUnlessRaise method to return the raised
