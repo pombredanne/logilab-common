@@ -1594,7 +1594,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             msg = "unexpected reference to None"
         self.assert_( obj is not None, msg )
 
-    def assertFloatEquals(self, obj, other, prec=1e-5, msg=None):
+    def assertFloatAlmostEquals(self, obj, other, prec=1e-5, msg=None):
         """compares two floats"""
         if msg is None:
             msg = "%r != %r" % (obj, other)
