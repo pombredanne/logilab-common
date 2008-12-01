@@ -38,6 +38,11 @@ except ImportError:
         from optik import NO_DEFAULT
     except:
         NO_DEFAULT = []
+    # XXX check SUPPRESS_HELP availability
+    try:
+        from optik import SUPPRESS_HELP
+    except:
+        SUPPRESS_HELP = None
 
 try:
     from mx import DateTime
