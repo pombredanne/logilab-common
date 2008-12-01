@@ -1,6 +1,14 @@
 ChangeLog for logilab.common
 ============================
 
+--
+    * contexts: new module for context managers, keeping py <2.4 syntax compat
+      for distribution (only `tempdir` cm for now)
+    * tasksqueue: new module containing a class to handle prioritized tasks queue
+    * proc: new module for process information / resource control
+    * optik_ext: new time/bytes option types, using textutils conversion function
+	
+	
 2008-10-30  --  0.36.0
     * configuration:
       - option yn is now behaving like a flag (i.e --ex : if ex.default=True and --ex in sys.args then ex.value=False)
