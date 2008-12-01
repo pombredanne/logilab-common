@@ -11,7 +11,23 @@ It also defines three new types for optik/optparse command line parser :
     argument of this type will be true if 'y' or 'yes', false if 'n' or 'no'
   * named
     argument of this type are in the form <NAME>=<VALUE> or <NAME>:<VALUE>
-
+  * password
+    argument of this type wont be converted but this is used by other tools
+    such as interactive prompt for configuration to double check value and
+    use an invisible field
+  * multiple_choice
+    same as default "choice" type but multiple choices allowed
+  * file
+    argument of this type wont be converted but checked that the given file exists
+  * color
+    argument of this type wont be converted but checked its either a
+    named color or a color specified using hexadecimal notation (preceded by a #)
+  * time
+    argument of this type will be converted to a float value in seconds
+    according to time units (ms, s, min, h, d)
+  * bytes
+    argument of this type will be converted to a float value in bytes
+    according to byte units (b, kb, mb, gb, tb)
 
 :copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
