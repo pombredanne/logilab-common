@@ -151,13 +151,22 @@ def check_color(option, opt, value):
     value or predefinied color"
     raise OptionValueError(msg % (opt, value))
 
+def check_time(option, opt, value):
+    from logilab.common.textutils import TIME_UNITS, apply_units
+    apply_unit(value, TIME_UNITS)
+
+def check_bytes(option, opt, value):
+    from logilab.common.textutils import BYTES_UNITS, apply_units
+    apply_unit(value, BYTES_UNITS)
+    
 import types
 
 class Option(BaseOption):
     """override optik.Option to add some new option types
     """
     TYPES = BaseOption.TYPES + ('regexp', 'csv', 'yn', 'named', 'password',
-                                'multiple_choice', 'file', 'font', 'color')
+                                'multiple_choice', 'file', 'color',
+                                'time', 'bytes')
     ATTRS = BaseOption.ATTRS + ['hide']
     TYPE_CHECKER = copy(BaseOption.TYPE_CHECKER)
     TYPE_CHECKER['regexp'] = check_regexp
@@ -168,6 +177,8 @@ class Option(BaseOption):
     TYPE_CHECKER['file'] = check_file
     TYPE_CHECKER['color'] = check_color
     TYPE_CHECKER['password'] = check_password
+    TYPE_CHECKER['time'] = check_time
+    TYPE_CHECKER['bytes'] = check_bytes
     if HAS_MX_DATETIME:
         TYPES += ('date',)
         TYPE_CHECKER['date'] = check_date
