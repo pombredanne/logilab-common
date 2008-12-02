@@ -789,6 +789,9 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
     def load_defaults(self):
         OptionsProviderMixIn.load_defaults(self)
 
+    def __iter__(self):
+        return iter(self.config)
+    
     def __getitem__(self, key):
         try:
             return getattr(self.config, self.option_name(key))
