@@ -1,6 +1,6 @@
 """module providing:
 * process information (linux specific: rely on /proc)
-* a class for resource (memory / cpu time) control
+* a class for resource control (memory / time / cpu time)
 
 :organization: Logilab
 :copyright: 2007-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
@@ -100,7 +100,6 @@ class ProcInfoLoader:
                 pass
 
 
-
 import tempfile
 import traceback
 from signal import signal, SIGXCPU, SIGKILL, SIGUSR2, SIGUSR1
@@ -109,7 +108,6 @@ from threading import Timer, currentThread, Thread, Event
 from time import time
 
 from resource import getrlimit, setrlimit, RLIMIT_CPU, RLIMIT_AS
-
 
 try:
     class ResourceError(BaseException):
