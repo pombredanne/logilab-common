@@ -850,8 +850,8 @@ Examples:
                                 el._testMethodName))
                         if descr in succTests:
                             obj.remove(el)
-
-        if self.options.restart:
+        # take care, self.options may be None
+        if getattr(self.options, 'restart', False):
             # retrieve succeeded tests from FILE_RESTART
             try:
                 restartfile = open(FILE_RESTART, 'r')
