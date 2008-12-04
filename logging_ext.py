@@ -8,9 +8,19 @@
 """
 __docformat__ = "restructuredtext en"
 
+import os
+import sys
 import logging
 
 from logilab.common.textutils import colorize_ansi
+
+
+def set_log_methods(cls, logger):
+    """bind standart logger's methods as methods on the class"""
+    cls.__logger = logger
+    for attr in ('lldebug', 'debug', 'info', 'warning', 'error', 'critical', 'exception'):
+        setattr(cls, attr, getattr(logger, attr))
+
 
 def xxx_cyan(record):
     if 'XXX' in record.message:
@@ -70,3 +80,63 @@ def set_color_formatter(logger=None, **kw):
     fmt = ColorFormatter(format_msg, **kw)
     fmt.colorfilters.append(xxx_cyan)
     logger.handlers[0].setFormatter(fmt)
+
+
+LOG_FORMAT = '%(asctime)s - (%(name)s) %(levelname)s: %(message)s'
+LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
+             logformat=LOG_FORMAT, logdateformat=LOG_DATE_FORMAT):
+    """init the log service"""
+    if os.environ.get('APYCOT_ROOT'):
+        logthreshold = logging.CRITICAL
+        # redirect logs to stdout to avoid apycot output parsing failure
+        handler = logging.StreamHandler(sys.stdout)
+    else:
+        if debug:
+            logthreshold = logging.DEBUG
+            handler = logging.StreamHandler()
+        elif logfile is None:
+            if syslog:
+                from logging import handlers
+                handler = handlers.SysLogHandler()
+            else:
+                handler = logging.StreamHandler()
+        else:
+            try:
+                handler = logging.FileHandler(logfile)
+            except IOError:
+                handler = logging.StreamHandler()
+        if logthreshold is None:
+            logthreshold = logging.ERROR
+        elif isinstance(logthreshold, basestring):
+            logthreshold = getattr(logging, THRESHOLD_MAP.get(logthreshold,
+                                                              logthreshold))
+    # configure the root logger
+    logger = logging.getLogger()
+    logger.setLevel(logthreshold)
+    # only addHandler and removeHandler method while I would like a
+    # setHandler method, so do it this way :$
+    logger.handlers = [handler]
+    isatty = hasattr(sys.__stdout__, 'isatty') and sys.__stdout__.isatty()
+    if debug and isatty:
+        fmt = ColorFormatter(logformat, logdateformat)
+        def col_fact(record):
+            if 'XXX' in record.message:
+                return 'cyan'
+            if 'kick' in record.message:
+                return 'red'
+        fmt.colorfilters.append(col_fact)
+    else:
+        fmt = logging.Formatter(logformat, logdateformat)
+    handler.setFormatter(fmt)
+    return handler
+
+# map logilab.common.logger thresholds to logging thresholds
+THRESHOLD_MAP = {'LOG_DEBUG':  'DEBUG',
+                 'LOG_INFO':   'INFO',
+                 'LOG_NOTICE': 'INFO',
+                 'LOG_WARN':   'WARNING',
+                 'LOG_ERR':    'ERROR',
+                 'LOG_CRIT':   'CRITICAL',
+                 }

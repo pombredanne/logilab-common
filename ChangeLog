@@ -7,7 +7,7 @@ ChangeLog for logilab.common
     * tasksqueue: new module containing a class to handle prioritized tasks queue
     * proc: new module for process information / resource control
     * optik_ext: new time/bytes option types, using textutils conversion function
-	
+    * logging_ext: new set_log_methods / init_log utility functions	
 	
 2008-10-30  --  0.36.0
     * configuration:
