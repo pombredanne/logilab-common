@@ -790,7 +790,7 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
         OptionsProviderMixIn.load_defaults(self)
 
     def __iter__(self):
-        return iter(self.config)
+        return iter(self.config.__dict__.iteritems())
     
     def __getitem__(self, key):
         try:
