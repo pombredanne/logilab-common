@@ -94,7 +94,6 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
         handler = logging.StreamHandler(sys.stdout)
     else:
         if debug:
-            logthreshold = logging.DEBUG
             handler = logging.StreamHandler()
         elif logfile is None:
             if syslog:
