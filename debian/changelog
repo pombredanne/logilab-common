@@ -1,3 +1,9 @@
+logilab-common (0.37.0-1) DISTRIBUTION; urgency=low
+
+  * new upstream release
+
+ -- Adrien Di Mascio <Adrien.DiMascio@logilab.fr>  Tue, 09 Dec 2008 10:56:23 +0100
+
 logilab-common (0.36.1-1) DISTRIBUTION; urgency=low
 
   * new upstream release
