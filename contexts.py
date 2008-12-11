@@ -1,20 +1,27 @@
-try:
-    from contextlib import contextmanager
-except ImportError:
-    # py < 2.5
-    pass
-else:
+"""A few useful context managers 
+
+:copyright: 2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
+:license: General Public License version 2 - http://www.gnu.org/licenses
+"""
+__docformat__ = "restructuredtext en"
+
+import sys
+
+if sys.version_info < (2, 5):
+    raise ImportError("python >= 2.5 is required to import logilab.common.contexts")
+
+import tempfile
+import shutil
+
+class tempdir(object):
+
+    def __enter__(self):
+        self.path = tempfile.mkdtemp()
+        return self.path
+
+    def __exit__(self, exctype, value, traceback):
+        # rmtree in all cases
+        shutil.rmtree(self.path)
+        return traceback is None
     
-    import tempfile
-    import shutil
-
-    def tempdir():
-        try:
-            path = tempfile.mkdtemp()
-            yield path
-        finally:
-            shutil.rmtree(path)
-
-    # keep py < 2.4 syntax compat to avoid distribution pb
-    tempdir = contextmanager(tempdir)
-
