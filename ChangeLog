@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+2008-12-11  --  0.37.1
+   * contexts: make the module syntactically correct wrt python2.4
+
+
 2008-12-09  --  0.37.0
     * contexts: new module for context managers, keeping py <2.4 syntax compat
       for distribution (only `tempdir` cm for now)
