@@ -465,6 +465,8 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
     TYPE_MAPPING['Password'] = 'tinyblob'
     TYPE_MAPPING['String'] = 'mediumtext'
     TYPE_MAPPING['Bytes'] = 'longblob'
+    # don't use timestamp which is automatically updated on row update
+    TYPE_MAPPING['Datetime'] = 'datetime'
     
     def system_database(self):
         """return the system database for the given driver"""
