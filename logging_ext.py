@@ -18,7 +18,7 @@ from logilab.common.textutils import colorize_ansi
 def set_log_methods(cls, logger):
     """bind standart logger's methods as methods on the class"""
     cls.__logger = logger
-    for attr in ('lldebug', 'debug', 'info', 'warning', 'error', 'critical', 'exception'):
+    for attr in ('debug', 'info', 'warning', 'error', 'critical', 'exception'):
         setattr(cls, attr, getattr(logger, attr))
 
 
