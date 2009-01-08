@@ -1,22 +1,32 @@
 ChangeLog for logilab.common
 ============================
 
- --
-   * configuration: encoding handling for configuration file generation
-   * adbh: fix Datetime type map for mysql
-   * logging_ext: drop lldebug level which shouldn't be there
-	
+2009-01-08  --  0.37.2
+    * configuration: encoding handling for configuration file generation
+
+    * adbh: fix Datetime type map for mysql
+
+    * logging_ext: drop lldebug level which shouldn't be there
+
+
+
 2008-12-11  --  0.37.1
-   * contexts: make the module syntactically correct wrt python2.4
+    * contexts: make the module syntactically correct wrt python2.4
+
 
 
 2008-12-09  --  0.37.0
     * contexts: new module for context managers, keeping py <2.4 syntax compat
       for distribution (only `tempdir` cm for now)
+
     * tasksqueue: new module containing a class to handle prioritized tasks queue
+
     * proc: new module for process information / resource control
+
     * optik_ext: new time/bytes option types, using textutils conversion function
-    * logging_ext: new set_log_methods / init_log utility functions	
+
+    * logging_ext: new set_log_methods / init_log utility functions
+
 
 
 2008-10-30  --  0.36.0

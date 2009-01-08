@@ -8,7 +8,7 @@ __docformat__ = "restructuredtext en"
 
 distname = 'logilab-common'
 modname = 'common'
-numversion = (0, 37, 1)
+numversion = (0, 37, 2)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
