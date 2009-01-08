@@ -1,6 +1,6 @@
 """logilab.common packaging information.
 
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -12,7 +12,7 @@ numversion = (0, 37, 1)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
-copyright = '''Copyright (c) 2003-2008 LOGILAB S.A. (Paris, FRANCE).
+copyright = '''Copyright (c) 2003-2009 LOGILAB S.A. (Paris, FRANCE).
 http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
 
 author = "Logilab"
