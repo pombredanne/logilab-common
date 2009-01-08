@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+   * configuration: encoding handling for configuration file generation
+   * adbh: fix Datetime type map for mysql
+   * logging_ext: drop lldebug level which shouldn't be there
+	
 2008-12-11  --  0.37.1
    * contexts: make the module syntactically correct wrt python2.4
 
