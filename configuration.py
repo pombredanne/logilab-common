@@ -112,6 +112,20 @@ REQUIRED = []
 class UnsupportedAction(Exception):
     """raised by set_option when it doesn't know what to do for an action"""
 
+
+def _get_encoding(encoding, stream):
+    encoding = encoding or stream.encoding
+    if not encoding:
+        import locale
+        encoding = locale.getpreferredencoding()
+    return encoding
+
+def _encode(string, encoding):
+    if isinstance(string, unicode):
+        return string.encode(encoding)
+    return str(string)
+
+
 # validation functions ########################################################
 
 def choice_validator(opt_dict, name, value):
@@ -286,42 +300,48 @@ def format_option_value(optdict, value):
         value = "'%s'" % value
     return value
 
-def ini_format_section(stream, section, options, doc=None):
+def ini_format_section(stream, section, options, encoding=None, doc=None):
     """format an options section using the INI format"""
+    encoding = _get_encoding(encoding, stream)
     if doc:
-        print >> stream, comment(doc)
+        print >> stream, _encode(comment(doc), encoding)
     print >> stream, '[%s]' % section
     for optname, optdict, value in options:
         value = format_option_value(optdict, value)
         help = optdict.get('help')
         if help:
+            help = normalize_text(help, line_len=79, indent='# ')
             print >> stream
-            print >> stream, normalize_text(help, line_len=79, indent='# ')
+            print >> stream, _encode(help, encoding)
         else:
             print >> stream
         if value is None:
             print >> stream, '#%s=' % optname
         else:
-            print >> stream, '%s=%s' % (optname, str(value).strip())
+            value = _encode(value, encoding).strip()
+            print >> stream, '%s=%s' % (optname, value)
         
 format_section = ini_format_section
 
-def rest_format_section(stream, section, options, doc=None):
+def rest_format_section(stream, section, options, encoding=None, doc=None):
     """format an options section using the INI format"""
+    encoding = _get_encoding(encoding, stream)
     if section:
         print >> stream, '%s\n%s' % (section, "'"*len(section))
     if doc:
-        print >> stream, normalize_text(doc, line_len=79, indent='')
+        print >> stream, _encode(normalize_text(doc, line_len=79, indent=''),
+                                 encoding)
         print >> stream
     for optname, optdict, value in options:
         help = optdict.get('help')
         print >> stream, ':%s:' % optname
         if help:
-            print >> stream, normalize_text(help, line_len=79, indent='  ')
+            help = normalize_text(help, line_len=79, indent='  ')
+            print >> stream, _encode(help, encoding)
         if value:
+            value = _encode(format_option_value(optdict, value), encoding)
             print >> stream, ''
-            print >> stream, '  Default: ``%s``' % str(
-                format_option_value(optdict, value)).replace("`` ","```` ``")
+            print >> stream, '  Default: ``%s``' % value.replace("`` ","```` ``")
 
 
 class OptionsManagerMixIn(object):
@@ -436,11 +456,12 @@ class OptionsManagerMixIn(object):
         """set option on the correct option provider"""
         self._all_options[opt_name].set_option(opt_name, value)
 
-    def generate_config(self, stream=None, skipsections=()):
+    def generate_config(self, stream=None, skipsections=(), encoding=None):
         """write a configuration file according to the current configuration
         into the given stream or stdout
         """
         stream = stream or sys.stdout
+        encoding = _get_encoding(encoding, stream)
         printed = False
         for provider in self.options_providers:
             default_options = []
@@ -459,7 +480,7 @@ class OptionsManagerMixIn(object):
                     doc = None
                 if printed:
                     print >> stream, '\n'
-                format_section(stream, section.upper(), options, doc)
+                format_section(stream, section.upper(), options, encoding, doc)
                 printed = True
 
     def generate_manpage(self, pkginfo, section=1, stream=None):
