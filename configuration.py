@@ -515,7 +515,11 @@ class OptionsManagerMixIn(object):
         if config_file is not None:
             config_file = expanduser(config_file)
         if config_file and exists(config_file):
-            self._config_parser.read([config_file])
+            parser = self._config_parser
+            parser.read([config_file])
+            # normalize sections'title
+            for sect in parser._sections.keys():
+                parser._sections[sect.upper()] = parser._sections[sect]
         elif not self.quiet:
             msg = 'No config file found, using default configuration'
             print >> sys.stderr, msg
