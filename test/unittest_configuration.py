@@ -20,6 +20,10 @@ options = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar
                                 'metavar':'<yo|ye>'}),
            ('named', {'type':'named', 'default':Method('get_named'),
                       'metavar': '<key=val>'}),
+
+           ('diffgroup', {'type':'string', 'default':'pouet', 'metavar': '<key=val>',
+                          'group': 'agroup'}),
+           
            ]
 
 class MyConfiguration(Configuration):
@@ -92,30 +96,33 @@ class ConfigurationTC(TestCase):
             stream.write("""# test configuration
 [Test]
 
-dothis=yes
+dothis=no
 
 #value=
 
 # you can also document the option
-multiple=yop,yep
+multiple=yop,yepii
 
 # boom
-number=2
+number=3
 
 choice=yo
 
 multiple-choice=yo,ye
 
 named=key:val
+
+
+[agroup]
+
+diffgroup=zou
 """)
+            stream.close()
             self.cfg.load_file_configuration(file)
-            self.assertEquals(self.cfg['dothis'], True)
+            self.assertEquals(self.cfg['dothis'], False)
             self.assertEquals(self.cfg['value'], None)
-            self.assertEquals(self.cfg['multiple'], ('yop','yep'))
-            self.assertEquals(self.cfg['number'], 2)
-            self.assertEquals(self.cfg['choice'], 'yo')
-            self.assertEquals(self.cfg['multiple-choice'], ('yo', 'ye'))
-            self.assertEquals(self.cfg['named'], {'key': 'val'})
+            self.assertEquals(self.cfg['multiple'], ['yop','yepii'])
+            self.assertEquals(self.cfg['diffgroup'], 'zou')
         finally:
             os.remove(file)
         
@@ -140,6 +147,11 @@ choice=yo
 multiple-choice=yo,ye
 
 named=key:val
+
+
+[AGROUP]
+
+diffgroup=pouet
 """)
         
     def test_generate_config_with_space_string(self):
@@ -164,6 +176,11 @@ choice=yo
 multiple-choice=yo,ye
 
 named=key:val
+
+
+[AGROUP]
+
+diffgroup=pouet
 """)
         
 
@@ -206,6 +223,9 @@ Options:
   --choice=<yo|ye>      
   --multiple-choice=<yo|ye>
   --named=<key=val>     
+
+  Agroup:
+    --diffgroup=<key=val>
 
   Bonus:
     a nice additional help
@@ -275,6 +295,11 @@ choice=yo
 multiple-choice=yo,ye
 
 named=key:val
+
+
+[AGROUP]
+
+diffgroup=pouet
 """)
         
 class Linter(OptionsManagerMixIn, OptionsProviderMixIn):

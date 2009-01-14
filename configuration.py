@@ -114,7 +114,7 @@ class UnsupportedAction(Exception):
 
 
 def _get_encoding(encoding, stream):
-    encoding = encoding or stream.encoding
+    encoding = encoding or getattr(stream, 'encoding', None)
     if not encoding:
         import locale
         encoding = locale.getpreferredencoding()
@@ -390,8 +390,9 @@ class OptionsManagerMixIn(object):
                 
                 self._all_options[opt_name] = provider
         for gname, gdoc in groups:
+            gname = gname.upper()
             goptions = [option for option in provider.options
-                        if option[1].get('group') == gname]
+                        if option[1].get('group', '').upper() == gname]
             self.add_option_group(gname, gdoc, goptions, provider)
         
     def add_option_group(self, group_name, doc, options, provider):
@@ -518,8 +519,9 @@ class OptionsManagerMixIn(object):
             parser = self._config_parser
             parser.read([config_file])
             # normalize sections'title
-            for sect in parser._sections.keys():
-                parser._sections[sect.upper()] = parser._sections[sect]
+            for sect, values in parser._sections.items():
+                if not sect.isupper() and values:
+                    parser._sections[sect.upper()] = values
         elif not self.quiet:
             msg = 'No config file found, using default configuration'
             print >> sys.stderr, msg
@@ -795,7 +797,7 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
             self.option_groups = []
             for option, optdict in self.options:
                 try:
-                    gdef = (optdict['group'], '')
+                    gdef = (optdict['group'].upper(), '')
                 except KeyError:
                     continue
                 if not gdef in self.option_groups:
