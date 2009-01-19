@@ -219,7 +219,7 @@ def acquire_lock(lock_file, max_try=10, delay=10):
                     # only print the message one time
                     if count == max_try:
                         diff = (int(time.time()) - pi.age()) / 60
-                        print("Command '%s' (pid %s) have locked the file '%s' for %s minutes.\nWaiting..." % (pi.name(), pid, lock_file, diff))
+                        print("Command '%s' (pid %s) has locked the file '%s' for %s minutes.\nWaiting..." % (pi.name(), pid, lock_file, diff))
                 except NoSuchProcess:
                     raise NoSuchProcess('You can delete the lock file "%s" safely' % lock_file)
                 except:
