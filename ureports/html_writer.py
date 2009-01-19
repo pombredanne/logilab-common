@@ -22,9 +22,9 @@ from logilab.common.ureports import BaseWriter
 class HTMLWriter(BaseWriter):
     """format layouts as HTML"""
     
-    def __init__(self, snipet=None):
+    def __init__(self, snippet=None):
         super(HTMLWriter, self).__init__()
-        self.snipet = snipet
+        self.snippet = snippet
         
     def handle_attrs(self, layout):
         """get an attribute string from layout member attributes"""
@@ -40,13 +40,13 @@ class HTMLWriter(BaseWriter):
     def begin_format(self, layout):
         """begin to format a layout"""
         super(HTMLWriter, self).begin_format(layout)
-        if self.snipet is None:
+        if self.snippet is None:
             self.writeln('<html>')
             self.writeln('<body>')
         
     def end_format(self, layout):
         """finished to format a layout"""
-        if self.snipet is None:
+        if self.snippet is None:
             self.writeln('</body>')
             self.writeln('</html>')
 

@@ -23,7 +23,7 @@ class DocbookWriter(HTMLWriter):
     def begin_format(self, layout):
         """begin to format a layout"""
         super(HTMLWriter, self).begin_format(layout)
-        if self.snipet is None:
+        if self.snippet is None:
             self.writeln('<?xml version="1.0" encoding="ISO-8859-1"?>')
             self.writeln("""
 <book xmlns:xi='http://www.w3.org/2001/XInclude'
@@ -32,7 +32,7 @@ class DocbookWriter(HTMLWriter):
     
     def end_format(self, layout):
         """finished to format a layout"""
-        if self.snipet is None:
+        if self.snippet is None:
             self.writeln('</book>')
 
     def visit_section(self, layout):

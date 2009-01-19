@@ -92,7 +92,7 @@ ChangeLog for logilab.common
       - added assertDirEquals
       - various failure ouput improvement
 
-    * umessage: umessage.date() mayreturn unparsage string as is instead of None
+    * umessage: umessage.date() may return unparsable string as is instead of None
 
     * compat: adds a max function taking 'key' as keyword argument as in 2.5
 
