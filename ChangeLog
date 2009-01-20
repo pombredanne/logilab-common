@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+    * reimplemented pytest's colorization
+	
+	
 2009-01-08  --  0.37.2
     * configuration: encoding handling for configuration file generation
 
