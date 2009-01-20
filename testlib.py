@@ -45,9 +45,6 @@ from warnings import warn
 from compiler.consts import CO_GENERATOR
 from ConfigParser import ConfigParser
 
-
-# PRINT_ = file('stdout.txt', 'w').write
-
 try:
     from test import test_support
 except ImportError:
@@ -73,6 +70,7 @@ from logilab.common.modutils import load_module_from_name
 from logilab.common.debugger import Debugger
 from logilab.common.decorators import cached
 from logilab.common import textutils
+        
 
 __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 
@@ -82,6 +80,9 @@ DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
 ENABLE_DBC = False
 
 FILE_RESTART = ".pytest.restart"
+
+# used by unittest to count the number of relevant levels in the traceback
+__unittest = 1
 
 
 def with_tempdir(callable):
