@@ -592,6 +592,9 @@ def make_parser():
                       action="callback", 
                       help="Captures and prints standard out/err only on errors "
                       "(only make sense when pytest run one test file)")
+    parser.add_option('--color', callback=rebuild_cmdline,
+                      action="callback", 
+                      help="colorize tracebacks")
     parser.add_option('-p', '--printonly',
                       # XXX: I wish I could use the callback action but it
                       #      doesn't seem to be able to get the value
