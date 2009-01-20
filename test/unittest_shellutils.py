@@ -2,6 +2,7 @@
 
 import sys, os, tempfile, shutil
 from os.path import join
+import datetime, time
 
 from logilab.common.testlib import TestCase, unittest_main
 
@@ -147,7 +148,20 @@ class AcquireLockTC(TestCase):
         os.write(fd, '1111111111')
         os.close(fd)
         self.assertTrue(os.path.exists(self.lock))
-        self.assertRaises(NoSuchProcess, acquire_lock, self.lock)
+        self.assertRaises(Exception, acquire_lock, self.lock, 1, 1)
+
+    def test_wrong_process_and_continue(self):
+        fd = os.open(self.lock, os.O_EXCL | os.O_RDWR | os.O_CREAT)
+        os.write(fd, '1111111111')
+        os.close(fd)
+        self.assertTrue(os.path.exists(self.lock))
+        self.assertTrue(acquire_lock(self.lock))
+
+    def test_locked_for_one_hour(self):
+        self.assertTrue(acquire_lock(self.lock))
+        touch = datetime.datetime.fromtimestamp(time.time() - 3601).strftime("%m%d%H%M")
+        os.system("touch -t %s %s" % (touch, self.lock))
+        self.assertRaises(UserWarning, acquire_lock, self.lock, max_try=2, delay=1)
 
 
 if __name__ == '__main__':

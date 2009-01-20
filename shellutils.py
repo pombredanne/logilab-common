@@ -11,6 +11,7 @@ __docformat__ = "restructuredtext en"
 import os
 import glob
 import shutil
+import stat
 import sys
 import tempfile
 import time
@@ -201,8 +202,13 @@ class Execute:
         os.remove(outfile)
         os.remove(errfile)
 
-def acquire_lock(lock_file, max_try=10, delay=10):
-    """Acquire a lock represented by a file on the file system."""
+def acquire_lock(lock_file, max_try=10, delay=10, max_delay=3600):
+    """Acquire a lock represented by a file on the file system
+
+    If the process written in lock file doesn't exist anymore, we remove the
+    lock file immediately
+    If age of the lock_file is greater than max_delay, then we raise a UserWarning
+    """
     count = abs(max_try)
     while count:
         try:
@@ -216,14 +222,20 @@ def acquire_lock(lock_file, max_try=10, delay=10):
                     fd = open(lock_file, "r")
                     pid = int(fd.readline())
                     pi = ProcInfo(pid)
-                    # only print the message one time
-                    if count == max_try:
-                        diff = (int(time.time()) - pi.age()) / 60
-                        print("Command '%s' (pid %s) has locked the file '%s' for %s minutes.\nWaiting..." % (pi.name(), pid, lock_file, diff))
+                    age = (time.time() - os.stat(lock_file)[stat.ST_MTIME])
+                    if age / max_delay > 1 :
+                        raise UserWarning("Command '%s' (pid %s) has locked the "
+                                          "file '%s' for %s minutes"
+                                          % (pi.name(), pid, lock_file, age/60))
+                except UserWarning:
+                    raise
                 except NoSuchProcess:
-                    raise NoSuchProcess('You can delete the lock file "%s" safely' % lock_file)
-                except:
-                    # process information are not accessible
+                    os.remove(lock_file)
+                except Exception:
+                    # The try block is not essential. can be skipped.
+                    # Note: ProcInfo object is only available for linux
+                    # process information are not accessible...
+                    # or lock_file is no more present...
                     pass
             else:
                 raise
