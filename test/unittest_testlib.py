@@ -608,12 +608,22 @@ class OutErrCaptureTC(TestCase):
         bootstrap_print("hello")
         self.assertEquals(output.restore(), "hello")
         
-    def test_exotic_unicode_string(self):
+    def test_unicode_non_ascii_messages(self):
         class FooTC(TestCase):
             def test_xxx(self):
                 raise Exception(u'\xe9')
         test = FooTC('test_xxx')
+        # run the test and make sure testlib doesn't raise an exception
         result = self.runner.run(test)
+        
+    def test_encoded_non_ascii_messages(self):
+        class FooTC(TestCase):
+            def test_xxx(self):
+                raise Exception('\xe9')
+        test = FooTC('test_xxx')
+        # run the test and make sure testlib doesn't raise an exception
+        result = self.runner.run(test)
+
 
 class DecoratorTC(TestCase):
     

@@ -28,9 +28,13 @@ except ImportError:
     def colorize(source, *args):
         """fallback colorize function"""
         return source
+    def colorize_source(source, *args):
+        return source
 else:
     def colorize(source, start_lineno, curlineno):
-        """"""
+        """colorize and annotate source with linenos
+        (as in pdb's list command)
+        """
         parser = PyColorize.Parser()
         output = StringIO()
         parser.format(source, output)
@@ -42,6 +46,14 @@ else:
             else:
                 annotated.append('%4s\t\t%s' % (lineno, line))                
         return '\n'.join(annotated)
+
+    def colorize_source(source):
+        """colorize given source"""
+        parser = PyColorize.Parser()
+        output = StringIO()
+        parser.format(source, output)
+        return output.getvalue()
+    
 
 def getsource(obj):
     """Return the text of the source code for an object.

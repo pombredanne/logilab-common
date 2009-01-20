@@ -34,6 +34,7 @@ import re
 import time
 import getopt
 import traceback
+import inspect
 import unittest
 import difflib
 import types
@@ -45,9 +46,6 @@ from warnings import warn
 from compiler.consts import CO_GENERATOR
 from ConfigParser import ConfigParser
 
-
-# PRINT_ = file('stdout.txt', 'w').write
-
 try:
     from test import test_support
 except ImportError:
@@ -57,22 +55,16 @@ except ImportError:
             pass
     test_support = TestSupport()
 
-try:
-    from pygments import highlight, lexers, formatters
-    # only print in color if executed from a terminal
-    PYGMENTS_FOUND = True
-except ImportError:
-    PYGMENTS_FOUND = False
-
 from logilab.common.deprecation import class_renamed, deprecated_function, \
      obsolete
 # pylint: disable-msg=W0622
-from logilab.common.compat import set, enumerate, any
+from logilab.common.compat import set, enumerate, any, sorted
 # pylint: enable-msg=W0622
 from logilab.common.modutils import load_module_from_name
-from logilab.common.debugger import Debugger
+from logilab.common.debugger import Debugger, colorize_source
 from logilab.common.decorators import cached
 from logilab.common import textutils
+        
 
 __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 
@@ -82,6 +74,9 @@ DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
 ENABLE_DBC = False
 
 FILE_RESTART = ".pytest.restart"
+
+# used by unittest to count the number of relevant levels in the traceback
+__unittest = 1
 
 
 def with_tempdir(callable):
@@ -100,6 +95,7 @@ def with_tempdir(callable):
             finally:
                 tempfile.tempdir = old_tmpdir
     return proxy
+
 
 def main(testdir=None, exitafter=True):
     """Execute a test suite.
@@ -353,7 +349,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def __init__(self, stream, descriptions, verbosity,
                  exitfirst=False, capture=0, printonly=None,
-                 pdbmode=False, cvg=None):
+                 pdbmode=False, cvg=None, colorize=False):
         super(SkipAwareTestResult, self).__init__(stream,
                                                   descriptions, verbosity)
         self.skipped = []
@@ -365,7 +361,9 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.printonly = printonly
         self.pdbmode = pdbmode
         self.cvg = cvg
+        self.colorize = colorize
         self.pdbclass = Debugger
+        self.verbose = verbosity > 1
 
     def descrs_for(self, flavour):
         return getattr(self, '%s_descrs' % flavour.lower())
@@ -374,6 +372,45 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.descrs_for(flavour).append( (len(self.debuggers), test_descr) )
         if self.pdbmode:
             self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
+
+    def _exc_info_to_string(self, err, test):
+        """Converts a sys.exc_info()-style tuple of values into a string.
+
+        This method is overridden here because we want to colorize
+        lines if --color is passed, and display local variables if
+        --verbose is passed
+        """
+        exctype, exc, tb = err
+        output = ['Traceback (most recent call last)']
+        frames = inspect.getinnerframes(tb)
+        colorize = self.colorize
+        # count number of relevant levels in the traceback: skip first since
+        # it's our own _proceed function, and then start counting, using
+        # unittest's heuristic
+        nb_frames_skipped = self._count_relevant_tb_levels(tb.tb_next)
+        for index, (frame, filename, lineno, funcname, ctx, ctxindex) in enumerate(frames):
+            if not (0 < index <= nb_frames_skipped):
+                continue
+            filename = osp.abspath(filename)
+            source = ''.join(ctx)
+            if colorize:
+                filename = textutils.colorize_ansi(filename, 'magenta')
+                source = colorize_source(source)
+            output.append('  File "%s", line %s, in %s' % (filename, lineno, funcname))
+            output.append('    %s' % source.strip())
+            if self.verbose:
+                output.append('%r == %r' % (dir(frame), test.__module__))
+                output.append('')
+                output.append('    ' + ' local variables '.center(66, '-'))
+                for varname, value in sorted(frame.f_locals.items()):
+                    output.append('    %s: %r' % (varname, value))
+                    if varname == 'self': # special handy processing for self
+                        for varname, value in sorted(vars(value).items()):
+                            output.append('      self.%s: %r' % (varname, value))
+                output.append('    ' + '-' * 66)
+                output.append('')
+        output.append(''.join(traceback.format_exception_only(exctype, exc)))
+        return '\n'.join(output)
 
     def addError(self, test, err):
         """err ==  (exc_type, exc, tcbk)"""
@@ -414,34 +451,14 @@ class SkipAwareTestResult(unittest._TextTestResult):
     def printErrorList(self, flavour, errors):
         for (_, descr), (test, err) in zip(self.descrs_for(flavour), errors):
             self.stream.writeln(self.separator1)
-            if isatty(self.stream):
+            if self.colorize:
                 self.stream.writeln("%s: %s" % (
                     textutils.colorize_ansi(flavour, color='red'), descr))
             else:
                 self.stream.writeln("%s: %s" % (flavour, descr))
 
             self.stream.writeln(self.separator2)
-            if PYGMENTS_FOUND and isatty(self.stream):
-                # ensure `err` is a unicode string before passing it to highlight
-                if isinstance(err, str):
-                    try:
-                        # encoded str, no encoding information, try to decode
-                        err = err.decode('utf-8')
-                    except UnicodeDecodeError:
-                        err = err.decode('iso-8859-1')
-                err_color = highlight(err, lexers.PythonLexer(), 
-                    formatters.terminal.TerminalFormatter())
-                # `err_color` is a unicode string, encode it before writing
-                # to stdout
-                if hasattr(self.stream, 'encoding'):
-                    err_color = err_color.encode(self.stream.encoding, 'replace')
-                else: 
-                    # rare cases where test ouput has been hijacked, pick
-                    # up a random encoding
-                    err_color = err_color.encode('utf-8', 'replace')
-                self.stream.writeln(err_color)
-            else:
-                self.stream.writeln(err)
+            self.stream.writeln(err)
 
             try:
                 output, errput = test.captured_output()
@@ -467,9 +484,6 @@ class SkipAwareTestResult(unittest._TextTestResult):
                     self.stream.writeln('no stderr'.center(
                         len(self.separator2)))
 
-
-def isatty(stream):
-    return hasattr(stream, 'isatty') and stream.isatty()
 
 def run(self, result, runcondition=None, options=None):
     for test in self._tests:
@@ -500,7 +514,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
     def __init__(self, stream=sys.stderr, verbosity=1,
                  exitfirst=False, capture=False, printonly=None,
                  pdbmode=False, cvg=None, test_pattern=None,
-                 skipped_patterns=(), options=None):
+                 skipped_patterns=(), colorize=False, options=None):
         super(SkipAwareTextTestRunner, self).__init__(stream=stream,
                                                       verbosity=verbosity)
         self.exitfirst = exitfirst
@@ -510,6 +524,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         self.cvg = cvg
         self.test_pattern = test_pattern
         self.skipped_patterns = skipped_patterns
+        self.colorize = colorize
         self.options = options
 
     def _this_is_skipped(self, testedname):
@@ -561,7 +576,8 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
     def _makeResult(self):
         return SkipAwareTestResult(self.stream, self.descriptions,
                                    self.verbosity, self.exitfirst, self.capture,
-                                   self.printonly, self.pdbmode, self.cvg)
+                                   self.printonly, self.pdbmode, self.cvg,
+                                   self.colorize)
 
     def run(self, test):
         "Run the given test case or test suite."
@@ -577,12 +593,12 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                             (run, run != 1 and "s" or "", timeTaken))
         self.stream.writeln()
         if not result.wasSuccessful():
-            if isatty(self.stream):
+            if self.colorize:
                 self.stream.write(textutils.colorize_ansi("FAILED", color='red'))
             else:
                 self.stream.write("FAILED")
         else:
-            if isatty(self.stream):
+            if self.colorize:
                 self.stream.write(textutils.colorize_ansi("OK", color='green'))
             else:
                 self.stream.write("OK")
@@ -738,6 +754,7 @@ Options:
                    (implies capture)
   -s, --skip       skip test matching this pattern (no regexp for now)
   -q, --quiet      Minimal output
+  --color          colorize tracebacks
 
   -m, --match      Run only test whose tag match this pattern
 
@@ -766,12 +783,13 @@ Examples:
         self.skipped_patterns = []
         self.test_pattern = None
         self.tags_pattern = None
+        self.colorize = False
         import getopt
         try:
             options, args = getopt.getopt(argv[1:], 'hHvixrqcp:s:m:',
                                           ['help', 'verbose', 'quiet', 'pdb',
                                            'exitfirst', 'restart', 'capture', 'printonly=',
-                                           'skip=', 'match='])
+                                           'skip=', 'color', 'match='])
             for opt, value in options:
                 if opt in ('-h', '-H', '--help'):
                     self.usageExit()
@@ -793,6 +811,8 @@ Examples:
                 if opt in ('-s', '--skip'):
                     self.skipped_patterns = [pat.strip() for pat in
                         value.split(', ')]
+                if opt == '--color':
+                    self.colorize = True
                 if opt in ('-m', '--match'):
                     #self.tags_pattern = value
                     self.options["tag_pattern"] = value
@@ -833,6 +853,7 @@ Examples:
                                                   cvg=self.cvg,
                                                   test_pattern=self.test_pattern,
                                                   skipped_patterns=self.skipped_patterns,
+                                                  colorize=self.colorize,
                                                   options=self.options)
 
         def removeSucceededTests(obj, succTests):
