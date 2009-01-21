@@ -11,10 +11,19 @@ __docformat__ = "restructuredtext en"
 import os
 import sys
 import shutil
-from distutils.core import setup
-from distutils import command
-from distutils.command import install_lib
 from os.path import isdir, exists, join, walk
+
+try:
+    from setuptools import setup
+    from setuptools import command
+    from setuptools.command import install_lib
+    USE_SETUPTOOLS = 1
+except ImportError:    
+    from distutils.core import setup
+    from distutils import command
+    from distutils.command import install_lib
+    USE_SETUPTOOLS = 0
+    
 
 # import required features
 from __pkginfo__ import modname, version, license, short_desc, long_desc, \
@@ -44,6 +53,10 @@ try:
     from __pkginfo__ import ext_modules
 except ImportError:
     ext_modules = None
+try:
+    from __pkginfo__ import install_requires
+except ImportError:
+    install_requires = None
 
 STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 
@@ -119,7 +132,12 @@ def export(from_dir, to_dir,
     walk(from_dir, make_mirror, None)
 
 
-EMPTY_FILE = '"""generated file, don\'t modify or your data will be lost"""\n'
+EMPTY_FILE = '''"""generated file, don\'t modify or your data will be lost"""
+try:
+    __import__('pkg_resources').declare_namespace(__name__)
+except ImportError:
+    pass
+'''
 
 class BuildScripts(command.install_lib.install_lib):
 
@@ -145,9 +163,13 @@ def install(**kwargs):
         package = subpackage_of + '.' + modname
         kwargs['package_dir'] = {package : '.'}
         packages = [package] + get_packages(os.getcwd(), package)
+        if USE_SETUPTOOLS:
+            kwargs['namespace_packages'] = [subpackage_of]
     else:
         kwargs['package_dir'] = {modname : '.'}
         packages = [modname] + get_packages(os.getcwd(), modname)
+    if USE_SETUPTOOLS and install_requires:
+        kwargs['install_requires'] = install_requires
     kwargs['packages'] = packages
     return setup(name = distname,
                  version = version,
