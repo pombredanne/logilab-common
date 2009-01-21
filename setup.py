@@ -2,7 +2,7 @@
 # pylint: disable-msg=W0404,W0622,W0704,W0613,W0152
 """Generic Setup script, takes package info from __pkginfo__.py file.
 
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2003-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -15,12 +15,10 @@ from os.path import isdir, exists, join, walk
 
 try:
     from setuptools import setup
-    from setuptools import command
     from setuptools.command import install_lib
     USE_SETUPTOOLS = 1
 except ImportError:    
     from distutils.core import setup
-    from distutils import command
     from distutils.command import install_lib
     USE_SETUPTOOLS = 0
     
@@ -139,20 +137,27 @@ except ImportError:
     pass
 '''
 
-class BuildScripts(command.install_lib.install_lib):
-
+class MyInstallLib(install_lib.install_lib):
+    """extend install_lib command to handle  package __init__.py and
+    include_dirs variable if necessary
+    """
     def run(self):
-        command.install_lib.install_lib.run(self)
+        """overridden from install_lib class"""
+        install_lib.install_lib.run(self)
         # create Products.__init__.py if needed
-        product_init = join(self.install_dir, 'logilab', '__init__.py')
-        if not exists(product_init):
-            self.announce('creating logilab/__init__.py')
-            stream = open(product_init, 'w')
-            stream.write(EMPTY_FILE)
-            stream.close()
+        if subpackage_of:
+            product_init = join(self.install_dir, subpackage_of, '__init__.py')
+            if not exists(product_init):
+                self.announce('creating %s' % product_init)
+                stream = open(product_init, 'w')
+                stream.write(EMPTY_FILE)
+                stream.close()
         # manually install included directories if any
         if include_dirs:
-            base = join('logilab', modname)
+            if subpackage_of:
+                base = join(subpackage_of, modname)
+            else:
+                base = modname
             for directory in include_dirs:
                 dest = join(self.install_dir, base, directory)
                 export(directory, dest)
@@ -173,16 +178,16 @@ def install(**kwargs):
     kwargs['packages'] = packages
     return setup(name = distname,
                  version = version,
-                 license =license,
+                 license = license,
                  description = short_desc,
                  long_description = long_desc,
                  author = author,
                  author_email = author_email,
                  url = web,
                  scripts = ensure_scripts(scripts),
-                 data_files=data_files,
-                 ext_modules=ext_modules,
-                 cmdclass={'install_lib': BuildScripts},
+                 data_files = data_files,
+                 ext_modules = ext_modules,
+                 cmdclass = {'install_lib': MyInstallLib},
                  **kwargs
                  )
             
