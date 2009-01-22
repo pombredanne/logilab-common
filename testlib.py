@@ -392,7 +392,10 @@ class SkipAwareTestResult(unittest._TextTestResult):
             if not (0 < index <= nb_frames_skipped):
                 continue
             filename = osp.abspath(filename)
-            source = ''.join(ctx)
+            if ctx is None: # pyc files or C extensions for instance
+                source = '<no source available>'
+            else:
+                source = ''.join(ctx)
             if colorize:
                 filename = textutils.colorize_ansi(filename, 'magenta')
                 source = colorize_source(source)
