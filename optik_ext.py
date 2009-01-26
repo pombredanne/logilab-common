@@ -169,11 +169,11 @@ def check_color(option, opt, value):
 
 def check_time(option, opt, value):
     from logilab.common.textutils import TIME_UNITS, apply_units
-    apply_unit(value, TIME_UNITS)
+    apply_units(value, TIME_UNITS)
 
 def check_bytes(option, opt, value):
-    from logilab.common.textutils import BYTES_UNITS, apply_units
-    apply_unit(value, BYTES_UNITS)
+    from logilab.common.textutils import BYTE_UNITS, apply_units
+    apply_units(value, BYTE_UNITS)
     
 import types
 

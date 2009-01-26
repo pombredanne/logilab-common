@@ -27,53 +27,6 @@ STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc', '~')
 
 
-from logilab.common.deprecation import moved
-
-get_cycles = moved('logilab.common.graph', 'get_cycles')
-cached = moved('logilab.common.decorators', 'cached')
-ProgressBar = moved('logilab.common.shellutils', 'ProgressBar')
-Execute = moved('logilab.common.shellutils', 'Execute')
-acquire_lock = moved('logilab.common.shellutils', 'acquire_lock')
-release_lock = moved('logilab.common.shellutils', 'release_lock')
-deprecated_function = moved('logilab.common.deprecation', 'deprecated_function')
-class_renamed = moved('logilab.common.deprecation', 'class_renamed')
-
-def intersection(list1, list2):
-    """Return the intersection of list1 and list2."""
-    warn('this function is deprecated, use a set instead', DeprecationWarning,
-         stacklevel=2)
-    intersect_dict, result = {}, []
-    for item in list1:
-        intersect_dict[item] = 1
-    for item in list2:
-        if item in intersect_dict:
-            result.append(item)
-    return result
-
-def difference(list1, list2):
-    """Return elements of list1 not in list2."""
-    warn('this function is deprecated, use a set instead', DeprecationWarning,
-         stacklevel=2)
-    tmp, result = {}, []
-    for i in list2:
-        tmp[i] = 1
-    for i in list1:
-        if i not in tmp:
-            result.append(i)
-    return result
-
-def union(list1, list2):
-    """Return list1 union list2."""
-    warn('this function is deprecated, use a set instead', DeprecationWarning,
-         stacklevel=2)
-    tmp = {}
-    for i in list1:
-        tmp[i] = 1
-    for i in list2:
-        tmp[i] = 1
-    return tmp.keys()
-
-
 class attrdict(dict):
     """A dictionary for which keys are also accessible as attributes."""
     def __getattr__(self, attr):

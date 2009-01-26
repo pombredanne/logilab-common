@@ -385,12 +385,8 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
             cursor.execute('CREATE LANGUAGE %s' % extlang)
             print '%s language installed' % extlang
 
-    def list_users(self, cursor, username=None):
+    def list_users(self, cursor):
         """return the list of existing database users"""
-        if username:
-            warn('username argument is deprecated, use user_exists method',
-                 DeprecationWarning, stacklevel=2)
-            return self.user_exists(cursor, username)
         cursor.execute("SELECT usename FROM pg_user")
         return [r[0] for r in cursor.fetchall()]
 
