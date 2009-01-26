@@ -8,7 +8,7 @@ __docformat__ = "restructuredtext en"
 
 distname = 'logilab-common'
 modname = 'common'
-numversion = (0, 37, 2)
+numversion = (0, 38, 0)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
@@ -32,7 +32,9 @@ modules,
   * manipulating tree structures
   * accessing RDBMS (currently postgreSQL, mysql and sqlite)
   * generating text and HTML reports
-  * logging"""
+  * logging
+  * more...
+"""
 
 
 web = "http://www.logilab.org/project/%s" % distname
