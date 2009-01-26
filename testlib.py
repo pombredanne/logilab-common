@@ -1623,7 +1623,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         """compares two floats"""
         if msg is None:
             msg = "%r != %r" % (obj, other)
-        self.assert_(math.fabs(obj - other) < prec)
+        self.assert_(math.fabs(obj - other) < prec, msg)
     
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
         """override default failUnlessRaise method to return the raised
