@@ -11,6 +11,7 @@ import sys
 if sys.version_info < (2, 5):
     raise ImportError("python >= 2.5 is required to import logilab.common.contexts")
 
+import os
 import tempfile
 import shutil
 
@@ -24,4 +25,17 @@ class tempdir(object):
         # rmtree in all cases
         shutil.rmtree(self.path)
         return traceback is None
-    
+
+
+class pushd(object):
+    def __init__(self, directory):
+        self.directory = directory
+        
+    def __enter__(self):
+        self.cwd = os.getcwd()
+        os.chdir(self.directory)
+        return self.directory
+
+    def __exit__(self, exctype, value, traceback):
+        os.chdir(self.cwd)
+
