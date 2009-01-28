@@ -111,7 +111,7 @@ def export(from_dir, to_dir,
                 continue
             if filename[-1] == '~':
                 continue
-            src = '%s/%s' % (directory, filename)
+            src = join(directory, filename)
             dest = to_dir + src[len(from_dir):]
             if verbose:
                 print >> sys.stderr, src, '->', dest
