@@ -94,7 +94,7 @@ class wproperty(object):
         self.setfunc(obj, value)
         
     def __get__(self, obj, cls):
-        assert obj is not None
+        # assert obj is not None
         return getattr(obj, self.attrname)
 
 

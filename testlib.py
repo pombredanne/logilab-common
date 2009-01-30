@@ -896,7 +896,7 @@ succeeded tests into", osp.join(os.getcwd(),FILE_RESTART)
         result = self.testRunner.run(self.test)
         if hasattr(self.module, 'teardown_module'):
             try:
-                self.module.teardown_module(self.options)
+                self.module.teardown_module(self.options, result)
             except Exception, exc:
                 print 'teardown_module error:', exc
                 sys.exit(1)
