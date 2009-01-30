@@ -143,3 +143,27 @@ def locked(acquire, release):
                 release(self)
         return wrapper
     return decorator
+
+
+def monkeypatch(klass, methodname=None):
+    """Decorator extending class with the decorated function
+    >>> class A:
+    ...     pass
+    >>> @monkeypatch(A)
+    ... def meth(self):
+    ...     return 12
+    ...
+    >>> a = A()
+    >>> a.meth()
+    12
+    >>> @monkeypatch(A, 'foo')
+    ... def meth(self):
+    ...     return 12
+    ...
+    >>> a.foo()
+    12
+    """
+    def decorator(func):
+        setattr(klass, methodname or func.__name__, func)
+        return func
+    return decorator
