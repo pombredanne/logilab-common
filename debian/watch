@@ -1,3 +1,2 @@
-version=2
-ftp://ftp.logilab.org/pub/common/logilab-common-(.*)\.tar\.gz debian uupdate
-
+version=3
+opts=pasv ftp://ftp.logilab.org/pub/common/logilab-common-(.*)\.tar\.gz

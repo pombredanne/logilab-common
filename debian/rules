@@ -19,7 +19,7 @@ build-stamp:
 	python setup.py -q build
 
 	# build doc
-	$(MAKE) -C doc || true 
+	$(MAKE) -C doc
 
 	touch build-stamp
 

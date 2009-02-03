@@ -1,8 +1,14 @@
-logilab-common (0.38.1-1) unstable; urgency=low
+logilab-common (0.38.0-2) UNRELEASED; urgency=low
 
-  * new upstream release
+  * New upstream release
+  * debian/watch
+    - added opts=pasv to parse correctly remote ftp site
+    - bump version to 3
+    - removed path to debian package and command to execute after download
+  * debian/copyright
+    - updated upstream copyright information
 
- --
+ -- Sandro Tosi <morph@debian.org>  Sun, 01 Feb 2009 18:08:57 +0100
 
 logilab-common (0.38.0-1) unstable; urgency=low
 
