@@ -112,7 +112,12 @@ class ProcInfoLoader:
 
 import tempfile
 import traceback
-from signal import signal, SIGXCPU, SIGKILL, SIGUSR2, SIGUSR1
+from signal import signal
+try:
+    from signal import SIGXCPU, SIGKILL, SIGUSR2, SIGUSR1
+except ImportError: # Windows ?
+    from signal import SIGKILL, SIGUSR2, SIGUSR1
+    SIGXCPU = -1 
 from os import killpg, getpid, setpgrp
 from threading import Timer, currentThread, Thread, Event
 from time import time
@@ -174,6 +179,8 @@ class ResourceController:
 
     def __init__(self, max_cpu_time=None, max_time=None, max_memory=None,
                  max_reprieve=60):
+        if SIGXCPU == -1:
+            raise RuntimeError("Unsupported platform")
         self.max_time = max_time
         self.max_memory = max_memory
         self.max_cpu_time = max_cpu_time
