@@ -2,16 +2,21 @@
 * process information (linux specific: rely on /proc)
 * a class for resource control (memory / time / cpu time)
 
+This module doesn't work on windows platforms (only tested on linux)
+
 :organization: Logilab
-:copyright: 2007-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2007-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
 __docformat__ = "restructuredtext en"
 
 import os
-from os.path import exists
 import stat
+from resource import getrlimit, setrlimit, RLIMIT_CPU, RLIMIT_AS
+from signal import signal, SIGXCPU, SIGKILL, SIGUSR2, SIGUSR1
+from threading import Timer, currentThread, Thread, Event
+from time import time
 
 from logilab.common.tree import Node
 
@@ -21,7 +26,7 @@ def proc_exists(pid):
     """check the a pid is registered in /proc
     raise NoSuchProcess exception if not
     """
-    if not exists('/proc/%s' % pid):
+    if not os.path.exists('/proc/%s' % pid):
         raise NoSuchProcess()
 
 PPID = 3
@@ -110,20 +115,6 @@ class ProcInfoLoader:
                 pass
 
 
-import tempfile
-import traceback
-from signal import signal
-try:
-    from signal import SIGXCPU, SIGKILL, SIGUSR2, SIGUSR1
-except ImportError: # Windows ?
-    from signal import SIGKILL, SIGUSR2, SIGUSR1
-    SIGXCPU = -1 
-from os import killpg, getpid, setpgrp
-from threading import Timer, currentThread, Thread, Event
-from time import time
-
-from resource import getrlimit, setrlimit, RLIMIT_CPU, RLIMIT_AS
-
 try:
     class ResourceError(BaseException):
         """Error raise when resource limit is reached"""
@@ -155,7 +146,7 @@ class MemorySentinel(Thread):
     """A class checking a process don't use too much memory in a separated
     daemonic thread
     """
-    def __init__(self, interval, memory_limit, gpid=getpid()):
+    def __init__(self, interval, memory_limit, gpid=os.getpid()):
         Thread.__init__(self, target=self._run, name="Test.Sentinel")
         self.memory_limit = memory_limit
         self._stop = Event()
@@ -171,7 +162,7 @@ class MemorySentinel(Thread):
         pil = ProcInfoLoader()
         while not self._stop.isSet():
             if self.memory_limit <= pil.load(self.gpid).lineage_memory_usage():
-                killpg(self.gpid, SIGUSR1)
+                os.killpg(self.gpid, SIGUSR1)
             self._stop.wait(self.interval)
 
 
@@ -205,29 +196,29 @@ class ResourceController:
             self._abort_try += 1
             raise LineageMemoryError("Memory limit reached")
         else:
-            killpg(getpid(), SIGKILL)
+            os.killpg(os.getpid(), SIGKILL)
 
     def _handle_sigxcpu(self, sig, frame):
         if self._abort_try < self._reprieve:
             self._abort_try += 1
             raise XCPUError("Soft CPU time limit reached")
         else:
-            killpg(getpid(), SIGKILL)
+            os.killpg(os.getpid(), SIGKILL)
 
     def _time_out(self):
         if self._abort_try < self._reprieve:
             self._abort_try += 1
-            killpg(getpid(), SIGUSR2)
+            os.killpg(os.getpid(), SIGUSR2)
             if self._limit_set > 0:
                 self._timer = Timer(1, self._time_out)
                 self._timer.start()
         else:
-            killpg(getpid(), SIGKILL)
+            os.killpg(os.getpid(), SIGKILL)
     
     def setup_limit(self):
         """set up the process limit"""
         assert currentThread().getName() == 'MainThread'
-        setpgrp()
+        os.setpgrp()
         if self._limit_set <= 0:
             if self.max_time is not None:
                 self._old_usr2_hdlr = signal(SIGUSR2, self._hangle_sig_timeout)

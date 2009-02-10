@@ -2,7 +2,7 @@
 scripts.
 
 :author:    Logilab
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -20,7 +20,14 @@ import errno
 from os.path import exists, isdir, islink, basename, join, walk
 
 from logilab.common import STD_BLACKLIST
-from logilab.common.proc import ProcInfo, NoSuchProcess
+try:
+    from logilab.common.proc import ProcInfo, NoSuchProcess
+except ImportError:
+    # windows platform
+    class NoSuchProcess(Exception): pass
+    
+    def ProcInfo(pid):
+        raise NoSuchProcess()
 
 
 def chown(path, login=None, group=None):
