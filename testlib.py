@@ -761,6 +761,9 @@ Options:
 
   -m, --match      Run only test whose tag match this pattern
 
+  -P, --profile    FILE: Run the tests using cProfile and saving results
+                   in FILE
+
 Examples:
   %(progName)s                               - run default set of tests
   %(progName)s MyTestSuite                   - run suite 'MyTestSuite'
@@ -787,12 +790,13 @@ Examples:
         self.test_pattern = None
         self.tags_pattern = None
         self.colorize = False
+        self.profile_name = None
         import getopt
         try:
-            options, args = getopt.getopt(argv[1:], 'hHvixrqcp:s:m:',
+            options, args = getopt.getopt(argv[1:], 'hHvixrqcp:s:m:P:',
                                           ['help', 'verbose', 'quiet', 'pdb',
                                            'exitfirst', 'restart', 'capture', 'printonly=',
-                                           'skip=', 'color', 'match='])
+                                           'skip=', 'color', 'match=', 'profile='])
             for opt, value in options:
                 if opt in ('-h', '-H', '--help'):
                     self.usageExit()
@@ -819,6 +823,8 @@ Examples:
                 if opt in ('-m', '--match'):
                     #self.tags_pattern = value
                     self.options["tag_pattern"] = value
+                if opt in ('-P', '--profile'):
+                    self.profile_name = value
             self.testLoader.skipped_patterns = self.skipped_patterns
             if self.printonly is not None:
                 self.capture += 1
@@ -841,6 +847,13 @@ Examples:
 
 
     def runTests(self):
+        if self.profile_name:
+            import cProfile
+            cProfile.runctx('self._runTests()', globals(), locals(), self.profile_name )
+        else:
+            return self._runTests()
+
+    def _runTests(self):
         if hasattr(self.module, 'setup_module'):
             try:
                 self.module.setup_module(self.options)
