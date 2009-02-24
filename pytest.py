@@ -263,9 +263,15 @@ class GlobalTestReport(object):
         """called when the test module could not be imported by unittest
         """
         self.errors += 1
+        self.modulescount += 1
+        self.ran += 1
         self.errmodules.append((filename[:-3], 1, 1))
         
-    
+    def skip_module(self, filename):
+        self.modulescount += 1
+        self.ran += 1
+        self.errmodules.append((filename[:-3], 0, 0))
+        
     def __str__(self):
         """this is just presentation stuff"""
         line1 = ['Ran %s test cases in %.2fs (%.2fs CPU)'
@@ -408,24 +414,31 @@ succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
         except TypeError: # < py 2.4 bw compat
             print >> outstream, ('  %s  ' % osp.basename(filename)).center(70)
         try:
+            tstart, cstart = time(), clock()
             try:
-                tstart, cstart = time(), clock()
                 testprog = testlib.unittest_main(modname, batchmode=batchmode, cvg=self.cvg,
                                                  options=self.options, outstream=outstream)
-                tend, cend = time(), clock()
-                ttime, ctime = (tend - tstart), (cend - cstart)
-                if testprog.result.testsRun and batchmode:
-                    print >> sys.stderr, outstream.getvalue()
-                self.report.feed(filename, testprog.result, ttime, ctime)
-                return testprog
             except (KeyboardInterrupt, SystemExit):
                 raise
+            except testlib.TestSkipped:
+                print "Module skipped:", filename
+                self.report.skip_module(filename)
+                return None
             except Exception:
                 self.report.failed_to_test_module(filename)
-                print 'unhandled exception occured while testing', modname
+                print >> outstream, 'unhandled exception occured while testing', modname
                 import traceback
-                traceback.print_exc()
-                return None                
+                traceback.print_exc(file=outstream)
+                if batchmode:
+                    print >> sys.stderr, outstream.getvalue()
+                return None
+
+            tend, cend = time(), clock()
+            ttime, ctime = (tend - tstart), (cend - cstart)
+            if testprog.result.testsRun and batchmode:
+                print >> sys.stderr, outstream.getvalue()
+            self.report.feed(filename, testprog.result, ttime, ctime)
+            return testprog
         finally:
             if dirname:
                 os.chdir(here)
