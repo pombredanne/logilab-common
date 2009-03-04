@@ -2,7 +2,7 @@
 """Wrappers around some builtins introduced in python 2.3, 2.4 and
 2.5, making them available in for earlier versions of python.
 
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -12,7 +12,7 @@ __docformat__ = "restructuredtext en"
 import os
 from warnings import warn
 
-import __builtin__
+import builtins
 
 from logilab.common.deprecation import class_renamed
 
@@ -190,7 +190,7 @@ except TypeError:
         key= kargs.pop("key", None)
         #default implementation
         if key is None:
-            return __builtin__.max(*args,**kargs)
+            return builtins.max(*args,**kargs)
 
         for karg in kargs:
             raise TypeError("unexpected keyword argument %s for function max") % karg

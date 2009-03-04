@@ -73,7 +73,7 @@ def deprecated_function(new_func, message=None):
     """
     if message is None:
         message = "this function is deprecated, use %s instead" % (
-            new_func.func_name)
+            new_func.__name__)
     def deprecated(*args, **kwargs):
         warn(message, DeprecationWarning, stacklevel=2)
         return new_func(*args, **kwargs)

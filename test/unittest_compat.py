@@ -171,13 +171,13 @@ class Py25CompatTC(CompatTCMixIn, TestCase):
 
     def test_any(self):
         from logilab.common.compat import any
-        testdata = ([], (), '', 'abc', xrange(0, 10), xrange(0, -10, -1))
+        testdata = ([], (), '', 'abc', range(0, 10), range(0, -10, -1))
         self.assertEquals(any([]), False)
         self.assertEquals(any(()), False)
         self.assertEquals(any(''), False)
         self.assertEquals(any('abc'), True)
-        self.assertEquals(any(xrange(10)), True)
-        self.assertEquals(any(xrange(0, -10, -1)), True)
+        self.assertEquals(any(range(10)), True)
+        self.assertEquals(any(range(0, -10, -1)), True)
         # python2.5's any consumes iterables 
         irange = iter(range(10))
         self.assertEquals(any(irange), True)
@@ -186,13 +186,13 @@ class Py25CompatTC(CompatTCMixIn, TestCase):
 
     def test_all(self):
         from logilab.common.compat import all
-        testdata = ([], (), '', 'abc', xrange(0, 10), xrange(0, -10, -1))
+        testdata = ([], (), '', 'abc', range(0, 10), range(0, -10, -1))
         self.assertEquals(all([]), True)
         self.assertEquals(all(()), True)
         self.assertEquals(all(''), True)
         self.assertEquals(all('abc'), True)
-        self.assertEquals(all(xrange(10)), False)
-        self.assertEquals(all(xrange(0, -10, -1)), False)
+        self.assertEquals(all(range(10)), False)
+        self.assertEquals(all(range(0, -10, -1)), False)
         # python2.5's all consumes iterables 
         irange = iter(range(10))
         self.assertEquals(all(irange), False)

@@ -5,7 +5,7 @@
 - overrides list command to search for current block instead
   of using 5 lines of context
 
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -18,9 +18,9 @@ except ImportError:
 import os
 import os.path as osp
 import sys
-from pdb import Pdb
-from cStringIO import StringIO
 import inspect
+from pdb import Pdb
+from io import StringIO
 
 try:
     from IPython import PyColorize
@@ -162,8 +162,8 @@ class Debugger(Pdb):
         if not arg:
             try:
                 source, start_lineno = getsource(self.curframe)
-                print colorize(''.join(source), start_lineno,
-                               self.curframe.f_lineno)
+                print(colorize(''.join(source), start_lineno,
+                               self.curframe.f_lineno))
             except KeyboardInterrupt:
                 pass
             except IOError:

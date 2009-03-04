@@ -208,10 +208,10 @@ class ColorizeAnsiTC(TestCase):
 
 class UnormalizeTC(TestCase):
     def test_unormalize(self):
-        data = [(u'\u0153nologie', u'oenologie'),
-                (u'\u0152nologie', u'OEnologie'),
-                (u'l\xf8to', u'loto'),
-                (u'été', u'ete'),
+        data = [('\u0153nologie', 'oenologie'),
+                ('\u0152nologie', 'OEnologie'),
+                ('l\xf8to', 'loto'),
+                ('été', 'ete'),
                 ]
         for input, output in data:
             yield self.assertEquals, tu.unormalize(input), output

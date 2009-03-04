@@ -2,11 +2,12 @@
 Unittests for table management
 """
 
-__revision__ = '$Id: unittest_table.py,v 1.13 2006-04-09 22:30:53 nico Exp $'
-
 import sys
 import os
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.table import Table, TableStyleSheet, DocbookTableWriter, \
@@ -55,8 +56,8 @@ class TableTC(TestCase):
     def test_iterable(self):
         """test iter(table)"""
         it = iter(self.table)
-        self.assert_(it.next() == self.table.data[0])
-        self.assert_(it.next() == self.table.data[1])
+        self.assert_(next(it) == self.table.data[0])
+        self.assert_(next(it) == self.table.data[1])
 
     def test_get_rows(self):
         """tests Table.get_rows()"""

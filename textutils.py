@@ -1,7 +1,7 @@
 """Some text manipulation utility functions.
 
 :author:    Logilab
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2003-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 
@@ -39,20 +39,20 @@ except ImportError:
 
 
 MANUAL_UNICODE_MAP = {
-    u'\xa1': u'!',    # INVERTED EXCLAMATION MARK
-    u'\u0142': u'l',  # LATIN SMALL LETTER L WITH STROKE
-    u'\u2044': u'/',  # FRACTION SLASH
-    u'\xc6': u'AE',   # LATIN CAPITAL LETTER AE
-    u'\xa9': u'(c)',  # COPYRIGHT SIGN
-    u'\xab': u'"',    # LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
-    u'\xe6': u'ae',   # LATIN SMALL LETTER AE
-    u'\xae': u'(r)',  # REGISTERED SIGN
-    u'\u0153': u'oe', # LATIN SMALL LIGATURE OE
-    u'\u0152': u'OE', # LATIN CAPITAL LIGATURE OE
-    u'\xd8': u'O',    # LATIN CAPITAL LETTER O WITH STROKE
-    u'\xf8': u'o',    # LATIN SMALL LETTER O WITH STROKE
-    u'\xbb': u'"',    # RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
-    u'\xdf': u'ss',   # LATIN SMALL LETTER SHARP S
+    '\xa1': '!',    # INVERTED EXCLAMATION MARK
+    '\u0142': 'l',  # LATIN SMALL LETTER L WITH STROKE
+    '\u2044': '/',  # FRACTION SLASH
+    '\xc6': 'AE',   # LATIN CAPITAL LETTER AE
+    '\xa9': '(c)',  # COPYRIGHT SIGN
+    '\xab': '"',    # LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+    '\xe6': 'ae',   # LATIN SMALL LETTER AE
+    '\xae': '(r)',  # REGISTERED SIGN
+    '\u0153': 'oe', # LATIN SMALL LIGATURE OE
+    '\u0152': 'OE', # LATIN CAPITAL LIGATURE OE
+    '\xd8': 'O',    # LATIN CAPITAL LETTER O WITH STROKE
+    '\xf8': 'o',    # LATIN SMALL LETTER O WITH STROKE
+    '\xbb': '"',    # RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+    '\xdf': 'ss',   # LATIN SMALL LETTER SHARP S
     }
 
 def unormalize(ustring, ignorenonascii=False):
@@ -69,7 +69,7 @@ def unormalize(ustring, ignorenonascii=False):
                 raise ValueError("can't deal with non-ascii based characters")
             replacement = _uninormalize('NFD', letter)[0]
         res.append(replacement)
-    return u''.join(res)
+    return ''.join(res)
 
 def unquote(string):
     """remove optional quotes (simple or double) from the string
@@ -261,7 +261,7 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
     :type string: str or unicode
     :param string: the string to parse
 
-    :type units: dict (or any object with __getitem__ using basestring key)
+    :type units: dict (or any object with __getitem__ using str key)
     :param units: a dict mapping a unit string repr to its value
 
     :type inter: type
@@ -281,8 +281,6 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
     values = []
     for match in value_reg.finditer(string):
         dic = match.groupdict()
-        #import sys
-        #print >> sys.stderr, dic
         lit, unit = dic["value"], dic.get("unit")
         value = inter(lit)
         if unit is not None:
@@ -297,7 +295,7 @@ def pretty_match(match, string, underline_char='^'):
     """return a string with the match location underlined:
 
     >>> import re
-    >>> print pretty_match(re.search('mange', 'il mange du bacon'), 'il mange du bacon')
+    >>> print(pretty_match(re.search('mange', 'il mange du bacon'), 'il mange du bacon'))
     il mange du bacon
        ^^^^^
     >>>

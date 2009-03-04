@@ -2,7 +2,7 @@
 """Python modules manipulation utility functions.
 
 :author: Logilab
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 
@@ -19,10 +19,11 @@ __docformat__ = "restructuredtext en"
 
 import sys
 import os
-from os.path import walk, splitext, join, abspath, isdir, dirname, exists
+from os.path import splitext, join, abspath, isdir, dirname, exists
 from imp import find_module, load_module, C_BUILTIN, PY_COMPILED, PKG_DIRECTORY
 
 from logilab.common import STD_BLACKLIST
+from logilab.common.shellutils import blacklist_walk
 
 if sys.platform.startswith('win'):
     PY_SOURCE_EXTS = ('py', 'pyw')
@@ -57,7 +58,7 @@ class LazyObject(object):
     def __getattribute__(self, attr):
         try:
             return super(LazyObject, self).__getattribute__(attr)
-        except AttributeError, ex:
+        except AttributeError:
             return getattr(self.__getobj(), attr)
         
     def __call__(self, *args, **kwargs):
@@ -327,18 +328,11 @@ def get_modules(package, src_directory, blacklist=STD_BLACKLIST):
       the list of all available python modules in the package and its
       subpackages
     """
-    def func(modules, directory, fnames):
-        """walk handler"""
-        # remove files/directories in the black list
-        for norecurs in blacklist:
-            try:
-                fnames.remove(norecurs)
-            except ValueError:
-                continue
+    modules = []
+    for directory, dirnames, fnames in blacklist_walk(src_directory, blacklist):
         # check for __init__.py
         if not '__init__.py' in fnames:
-            while fnames:
-                fnames.pop()
+            fnames[:] = ()
         elif directory != src_directory:
             #src = join(directory, file)
             dir_package = directory[len(src_directory):].replace(os.sep, '.')
@@ -350,12 +344,8 @@ def get_modules(package, src_directory, blacklist=STD_BLACKLIST):
             if _is_python_file(filename) and filename != '__init__.py':
                 module = package + src[len(src_directory):-3]
                 modules.append(module.replace(os.sep, '.'))
-    modules = []
-    walk(src_directory, func, modules)
     return modules
-
-
-
+        
 def get_module_files(src_directory, blacklist=STD_BLACKLIST):
     """given a package directory return a list of all available python
     module's files in the package and its subpackages
@@ -374,14 +364,8 @@ def get_module_files(src_directory, blacklist=STD_BLACKLIST):
       the list of all available python module's files in the package and
       its subpackages
     """
-    def func(files, directory, fnames):
-        """walk handler"""
-        # remove files/directories in the black list
-        for norecurs in blacklist:
-            try:
-                fnames.remove(norecurs)
-            except ValueError:
-                continue
+    files = []
+    for directory, dirnames, fnames in blacklist_walk(src_directory, blacklist):
         # check for __init__.py
         if not '__init__.py' in fnames:
             while fnames:
@@ -392,8 +376,6 @@ def get_module_files(src_directory, blacklist=STD_BLACKLIST):
                 continue
             if _is_python_file(filename):
                 files.append(src)
-    files = []
-    walk(src_directory, func, files)
     return files
 
 
@@ -455,19 +437,19 @@ def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
     except ImportError:
         # import failed, i'm probably not so wrong by supposing it's
         # not standard...
-        return 0
+        return False
     # modules which are not living in a file are considered standard
     # (sys and __builtin__ for instance)
     if filename is None:
-        return 1
+        return True
     filename = abspath(filename)
     for path in std_path:
         path = abspath(path)
         if filename.startswith(path):
             pfx_len = len(path)
             if filename[pfx_len+1:pfx_len+14] != 'site-packages':
-                return 1
-            return 0
+                return True
+            return False
     return False
 
     

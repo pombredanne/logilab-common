@@ -19,7 +19,7 @@ Command line options:
 If no non-option arguments are present, prefixes used are 'test',
 'regrtest', 'smoketest' and 'unittest'.
 
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2003-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -40,11 +40,12 @@ import difflib
 import types
 import tempfile
 import math
+from io import StringIO
 from shutil import rmtree
 from operator import itemgetter
 from warnings import warn
-from compiler.consts import CO_GENERATOR
-from ConfigParser import ConfigParser
+from inspect import CO_GENERATOR
+from configparser import ConfigParser
 
 try:
     from test import test_support
@@ -118,9 +119,9 @@ def main(testdir=None, exitafter=True):
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'hvqxr:t:pcd', ['help'])
-    except getopt.error, msg:
-        print msg
-        print __doc__
+    except getopt.error as msg:
+        print(msg)
+        print(__doc__)
         return 2
     verbose = 0
     quiet = False
@@ -145,7 +146,7 @@ def main(testdir=None, exitafter=True):
             global ENABLE_DBC
             ENABLE_DBC = True
         elif o in ('-h', '--help'):
-            print __doc__
+            print(__doc__)
             sys.exit(0)
 
     args = [item.rstrip('.py') for item in args]
@@ -158,7 +159,7 @@ def main(testdir=None, exitafter=True):
     # Tell tests to be moderately quiet
     test_support.verbose = verbose
     if profile:
-        print >> sys.stderr, '** profiled run'
+        print('** profiled run', file=sys.stderr)
         from hotshot import Profile
         prof = Profile('stones.prof')
         start_time, start_ctime = time.time(), time.clock()
@@ -172,28 +173,28 @@ def main(testdir=None, exitafter=True):
             capture)
         end_time, end_ctime = time.time(), time.clock()
     if not quiet:
-        print '*'*80
+        print('*'*80)
         if all_result:
-            print 'Ran %s test cases in %0.2fs (%0.2fs CPU)' % (
+            print('Ran %s test cases in %0.2fs (%0.2fs CPU)' % (
                 all_result.testsRun, end_time - start_time,
-                end_ctime - start_ctime), 
+                end_ctime - start_ctime), )
             if all_result.errors:
-                print ', %s errors' % len(all_result.errors),
+                print(', %s errors' % len(all_result.errors), end='')
             if all_result.failures:
-                print ', %s failed' % len(all_result.failures),
+                print(', %s failed' % len(all_result.failures), end='')
             if all_result.skipped:
-                print ', %s skipped' % len(all_result.skipped),
+                print(', %s skipped' % len(all_result.skipped), end='')
             print
         if good:
             if not bad and not skipped and len(good) > 1:
-                print "All",
-            print _count(len(good), "test"), "OK."
+                print("All",  end='')
+            print(_count(len(good), "test"), "OK.")
         if bad:
-            print _count(len(bad), "test"), "failed:",
-            print ', '.join(bad)
+            print(_count(len(bad), "test"), "failed:",)
+            print(', '.join(bad))
         if skipped:
-            print _count(len(skipped), "test"), "skipped:",
-            print ', '.join(['%s (%s)' % (test, msg) for test, msg in skipped])
+            print(_count(len(skipped), "test"), "skipped:", end='')
+            print(', '.join(['%s (%s)' % (test, msg) for test, msg in skipped]))
     if profile:
         from hotshot import stats
         stats = stats.load('stones.prof')
@@ -219,9 +220,9 @@ def run_tests(tests, quiet, verbose, runner=None, capture=0):
     all_result = None
     for test in tests:
         if not quiet:
-            print 
-            print '-'*80
-            print "Executing", test
+            print()
+            print('-'*80)
+            print('Executing', test)
         result = run_test(test, verbose, runner, capture)
         if type(result) is type(''):
             # an unexpected error occured
@@ -237,9 +238,9 @@ def run_tests(tests, quiet, verbose, runner=None, capture=0):
             if result.errors or result.failures:
                 bad.append(test)
                 if verbose:
-                    print "test", test, \
+                    print("test", test, 
                           "failed -- %s errors, %s failures" % (
-                        len(result.errors), len(result.failures))
+                        len(result.errors), len(result.failures)))
             else:
                 good.append(test)
             
@@ -278,7 +279,7 @@ def run_test(test, verbose, runner=None, capture=0):
 #        m = __import__(test, globals(), locals(), sys.path)
         try:
             suite = m.suite
-            if callable(suite):
+            if hasattr(suite, '__call__'):
                 suite = suite()
         except AttributeError:
             loader = unittest.TestLoader()
@@ -286,8 +287,8 @@ def run_test(test, verbose, runner=None, capture=0):
         if runner is None:
             runner = SkipAwareTextTestRunner(capture=capture) # verbosity=0)
         return runner.run(suite)
-    except KeyboardInterrupt, v:
-        raise KeyboardInterrupt, v, sys.exc_info()[2]
+    except KeyboardInterrupt:
+        raise
     except:
         # raise
         type, value = sys.exc_info()[:2]
@@ -318,12 +319,12 @@ def start_interactive_mode(result):
     else:
         while True:
             testindex = 0
-            print "Choose a test to debug:"
+            print('Choose a test to debug:')
             # order debuggers in the same way than errors were printed
-            print "\n".join(['\t%s : %s' % (i, descr) for i, (_, descr)
-                in enumerate(descrs)])
-            print "Type 'exit' (or ^D) to quit"
-            print
+            print("\n".join(['\t%s : %s' % (i, descr) for i, (_, descr)
+                             in enumerate(descrs)]))
+            print("Type 'exit' (or ^D) to quit")
+            print()
             try:
                 todebug = raw_input('Enter a test name: ')
                 if todebug.strip().lower() == 'exit':
@@ -334,16 +335,15 @@ def start_interactive_mode(result):
                         testindex = int(todebug)
                         debugger = debuggers[descrs[testindex][0]]
                     except (ValueError, IndexError):
-                        print "ERROR: invalid test number %r" % (todebug, )
+                        print("ERROR: invalid test number %r" % todebug)
                     else:
                         debugger.start()
             except (EOFError, KeyboardInterrupt):
-                print
+                print()
                 break
 
 
 # test utils ##################################################################
-from cStringIO import StringIO
 
 class SkipAwareTestResult(unittest._TextTestResult):
 
@@ -539,14 +539,14 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         else:
             if isinstance(test, TestCase):
                 meth = test._get_test_method()
-                func = meth.im_func
-                testname = '%s.%s' % (meth.im_class.__name__, func.__name__)
+                func = meth.__func__
+                testname = '%s.%s' % (meth.__self__.__class__.__name__, func.__name__)
             elif isinstance(test, types.FunctionType):
                 func = test
                 testname = func.__name__
             elif isinstance(test, types.MethodType):
-                func = test.im_func
-                testname = '%s.%s' % (test.im_class.__name__, func.__name__)
+                func = test.__func__
+                testname = '%s.%s' % (test.__self__.__class__.__name__, func.__name__)
             else:
                 return True # Not sure when this happens
 
@@ -666,8 +666,7 @@ class NonStrictTestLoader(unittest.TestLoader):
     def _collect_tests(self, module):
         tests = {}
         for obj in vars(module).values():
-            if (issubclass(type(obj), (types.ClassType, type)) and
-                 issubclass(obj, unittest.TestCase)):
+            if issubclass(type(obj), type) and issubclass(obj, unittest.TestCase):
                 classname = obj.__name__
                 if classname[0] == '_' or self._this_is_skipped(classname):
                     continue
@@ -676,7 +675,7 @@ class NonStrictTestLoader(unittest.TestLoader):
                 for attrname in dir(obj):
                     if attrname.startswith(self.testMethodPrefix):
                         attr = getattr(obj, attrname)
-                        if callable(attr):
+                        if hasattr(attr, '__call__'):
                             methodnames.append(attrname)
                 # keep track of class (obj) for convenience
                 tests[classname] = (obj, methodnames)
@@ -704,7 +703,7 @@ class NonStrictTestLoader(unittest.TestLoader):
         collected = []
         if len(parts) == 1:
             pattern = parts[0]
-            if callable(getattr(module, pattern, None)
+            if hasattr(getattr(module, pattern, None), '__call__'
                     )  and pattern not in tests:
                 # consider it as a suite
                 return self.loadTestsFromSuite(module, pattern)
@@ -836,16 +835,16 @@ Examples:
             else:
                 self.testNames = (self.defaultTest, )
             self.createTests()
-        except getopt.error, msg:
-            self.usageExit(msg)
+        except getopt.error as ex:
+            self.usageExit(ex)
 
 
     def runTests(self):
         if hasattr(self.module, 'setup_module'):
             try:
                 self.module.setup_module(self.options)
-            except Exception, exc:
-                print 'setup_module error:', exc
+            except Exception as ex:
+                print('setup_module error:', ex)
                 sys.exit(1)
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
                                                   stream=self.outstream,
@@ -881,24 +880,20 @@ Examples:
             try:
                 restartfile = open(FILE_RESTART, 'r')
                 try:
-                    try:
-                        succeededtests = list(elem.rstrip('\n\r') for elem in 
-                            restartfile.readlines())
-                        removeSucceededTests(self.test, succeededtests)
-                    except Exception, e:
-                        raise e
+                    succeededtests = list(elem.rstrip('\n\r') for elem in 
+                                          restartfile.readlines())
+                    removeSucceededTests(self.test, succeededtests)
                 finally:
                     restartfile.close()
-            except Exception ,e:
-                raise "Error while reading \
-succeeded tests into", osp.join(os.getcwd(),FILE_RESTART)
-
+            except Exception:
+                raise Exception("Error while reading succeeded tests into %s"
+                                % osp.join(os.getcwd(), FILE_RESTART))
         result = self.testRunner.run(self.test)
         if hasattr(self.module, 'teardown_module'):
             try:
                 self.module.teardown_module(self.options, result)
-            except Exception, exc:
-                print 'teardown_module error:', exc
+            except Exception as ex:
+                print('teardown_module error:', ex)
                 sys.exit(1)
         if os.environ.get('PYDEBUG'):
             warn("PYDEBUG usage is deprecated, use -i / --pdb instead",
@@ -1009,7 +1004,7 @@ class TestSkipped(Exception):
     """raised when a test is skipped"""
 
 def is_generator(function):
-    flags = function.func_code.co_flags
+    flags = function.__code__.co_flags
     return flags & CO_GENERATOR
 
 
@@ -1197,7 +1192,7 @@ class TestCase(unittest.TestCase):
             if not self.quiet_run(result, self.setUp):
                 return
             # generative tests
-            if is_generator(testMethod.im_func):
+            if is_generator(testMethod.__func__):
                 success = self._proceed_generative(result, testMethod,
                     runcondition)
             else:
@@ -1211,19 +1206,16 @@ class TestCase(unittest.TestCase):
                     try:
                         restartfile = open(FILE_RESTART, 'a')
                         try:
-                            try:
-                                descr = '.'.join((self.__class__.__module__, 
-                                    self.__class__.__name__, 
-                                    self._testMethodName))
-                                restartfile.write(descr+os.linesep)
-                            except Exception, e: 
-                                raise e
+                            descr = '.'.join((self.__class__.__module__, 
+                                              self.__class__.__name__, 
+                                              self._testMethodName))
+                            restartfile.write(descr+os.linesep)
                         finally:
                             restartfile.close()
-                    except Exception, e:
-                        print >> sys.__stderr__, "Error while saving \
-succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
-                        raise e
+                    except Exception:
+                        print('Error while saving succeeded test into',
+                              osp.join(os.getcwd(), FILE_RESTART), file=sys.__stderr__)
+                        raise
                 result.addSuccess(self)
         finally:
             # if result.cvg:
@@ -1371,7 +1363,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         items={}
         items['missing'] = expected - got
         items['unexpected'] = got - expected
-        if any(items.itervalues()):
+        if any(items.values()):
             if msg is None:
                 msg = '\n'.join('%s:\n\t%s' % (key,"\n\t".join(str(value) for value in values))
                     for key, values in items.iteritems() if values)
@@ -1454,7 +1446,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                 self.fail( "tuple %s has %i children%s (%i expected)"%(tup,
                     len(tup[2]),
                         ('', 's')[len(tup[2])>1], len(element)))
-            for index in xrange(len(tup[2])):
+            for index in range(len(tup[2])):
                 self.assertXMLEqualsTuple(element[index], tup[2][index])
         #check text
         if element.text or len(tup)>3:
@@ -1484,9 +1476,9 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             msg_prefix='Text differ'):
         """compare two multiline strings (using difflib and splitlines())"""
         msg = []
-        if not isinstance(text1, basestring):
+        if not isinstance(text1, str):
             msg.append('text1 is not a string (%s)'%(type(text1)))
-        if not isinstance(text2, basestring):
+        if not isinstance(text2, str):
             msg.append('text2 is not a string (%s)'%(type(text2)))
         if msg:
             self.fail('\n'.join(msg))
@@ -1638,14 +1630,14 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         """
         try:
             callableObj(*args, **kwargs)
-        except excClass, exc:
+        except excClass as exc:
             return exc
         else:
             if hasattr(excClass, '__name__'):
                 excName = excClass.__name__
             else:
                 excName = str(excClass)
-            raise self.failureException, "%s not raised" % excName
+            raise self.failureException("%s not raised" % excName)
 
     assertRaises = failUnlessRaises
 
@@ -1885,15 +1877,12 @@ def require_version(version):
         except ValueError:
             raise ValueError('%s is not a correct version : should be X.Y[.Z].' % version)
         current = sys.version_info[:3]
-        #print 'comp', current, compare
         if current < compare:
-            #print 'version too old'
             def new_f(self, *args, **kwargs):
                 self.skip('Need at least %s version of python. Current version is %s.' % (version, '.'.join([str(element) for element in current])))
             new_f.__name__ = f.__name__
             return new_f
         else:
-            #print 'version young enough'
             return f
     return check_require_version
 
@@ -1903,10 +1892,8 @@ def require_module(module):
     def check_require_module(f):
         try:
             __import__(module)
-            #print module, 'imported'
             return f
         except ImportError:
-            #print module, 'can not be imported'
             def new_f(self, *args, **kwargs):
                 self.skip('%s can not be imported.' % module)
             new_f.__name__ = f.__name__

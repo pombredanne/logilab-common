@@ -672,7 +672,7 @@ class OptionsProviderMixIn(object):
         if opt_dict is None:
             opt_dict = self.get_option_def(opt_name)
         default = opt_dict.get('default')
-        if callable(default):
+        if hasattr(default, '__call__'):
             default = default()
         return default
         

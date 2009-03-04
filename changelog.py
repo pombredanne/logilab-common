@@ -50,7 +50,7 @@ class Version(tuple):
     correctly printing it as X.Y.Z
     """
     def __new__(klass, versionstr):
-        if isinstance(versionstr, basestring):
+        if isinstance(versionstr, str):
             versionstr = versionstr.strip(' :')
             try:
                 parsed = [int(i) for i in versionstr.split('.')]

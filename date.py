@@ -59,7 +59,7 @@ else:
         end = Date(end.year, end.month, end.day)
         holidays = [strptime(datestr, '%Y-%m-%d')
                     for datestr in FRENCH_MOBILE_HOLIDAYS.values()]
-        for year in xrange(begin.year, end.year+1):
+        for year in range(begin.year, end.year+1):
             for datestr in FRENCH_FIXED_HOLIDAYS.values():
                 date = strptime(datestr % year, '%Y-%m-%d')
                 if date not in holidays:

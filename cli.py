@@ -173,7 +173,7 @@ class CLIHelper:
             print
             for command_help_method in self._topics[command]:
                 try:
-                    if callable(command_help_method):
+                    if hasattr(command_help_method, '__call__'):
                         self._print_help(*command_help_method())
                     else:
                         self._print_help(*command_help_method)
@@ -181,7 +181,7 @@ class CLIHelper:
                     import traceback
                     traceback.print_exc()
                     print 'ERROR in help method %s'% (
-                        command_help_method.func_name)
+                        command_help_method.__name__)
                 
     help_do_help = ("help", "help [topic|command]",
                     _("print help message for the given topic/command or \

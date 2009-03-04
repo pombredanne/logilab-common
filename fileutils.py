@@ -6,7 +6,7 @@ get_by_ext, remove_dead_links
 write_open_mode, ensure_fs_mode, export
 :sort: path manipulation, file manipulation
 
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -15,14 +15,14 @@ __docformat__ = "restructuredtext en"
 import sys
 import shutil
 import mimetypes
-from os.path import isabs, isdir, islink, split, exists, walk, normpath, join
-from os.path import abspath
+from warnings import warn
 from os import sep, mkdir, remove, listdir, stat, chmod
+from os.path import isabs, isdir, islink, split, exists, normpath, join, abspath
 from stat import ST_MODE, S_IWRITE
-from cStringIO import StringIO
+from io import StringIO, FileIO
 
 from logilab.common import STD_BLACKLIST as BASE_BLACKLIST, IGNORED_EXTENSIONS
-from logilab.common.shellutils import find
+from logilab.common.shellutils import find, blacklist_walk
 
 def first_level_directory(path):
     """Return the first level directory of a path.
@@ -110,7 +110,7 @@ def ensure_fs_mode(filepath, desired_mode=S_IWRITE):
         chmod(filepath, mode | desired_mode)
         
 
-class ProtectedFile(file):
+class ProtectedFile(FileIO):
     """A special file-object class that automatically that automatically
     does a 'chmod +w' when needed.
 
@@ -137,7 +137,7 @@ class ProtectedFile(file):
             if not self.original_mode & S_IWRITE:
                 chmod(filepath, self.original_mode | S_IWRITE)
                 self.mode_changed = True
-        file.__init__(self, filepath, mode)
+        FileIO.__init__(self, filepath, mode)
 
     def _restore_mode(self):
         """restores the original mode if needed"""
@@ -149,7 +149,7 @@ class ProtectedFile(file):
     def close(self):
         """restore mode before closing"""
         self._restore_mode()
-        file.close(self)
+        FileIO.close(self)
 
     def __del__(self):
         if not self.closed:
@@ -343,13 +343,16 @@ def export(from_dir, to_dir,
       flag indicating wether information about exported files should be
       printed to stderr, default to False
     """
-    def make_mirror(_, directory, fnames):
-        """walk handler"""
-        for norecurs in blacklist:
-            try:
-                fnames.remove(norecurs)
-            except ValueError:
-                continue
+    try:
+        mkdir(to_dir)
+    except OSError:
+        pass
+    for directory, dirnames, fnames in blacklist_walk(from_dir, blacklist):
+        for dirname in dirnames:
+            src = join(directory, dirname)
+            dest = to_dir + src[len(from_dir):]
+            if not exists(dest):
+                mkdir(dest)
         for filename in fnames:
             # don't include binary files
             for ext in ignore_ext:
@@ -359,19 +362,10 @@ def export(from_dir, to_dir,
                 src = join(directory, filename)
                 dest = to_dir + src[len(from_dir):]
                 if verbose:
-                    print >> sys.stderr, src, '->', dest
-                if isdir(src):
-                    if not exists(dest):
-                        mkdir(dest)
-                else:
-                    if exists(dest):
-                        remove(dest)
-                    shutil.copy2(src, dest)
-    try:
-        mkdir(to_dir)
-    except OSError:
-        pass
-    walk(from_dir, make_mirror, None)
+                    print(src, '->', dest, file=sys.stderr)
+                if exists(dest):
+                    remove(dest)
+                shutil.copy2(src, dest)
 
 
 def remove_dead_links(directory, verbose=0):
@@ -391,12 +385,10 @@ def remove_dead_links(directory, verbose=0):
             src = join(directory, filename)
             if islink(src) and not exists(src):
                 if verbose:
-                    print 'remove dead link', src
+                    print('remove dead link', src)
                 remove(src)
     walk(directory, _remove_dead_link, None)
 
-
-from warnings import warn
 
 def files_by_ext(directory, include_exts=None, exclude_exts=None,
                  exclude_dirs=BASE_BLACKLIST):

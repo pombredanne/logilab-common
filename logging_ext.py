@@ -108,7 +108,7 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
                 handler = logging.StreamHandler()
         if logthreshold is None:
             logthreshold = logging.ERROR
-        elif isinstance(logthreshold, basestring):
+        elif isinstance(logthreshold, str):
             logthreshold = getattr(logging, THRESHOLD_MAP.get(logthreshold,
                                                               logthreshold))
     # configure the root logger

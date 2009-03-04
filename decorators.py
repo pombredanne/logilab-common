@@ -1,6 +1,6 @@
 """A few useful function/method decorators.
 
-:copyright: 2006-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2006-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -14,16 +14,13 @@ import sys, re
 
 def cached(callableobj, keyarg=None):
     """Simple decorator to cache result of method call."""
-    #print callableobj, keyarg, callableobj.func_code.co_argcount
-    if callableobj.func_code.co_argcount == 1 or keyarg == 0:
+    if callableobj.__code__.co_argcount == 1 or keyarg == 0:
         
         def cache_wrapper1(self, *args):
             cache = '_%s_cache_' % callableobj.__name__
-            #print 'cache1?', cache
             try:
                 return self.__dict__[cache]
             except KeyError:
-                #print 'miss'
                 value = callableobj(self, *args)
                 setattr(self, cache, value)
                 return value
@@ -34,34 +31,28 @@ def cached(callableobj, keyarg=None):
         def cache_wrapper2(self, *args, **kwargs):
             cache = '_%s_cache_' % callableobj.__name__
             key = args[keyarg-1]
-            #print 'cache2?', cache, self, key
             try:
                 _cache = self.__dict__[cache]
             except KeyError:
-                #print 'init'
                 _cache = {}
                 setattr(self, cache, _cache)
             try:
                 return _cache[key]
             except KeyError:
-                #print 'miss', self, cache, key
                 _cache[key] = callableobj(self, *args, **kwargs)
             return _cache[key]
         return cache_wrapper2
 
     def cache_wrapper3(self, *args):
         cache = '_%s_cache_' % callableobj.__name__
-        #print 'cache3?', cache, self, args
         try:
             _cache = self.__dict__[cache]
         except KeyError:
-            #print 'init'
             _cache = {}
             setattr(self, cache, _cache)
         try:
             return _cache[args]
         except KeyError:
-            #print 'miss'
             _cache[args] = callableobj(self, *args)
         return _cache[args]
     return cache_wrapper3
@@ -124,7 +115,7 @@ def timed(f):
         t = clock()
         #for i in range(100):
         res = f(*args, **kwargs)
-        print '%s time: %.9f' % (f.__name__, clock() - t)
+        print('%s time: %.9f' % (f.__name__, clock() - t))
         return res
     return wrap
 

@@ -179,7 +179,7 @@ class Table(object):
             row_index = self.row_names.index(row_id)
             self.set_row(row_index, row_data)
         except ValueError:
-            raise KeyError('Row (%s) not found in table' % (row_id))
+            raise KeyError('Row (%s) not found in table' % row_id)
         
 
     def append_row(self, row_data, row_name=None):
@@ -478,7 +478,7 @@ class Table(object):
         # The first cell <=> an empty one
         col_names_line = [' '*col_start]
         for col_name in self.col_names:
-            col_names_line.append(col_name.encode('iso-8859-1') + ' '*5)
+            col_names_line.append(col_name + ' '*5)
         lines.append('|' + '|'.join(col_names_line) + '|')
         max_line_length = len(lines[0])
 
@@ -486,9 +486,8 @@ class Table(object):
         for row_index, row in enumerate(self.data):
             line = []
             # First, build the row_name's cell
-            row_name = self.row_names[row_index].encode('iso-8859-1')
+            row_name = self.row_names[row_index]
             line.append(row_name + ' '*(col_start-len(row_name)))
-
             # Then, build all the table's cell for this line.
             for col_index, cell in enumerate(row):
                 col_name_length = len(self.col_names[col_index]) + 5
@@ -675,7 +674,6 @@ class TableStyleSheet:
         for rule in rules:
             self.add_rule(rule)
 
-
     def add_rule(self, rule):
         """Adds a rule to the stylesheet rules
         """
@@ -686,8 +684,7 @@ class TableStyleSheet:
                 'table.py', 'exec'))
             self.rules.append(rule)
         except SyntaxError:
-            print "Bad Stylesheet Rule : %s [skipped]"%rule
-
+            print("Bad Stylesheet Rule : %s [skipped]" % rule)
     
     def add_rowsum_rule(self, dest_cell, row_index, start_col, end_col):
         """Creates and adds a rule to sum over the row at row_index from
@@ -703,7 +700,6 @@ class TableStyleSheet:
         rule = '%d_%d=' % dest_cell + '+'.join(cell_list)
         self.add_rule(rule)
             
-
     def add_rowavg_rule(self, dest_cell, row_index, start_col, end_col):
         """Creates and adds a rule to make the row average (from start_col
         to end_col)
@@ -718,7 +714,6 @@ class TableStyleSheet:
         num = (end_col - start_col + 1)
         rule = '%d_%d=' % dest_cell + '('+'+'.join(cell_list)+')/%f'%num
         self.add_rule(rule)
-        
 
     def add_colsum_rule(self, dest_cell, col_index, start_row, end_row):
         """Creates and adds a rule to sum over the col at col_index from
@@ -733,7 +728,6 @@ class TableStyleSheet:
                                                                    end_row + 1)]
         rule = '%d_%d=' % dest_cell + '+'.join(cell_list)
         self.add_rule(rule)
-        
     
     def add_colavg_rule(self, dest_cell, col_index, start_row, end_row):
         """Creates and adds a rule to make the col average (from start_row
@@ -766,7 +760,6 @@ class TableCellRenderer:
         """
         self.properties = properties
 
-
     def render_cell(self, cell_coord, table, table_style):
         """Renders the cell at 'cell_coord' in the table, using table_style
         """
@@ -777,22 +770,16 @@ class TableCellRenderer:
         return self._render_cell_content(final_content,
                                          table_style, col_index + 1)
         
-
     def render_row_cell(self, row_name, table, table_style):
         """Renders the cell for 'row_id' row
         """
-        cell_value = row_name.encode('iso-8859-1')
-        return self._render_cell_content(cell_value, table_style, 0)
-
+        return self._render_cell_content(row_name, table_style, 0)
 
     def render_col_cell(self, col_name, table, table_style):
         """Renders the cell for 'col_id' row
         """
-        cell_value = col_name.encode('iso-8859-1')
         col_index = table.col_names.index(col_name)
-        return self._render_cell_content(cell_value, table_style, col_index +1)
-
-    
+        return self._render_cell_content(col_name, table_style, col_index +1)
 
     def _render_cell_content(self, content, table_style, col_index):
         """Makes the appropriate rendering for this cell content.
@@ -802,7 +789,6 @@ class TableCellRenderer:
         **This method should be overridden in the derived renderer classes.**
         """
         return content
-
     
     def _make_cell_content(self, cell_content, table_style, col_index):
         """Makes the cell content (adds decoration data, like units for
@@ -815,7 +801,6 @@ class TableCellRenderer:
             replacement_char = 0
         if replacement_char and final_content == 0:
             return replacement_char
-        
         try:
             units_on = self.properties['units']
             if units_on:
@@ -823,9 +808,7 @@ class TableCellRenderer:
                     cell_content, table_style, col_index)
         except KeyError:
             pass
-        
         return final_content
-        
         
     def _add_unit(self, cell_content, table_style, col_index):
         """Adds unit to the cell_content if needed
@@ -845,7 +828,6 @@ class DocbookRenderer(TableCellRenderer):
         size = table_style.get_size_by_index(col_index)
         return '<colspec colname="c%d" colwidth="%s"/>\n' % \
                (col_index, size)
-    
         
     def _render_cell_content(self, cell_content, table_style, col_index):
         """Makes the appropriate rendering for this cell content.
@@ -874,30 +856,25 @@ class TableWriter:
         self.properties = properties
         self.renderer = None
         
-
     def set_style(self, style):
         """sets the table's associated style
         """
         self.style = style
 
-
     def set_renderer(self, renderer):
         """sets the way to render cell
         """
         self.renderer = renderer
-    
         
     def update_properties(self, **properties):
         """Updates writer's properties (for cell rendering)
         """
         self.properties.update(properties)
 
-
     def write_table(self, title = ""):
         """Writes the table
         """
         raise NotImplementedError("write_table must be implemented !")
-        
 
 
 class DocbookTableWriter(TableWriter):
@@ -911,7 +888,6 @@ class DocbookTableWriter(TableWriter):
         for col_index in range(len(self._table.col_names)+1):
             self._stream.write(self.renderer.define_col_header(col_index,
                                                               self.style))
-        
         self._stream.write("<thead>\n<row>\n")
         # XXX FIXME : write an empty entry <=> the first (__row_column) column
         self._stream.write('<entry></entry>\n')
@@ -919,15 +895,12 @@ class DocbookTableWriter(TableWriter):
             self._stream.write(self.renderer.render_col_cell(
                 col_name, self._table,
                 self.style))
-            
         self._stream.write("</row>\n</thead>\n")
-
 
     def _write_body(self):
         """Writes the table body
         """
         self._stream.write('<tbody>\n')
-        
         for row_index, row in enumerate(self._table.data):
             self._stream.write('<row>\n')
             row_name = self._table.row_names[row_index]
@@ -935,16 +908,12 @@ class DocbookTableWriter(TableWriter):
             self._stream.write(self.renderer.render_row_cell(row_name,
                                                             self._table,
                                                             self.style))
-            
             for col_index, cell in enumerate(row):
                 self._stream.write(self.renderer.render_cell(
                     (row_index, col_index),
                     self._table, self.style))
-                
             self._stream.write('</row>\n')
-            
         self._stream.write('</tbody>\n')
-
 
     def write_table(self, title = ""):
         """Writes the table
@@ -955,7 +924,6 @@ class DocbookTableWriter(TableWriter):
             (len(self._table.col_names)+1))
         self._write_headers()
         self._write_body()
-        
         self._stream.write('</tgroup>\n</table>\n')
 
     

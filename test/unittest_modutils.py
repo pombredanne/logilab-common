@@ -143,7 +143,7 @@ class is_standard_module_tc(TestCase):
     """
     
     def test_knownValues_is_standard_module_0(self):
-        self.assertEqual(modutils.is_standard_module('__builtin__'), True)
+        self.assertEqual(modutils.is_standard_module('builtins'), True)
         
     def test_knownValues_is_standard_module_1(self):
         self.assertEqual(modutils.is_standard_module('sys'), True)
@@ -155,7 +155,7 @@ class is_standard_module_tc(TestCase):
         self.assertEqual(modutils.is_standard_module('unknown'), False)
 
     def test_knownValues_is_standard_module_4(self):
-        self.assertEqual(modutils.is_standard_module('StringIO'), True)
+        self.assertEqual(modutils.is_standard_module('io'), True)
 
     def test_knownValues_is_standard_module_5(self):
         self.assertEqual(modutils.is_standard_module('data.module', (DATADIR,)), True)
@@ -186,8 +186,8 @@ class get_modules_tc(TestCase):
         modules = modutils.get_modules(path.join(*mod_path), data.__path__[0])
         modules.sort()
         self.assertSetEquals(set(modules),
-            set([ '.'.join(mod_path + (mod, )) for mod in 'module', 'module2',
-            'noendingnewline', 'nonregr']))
+            set([ '.'.join(mod_path + (mod, )) for mod in ('module', 'module2',
+                                                           'noendingnewline', 'nonregr')]))
 
 
 class get_modules_files_tc(TestCase):

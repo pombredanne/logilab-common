@@ -2,7 +2,7 @@
 scripts.
 
 :author:    Logilab
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -17,7 +17,7 @@ import tempfile
 import time
 import fnmatch
 import errno
-from os.path import exists, isdir, islink, basename, join, walk
+from os.path import exists, isdir, islink, basename, join
 
 from logilab.common import STD_BLACKLIST
 from logilab.common.proc import ProcInfo, NoSuchProcess
@@ -65,7 +65,7 @@ def mv(source, destination, _action=shutil.move):
             destination = join(destination, basename(source))
         try:
             _action(source, destination)
-        except OSError, ex:
+        except OSError as ex:
             raise OSError('Unable to move %r to %r (%s)' % (
                 source, destination, ex))
         
@@ -87,6 +87,20 @@ def cp(source, destination):
     mv(source, destination, _action=shutil.copy)
 
 
+def blacklist_walk(path, blacklist):
+    for directory, dirnames, fnames in os.walk(path):
+        # remove files/directories in the black list
+        for norecurs in blacklist:
+            try:
+                fnames.remove(norecurs)
+            except ValueError:
+                try:
+                    dirnames.remove(norecurs)
+                except ValueError:
+                    continue
+        yield directory, dirnames, fnames
+
+
 def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
     """Recursivly find files ending with the given extensions from the directory.
 
@@ -94,7 +108,7 @@ def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
     :param directory:
       directory where the search should start
 
-    :type exts: basestring or list or tuple
+    :type exts: str or list or tuple
     :param exts:
       extensions or lists or extensions to search
 
@@ -112,7 +126,7 @@ def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
     :return:
       the list of all matching files
     """
-    if isinstance(exts, basestring):
+    if isinstance(exts, str):
         exts = (exts,)
     if exclude:
         def match(filename, exts):
@@ -126,22 +140,14 @@ def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
                 if filename.endswith(ext):
                     return True
             return False
-    def func(files, directory, fnames):
-        """walk handler"""
-        # remove files/directories in the black list
-        for norecurs in blacklist:
-            try:
-                fnames.remove(norecurs)
-            except ValueError:
-                continue
+    files = []
+    for directory, dirnames, fnames in blacklist_walk(directory, blacklist):
         for filename in fnames:
             src = join(directory, filename)
             if isdir(src):
                 continue
             if match(filename, exts):
                 files.append(src)
-    files = []
-    walk(directory, func, files)
     return files
 
 
@@ -154,7 +160,7 @@ def globfind(directory, pattern, blacklist=STD_BLACKLIST):
     :param directory:
       directory where the search should start
 
-    :type pattern: basestring
+    :type pattern: str
     :param pattern:
       the glob pattern (e.g *.py, foo*.py, etc.)
 
@@ -213,11 +219,11 @@ def acquire_lock(lock_file, max_try=10, delay=10, max_delay=3600):
     while count:
         try:
             fd = os.open(lock_file, os.O_EXCL | os.O_RDWR | os.O_CREAT)
-            os.write(fd, str(os.getpid()))
+            os.write(fd, bytes(str(os.getpid()), 'ascii'))
             os.close(fd)
             return True
-        except OSError, e:
-            if e.errno == errno.EEXIST:
+        except OSError as ex:
+            if ex.errno == errno.EEXIST:
                 try:
                     fd = open(lock_file, "r")
                     pid = int(fd.readline())

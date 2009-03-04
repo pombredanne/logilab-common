@@ -144,7 +144,7 @@ class _GenericAdvFuncHelper:
 
     #@classmethod
     def register_function(cls, funcdef):
-        if isinstance(funcdef, basestring) :
+        if isinstance(funcdef, str) :
             funcdef = FunctionDescr(funcdef.upper())
         assert not funcdef.name in cls.FUNCTIONS, \
                '%s is already registered' % funcdef.name

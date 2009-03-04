@@ -78,9 +78,9 @@ def bind_code(co, globals):
 def bind(f, globals):
     """Returns a new function whose code object has been
     bound by bind_code()"""
-    newcode = bind_code(f.func_code, globals)
+    newcode = bind_code(f.__code__, globals)
     defaults = f.func_defaults or ()
-    return make_function(newcode, f.func_globals, f.func_name, defaults)
+    return make_function(newcode, f.func_globals, f.__name__, defaults)
 
 if type(__builtins__) == dict:
     builtins = __builtins__
@@ -221,12 +221,12 @@ def optimize_module_2(m, globals_consts, bind_builtins=1):
     for name, f in m.__dict__.items():
         if inspect.isfunction(f):
             functions[name] = f
-            analyze_code(f.func_code, globals, consts_dict, consts_list)
+            analyze_code(f.__code__, globals, consts_dict, consts_list)
     consts_list = tuple(consts_list)
     for name, f in functions.items():
-        newcode = rewrite_code(f.func_code, consts_dict, consts_list)
+        newcode = rewrite_code(f.__code__, consts_dict, consts_list)
         defaults = f.func_defaults or ()
-        m.__dict__[name] = make_function(newcode, f.func_globals, f.func_name,
+        m.__dict__[name] = make_function(newcode, f.func_globals, f.__name__,
                                          defaults)
         
 

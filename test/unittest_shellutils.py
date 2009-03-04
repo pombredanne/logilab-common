@@ -1,14 +1,14 @@
 """unit tests for logilab.common.shellutils"""
 
 import sys, os, tempfile, shutil
-from os.path import join
 import datetime, time
+from os.path import join
+from io import StringIO
 
 from logilab.common.testlib import TestCase, unittest_main
-
 from logilab.common.shellutils import globfind, find, ProgressBar, acquire_lock, release_lock
 from logilab.common.proc import NoSuchProcess
-from StringIO import StringIO
+
 
 DATA_DIR = join('data','find_test')
 
@@ -94,14 +94,15 @@ class ProgressBarTC(TestCase):
                 dots, update = round
             else:
                 dots, update = round, None
+            dots = int(dots)
             pgb.update()
             if update or (update is None and dots != last):
                 last = dots
-                expected_stream.write("\r["+('.'*dots)+(' '*(size-dots))+"]")
+                expected_stream.write('\r[' + ('.'*dots) + (' '*(size-dots)) + ']')
             self.assertEquals(pgb_stream.getvalue(), expected_stream.getvalue())
 
     def test_default(self):
-        self._update_test(20, xrange(1,21))
+        self._update_test(20, range(1,21))
 
     def test_nbops_gt_size(self):
         """Test the progress bar for nbops > size"""
@@ -145,14 +146,14 @@ class AcquireLockTC(TestCase):
 
     def test_wrong_process(self):
         fd = os.open(self.lock, os.O_EXCL | os.O_RDWR | os.O_CREAT)
-        os.write(fd, '1111111111')
+        os.write(fd, b'1111111111')
         os.close(fd)
         self.assertTrue(os.path.exists(self.lock))
         self.assertRaises(Exception, acquire_lock, self.lock, 1, 1)
 
     def test_wrong_process_and_continue(self):
         fd = os.open(self.lock, os.O_EXCL | os.O_RDWR | os.O_CREAT)
-        os.write(fd, '1111111111')
+        os.write(fd, b'1111111111')
         os.close(fd)
         self.assertTrue(os.path.exists(self.lock))
         self.assertTrue(acquire_lock(self.lock))

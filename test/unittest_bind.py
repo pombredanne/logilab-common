@@ -25,8 +25,8 @@ class BindTC(TestCase):
         d = {'HELLO' : HELLO}
         new_f = bind.bind(f, d)
         self.assertEquals(new_f(), f())
-        f_consts = f.func_code.co_consts
-        newf_consts = new_f.func_code.co_consts
+        f_consts = f.__code__.co_consts
+        newf_consts = new_f.__code__.co_consts
         self.assertEquals(f_consts, (None,))
         self.assert_(newf_consts, (None, HELLO))
 
@@ -41,20 +41,20 @@ class BindTC(TestCase):
         """tests bind.analyze_code()"""
         consts_dict, consts_list = {}, []
         globs = {'HELLO' : "some global value"}
-        modified = bind.analyze_code(modify_hello.func_code, globs,
+        modified = bind.analyze_code(modify_hello.__code__, globs,
                                      consts_dict, consts_list)
         self.assertEquals(consts_list, [None, 'hacked !'])
         self.assertEquals(modified, ['HELLO'])
     
     def test_optimize_module2(self):
         """test optimize_module_2()"""
-        f1_consts = Set(foomod.f1.func_code.co_consts)
-        f2_consts = Set(foomod.f2.func_code.co_consts)
-        f3_consts = Set(foomod.f3.func_code.co_consts)
+        f1_consts = Set(foomod.f1.__code__.co_consts)
+        f2_consts = Set(foomod.f2.__code__.co_consts)
+        f3_consts = Set(foomod.f3.__code__.co_consts)
         bind.optimize_module_2(foomod, ['f1', 'f2', 'f3'])
-        newf1_consts = Set(foomod.f1.func_code.co_consts)
-        newf2_consts = Set(foomod.f2.func_code.co_consts)
-        newf3_consts = Set(foomod.f3.func_code.co_consts)
+        newf1_consts = Set(foomod.f1.__code__.co_consts)
+        newf2_consts = Set(foomod.f2.__code__.co_consts)
+        newf3_consts = Set(foomod.f3.__code__.co_consts)
         self.assert_(newf1_consts == newf2_consts == newf3_consts)
         self.assertEquals(newf1_consts, f1_consts | f2_consts | f3_consts)
     
