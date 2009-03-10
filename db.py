@@ -32,7 +32,11 @@ try:
     HAS_MX_DATETIME = True
 except:
     HAS_MX_DATETIME = False
-    
+
+# set this to False if you've mx DateTime installed but you don't want your db
+# adapter to use it (should be set before you got a connection)
+USE_MX_DATETIME = True
+
 __all__ = ['get_dbapi_compliant_module', 
            'get_connection', 'set_prefered_driver',
            'PyConnection', 'PyCursor',
@@ -292,7 +296,7 @@ class _Psycopg2Adapter(_PsycopgAdapter):
             return
         psycopg2._lc_initialized = 1
         # use mxDateTime instead of datetime if available
-        if HAS_MX_DATETIME:
+        if HAS_MX_DATETIME and USE_MX_DATETIME:
             from psycopg2 import extensions
             extensions.register_type(psycopg2._psycopg.MXDATETIME)
             extensions.register_type(psycopg2._psycopg.MXINTERVAL)
@@ -385,7 +389,7 @@ class _PySqlite2Adapter(DBAPIAdapter):
         sqlite.register_converter('decimal',convert_decimal)
 
         # date/time types handling
-        if HAS_MX_DATETIME:
+        if HAS_MX_DATETIME and USE_MX_DATETIME:
             def adapt_mxdatetime(mxd):
                 return mxd.strftime('%Y-%m-%d %H:%M:%S')
             sqlite.register_adapter(DateTimeType, adapt_mxdatetime)
@@ -483,7 +487,7 @@ class _MySqlDBAdapter(DBAPIAdapter):
             return
         natmod._lc_initialized = 1
         # date/time types handling
-        if HAS_MX_DATETIME:
+        if HAS_MX_DATETIME and USE_MX_DATETIME:
             from MySQLdb import times
             from mx import DateTime as mxdt
             times.Date = times.date = mxdt.Date
