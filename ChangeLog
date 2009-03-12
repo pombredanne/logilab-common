@@ -1,6 +1,14 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+    * fix #7915 (shellutils unusable under windows)
+    * testlib:
+      * new profile option using cProfile
+      * allows to skip a module by raising TestSkipped from module import
+    * db: USE_MX_DATETIME global to control usage of mx.DateTime / py datetime
+	
+	
 2009-01-26  --  0.38.0
     * setuptools / easy_install support!
 
