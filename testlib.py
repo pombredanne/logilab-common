@@ -1503,8 +1503,8 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             msg.append('text2 is not a string (%s)'%(type(text2)))
         if msg:
             self.fail('\n'.join(msg))
-        self._difftext(text1.splitlines(True), text2.splitlines(True), junk, 
-            msg_prefix)
+        self._difftext(text1.strip().splitlines(True), text2.strip().splitlines(True),
+                       junk,  msg_prefix)
     assertTextEqual = assertTextEquals
             
     def assertStreamEquals(self, stream1, stream2, junk=None,
