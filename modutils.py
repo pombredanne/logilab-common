@@ -22,6 +22,13 @@ import os
 from os.path import walk, splitext, join, abspath, isdir, dirname, exists
 from imp import find_module, load_module, C_BUILTIN, PY_COMPILED, PKG_DIRECTORY
 
+try:
+    import zipimport
+except ImportError:
+    zipimport = None
+    
+ZIPFILE = object()
+
 from logilab.common import STD_BLACKLIST
 
 if sys.platform.startswith('win'):
@@ -527,6 +534,16 @@ def _file_from_modpath(modpath, path=None, context=None):
         mp_filename = _has_init(mp_filename)
     return mp_filename
 
+def _search_zip(modpath, pic):
+    for filepath, importer in pic.items():
+        if importer is not None:
+            if importer.find_module(modpath[0]):
+                if not importer.find_module('/'.join(modpath)):
+                    raise ImportError('No module %s in %s' % (
+                        '.'.join(modpath[1:]), file))
+                return ZIPFILE, abspath(filepath) + '/' + '/'.join(modpath), filepath
+    raise ImportError('No module %s' % '.'.join(modpath))
+    
 def _module_file(modpath, path=None):
     """get a module type / file path
 
@@ -544,8 +561,38 @@ def _module_file(modpath, path=None):
     :rtype: tuple(int, str)
     :return: the module type flag and the file path for a module
     """
+    # egg support compat
+    try:
+        pic = sys.path_importer_cache
+        _path = (path is None and sys.path or path)
+        for __path in _path:
+            if not __path in pic:
+                try:
+                    pic[__path] = zipimport.zipimporter(__path)
+                except zipimport.ZipImportError:
+                    pic[__path] = None
+        checkeggs = True
+    except AttributeError:
+        checkeggs = False
     while modpath:
-        _, mp_filename, mp_desc = find_module(modpath[0], path)
+        try:
+            _, mp_filename, mp_desc = find_module(modpath[0], path)
+        except ImportError:
+            if checkeggs:
+                return _search_zip(modpath, pic)[:2]
+            raise
+        else:
+            if checkeggs:
+                fullabspath = [abspath(x) for x in _path]
+                pathindex = fullabspath.index(dirname(abspath(mp_filename)))
+                try:
+                    emtype, emp_filename, zippath = _search_zip(modpath, pic)
+                    if pathindex > _path.index(zippath):
+                        # an egg takes priority
+                        return emtype, emp_filename
+                except ImportError:
+                    pass
+                checkeggs = False
         modpath.pop(0)
         mtype = mp_desc[2]
         if modpath:
@@ -570,7 +617,7 @@ def _has_init(directory):
     else return None
     """
     mod_or_pack = join(directory, '__init__')
-    for ext in ('.py', '.pyw', '.pyc', '.pyo'):
-        if exists(mod_or_pack + ext):
+    for ext in PY_SOURCE_EXTS + ('.pyc', '.pyo'):
+        if exists(mod_or_pack + '.' + ext):
             return mod_or_pack + ext
     return None

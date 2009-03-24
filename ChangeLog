@@ -6,6 +6,7 @@ ChangeLog for logilab.common
     * testlib:
       * new profile option using cProfile
       * allows to skip a module by raising TestSkipped from module import
+    * modutils: locate modules in zip/egg archive
     * db: USE_MX_DATETIME global to control usage of mx.DateTime / py datetime
 	
 	
