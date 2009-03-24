@@ -1,20 +1,29 @@
-logilab-common (0.38.1-1) UNRELEASED; urgency=low
+logilab-common (0.38.1-1) unstable; urgency=low
 
-  * new upstream release
+  * New upstream release
+  * debian/{control, rules}
+    - move from python-central to python-support
+  * debian/control
+    - bump Standard-Version to 3.8.1 (no changes needed)
+
+ -- Sandro Tosi <morph@debian.org>  Tue, 17 Mar 2009 16:26:15 +0100
+
+logilab-common (0.38.0-1) unstable; urgency=low
+
+  * New upstream release
   * debian/watch
     - added opts=pasv to parse correctly remote ftp site
     - bump version to 3
     - removed path to debian package and command to execute after download
   * debian/copyright
     - updated upstream copyright information
+  * debian/rules
+    - added test execution at build-time, simulating "logilab" is a real
+      package; thanks Piotr!
+    - using --root at install-time
+    - build can't be used as dh_clean call (it's a dir), restored 'rm -rf'
 
- -- Sandro Tosi <morph@debian.org>  Sun, 01 Feb 2009 18:08:57 +0100
-
-logilab-common (0.38.0-1) unstable; urgency=low
-
-  * new upstream release
-
- -- Sylvain Thénault <sylvain.thenault@logilab.fr>  Mon, 26 Jan 2009 15:03:27 +0100
+ -- Sandro Tosi <morph@debian.org>  Thu, 05 Feb 2009 00:53:24 +0100
 
 logilab-common (0.37.2-2) unstable; urgency=low
 

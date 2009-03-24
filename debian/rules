@@ -16,7 +16,16 @@ build-stamp:
 	dh_testdir
 	
 	# python module build
-	python setup.py -q build
+	NO_SETUPTOOLS=1 python setup.py -q build
+
+	# run tests
+ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
+	# we need this hack because we have to import "logilab.common.pytest"
+	# but since it's a namespace package, we need to "simulate" it
+	touch $(CURDIR)/build/lib/logilab/__init__.py
+	-PYTHONPATH=$(CURDIR)/build/lib/ $(CURDIR)/build/scripts-2.5/pytest
+	rm -f $(CURDIR)/build/lib/logilab/__init__.py
+endif
 
 	# build doc
 	$(MAKE) -C doc
@@ -30,11 +39,13 @@ clean:
 	# clean doc
 	$(MAKE) -C doc clean
 
-	python setup.py clean
+	NO_SETUPTOOLS=1 python setup.py clean
+
+	[ ! -d build ] || rm -rf build
 
 	find . -name "*.pyc" -delete
 
-	dh_clean build-stamp build
+	dh_clean build-stamp
 
 install: build
 	dh_testdir
@@ -42,9 +53,9 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	python setup.py -q install --no-compile --prefix=debian/python-logilab-common/usr/ --install-headers=debian/python-logilab-common/usr/include/ --install-scripts=debian/python-logilab-common/usr/bin
+	NO_SETUPTOOLS=1 python setup.py -q install --no-compile --root=debian/python-logilab-common/ --install-headers=usr/include/ --install-scripts=usr/bin/
 
-	# remove test directory (installed in in the doc directory)
+	# remove test directory
 	rm -rf debian/python-logilab-common/usr/lib/python*/site-packages/logilab/common/test
 
 # Build architecture-independent files here.
@@ -52,7 +63,7 @@ binary-indep: build install
 	dh_testdir 
 	dh_testroot 
 	dh_install -i
-	dh_pycentral -i 
+	dh_pysupport -i 
 	dh_installchangelogs -i ChangeLog
 	dh_installexamples -i
 	dh_installdocs -i 	README doc/apidoc/
@@ -69,4 +80,3 @@ binary-arch:
 
 binary: binary-indep
 .PHONY: build clean binary binary-indep binary-arch
-
