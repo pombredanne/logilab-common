@@ -585,12 +585,15 @@ def _module_file(modpath, path=None):
         else:
             if checkeggs:
                 fullabspath = [abspath(x) for x in _path]
-                pathindex = fullabspath.index(dirname(abspath(mp_filename)))
                 try:
+                    pathindex = fullabspath.index(dirname(abspath(mp_filename)))
                     emtype, emp_filename, zippath = _search_zip(modpath, pic)
                     if pathindex > _path.index(zippath):
                         # an egg takes priority
                         return emtype, emp_filename
+                except ValueError:
+                    # XXX not in _path
+                    pass
                 except ImportError:
                     pass
                 checkeggs = False
