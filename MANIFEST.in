@@ -5,7 +5,7 @@ include DEPENDS
 include bin/pytest
 include bin/pytest.bat
 include test/data/ChangeLog
-recursive-include test/data *.py *.txt *.msg *.ini
+recursive-include test/data *.py *.txt *.msg *.ini *.zip *.egg
 recursive-include test/data/*_dir *
 recursive-include doc/html *
 include doc/pytest.1
