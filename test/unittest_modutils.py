@@ -134,12 +134,6 @@ class file_from_modpath_tc(TestCase):
         self.assertEqual(modutils.file_from_modpath(['sys']),
                          None)
     
-    def test_knownValues_file_from_modpath_5(self):
-        from email import MIMEMultipart
-        print MIMEMultipart.__file__
-        self.assertEqual(modutils.file_from_modpath(['email', 'MIMEMultipart']),
-                         MIMEMultipart.__file__.replace('.pyc', '.py'))
-    
     def test_raise_file_from_modpath_Exception(self):
         self.assertRaises(ImportError, modutils.file_from_modpath, ['turlututu'])
 
