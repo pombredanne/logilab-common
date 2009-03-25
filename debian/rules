@@ -55,9 +55,6 @@ install: build
 
 	NO_SETUPTOOLS=1 python setup.py -q install --no-compile --root=debian/python-logilab-common/ --install-headers=usr/include/ --install-scripts=usr/bin/
 
-	# remove test directory
-	rm -rf debian/python-logilab-common/usr/lib/python*/site-packages/logilab/common/test
-
 # Build architecture-independent files here.
 binary-indep: build install
 	dh_testdir 
