@@ -539,10 +539,10 @@ def _search_zip(modpath, pic):
         if importer is not None:
             if importer.find_module(modpath[0]):
                 if not importer.find_module('/'.join(modpath)):
-                    raise ImportError('No module %s in %s' % (
-                        '.'.join(modpath[1:]), file))
+                    raise ImportError('No module named %s in %s/%s' % (
+                        '.'.join(modpath[1:]), file, modpath))
                 return ZIPFILE, abspath(filepath) + '/' + '/'.join(modpath), filepath
-    raise ImportError('No module %s' % '.'.join(modpath))
+    raise ImportError('No module named %s' % '.'.join(modpath))
     
 def _module_file(modpath, path=None):
     """get a module type / file path
@@ -574,6 +574,7 @@ def _module_file(modpath, path=None):
         checkeggs = True
     except AttributeError:
         checkeggs = False
+    imported = []
     while modpath:
         try:
             _, mp_filename, mp_desc = find_module(modpath[0], path)
@@ -593,11 +594,12 @@ def _module_file(modpath, path=None):
                 except ImportError:
                     pass
                 checkeggs = False
-        modpath.pop(0)
+        imported.append(modpath.pop(0))
         mtype = mp_desc[2]
         if modpath:
             if mtype != PKG_DIRECTORY:
-                raise ImportError('No module %r' % '.'.join(modpath))
+                raise ImportError('No module %s in %s' % ('.'.join(modpath),
+                                                          '.'.join(imported)))
             path = [mp_filename]
     return mtype, mp_filename
 
