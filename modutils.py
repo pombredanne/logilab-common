@@ -622,7 +622,7 @@ def _has_init(directory):
     else return None
     """
     mod_or_pack = join(directory, '__init__')
-    for ext in PY_SOURCE_EXTS + ('.pyc', '.pyo'):
+    for ext in PY_SOURCE_EXTS + ('pyc', 'pyo'):
         if exists(mod_or_pack + '.' + ext):
-            return mod_or_pack + ext
+            return mod_or_pack + '.' + ext
     return None
