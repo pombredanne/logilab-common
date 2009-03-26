@@ -35,6 +35,16 @@ class attrdict(dict):
         except KeyError:
             raise AttributeError(attr)
         
+class dictattr(dict):
+    def __init__(self, proxy):
+        self.__proxy = proxy
+        
+    def __getitem__(self, attr):
+        try:
+            return getattr(self.__proxy, attr)
+        except AttributeError:
+            raise KeyError(attr)
+        
 class nullobject(object):
     def __nonzero__(self):
         return False
