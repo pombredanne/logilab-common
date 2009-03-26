@@ -7,7 +7,7 @@
 
   This module requires at least python 2.2
 
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -15,7 +15,7 @@ __docformat__ = "restructuredtext en"
 
 from types import ListType, TupleType
 
-class Interface:
+class Interface(object):
     """Base class for interfaces."""
     def is_implemented_by(cls, instance):
         return implements(instance, cls)
