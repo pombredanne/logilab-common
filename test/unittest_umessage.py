@@ -1,7 +1,7 @@
 # encoding: iso-8859-15
 
 from logilab.common.testlib import TestCase, unittest_main
-from logilab.common.umessage import UMessage
+from logilab.common.umessage import UMessage, decode_QP
 
 import email
 
@@ -26,6 +26,12 @@ class UMessageTC(TestCase):
     def test_get_payload_no_multi(self):
         payload = self.umessage1.get_payload()
         self.assertEquals(type(payload), unicode)
+
+    def test_decode_QP(self):
+        test_line =  '=??b?UmFwaGHrbA==?= DUPONT<raphael.dupont@societe.fr>'
+        test = decode_QP(test_line)
+        self.assertEquals(type(test), unicode)
+        self.assertEquals(test, u'Raphaël DUPONT<raphael.dupont@societe.fr>')
         
 
 if __name__ == '__main__':

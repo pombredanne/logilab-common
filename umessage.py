@@ -19,7 +19,7 @@ except ImportError:
 def decode_QP(string):
     parts = []
     for decoded, charset in decode_header(string):
-        if charset is None:
+        if not charset :
             charset = 'iso-8859-15'
         parts.append(unicode(decoded, charset, 'replace'))
 
