@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+2009-04-07  --  0.39.1
+    * fix #6760 umessage.decode_QP() crashes on unknown encoding
+
 2009-03-25  --  0.39.0
     * fix #7915 (shellutils unusable under windows)
 
