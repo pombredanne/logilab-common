@@ -99,17 +99,15 @@ class DotBackend:
         self.lines.append(line)
 
     def emit_edge(self, name1, name2, **props):
-        """Emits edge from <name1> to <name2>.
-        
-        Authorized props: see http://www.graphviz.org/doc/info/attrs.html
-        """
+        """emit an edge from <name1> to <name2>."""
+        #edge properties: see http://www.graphviz.org/doc/info/attrs.html
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
         n_from, n_to = normalize_node_id(name1), normalize_node_id(name2)
         self.emit('%s -> %s [%s];' % (n_from, n_to, ", ".join(attrs)) )
 
     def emit_node(self, name, **props):
-        """Authorized props: see http://www.graphviz.org/doc/info/attrs.html
-        """
+        """emit a node with given properties"""
+        # node properties: see http://www.graphviz.org/doc/info/attrs.html
         attrs = ['%s="%s"' % (prop, value) for prop, value in props.items()]
         self.emit('%s [%s];' % (normalize_node_id(name), ", ".join(attrs)))
 
@@ -119,12 +117,12 @@ def normalize_node_id(nid):
 
 class GraphGenerator:
     def __init__(self, backend):
-        # the backend is responsible to output the graph is a particular format
+        # the backend is responsible to output the graph in a particular format
         self.backend = backend
 
     def generate(self, visitor, propshdlr, outputfile=None):
         # the visitor 
-        # the properties handler is used to get nodes and edges properties
+        # the property handler is used to get node and edge properties
         # according to the graph and to the backend
         self.propshdlr = propshdlr
         for nodeid, node in visitor.nodes():
@@ -138,7 +136,7 @@ class GraphGenerator:
 
 
 def get_cycles(graph_dict, vertices=None):
-    '''given a dictionnary representing an ordered graph (i.e. key are vertices
+    '''given a dictionary representing an ordered graph (i.e. key are vertices
     and values is a list of destination vertices representing edges), return a
     list of detected cycles
     '''
@@ -155,8 +153,7 @@ def _get_cycles(graph_dict, vertice=None, path=None, result=None):
     """recursive function doing the real work for get_cycles"""
     if vertice in path:
         cycle = [vertice]
-        for i in range(len(path)-1, 0, -1):
-            node = path[i]
+        for node in path[::-1]:
             if node == vertice:
                 break
             cycle.insert(0, node)
