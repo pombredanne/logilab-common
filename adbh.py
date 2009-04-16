@@ -47,10 +47,7 @@ class FunctionDescr(object):
         self.aggregat = aggregat
 
     def backend_name(self, backend):
-        try:
-            return self.name_mapping[backend]
-        except KeyError:
-            return self.name
+        return self.name_mapping.get(backend, self.name)
     backend_name = classmethod(backend_name)
     
     #@classmethod
