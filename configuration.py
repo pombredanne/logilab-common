@@ -82,7 +82,7 @@ Quick start: simplest usage
   >>>
 
 
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2003-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -425,7 +425,9 @@ class OptionsManagerMixIn(object):
         # default is handled here and *must not* be given to optik if you
         # want the whole machinery to work
         if 'default' in opt_dict:
-            if OPTPARSE_FORMAT_DEFAULT and 'help' in opt_dict:
+            if (OPTPARSE_FORMAT_DEFAULT and 'help' in opt_dict and
+                opt_dict.get('default') is not None and
+                not opt_dict['action'] in ('store_true', 'store_false')):
                 opt_dict['help'] += ' [current: %default]'
             del opt_dict['default']
         args = ['--' + opt_name]
