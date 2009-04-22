@@ -530,7 +530,7 @@ class _MySqlDBAdapter(DBAPIAdapter):
             # XXX: what about other encodings ??
             if maxsize in (16777215, 50331645): # mediumtext (2**24 - 1)
                 if isinstance(value, str):
-                    return unicode(value, encoding)
+                    return unicode(value, encoding, 'replace')
                 return value
             #if maxsize == 255: # tinyblob (2**8 - 1)
             #    return value
