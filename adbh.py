@@ -3,7 +3,7 @@
 Helpers are provided for postgresql, mysql and sqlite.
 
 :copyright:
-  2000-2008 `LOGILAB S.A. <http://www.logilab.fr>`_ (Paris, FRANCE),
+  2000-2009 `LOGILAB S.A. <http://www.logilab.fr>`_ (Paris, FRANCE),
   all rights reserved.
 
 :contact:
@@ -50,7 +50,6 @@ class FunctionDescr(object):
         return self.name_mapping.get(backend, self.name)
     backend_name = classmethod(backend_name)
 
-    #@classmethod
     def check_nbargs(cls, nbargs):
         if cls.minargs is not None and \
                nbargs < cls.minargs:
