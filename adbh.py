@@ -470,20 +470,26 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
                        keepownership=True):
         """return a command to backup the given database"""
         # XXX compress
-        return 'mysqldump -h %s -u %s -p -r %s %s' % (dbhost, dbuser, backupfile, dbname)
+        host_option = ''
+        if dbhost is not None:
+            host_option = '-h %s' % dbhost
+        return 'mysqldump %s -u %s -p -r %s %s' % (host_option, dbuser, backupfile, dbname)
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
         """return a list of commands to restore a backup the given database"""
         cmds = []
+        host_option = ''
+        if dbhost is not None:
+            host_option = '-h %s' % dbhost
         if drop:
-            cmd = 'echo "DROP DATABASE %s;" | mysql -h %s -u %s -p' % (
-                dbname, dbhost, dbuser)
+            cmd = 'echo "DROP DATABASE %s;" | mysql %s -u %s -p' % (
+                dbname, host_option, dbuser)
             cmds.append(cmd)
-        cmd = 'echo "%s;" | mysql -h %s -u %s -p' % (
-            self.sql_create_database(dbname, encoding), dbhost, dbuser)
+        cmd = 'echo "%s;" | mysql %s -u %s -p' % (
+            self.sql_create_database(dbname, encoding), host_option, dbuser)
         cmds.append(cmd)
-        cmd = 'mysql -h %s -u %s -p %s < %s' % (dbhost, dbuser, dbname, backupfile)
+        cmd = 'mysql %s -u %s -p %s < %s' % (host_option, dbuser, dbname, backupfile)
         cmds.append(cmd)
         return cmds
 
