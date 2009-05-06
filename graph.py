@@ -2,7 +2,7 @@
 
 (dot generation adapted from pypy/translator/tool/make_dot.py)
 
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -22,9 +22,8 @@ def escape(value):
 
 def target_info_from_filename(filename):
     """Transforms /some/path/foo.png into ('/some/path', 'foo.png', 'png')."""
-    abspath = osp.abspath(filename)
     basename = osp.basename(filename)
-    storedir = osp.dirname(abspath)
+    storedir = osp.dirname(osp.abspath(filename))
     target = filename.split('.')[-1]
     return storedir, basename, target
 
@@ -71,7 +70,12 @@ class DotBackend:
         :return: a path to the generated file
         """
         name = self.graphname
-        dotfile = dotfile or ('%s.dot' % name)
+        if not dotfile:
+            # if 'outputfile' is a dot file use it as 'dotfile'
+            if outputfile and outputfile[-4:]==".dot":
+                dotfile = outputfile
+            else:
+                dotfile = '%s.dot' % name
         if outputfile is not None:
             storedir, basename, target = target_info_from_filename(outputfile)
             if target != "dot":
