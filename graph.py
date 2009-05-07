@@ -72,7 +72,7 @@ class DotBackend:
         name = self.graphname
         if not dotfile:
             # if 'outputfile' is a dot file use it as 'dotfile'
-            if outputfile and outputfile[-4:]==".dot":
+            if outputfile and outputfile.endswith(".dot"):
                 dotfile = outputfile
             else:
                 dotfile = '%s.dot' % name
