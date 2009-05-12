@@ -410,8 +410,18 @@ class _PySqlite2Adapter(DBAPIAdapter):
                     # DateTime used as Time?
                     return strptime(ustr, '%Y-%m-%d %H:%M:%S')
             sqlite.register_converter('time', convert_mxtime)
-        # XXX else use datetime.datetime
-    
+        # else use datetime.datetime
+        else:
+            from datetime import time
+            def adapt_time(data):
+                return data.strftime('%H:%M:%S')
+            sqlite.register_adapter(time, adapt_time)
+            def convert_time(data):
+               return time(*[int(i) for i in data.split(':')])
+            sqlite.register_converter('time', convert_time)
+
+
+
             
     def connect(self, host='', database='', user='', password='', port=None):
         """Handles sqlite connexion format"""
