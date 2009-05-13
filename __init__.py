@@ -8,7 +8,7 @@
 :var IGNORED_EXTENSIONS: file extensions that may usually be ignored
 
 :copyright:
-  2000-2008 `LOGILAB S.A. <http://www.logilab.fr>`_ (Paris, FRANCE),
+  2000-2009 `LOGILAB S.A. <http://www.logilab.fr>`_ (Paris, FRANCE),
   all rights reserved.
 
 :contact:
@@ -26,6 +26,10 @@ STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 
 IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc', '~')
 
+# set this to False if you've mx DateTime installed but you don't want your db
+# adapter to use it (should be set before you got a connection)
+USE_MX_DATETIME = True
+
 
 class attrdict(dict):
     """A dictionary for which keys are also accessible as attributes."""
@@ -34,17 +38,17 @@ class attrdict(dict):
             return self[attr]
         except KeyError:
             raise AttributeError(attr)
-        
+
 class dictattr(dict):
     def __init__(self, proxy):
         self.__proxy = proxy
-        
+
     def __getitem__(self, attr):
         try:
             return getattr(self.__proxy, attr)
         except AttributeError:
             raise KeyError(attr)
-        
+
 class nullobject(object):
     def __nonzero__(self):
         return False
@@ -68,7 +72,7 @@ class nullobject(object):
 #
 #def flatten(seq):
 #    for item in seq:
-#        if is_scalar(item): 
+#        if is_scalar(item):
 #            yield item
 #        else:
 #            for subitem in flatten(item):
@@ -105,7 +109,7 @@ def make_domains(lists):
     combinations of possibles values.
 
     :rtype: list
-    
+
     Example:
 
     >>> make_domains(['a', 'b'], ['c','d', 'e'])
