@@ -21,7 +21,7 @@ class Interface(object):
         return implements(instance, cls)
     is_implemented_by = classmethod(is_implemented_by)
 
-    
+
 def implements(obj, interface):
     """Return true if the give object (maybe an instance or class) implements
     the interface.
@@ -39,7 +39,7 @@ def extend(klass, interface, _recurs=False):
     """Add interface to klass'__implements__ if not already implemented in.
 
     If klass is subclassed, ensure subclasses __implements__ it as well.
-    
+
     NOTE: klass should be e new class.
     """
     if not implements(klass, interface):

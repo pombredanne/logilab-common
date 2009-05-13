@@ -16,7 +16,7 @@ def cached(callableobj, keyarg=None):
     """Simple decorator to cache result of method call."""
     #print callableobj, keyarg, callableobj.func_code.co_argcount
     if callableobj.func_code.co_argcount == 1 or keyarg == 0:
-        
+
         def cache_wrapper1(self, *args):
             cache = '_%s_cache_' % callableobj.__name__
             #print 'cache1?', cache
@@ -28,9 +28,9 @@ def cached(callableobj, keyarg=None):
                 setattr(self, cache, value)
                 return value
         return cache_wrapper1
-    
+
     elif keyarg:
-        
+
         def cache_wrapper2(self, *args, **kwargs):
             cache = '_%s_cache_' % callableobj.__name__
             key = args[keyarg-1]
@@ -89,10 +89,10 @@ class wproperty(object):
     def __init__(self, setfunc):
         self.setfunc = setfunc
         self.attrname = '_%s' % setfunc.__name__
-        
+
     def __set__(self, obj, value):
         self.setfunc(obj, value)
-        
+
     def __get__(self, obj, cls):
         assert obj is not None
         return getattr(obj, self.attrname)
