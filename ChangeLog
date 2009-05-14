@@ -1,6 +1,15 @@
 ChangeLog for logilab.common
 ============================
 
+--
+    * python < 2.3 are now officially unsupported
+    * #9162: new module with some sphinx utilities
+    * #9166: use a global variable to control mx datetime / py datetime usage
+    * db: add time adapter for pysqlite2, fix mysql bool and string handling
+    * configuration: don't print default for store_true / store_false option
+      or option with None as default
+
+
 2009-04-07  --  0.39.1
     * fix #6760 umessage.decode_QP() crashes on unknown encoding
 
@@ -1006,6 +1015,3 @@ ChangeLog for logilab.common
 
 2003-02-17  --  0.1.0
     * initial revision
-
-
-
