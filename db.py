@@ -361,19 +361,19 @@ class _PySqlite2Adapter(DBAPIAdapter):
         def adapt_bytea(data):
             return data.getvalue()
         sqlite.register_adapter(StringIO, adapt_bytea)
-        def convert_bytea(data):
-            return StringIO(data)
+        def convert_bytea(data, Binary=sqlite.Binary):
+            return Binary(data)
         sqlite.register_converter('bytea', convert_bytea)
 
         # boolean type handling
+        def adapt_boolean(bval):
+            return str(bval).upper()
+        sqlite.register_adapter(bool, adapt_boolean)
         def convert_boolean(ustr):
             if ustr.upper() in ('F', 'FALSE'):
                 return False
             return True
         sqlite.register_converter('boolean', convert_boolean)
-        def adapt_boolean(bval):
-            return str(bval).upper()
-        sqlite.register_adapter(bool, adapt_boolean)
 
 
         # decimal type handling
@@ -458,7 +458,7 @@ class _PySqlite2Adapter(DBAPIAdapter):
         return self._wrap_if_needed(PySqlite2CnxWrapper(cnx), user)
 
     def process_value(self, value, description, encoding='utf-8', binarywrap=None):
-        if not binarywrap is None and isinstance(value, self._native_module.Binary):
+        if binarywrap is not None and isinstance(value, self._native_module.Binary):
             return binarywrap(value)
         return value # no type code support, can't do anything
 
