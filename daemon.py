@@ -56,8 +56,7 @@ If it i not the case, remove the file %s''' % (self.name, self._pid_file))
             # put signal handler
             signal.signal(signal.SIGTERM, self.signal_handler)
             signal.signal(signal.SIGHUP, self.signal_handler)
-		
-        
+
     def run(self):
         """ optionaly go in daemon mode and
         do what concrete classe has to do and pauses for delay between runs
@@ -87,7 +86,7 @@ If it i not the case, remove the file %s''' % (self.name, self._pid_file))
         self.config.log(LOG_NOTICE, '%s instance exited'%self.name)
         # remove pid file
         os.remove(self._pid_file)
-        
+
     def signal_handler(self, sig_num, stack_frame):
         if sig_num == signal.SIGTERM:
             if self._sleeping:
