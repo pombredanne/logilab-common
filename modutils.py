@@ -26,7 +26,7 @@ try:
     import zipimport
 except ImportError:
     zipimport = None
-    
+
 ZIPFILE = object()
 
 from logilab.common import STD_BLACKLIST
@@ -39,7 +39,7 @@ else:
     PY_SOURCE_EXTS = ('py',)
     PY_COMPILED_EXTS = ('so',)
     STD_LIB_DIR = join(sys.prefix, 'lib', 'python%s' % sys.version[:3])
-    
+
 BUILTIN_MODULES = dict(zip(sys.builtin_module_names,
                            [1]*len(sys.builtin_module_names)))
 
@@ -54,19 +54,19 @@ class LazyObject(object):
         self.module = module
         self.obj = obj
         self._imported = None
-        
+
     def __getobj(self):
         if self._imported is None:
            self._imported = getattr(load_module_from_name(self.module),
                                     self.obj)
         return self._imported
-    
+
     def __getattribute__(self, attr):
         try:
             return super(LazyObject, self).__getattribute__(attr)
         except AttributeError, ex:
             return getattr(self.__getobj(), attr)
-        
+
     def __call__(self, *args, **kwargs):
         return self.__getobj()(*args, **kwargs)
 
@@ -89,7 +89,7 @@ def load_module_from_name(dotted_name, path=None, use_sys=1):
 
 
     :raise ImportError: if the module or package is not found
-    
+
     :rtype: module
     :return: the loaded module
     """
@@ -113,7 +113,7 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
       boolean indicating whether the sys.modules dictionary should be used or not
 
     :raise ImportError: if the module or package is not found
-    
+
     :rtype: module
     :return: the loaded module
     """
@@ -162,7 +162,7 @@ def load_module_from_file(filepath, path=None, use_sys=1):
 
 
     :raise ImportError: if the module or package is not found
-    
+
     :rtype: module
     :return: the loaded module
     """
@@ -227,7 +227,7 @@ def file_from_modpath(modpath, path=None, context_file=None):
       context file to consider, necessary if the identifier has been
       introduced using a relative import unresolvable in the actual
       context (i.e. modutils)
-      
+
     :raise ImportError: if there is no such module in the directory
 
     :rtype: str or None
@@ -251,14 +251,14 @@ def file_from_modpath(modpath, path=None, context_file=None):
     return _file_from_modpath(modpath, path, context)
 
 
-    
+
 def get_module_part(dotted_name, context_file=None):
     """given a dotted name return the module part of the name :
-    
+
     >>> get_module_part('logilab.common.modutils.get_module_part')
     'logilab.common.modutils'
 
-    
+
     :type dotted_name: str
     :param dotted_name: full name of the identifier we are interested in
 
@@ -268,9 +268,9 @@ def get_module_part(dotted_name, context_file=None):
       introduced using a relative import unresolvable in the actual
       context (i.e. modutils)
 
-    
+
     :raise ImportError: if there is no such module in the directory
-    
+
     :rtype: str or None
     :return:
       the module part of the name or None if we have not been able at
@@ -312,7 +312,7 @@ def get_module_part(dotted_name, context_file=None):
     return dotted_name
 
 
-    
+
 def get_modules(package, src_directory, blacklist=STD_BLACKLIST):
     """given a package directory return a list of all available python
     modules in the package and its subpackages
@@ -392,7 +392,7 @@ def get_module_files(src_directory, blacklist=STD_BLACKLIST):
         # check for __init__.py
         if not '__init__.py' in fnames:
             while fnames:
-                fnames.pop()            
+                fnames.pop()
         for filename in fnames:
             src = join(directory, filename)
             if isdir(src):
@@ -414,7 +414,7 @@ def get_source_file(filename, include_no_ext=False):
 
 
     :raise NoSourceFile: if no source file exists on the file system
-    
+
     :rtype: str
     :return: the absolute path of the source file if it exists
     """
@@ -437,11 +437,11 @@ def is_python_source(filename):
     return splitext(filename)[1][1:] in PY_SOURCE_EXTS
 
 
-    
+
 def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
     """try to guess if a module is a standard python module (by default,
     see `std_path` parameter's description)
-    
+
     :type modname: str
     :param modname: name of the module we are interested in
 
@@ -477,19 +477,19 @@ def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
             return 0
     return False
 
-    
+
 
 def is_relative(modname, from_file):
     """return true if the given module name is relative to the given
     file name
-    
+
     :type modname: str
     :param modname: name of the module we are interested in
 
     :type from_file: str
     :param from_file:
       path of the module from which modname has been imported
-    
+
     :rtype: bool
     :return:
       true if the module has been imported relativly to `from_file`
@@ -543,7 +543,7 @@ def _search_zip(modpath, pic):
                         '.'.join(modpath[1:]), file, modpath))
                 return ZIPFILE, abspath(filepath) + '/' + '/'.join(modpath), filepath
     raise ImportError('No module named %s' % '.'.join(modpath))
-    
+
 def _module_file(modpath, path=None):
     """get a module type / file path
 
@@ -557,7 +557,7 @@ def _module_file(modpath, path=None):
       optional list of path where the module or package should be
       searched (use sys.path if nothing or None is given)
 
-      
+
     :rtype: tuple(int, str)
     :return: the module type flag and the file path for a module
     """
