@@ -12,8 +12,9 @@ from datetime import date, datetime, timedelta
 try:
     from mx.DateTime import RelativeDateTime, Date
 except ImportError:
-    from datetime import date, timedelta
+    from warnings import warn
     warn("mxDateTime not found, endsOfMonth won't be available")
+    from datetime import date, timedelta
     def weekday(date):
         return date.weekday()
     endOfMonth = None
