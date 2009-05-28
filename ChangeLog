@@ -1,7 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
---
+2009-05-28  -- 0.40.1
+   * date: handle both mx.DateTime and datetime representations
+   * db: use sqlite native module's Binary, not StringIO
+
+2009-05-14  -- 0.40.0
     * python < 2.3 are now officially unsupported
     * #9162: new module with some sphinx utilities
     * #9166: use a global variable to control mx datetime / py datetime usage
