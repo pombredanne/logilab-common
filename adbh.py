@@ -107,6 +107,7 @@ class _GenericAdvFuncHelper:
     users_support = True
     groups_support = True
     ilike_support = True
+    alter_column_support = True
 
     FUNCTIONS = {
         # aggregat functions
@@ -223,6 +224,15 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
     def sqls_increment_sequence(self, seq_name):
         return ('UPDATE %s SET last=last+1;' % seq_name,
                 'SELECT last FROM %s;' % seq_name)
+
+    def sql_change_col_type(self, table, column, coltype, null_allowed):
+        return 'ALTER TABLE %s ALTER COLUMN %s TYPE %s' % (
+            table, column, coltype)
+
+    def sql_set_null_allowed(self, table, column, coltype, null_allowed):
+        cmd = null_allowed and 'SET' or 'DROP'
+        return 'ALTER TABLE %s ALTER COLUMN %s %s NOT NULL' % (
+            table, column, cmd)
 
     def sql_temporary_table(self, table_name, table_schema,
                             drop_on_commit=True):
@@ -420,6 +430,7 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     ilike_support = False
     union_parentheses_support = False
     intersect_all_support = False
+    alter_column_support = False
 
     def sql_create_index(self, table, column, unique=False):
         idx = self._index_name(table, column, unique)
@@ -470,10 +481,12 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
                        keepownership=True):
         """return a command to backup the given database"""
         # XXX compress
-        host_option = ''
         if dbhost is not None:
             host_option = '-h %s' % dbhost
-        return 'mysqldump %s -u %s -p -r %s %s' % (host_option, dbuser, backupfile, dbname)
+        else:
+            host_option = ''
+        return 'mysqldump %s -u %s -p -r %s %s' % (host_option, dbuser,
+                                                   backupfile, dbname)
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
@@ -496,16 +509,27 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
     def sql_temporary_table(self, table_name, table_schema,
                             drop_on_commit=True):
         if not drop_on_commit:
-            return "CREATE TEMPORARY TABLE %s (%s);" % (table_name,
-                                                        table_schema)
-        return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (table_name,
-                                                                   table_schema)
+            return "CREATE TEMPORARY TABLE %s (%s);" % (
+                table_name, table_schema)
+        return "CREATE TEMPORARY TABLE %s (%s) ON COMMIT DROP;" % (
+            table_name, table_schema)
 
     def sql_create_database(self, dbname, encoding='utf-8'):
         sql = "CREATE DATABASE %(dbname)s"
         if encoding:
             sql += " CHARACTER SET %(encoding)s"
         return sql % locals()
+
+    def sql_change_col_type(self, table, column, coltype, null_allowed):
+        if null_allowed:
+            cmd = 'DEFAULT'
+        else:
+            cmd = 'NOT'
+        return 'ALTER TABLE %s MODIFY COLUMN %s %s NULL' % (
+            table, column, coltype, cmd)
+
+    def sql_set_null_allowed(self, table, column, coltype, null_allowed):
+        return self.sql_change_col_type(table, column, coltype, null_allowed)
 
     def create_database(self, cursor, dbname, owner=None, encoding='utf-8'):
         """create a new database"""

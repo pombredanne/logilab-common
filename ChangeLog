@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+ --
+   * adbh: new alter_column_support flag, sql_set_null_allowed and
+     sql_change_col_type methods
+
+
 2009-05-28  -- 0.40.1
    * date: handle both mx.DateTime and datetime representations
    * db: use sqlite native module's Binary, not StringIO
