@@ -169,12 +169,27 @@ def load_module_from_file(filepath, path=None, use_sys=1):
     return load_module_from_modpath(modpath_from_file(filepath), path, use_sys)
 
 
-def modpath_from_file(filename):
+def _check_init(path, mod_path):
+    """check there are some __init__.py all along the way"""
+    for part in mod_path:
+        path = join(path, part)
+        if not _has_init(path):
+            return False
+    return True
+
+
+def modpath_from_file(filename, extrapath=None):
     """given a file path return the corresponding splitted module's name
     (i.e name of a module or package splitted on '.')
 
     :type filename: str
     :param filename: file's path for which we want the module's name
+
+    :type extrapath: dict
+    :param extrapath:
+      optional extra search path, with path as key and package name for the path
+      as value. This is usually useful to handle package splited in multiple
+      directories using __path__ trick.
 
 
     :raise ImportError:
@@ -184,24 +199,25 @@ def modpath_from_file(filename):
     :return: the corresponding splitted module's name
     """
     base = splitext(abspath(filename))[0]
+    if extrapath is not None:
+        for path_ in extrapath:
+            path = abspath(path_)
+            if path and base[:len(path)] == path:
+                submodpath = [pkg for pkg in base[len(path):].split(os.sep)
+                              if pkg]
+                if _check_init(path, submodpath[:-1]):
+                    return extrapath[path_].split('.') + submodpath
     for path in sys.path:
         path = abspath(path)
         if path and base[:len(path)] == path:
             if filename.find('site-packages') != -1 and \
                    path.find('site-packages') == -1:
                 continue
-            mod_path = [module for module in base[len(path):].split(os.sep)
-                        if module]
-            for part in mod_path[:-1]:
-                path = join(path, part)
-                if not _has_init(path):
-                    break
-            else:
-                break
-    else:
-        raise ImportError('Unable to find module for %s in %s' % (
-            filename, ', \n'.join(sys.path)))
-    return mod_path
+            modpath = [pkg for pkg in base[len(path):].split(os.sep) if pkg]
+            if _check_init(path, modpath[:-1]):
+                return modpath
+    raise ImportError('Unable to find module for %s in %s' % (
+        filename, ', \n'.join(sys.path)))
 
 
 

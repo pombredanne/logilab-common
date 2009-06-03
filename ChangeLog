@@ -2,6 +2,8 @@ ChangeLog for logilab.common
 ============================
 
  --
+   * modutils: new extrapath argument to modpath_from_file (see function's
+     docstring for explanation)
    * adbh: new alter_column_support flag, sql_set_null_allowed and
      sql_change_col_type methods
 
