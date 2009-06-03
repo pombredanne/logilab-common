@@ -2,7 +2,12 @@ Source: logilab-common
 Section: python
 Priority: optional
 Maintainer: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>
-Uploaders: David Douard <david.douard@logilab.fr>, Fabrice Douchant <fabrice.douchant@logilab.fr>, Alexandre Fayolle <afayolle@debian.org>, Sandro Tosi <morph@debian.org>, Dorothe SÃ©nÃ©chal <dorothee.senechal@logilab.fr>, Adrien Di Mascio <Adrien.DiMascio@logilab.fr>
+Uploaders: David Douard <david.douard@logilab.fr>,
+	   Alexandre Fayolle <afayolle@debian.org>,
+	   Sandro Tosi <morph@debian.org>,
+	   Dorothe Sénéchal <dorothee.senechal@logilab.fr>,
+	   Adrien Di Mascio <Adrien.DiMascio@logilab.fr>,
+	   Nicolas Chauvat <nicolas.chauvat@logilab.fr>
 Build-Depends: debhelper (>= 5.0.38), python (>= 2.3.5-7)
 Build-Depends-Indep: python-support, python-epydoc, graphviz
 XS-Python-Version: all
