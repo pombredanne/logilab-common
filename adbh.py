@@ -108,6 +108,7 @@ class _GenericAdvFuncHelper:
     groups_support = True
     ilike_support = True
     alter_column_support = True
+    case_sensitive = False
 
     FUNCTIONS = {
         # aggregat functions
@@ -463,6 +464,7 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
     backend_name = 'mysql'
     needs_from_clause = True
     ilike_support = False # insensitive search by default
+    case_sensitive = True
 
     # modifiable but should not be shared
     FUNCTIONS = _GenericAdvFuncHelper.FUNCTIONS.copy()
