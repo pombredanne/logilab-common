@@ -231,7 +231,7 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
             table, column, coltype)
 
     def sql_set_null_allowed(self, table, column, coltype, null_allowed):
-        cmd = null_allowed and 'SET' or 'DROP'
+        cmd = null_allowed and 'DROP' or 'SET'
         return 'ALTER TABLE %s ALTER COLUMN %s %s NOT NULL' % (
             table, column, cmd)
 
