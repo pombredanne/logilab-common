@@ -242,48 +242,52 @@ except NameError:
 
 
 # Python2.5 subprocess added functions and exceptions
-from subprocess import Popen
-class CalledProcessError(Exception):
-    """This exception is raised when a process run by check_call() returns
-    a non-zero exit status.  The exit status will be stored in the
-    returncode attribute."""
-    def __init__(self, returncode, cmd):
-        self.returncode = returncode
-        self.cmd = cmd
-    def __str__(self):
-        return "Command '%s' returned non-zero exit status %d" % (self.cmd,
-self.returncode)
+try:
+    from subprocess import Popen
+except ImportError:
+    # gae or python < 2.3
 
-def call(*popenargs, **kwargs):
-    """Run command with arguments.  Wait for command to complete, then
-    return the returncode attribute.
+    class CalledProcessError(Exception):
+        """This exception is raised when a process run by check_call() returns
+        a non-zero exit status.  The exit status will be stored in the
+        returncode attribute."""
+        def __init__(self, returncode, cmd):
+            self.returncode = returncode
+            self.cmd = cmd
+        def __str__(self):
+            return "Command '%s' returned non-zero exit status %d" % (self.cmd,
+    self.returncode)
 
-    The arguments are the same as for the Popen constructor.  Example:
+    def call(*popenargs, **kwargs):
+        """Run command with arguments.  Wait for command to complete, then
+        return the returncode attribute.
 
-    retcode = call(["ls", "-l"])
-    """
-    # workaround: subprocess.Popen(cmd, stdout=sys.stdout) fails
-    # see http://bugs.python.org/issue1531862
-    if "stdout" in kwargs:
-        fileno = kwargs.get("stdout").fileno()
-        del kwargs['stdout']
-        return Popen(stdout=os.dup(fileno), *popenargs, **kwargs).wait()
-    return Popen(*popenargs, **kwargs).wait()
+        The arguments are the same as for the Popen constructor.  Example:
 
-def check_call(*popenargs, **kwargs):
-    """Run command with arguments.  Wait for command to complete.  If
-    the exit code was zero then return, otherwise raise
-    CalledProcessError.  The CalledProcessError object will have the
-    return code in the returncode attribute.
+        retcode = call(["ls", "-l"])
+        """
+        # workaround: subprocess.Popen(cmd, stdout=sys.stdout) fails
+        # see http://bugs.python.org/issue1531862
+        if "stdout" in kwargs:
+            fileno = kwargs.get("stdout").fileno()
+            del kwargs['stdout']
+            return Popen(stdout=os.dup(fileno), *popenargs, **kwargs).wait()
+        return Popen(*popenargs, **kwargs).wait()
 
-    The arguments are the same as for the Popen constructor.  Example:
+    def check_call(*popenargs, **kwargs):
+        """Run command with arguments.  Wait for command to complete.  If
+        the exit code was zero then return, otherwise raise
+        CalledProcessError.  The CalledProcessError object will have the
+        return code in the returncode attribute.
 
-    check_call(["ls", "-l"])
-    """
-    retcode = call(*popenargs, **kwargs)
-    cmd = kwargs.get("args")
-    if cmd is None:
-        cmd = popenargs[0]
-    if retcode:
-        raise CalledProcessError(retcode, cmd)
-    return retcode
+        The arguments are the same as for the Popen constructor.  Example:
+
+        check_call(["ls", "-l"])
+        """
+        retcode = call(*popenargs, **kwargs)
+        cmd = kwargs.get("args")
+        if cmd is None:
+            cmd = popenargs[0]
+        if retcode:
+            raise CalledProcessError(retcode, cmd)
+        return retcode
