@@ -12,7 +12,7 @@ from warnings import warn
 
 class deprecated(type):
     """metaclass to print a warning on instantiation of a deprecated class"""
-    
+
     def __call__(cls, *args, **kwargs):
         msg = getattr(cls, "__deprecation_warning__",
                       "%s is deprecated" % cls.__name__)
@@ -23,7 +23,7 @@ class deprecated(type):
 def class_renamed(old_name, new_class, message=None):
     """automatically creates a class which fires a DeprecationWarning
     when instantiated.
-    
+
     >>> Set = class_renamed('Set', set, 'Set is now replaced by set')
     >>> s = Set()
     sample.py:57: DeprecationWarning: Set is now replaced by set
@@ -64,7 +64,7 @@ def deprecated_function(new_func, message=None):
     """Creates a function which fires a DeprecationWarning when used.
 
     For example, if <bar> is deprecated in favour of <foo>:
-    
+
     >>> bar = deprecated_function(foo, 'bar is deprecated')
     >>> bar()
     sample.py:57: DeprecationWarning: bar is deprecated
