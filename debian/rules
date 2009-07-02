@@ -53,7 +53,9 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	NO_SETUPTOOLS=1 python setup.py -q install --no-compile --root=debian/python-logilab-common/ --install-headers=usr/include/ --install-scripts=usr/bin/
+	NO_SETUPTOOLS=1 python setup.py -q install --no-compile \
+		--root=$(CURDIR)/debian/python-logilab-common/ \
+		--install-layout=deb
 	# remove test directory
 	rm -rf debian/python-logilab-common/usr/lib/python*/site-packages/logilab/common/test
 
