@@ -25,7 +25,7 @@ try:
 except ImportError:
     # windows platform
     class NoSuchProcess(Exception): pass
-    
+
     def ProcInfo(pid):
         raise NoSuchProcess()
 
@@ -51,9 +51,8 @@ def chown(path, login=None, group=None):
             gid = int(group)
         except ValueError:
             import grp
-            gid = grp.getgrname(group).gr_gid
+            gid = grp.getgrnam(group).gr_gid
     os.chown(path, uid, gid)
-        
 
 def mv(source, destination, _action=shutil.move):
     """A shell-like mv, supporting wildcards.
@@ -75,7 +74,7 @@ def mv(source, destination, _action=shutil.move):
         except OSError, ex:
             raise OSError('Unable to move %r to %r (%s)' % (
                 source, destination, ex))
-        
+
 def rm(*files):
     """A shell-like rm, supporting wildcards.
     """
@@ -87,12 +86,11 @@ def rm(*files):
                 shutil.rmtree(filename)
             else:
                 os.remove(filename)
-    
+
 def cp(source, destination):
     """A shell-like cp, supporting wildcards.
     """
     mv(source, destination, _action=shutil.copy)
-
 
 def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
     """Recursivly find files ending with the given extensions from the directory.
