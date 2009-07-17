@@ -1,3 +1,9 @@
+logilab-common (0.42.0-2) unstable; urgency=low
+
+  * Does clean up old pycentral package
+
+ -- Julien Jehannet <julien.jehannet@logilab.fr>  Fri, 17 Jul 2009 17:44:14 +0200
+
 logilab-common (0.42.0-1) unstable; urgency=low
 
   * New upstream release
