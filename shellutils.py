@@ -257,8 +257,8 @@ def release_lock(lock_file):
 class ProgressBar(object):
     """A simple text progression bar."""
 
-    def __init__(self, nbops, size=20, stream=sys.stdout):
-        self._fstr = '\r[%%-%ss]' % int(size)
+    def __init__(self, nbops, size=20, stream=sys.stdout, title=''):
+        self._fstr = '\r%s[%%-%ss]' % (title, int(size))
         self._stream = stream
         self._total = nbops
         self._size = size
