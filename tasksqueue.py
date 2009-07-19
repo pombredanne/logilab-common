@@ -37,7 +37,7 @@ class PrioritizedTasksQueue(Queue):
                 task.merge(item)
                 return
         insort_left(self.queue, item)
-        
+
     def _get(self):
         """Get an item from the queue"""
         return self.queue.pop()
@@ -63,10 +63,10 @@ class Task(object):
 
     def __repr__(self):
         return '<Task %s @%#x>' % (self.id, id(self))
-    
+
     def __cmp__(self, other):
         return cmp(self.priority, other.priority)
-    
+
     def __eq__(self, other):
         return self.id == other.id
 

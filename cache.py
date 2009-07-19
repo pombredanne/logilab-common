@@ -20,7 +20,7 @@ class Cache(dict):
         len(self._usage) <= self.size
         len(self.data) <= self.size
     """
-    
+
     def __init__(self, size=100):
         """ Warning : Cache.__init__() != dict.__init__().
         Constructor does not take any arguments beside size.
@@ -30,7 +30,7 @@ class Cache(dict):
         self._usage = []
         self._lock = Lock()
         super(Cache, self).__init__()
-        
+
     def _acquire(self):
         self._lock.acquire()
 
@@ -39,7 +39,7 @@ class Cache(dict):
 
     def _update_usage(self, key):
         if not self._usage:
-            self._usage.append(key)        
+            self._usage.append(key)
         elif self._usage[-1] != key:
             try:
                 self._usage.remove(key)
@@ -53,25 +53,25 @@ class Cache(dict):
             self._usage.append(key)
         else:
             pass # key is already the most recently used key
-            
+
     def __getitem__(self, key):
         value = super(Cache, self).__getitem__(key)
         self._update_usage(key)
         return value
     __getitem__ = locked(_acquire, _release)(__getitem__)
-    
+
     def __setitem__(self, key, item):
         # Just make sure that size > 0 before inserting a new item in the cache
         if self.size > 0:
             super(Cache, self).__setitem__(key, item)
             self._update_usage(key)
     __setitem__ = locked(_acquire, _release)(__setitem__)
-        
+
     def __delitem__(self, key):
         super(Cache, self).__delitem__(key)
         self._usage.remove(key)
     __delitem__ = locked(_acquire, _release)(__delitem__)
-    
+
     def clear(self):
         super(Cache, self).clear()
         self._usage = []

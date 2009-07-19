@@ -47,7 +47,7 @@ class Node(object):
 
     def is_leaf(self):
         return not self.children
-    
+
     def append(self, child):
         """add a node to children"""
         self.children.append(child)
@@ -62,7 +62,7 @@ class Node(object):
         """insert a child node"""
         self.children.insert(index, child)
         child.parent = self
-        
+
     def replace(self, old_child, new_child):
         """replace a child node with another"""
         i = self.children.index(old_child)
@@ -90,7 +90,7 @@ class Node(object):
             return parent.children[index+1]
         except IndexError:
             return None
-        
+
     def previous_sibling(self):
         """
         return the previous sibling for this node if any
@@ -113,7 +113,7 @@ class Node(object):
             return root.get_child_by_id(nid, 1)
         except NodeNotFound :
             raise NodeNotFound(EX_NODE_NOT_FOUND % nid)
-        
+
     def get_child_by_id(self, nid, recurse=None):
         """
         return child of given id
@@ -167,7 +167,7 @@ class Node(object):
         return the width of the tree from this node
         """
         return len(self.leaves())
-        
+
     def root(self):
         """
         return the root node of the tree
@@ -190,7 +190,7 @@ class Node(object):
 
     def __iter__(self):
         return iter(self.children)
-    
+
     def flatten(self, _list=None):
         """
         return a list with all the nodes descendant from this node
@@ -210,13 +210,13 @@ class Node(object):
         if self.parent is not None:
             lst.extend(self.parent.lineage())
         return lst
-    
+
 class VNode(Node, VisitedMixIn):
     """a visitable node
     """
     pass
 
-            
+
 class BinaryNode(VNode):
     """a binary node (ie only two children
     """
@@ -226,19 +226,19 @@ class BinaryNode(VNode):
             assert lhs and rhs
             self.append(lhs)
             self.append(rhs)
-            
+
     def remove(self, child):
         """remove the child and replace this node with the other child
         """
         self.children.remove(child)
         self.parent.replace(self, self.children[0])
-        
+
     def get_parts(self):
         """
         return the left hand side and the right hand side of this node
         """
         return self.children[0], self.children[1]
-        
+
 
 
 if sys.version_info[0:2] >= (2, 2):
@@ -246,7 +246,7 @@ if sys.version_info[0:2] >= (2, 2):
 else:
     from UserList import UserList
     list_class = UserList
-    
+
 class ListNode(VNode, list_class):
     """Used to manipulate Nodes as Lists
     """
@@ -254,7 +254,7 @@ class ListNode(VNode, list_class):
         list_class.__init__(self)
         VNode.__init__(self)
         self.children = self
-        
+
     def __str__(self, indent=0):
         return '%s%s %s' % (indent*' ', self.__class__.__name__,
                             ', '.join([str(v) for v in self]))
@@ -263,17 +263,17 @@ class ListNode(VNode, list_class):
         """add a node to children"""
         list_class.append(self, child)
         child.parent = self
- 
+
     def insert(self, index, child):
         """add a node to children"""
         list_class.insert(self, index, child)
         child.parent = self
-    
+
     def remove(self, child):
         """add a node to children"""
         list_class.remove(self, child)
         child.parent = None
- 
+
     def pop(self, index):
         """add a node to children"""
         child = list_class.pop(self, index)
@@ -285,7 +285,7 @@ class ListNode(VNode, list_class):
 # construct list from tree ####################################################
 
 def post_order_list(node, filter_func=no_filter):
-    """ 
+    """
     create a list with tree nodes for which the <filter> function returned true
     in a post order fashion
     """
@@ -352,4 +352,4 @@ class PrefixedDepthFirstIterator(FilteredIterator):
     """
     def __init__(self, node, filter_func=None):
         FilteredIterator.__init__(self, node, pre_order_list, filter_func)
-        
+

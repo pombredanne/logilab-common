@@ -39,7 +39,7 @@ ATTRS_VAL = {
 
 # meaning of possible values:
 #   O    -> string
-#   1    -> int 
+#   1    -> int
 #   list -> value in list
 GRAPH_ATTRS = {
     'title' :              0,
@@ -128,7 +128,7 @@ def latin_to_vcg(st):
 class VCGPrinter:
     """A vcg graph writer.
     """
-    
+
     def __init__(self, output_stream):
         self._stream = output_stream
         self._indent = ''
@@ -166,7 +166,7 @@ class VCGPrinter:
 
 
     # private ##################################################################
-    
+
     def _write_attributes(self, attributes_dict, **args):
         """write graph, node or edge attributes
         """
@@ -187,12 +187,12 @@ possible attributes are %s''' % (key, attributes_dict.keys()))
             else:
                 raise Exception('''value %s isn\'t correct for attribute %s
 correct values are %s''' % (value, key, _type))
-    
+
     def _inc_indent(self):
         """increment indentation
         """
         self._indent = '  %s' % self._indent
-        
+
     def _dec_indent(self):
         """decrement indentation
         """

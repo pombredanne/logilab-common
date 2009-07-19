@@ -56,7 +56,7 @@ class MonitorInterpreter(code.InteractiveConsole):
         elif line.endswith("\n"):
             line = line[:-1]
         return line
-        
+
 
 class MonitorRequestHandler(SocketServer.BaseRequestHandler):
     """Request handler for remote interpreter"""
@@ -67,7 +67,7 @@ class MonitorRequestHandler(SocketServer.BaseRequestHandler):
         self.rfile = request.makefile("r")
         SocketServer.BaseRequestHandler.__init__(self, request, clientaddress,
                                                  server )
-        
+
     def handle(self):
         """handle on request, through MonitorInterpreter"""
         saved_stdout = sys.stdout

@@ -103,7 +103,7 @@ If it i not the case, remove the file %s''' % (self.name, self._pid_file))
     def _run(self):
         """should be overidden in the mixed class"""
         raise NotImplementedError()
-    
+
 ## command line utilities ######################################################
 
 L_OPTIONS = ["help", "log=", "delay=", 'no-detach']
@@ -120,7 +120,7 @@ def print_help(modconfig):
     Defaults to %s""" % (modconfig.LOG_TRESHOLD, modconfig.DELAY)
 
 def handle_option(modconfig, opt_name, opt_value, help_meth):
-    if opt_name in ('-h','--help'):            
+    if opt_name in ('-h','--help'):
         help_meth()
         sys.exit(0)
     elif opt_name in ('-l','--log'):

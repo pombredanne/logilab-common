@@ -59,13 +59,13 @@ class DotBackend:
         return self._source
 
     source = property(get_source)
-    
+
     def generate(self, outputfile=None, dotfile=None):
         """Generates a graph file.
-        
+
         :param outputfile: filename and path [defaults to graphname.png]
         :param dotfile: filename and path [defaults to graphname.dot]
-        
+
         :rtype: str
         :return: a path to the generated file
         """
@@ -93,7 +93,7 @@ class DotBackend:
             pdot.write(self.source)
         pdot.close()
         if target != 'dot':
-            os.system('%s -T%s %s -o%s' % (self.renderer, target, 
+            os.system('%s -T%s %s -o%s' % (self.renderer, target,
                         dot_sourcepath, outputfile))
             os.unlink(dot_sourcepath)
         return outputfile
@@ -127,7 +127,7 @@ class GraphGenerator:
         self.backend = backend
 
     def generate(self, visitor, propshdlr, outputfile=None):
-        # the visitor 
+        # the visitor
         # the property handler is used to get node and edge properties
         # according to the graph and to the backend
         self.propshdlr = propshdlr
@@ -182,7 +182,7 @@ def _get_cycles(graph_dict, vertice=None, path=None, result=None):
 def has_path(graph_dict, fromnode, tonode, path=None):
     """generic function taking a simple graph definition as a dictionary, with
     node has key associated to a list of nodes directly reachable from it.
-    
+
     Return None if no path exists to go from `fromnode` to `tonode`, else the
     first path found
     """

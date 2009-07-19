@@ -1,4 +1,4 @@
-"""A few useful context managers 
+"""A few useful context managers
 
 :copyright: 2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
@@ -30,7 +30,7 @@ class tempdir(object):
 class pushd(object):
     def __init__(self, directory):
         self.directory = directory
-        
+
     def __enter__(self):
         self.cwd = os.getcwd()
         os.chdir(self.directory)

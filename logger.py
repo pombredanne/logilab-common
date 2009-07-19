@@ -34,7 +34,7 @@ INDICATORS = ['emergency', 'alert', 'critical', 'error',
 
 def make_logger(method='print', threshold=LOG_DEBUG, sid=None, output=None):
     """return a logger for the given method
-    
+
     known methods are 'print', 'eprint' and syslog'
     """
     if method == 'print':
@@ -63,7 +63,7 @@ class AbstractLogger:
     def __init__(self, threshold=LOG_DEBUG, priority_indicator=1):
         self.threshold = threshold
         self.priority_indicator = priority_indicator
-        
+
     def log(self, priority=LOG_DEBUG, message='', substs=None):
         """log a message with priority <priority>
         substs are optional substrings
@@ -98,7 +98,7 @@ class AbstractLogger:
             l.append(str(e_type) + ': ' + value.__str__())
         except UnicodeError:
             l.append(str(e_type) + ' (message can\'t be displayed)')
-            
+
         self.log(priority, '\n'.join(l))
 
 
@@ -107,14 +107,14 @@ class PrintLogger(AbstractLogger):
 
     log everything to a file, using the standard output by default
     """
-    
+
     def __init__(self, threshold, output=sys.stdout, sid=None,
                  encoding='UTF-8'):
         AbstractLogger.__init__(self, threshold)
         self.output = output
         self.sid = sid
         self.encoding = encoding
-        
+
     def _writelog(self, priority, message):
         """overridden from AbstractLogger"""
         if isinstance(message, unicode):
@@ -140,7 +140,7 @@ class SysLogger(AbstractLogger):
             sid = 'syslog'
         self.encoding = encoding
         syslog.openlog(sid, syslog.LOG_PID)
-        
+
     def _writelog(self, priority, message):
         """overridden from AbstractLogger"""
         import syslog

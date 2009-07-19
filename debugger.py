@@ -44,7 +44,7 @@ else:
             if lineno == curlineno:
                 annotated.append('%4s\t->\t%s' % (lineno, line))
             else:
-                annotated.append('%4s\t\t%s' % (lineno, line))                
+                annotated.append('%4s\t\t%s' % (lineno, line))
         return '\n'.join(annotated)
 
     def colorize_source(source):
@@ -53,7 +53,7 @@ else:
         output = StringIO()
         parser.format(source, output)
         return output.getvalue()
-    
+
 
 def getsource(obj):
     """Return the text of the source code for an object.
@@ -68,7 +68,7 @@ def getsource(obj):
 ################################################################
 class Debugger(Pdb):
     """custom debugger
-    
+
     - sets up a history file
     - uses ipython if available to colorize lines of code
     - overrides list command to search for current block instead
@@ -81,7 +81,7 @@ class Debugger(Pdb):
             tcbk = tcbk.tb_next
         self._tcbk = tcbk
         self._histfile = osp.join(os.environ["HOME"], ".pdbhist")
-        
+
     def setup_history_file(self):
         """if readline is available, read pdb history file
         """
@@ -144,7 +144,7 @@ class Debugger(Pdb):
             if word[:n] == attr and word != "__builtins__":
                 matches.append("%s.%s" % (expr, word))
         return matches
-    
+
     def get_class_members(self, klass):
         """implementation coming from rlcompleter.get_class_members"""
         ret = dir(klass)
@@ -152,8 +152,8 @@ class Debugger(Pdb):
             for base in klass.__bases__:
                 ret = ret + self.get_class_members(base)
         return ret
-        
-    ## specific / overidden commands 
+
+    ## specific / overidden commands
     def do_list(self, arg):
         """overrides default list command to display the surrounding block
         instead of 5 lines of context
@@ -178,7 +178,7 @@ class Debugger(Pdb):
         lineno = self.curframe.f_lineno
         cmd = 'emacsclient --no-wait +%s %s' % (lineno, filename)
         os.system(cmd)
-        
+
     do_o = do_open
 
 

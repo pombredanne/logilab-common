@@ -1,6 +1,6 @@
 """Manipulate pdf and fdf files (pdftk recommended).
 
-Notes regarding pdftk, pdf forms and fdf files (form definition file) 
+Notes regarding pdftk, pdf forms and fdf files (form definition file)
 fields names can be extracted with:
 
     pdftk orig.pdf generate_fdf output truc.fdf
@@ -8,7 +8,7 @@ fields names can be extracted with:
 to merge fdf and pdf:
 
     pdftk orig.pdf fill_form test.fdf output result.pdf [flatten]
-    
+
 without flatten, one could further edit the resulting form.
 with flatten, everything is turned into text.
 
@@ -18,16 +18,16 @@ with flatten, everything is turned into text.
 """
 __docformat__ = "restructuredtext en"
 # XXX seems very unix specific
-# TODO: check availability of pdftk at import 
+# TODO: check availability of pdftk at import
 
 
 import os
 
 HEAD="""%FDF-1.2
 %\xE2\xE3\xCF\xD3
-1 0 obj 
+1 0 obj
 <<
-/FDF 
+/FDF
 <<
 /Fields [
 """
@@ -35,7 +35,7 @@ HEAD="""%FDF-1.2
 TAIL="""]
 >>
 >>
-endobj 
+endobj
 trailer
 
 <<

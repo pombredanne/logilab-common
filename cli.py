@@ -1,5 +1,5 @@
 """Command line interface helper classes.
- 
+
 It provides some default commands, a help system, a default readline
 configuration with completion and persistent history.
 
@@ -33,7 +33,7 @@ __docformat__ = "restructuredtext en"
 import __builtin__
 if not hasattr(__builtin__, '_'):
     __builtin__._ = str
-    
+
 
 def init_readline(complete_method, histfile=None):
     """Init the readline library if available."""
@@ -56,10 +56,10 @@ def init_readline(complete_method, histfile=None):
 
 class Completer :
     """Readline completer."""
-    
+
     def __init__(self, commands):
         self.list = commands
-        
+
     def complete(self, text, state):
         """Hook called by readline when <tab> is pressed."""
         n = len(text)
@@ -77,12 +77,12 @@ class CLIHelper:
     """An abstract command line interface client which recognize commands
     and provide an help system.
     """
-    
+
     CMD_MAP = {'help' : _("Others"),
                'quit' : _("Others"),
                }
     CMD_PREFIX = ''
-    
+
     def __init__(self, histfile=None) :
         self._topics = {}
         self.commands = None
@@ -95,7 +95,7 @@ class CLIHelper:
             try:
                 line = raw_input('>>> ')
             except EOFError:
-                print 
+                print
                 break
             s_line = line.strip()
             if not s_line:
@@ -125,7 +125,7 @@ class CLIHelper:
 
 
     # private methods #########################################################
-    
+
     def _register_commands(self):
         """ register available commands method and return the list of
         commands name
@@ -149,7 +149,7 @@ class CLIHelper:
 
 
     # predefined commands #####################################################
-    
+
     def do_help(self, command=None) :
         """base input of the help system"""
         if command in self._command_help:
@@ -167,7 +167,7 @@ class CLIHelper:
             commands.sort()
             for command in commands:
                 print '\t', command[len(self.CMD_PREFIX):]
-                
+
         else:
             print _('Available commands about %s:') % command
             print
@@ -182,7 +182,7 @@ class CLIHelper:
                     traceback.print_exc()
                     print 'ERROR in help method %s'% (
                         command_help_method.func_name)
-                
+
     help_do_help = ("help", "help [topic|command]",
                     _("print help message for the given topic/command or \
 available topics when no argument"))
@@ -190,6 +190,6 @@ available topics when no argument"))
     def do_quit(self):
         """quit the CLI"""
         raise EOFError()
-    
+
     def help_do_quit(self):
         return ("quit", "quit", _("quit the application"))

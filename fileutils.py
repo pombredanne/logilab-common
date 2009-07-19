@@ -26,7 +26,7 @@ from logilab.common.shellutils import find
 
 def first_level_directory(path):
     """Return the first level directory of a path.
-    
+
     >>> first_level_directory('home/syt/work')
     'home'
     >>> first_level_directory('/home/syt/work')
@@ -53,14 +53,14 @@ def abspath_listdir(path):
     """Lists path's content using absolute paths.
 
     >>> os.listdir('/home')
-    ['adim', 'alf', 'arthur', 'auc']    
+    ['adim', 'alf', 'arthur', 'auc']
     >>> abspath_listdir('/home')
     ['/home/adim', '/home/alf', '/home/arthur', '/home/auc']
     """
     path = abspath(path)
     return [join(path, filename) for filename in listdir(path)]
 
-    
+
 def is_binary(filename):
     """Return true if filename may be a binary file, according to it's
     extension.
@@ -86,7 +86,7 @@ def write_open_mode(filename):
     :param filename: the name of the file
 
     :rtype: str
-    :return: the mode that should be use to open the file ('w' or 'wb') 
+    :return: the mode that should be use to open the file ('w' or 'wb')
     """
     if is_binary(filename):
         return 'wb'
@@ -108,7 +108,7 @@ def ensure_fs_mode(filepath, desired_mode=S_IWRITE):
     mode = stat(filepath)[ST_MODE]
     if not mode & desired_mode:
         chmod(filepath, mode | desired_mode)
-        
+
 
 class ProtectedFile(file):
     """A special file-object class that automatically that automatically
@@ -118,15 +118,15 @@ class ProtectedFile(file):
     created during the ProtectedFile object lifetime.
     One way to circumvent this would be to chmod / unchmod on each
     write operation.
-    
+
     One other way would be to :
-    
+
     - catch the IOError in the __init__
-    
+
     - if IOError, then create a StringIO object
-    
+
     - each write operation writes in this StringIO obejct
-    
+
     - on close()/del(), write/append the StringIO content to the file and
       do the chmod only once
     """
@@ -145,7 +145,7 @@ class ProtectedFile(file):
             chmod(self.name, self.original_mode)
             # Don't re-chmod in case of several restore
             self.mode_changed = False
-    
+
     def close(self):
         """restore mode before closing"""
         self._restore_mode()
@@ -166,10 +166,10 @@ def relative_path(from_file, to_file):
     (path will be absolute if to_file is an absolute file). This function
     is useful to create link in `from_file` to `to_file`. This typical use
     case is used in this function description.
-    
+
     If both files are relative, they're expected to be relative to the same
     directory.
-    
+
     >>> relative_path( from_file='toto/index.html', to_file='index.html')
     '../index.html'
     >>> relative_path( from_file='index.html', to_file='toto/index.html')
@@ -195,12 +195,12 @@ def relative_path(from_file, to_file):
 
     :type from_file: str
     :param from_file: source file (where links will be inserted)
-    
+
     :type to_file: str
     :param to_file: target file (on which links point)
 
     :raise UnresolvableError: if it has been unable to guess a correct path
-    
+
     :rtype: str
     :return: the relative path of `to_file` from `from_file`
     """
@@ -260,7 +260,7 @@ def norm_open(path):
         return open(path, 'U')
     return StringIO(_LINE_RGX.sub('\n', open(path).read()))
 
-      
+
 def lines(path, comments=None):
     """Return a list of non empty lines in the file located at `path`.
 
@@ -324,7 +324,7 @@ def export(from_dir, to_dir,
 
     :type from_dir: str
     :param from_dir: directory to export
-    
+
     :type to_dir: str
     :param to_dir: destination directory
 
@@ -412,7 +412,7 @@ def files_by_ext(directory, include_exts=None, exclude_exts=None,
 
     :type include_exts: list or tuple or None
     :param include_exts: list of file extensions to consider
-    
+
     :type exclude_exts: list or tuple or None
     :param exclude_exts: list of file extensions to ignore
 

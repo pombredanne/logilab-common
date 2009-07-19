@@ -22,15 +22,15 @@ could define the following ``pytestconf.py`` file ::
 
     import logging
     from logilab.common.pytest import PyTester
-    
+
     def update_parser(parser):
         parser.add_option('-l', '--loglevel', dest='loglevel', action='store',
                           choices=('debug', 'info', 'warning', 'error', 'critical'),
                           default='critical', help="the default log level possible choices are "
                           "('debug', 'info', 'warning', 'error', 'critical')")
         return parser
-    
-    
+
+
     class CustomPyTester(PyTester):
         def __init__(self, cvg, options):
             super(CustomPyTester, self).__init__(cvg, options)
@@ -41,7 +41,7 @@ could define the following ``pytestconf.py`` file ::
 
 In your TestCase class you can then get the value of a specific option with
 the ``optval`` method::
-    
+
     class MyTestCase(TestCase):
         def test_foo(self):
             loglevel = self.optval('loglevel')
@@ -81,7 +81,7 @@ you can filter the function with a simpe python expression
 
 
 
-            
+
 
 :copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
@@ -152,7 +152,7 @@ class TraceController(object):
             cls.tracefunc(cls.oldtracer)
             delattr(sys, '__notrace__')
     resume_tracing = classmethod(resume_tracing)
-    
+
 
 pause_tracing = TraceController.pause_tracing
 resume_tracing = TraceController.resume_tracing
@@ -193,7 +193,7 @@ TESTFILE_RE = re.compile("^((unit)?test.*|smoketest)\.py$")
 def this_is_a_testfile(filename):
     """returns True if `filename` seems to be a test file"""
     return TESTFILE_RE.match(osp.basename(filename))
-    
+
 TESTDIR_RE = re.compile("^(unit)?tests?$")
 def this_is_a_testdir(dirpath):
     """returns True if `filename` seems to be a test directory"""
@@ -266,12 +266,12 @@ class GlobalTestReport(object):
         self.modulescount += 1
         self.ran += 1
         self.errmodules.append((filename[:-3], 1, 1))
-        
+
     def skip_module(self, filename):
         self.modulescount += 1
         self.ran += 1
         self.errmodules.append((filename[:-3], 0, 0))
-        
+
     def __str__(self):
         """this is just presentation stuff"""
         line1 = ['Ran %s test cases in %.2fs (%.2fs CPU)'
@@ -303,7 +303,7 @@ def remove_local_modules_from_sys(testdir):
     This is used to avoid strange side-effects when using the
     testall() mode of pytest.
     For instance, if we run pytest on this tree::
-    
+
       A/test/test_utils.py
       B/test/test_utils.py
 
@@ -326,7 +326,7 @@ def remove_local_modules_from_sys(testdir):
 
 class PyTester(object):
     """encaspulates testrun logic"""
-    
+
     def __init__(self, cvg, options):
         self.report = GlobalTestReport()
         self.cvg = cvg
@@ -339,7 +339,7 @@ class PyTester(object):
         print "*" * 79
         print self.report
         return self.report.failures + self.report.errors
-        
+
 
     def testall(self, exitfirst=False):
         """walks trhough current working directory, finds something
@@ -362,7 +362,7 @@ class PyTester(object):
             # the local directory as a test directory even if
             # it doesn't have a traditional test directory name
             self.testonedir(here)
- 
+
     def testonedir(self, testdir, exitfirst=False):
         """finds each testfile in the `testdir` and runs it"""
         for filename in abspath_listdir(testdir):
@@ -475,7 +475,7 @@ class DjangoTester(PyTester):
         setup_test_environment()
         create_test_db(verbosity=0)
         self.dbname = self.settings.TEST_DATABASE_NAME
-        
+
 
     def after_testfile(self):
         # Those imports must be done **after** setup_environ was called
@@ -484,7 +484,7 @@ class DjangoTester(PyTester):
         teardown_test_environment()
         print 'destroying', self.dbname
         destroy_test_db(self.dbname, verbosity=0)
-        
+
 
     def testall(self, exitfirst=False):
         """walks trhough current working directory, finds something
@@ -555,7 +555,7 @@ class DjangoTester(PyTester):
                 self.report.failed_to_test_module(filename)
                 print 'unhandled exception occured while testing', modname
                 print 'error: %s' % exc
-                return None                
+                return None
         finally:
             self.after_testfile()
             if dirname:
@@ -572,7 +572,7 @@ def make_parser():
     def rebuild_cmdline(option, opt, value, parser):
         """carry the option to unittest_main"""
         parser.newargs.append(opt)
-        
+
 
     def rebuild_and_store(option, opt, value, parser):
         """carry the option to unittest_main and store
@@ -602,11 +602,11 @@ def make_parser():
                       help="Restart tests from where it failed (implies exitfirst) "
                         "(only make sense if tests previously ran with exitfirst only)")
     parser.add_option('-c', '--capture', callback=rebuild_cmdline,
-                      action="callback", 
+                      action="callback",
                       help="Captures and prints standard out/err only on errors "
                       "(only make sense when pytest run one test file)")
     parser.add_option('--color', callback=rebuild_cmdline,
-                      action="callback", 
+                      action="callback",
                       help="colorize tracebacks")
     parser.add_option('-p', '--printonly',
                       # XXX: I wish I could use the callback action but it
@@ -686,7 +686,7 @@ def run():
     covermode = getattr(options, 'coverage', None)
     cvg = None
     if not '' in sys.path:
-        sys.path.insert(0, '')    
+        sys.path.insert(0, '')
     if covermode:
         # control_import_coverage(rootdir)
         from logilab.devtools.lib.coverage import Coverage

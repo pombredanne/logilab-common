@@ -34,7 +34,7 @@ def chown(path, login=None, group=None):
     """Same as `os.chown` function but accepting user login or group name as
     argument. If login or group is omitted, it's left unchanged.
 
-    Note: you must own the file to chown it (or be root). Otherwise OSError is raised. 
+    Note: you must own the file to chown it (or be root). Otherwise OSError is raised.
     """
     if login is None:
         uid = -1
@@ -154,7 +154,7 @@ def globfind(directory, pattern, blacklist=STD_BLACKLIST):
     """Recursively finds files matching glob `pattern` under `directory`.
 
     This is an alternative to `logilab.common.shellutils.find`.
-    
+
     :type directory: str
     :param directory:
       directory where the search should start
@@ -196,7 +196,7 @@ class Execute:
     """This is a deadlock safe version of popen2 (no stdin), that returns
     an object with errorlevel, out and err.
     """
-    
+
     def __init__(self, command):
         outfile = tempfile.mktemp()
         errfile = tempfile.mktemp()
@@ -256,7 +256,7 @@ def release_lock(lock_file):
 
 class ProgressBar(object):
     """A simple text progression bar."""
-    
+
     def __init__(self, nbops, size=20, stream=sys.stdout):
         self._fstr = '\r[%%-%ss]' % int(size)
         self._stream = stream

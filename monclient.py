@@ -23,7 +23,7 @@ class SocketPrinter(threading.Thread):
         threading.Thread.__init__(self)
         self.socket = sock
         self.stop = False
-        
+
     def run(self):
         """prints socket input indefinitely"""
         fd = self.socket.fileno()
@@ -35,7 +35,7 @@ class SocketPrinter(threading.Thread):
                 if data:
                     sys.stdout.write(data)
                     sys.stdout.flush()
-            
+
 
 
 def client( host, port ):
@@ -64,5 +64,5 @@ if __name__ == "__main__":
     server_port = int(sys.argv[2])
     client(server_host, server_port)
 
-        
-        
+
+

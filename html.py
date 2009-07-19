@@ -11,7 +11,7 @@ warn('html module is deprecated and will disappear in a near release',
      DeprecationWarning, stacklevel=2)
 
 import traceback
-from xml.sax.saxutils import escape  
+from xml.sax.saxutils import escape
 
 # mk html traceback error #####################################################
 

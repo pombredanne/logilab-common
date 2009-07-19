@@ -17,7 +17,7 @@ def get_orb():
     The first call to the method initialized the ORB
     This method is mainly used internally in the module.
     """
-    
+
     global orb
     if orb is None:
         import sys
@@ -29,7 +29,7 @@ def get_root_context():
     returns a reference to the NameService object.
     This method is mainly used internally in the module.
     """
-    
+
     orb = get_orb()
     nss = orb.resolve_initial_references("NameService")
     rootContext = nss._narrow(CosNaming.NamingContext)
@@ -47,7 +47,7 @@ def register_object_name(object, namepath):
     [('logilab','rootmodule'),('chatbot','application'),('chatter','server')]
     is mapped to
     'corbaname::hostname#logilab.rootmodule/chatbot.application/chatter.server'
-    
+
     The get_object_reference() function can be used to resolve such a URL.
     """
     context = get_root_context()

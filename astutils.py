@@ -22,7 +22,7 @@ def debuild(ast_tuple):
     """
     if type(ast_tuple[1]) is TupleType:
         result = ''
-        for child in ast_tuple[1:]: 
+        for child in ast_tuple[1:]:
             result = '%s%s' % (result, debuild(child))
         return result
     else:
@@ -55,7 +55,7 @@ def _clean(ast_tuple):
         return v
     else:
         return [list(ast_tuple[:2])]
-    
+
 def cvrtr(tuple):
     """debug method returning an ast string in a readable fashion"""
     if type(tuple) is TupleType:

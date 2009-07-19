@@ -10,7 +10,7 @@ command'specific
 """
 __docformat__ = "restructuredtext en"
 
-# XXX : merge with optparser ? 
+# XXX : merge with optparser ?
 import sys
 from os.path import basename
 
@@ -55,7 +55,7 @@ class Command(Configuration):
             raise BadCommandUsage('missing argument')
         if self.max_args is not None and len(args) > self.max_args:
             raise BadCommandUsage('too many arguments')
-        
+
     def run(self, args):
         """run the command with its specific arguments"""
         raise NotImplementedError()
@@ -123,7 +123,7 @@ def cmd_run(cmdname, *args):
         print 'ERROR: ', err
         print command.help()
 
-        
+
 def main_run(args, doc=DEFAULT_DOC):
     """command line tool"""
     try:
@@ -142,9 +142,9 @@ def main_run(args, doc=DEFAULT_DOC):
 class ListCommandsCommand(Command):
     """list available commands, useful for bash completion."""
     name = 'listcommands'
-    arguments = '[command]'    
+    arguments = '[command]'
     hidden = True
-    
+
     def run(self, args):
         """run the command with its specific arguments"""
         if args:
@@ -160,5 +160,5 @@ class ListCommandsCommand(Command):
                 cmd = _COMMANDS[command]
                 if not cmd.hidden:
                     print command
-                
+
 register_commands([ListCommandsCommand])

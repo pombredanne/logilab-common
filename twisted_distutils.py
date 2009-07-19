@@ -70,23 +70,23 @@ class twisted_install(install):
     def initialize_options (self):
         install.initialize_options(self)
         self.twisted_plugins = None
-        
+
     def has_twisted_plugins(self):
         return self.distribution.has_twisted_plugins()
-    
+
     sub_commands = []
     sub_commands.extend(install.sub_commands)
     sub_commands.append(('install_twisted_plugins', has_twisted_plugins))
-                   
+
 
 class twisted_build(build):
     def initialize_options (self):
         build.initialize_options(self)
         self.twisted_plugins = None
-        
+
     def has_twisted_plugins(self):
         return self.distribution.has_twisted_plugins()
-    
+
     sub_commands = []
     sub_commands.extend(build.sub_commands)
     sub_commands.append(('build_twisted_plugins', has_twisted_plugins))
@@ -189,8 +189,8 @@ class install_twisted_plugins(Command):
 
     def get_outputs(self):
         return self.outfiles or []
-        
-    
+
+
 
 class TwistedDistribution(Distribution):
     def __init__(self,attrs=None):

@@ -7,17 +7,17 @@ Sample ChangeLog format::
 
   Change log for project Yoo
   ==========================
-  
+
    --
       * add a new functionnality
 
   2002-02-01 -- 0.1.1
       * fix bug #435454
       * fix bug #434356
-    
+
   2002-01-01 -- 0.1
       * initial release
-    
+
 
 There is 3 entries in this change log, one for each released version and one
 for the next version (i.e. the current entry).
@@ -59,7 +59,7 @@ class Version(tuple):
         else:
             parsed = versionstr
         return tuple.__new__(klass, parsed)
-        
+
     def __str__(self):
         return '.'.join([str(i) for i in self])
 
@@ -70,7 +70,7 @@ class ChangeLogEntry(object):
     its release date
     """
     version_class = Version
-    
+
     def __init__(self, date=None, version=None, **kwargs):
         self.__dict__.update(kwargs)
         if version:
@@ -79,7 +79,7 @@ class ChangeLogEntry(object):
             self.version = None
         self.date = date
         self.messages = []
-        
+
     def add_message(self, msg):
         """add a new message"""
         self.messages.append(([msg],[]))
@@ -119,9 +119,9 @@ class ChangeLogEntry(object):
 
 class ChangeLog(object):
     """object representation of a whole ChangeLog file"""
-    
+
     entry_class = ChangeLogEntry
-    
+
     def __init__(self, changelog_file, title=''):
         self.file = changelog_file
         self.title = title
@@ -132,14 +132,14 @@ class ChangeLog(object):
     def __repr__(self):
         return '<ChangeLog %s at %s (%s entries)>' % (self.file, id(self),
                                                       len(self.entries))
-    
+
     def add_entry(self, entry):
         """add a new entry to the change log"""
         self.entries.append(entry)
 
     def get_entry(self, version='', create=None):
         """ return a given changelog entry
-        if version is omited, return the current entry 
+        if version is omited, return the current entry
         """
         if not self.entries:
             if version or not create:
@@ -159,7 +159,7 @@ class ChangeLog(object):
         """add a new message to the latest opened entry"""
         entry = self.get_entry(create=create)
         entry.add_message(msg)
-    
+
     def load(self):
         """ read a logilab's ChangeLog from file """
         try:
@@ -198,17 +198,17 @@ class ChangeLog(object):
                 expect_sub = True
                 self.additional_content += line
         stream.close()
-        
+
     def format_title(self):
         return '%s\n\n' % self.title.strip()
-    
+
     def save(self):
         """write back change log"""
         # filetutils isn't importable in appengine, so import locally
         from logilab.common.fileutils import ensure_fs_mode
         ensure_fs_mode(self.file, S_IWRITE)
         self.write(open(self.file, 'w'))
-            
+
     def write(self, stream=sys.stdout):
         """write changelog to stream"""
         stream.write(self.format_title())

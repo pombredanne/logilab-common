@@ -32,7 +32,7 @@ def bind_code(co, globals):
     """
     consts = list(co.co_consts)
     assigned = {}
-    
+
     code = co.co_code
     new_code = ""
     n = len(code)
@@ -60,7 +60,7 @@ def bind_code(co, globals):
         if oparg is not None:
             new_code += chr(oparg & 255)
             new_code += chr( (oparg>>8) & 255 )
-            
+
     return make_code(co.co_argcount,
                      co.co_nlocals,
                      co.co_stacksize,
@@ -86,7 +86,7 @@ if type(__builtins__) == dict:
     builtins = __builtins__
 else:
     builtins = __builtins__.__dict__
-    
+
 bind_code_opt = bind(bind_code, builtins )
 bind_code_opt = bind(bind_code_opt, globals() )
 
@@ -105,7 +105,7 @@ def optimize_module(m, global_consts):
             if d:
                 f = bind(f, d)
             m.__dict__[name] = f
-            
+
 
 
 
@@ -187,7 +187,7 @@ def rewrite_code(co, consts_dict, consts_tuple):
         if oparg is not None:
             new_code += chr(oparg & 255)
             new_code += chr( (oparg>>8) & 255 )
-            
+
     return make_code(co.co_argcount,
                      co.co_nlocals,
                      co.co_stacksize,
@@ -228,7 +228,7 @@ def optimize_module_2(m, globals_consts, bind_builtins=1):
         defaults = f.func_defaults or ()
         m.__dict__[name] = make_function(newcode, f.func_globals, f.func_name,
                                          defaults)
-        
+
 
 def run_bench(n):
     from time import time
@@ -245,7 +245,7 @@ def run_bench(n):
     print "1 regular version", t1
     print "2 optimized version", t2
     print "ratio (1-2)/1 : %f %%" % (100.*(t1-t2)/t1)
-    
+
 
 def test_pystone():
     from test import pystone

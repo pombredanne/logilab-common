@@ -19,11 +19,11 @@ unquote, colorize_ansi
 :type ANSI_PREFIX: str
 :var ANSI_PREFIX:
   ANSI terminal code notifing the start of an ANSI escape sequence
-  
+
 :type ANSI_END: str
 :var ANSI_END:
   ANSI terminal code notifing the end of an ANSI escape sequence
-  
+
 :type ANSI_RESET: str
 :var ANSI_RESET:
   ANSI terminal code reseting format defined by a previous ANSI escape sequence
@@ -151,7 +151,7 @@ def normalize_paragraph(text, line_len=80, indent=''):
         aline, text = splittext(text.strip(), line_len)
         lines.append(indent + aline)
     return linesep.join(lines)
-    
+
 def normalize_rest_paragraph(text, line_len=80, indent=''):
     """normalize a ReST text to display it with a maximum line size and
     optionaly arbitrary indentation. Line jumps are normalized. The
@@ -194,7 +194,7 @@ def normalize_rest_paragraph(text, line_len=80, indent=''):
 
 def splittext(text, line_len):
     """split the given text on space according to the given max line size
-    
+
     return a 2-uple:
     * a line <= line_len if possible
     * the rest of the text which has to be reported on another line
@@ -227,7 +227,7 @@ def get_csv(string, sep=','):
     :param sep: field separator, default to the comma (',')
 
     :rtype: str or unicode
-    :return: the unquoted string (or the input string if it wasn't quoted)    
+    :return: the unquoted string (or the input string if it wasn't quoted)
     """
     return [word.strip() for word in string.split(sep) if word.strip()]
 
@@ -257,7 +257,7 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
     value_reg=_VALUE_RE):
     """Parse the string applying the units defined in units
     (eg: "1.5m",{'m',60} -> 80).
-        
+
     :type string: str or unicode
     :param string: the string to parse
 
@@ -266,17 +266,17 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
 
     :type inter: type
     :param inter: used to parse every intermediate value (need __sum__)
-    
+
     :type blank_reg: regexp
     :param blank_reg: should match eveyr blank char to ignore.
-    
+
     :type value_reg: regexp with "value" and optional "unit" group
-    :param value_reg: match a value and it's unit into the 
+    :param value_reg: match a value and it's unit into the
     """
     if inter is None:
         inter = final
 
-    
+
     string = _BLANK_RE.sub('',string)
     values = []
     for match in value_reg.finditer(string):
@@ -301,7 +301,7 @@ def pretty_match(match, string, underline_char='^'):
     il mange du bacon
        ^^^^^
     >>>
-    
+
     :type match: _sre.SRE_match
     :param match: object returned by re.match, re.search or re.finditer
 
@@ -375,7 +375,7 @@ ANSI_COLORS = {
 
 def _get_ansi_code(color=None, style=None):
     """return ansi escape code corresponding to color and style
-    
+
     :type color: str or None
     :param color:
       the color identifier (see `ANSI_COLORS` for available values)
@@ -386,7 +386,7 @@ def _get_ansi_code(color=None, style=None):
       several style effects at the same time, use a coma as separator.
 
     :raise KeyError: if an unexistant color or style identifier is given
-    
+
     :rtype: str
     :return: the built escape code
     """

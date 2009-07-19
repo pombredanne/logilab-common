@@ -40,7 +40,7 @@ def split(index, string):
 class PatriciaNode:
     """a PATRICIA trie node
     """
-    
+
     def __init__(self, value='', leaf=0, data=None):
         self.value = value
         self.edges = {}
@@ -48,7 +48,7 @@ class PatriciaNode:
             self.datas = [data]
         else:
             self.datas = []
-        
+
     def insert(self, string, data):
         """ insert the string in the trie and associate data to it
         if the string exists is the trie, data is added to the existing datas
@@ -86,12 +86,12 @@ class PatriciaNode:
             datas = self.datas
             self.datas = []
             return datas
-        else: 
+        else:
             pfx, e, sfx = split(len(self.value), string)
             if self.value == pfx:
                 return self.edges[e].remove(sfx)
         raise KeyError(string)
-    
+
     def lookup(self, string):
         """ return datas associated with string
         raise KeyError if the key isn't found
@@ -100,12 +100,12 @@ class PatriciaNode:
             if self.datas:
                 return self.datas
             raise KeyError(string)
-        else: # len(self.value) < len(string): 
+        else: # len(self.value) < len(string):
             pfx, e, sfx = split(len(self.value), string)
             if self.value == pfx:
                 return self.edges[e].lookup(sfx)
         raise KeyError(string)
-    
+
     def pfx_search(self, pfx, depth=-1):
         """ return all string with prefix pfx """
         sfxs = []
@@ -124,7 +124,7 @@ class PatriciaNode:
                 if self.datas:
                     sfxs.append(self.value)
         return sfxs
-        
+
     def __str__(self, indent=''):
         node_str = ''.join([' %s%s:\n%s' % (indent, key,
                                             a.__str__('  %s' % indent))
@@ -140,7 +140,7 @@ class PatriciaTrie:
     """ wrapper class for a patricia tree
     delegates to the root of the tree (PatriciaNode)
     """
-    
+
     def __init__(self):
         self._trie = None
         self.words = 0
@@ -152,7 +152,7 @@ class PatriciaTrie:
             self._trie = PatriciaNode(string, 1, data)
         else:
             self._trie = self._trie.insert(string, data)
-            
+
     def remove(self, string):
         """ remove a string from the tree """
         if self._trie is not None:
@@ -173,6 +173,6 @@ class PatriciaTrie:
 
     def __str__(self):
         return self._trie.__str__()
-    
+
     def __repr__(self):
         return '<PatriciaTrie id=%s words=%s>' % (id(self), self.words)

@@ -64,7 +64,7 @@ from logilab.common.modutils import load_module_from_name
 from logilab.common.debugger import Debugger, colorize_source
 from logilab.common.decorators import cached
 from logilab.common import textutils
-        
+
 
 __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 
@@ -83,7 +83,7 @@ def with_tempdir(callable):
     """A decorator ensuring no temporary file left when the function return
     Work only for temporary file create with the tempfile module"""
     def proxy(*args, **kargs):
-        
+
         old_tmpdir = tempfile.gettempdir()
         new_tmpdir = tempfile.mkdtemp("-logilab-common-testlib","temp-dir-")
         tempfile.tempdir = new_tmpdir
@@ -176,7 +176,7 @@ def main(testdir=None, exitafter=True):
         if all_result:
             print 'Ran %s test cases in %0.2fs (%0.2fs CPU)' % (
                 all_result.testsRun, end_time - start_time,
-                end_ctime - start_ctime), 
+                end_ctime - start_ctime),
             if all_result.errors:
                 print ', %s errors' % len(all_result.errors),
             if all_result.failures:
@@ -219,7 +219,7 @@ def run_tests(tests, quiet, verbose, runner=None, capture=0):
     all_result = None
     for test in tests:
         if not quiet:
-            print 
+            print
             print '-'*80
             print "Executing", test
         result = run_test(test, verbose, runner, capture)
@@ -242,9 +242,9 @@ def run_tests(tests, quiet, verbose, runner=None, capture=0):
                         len(result.errors), len(result.failures))
             else:
                 good.append(test)
-            
+
     return good, bad, skipped, all_result
-    
+
 def find_tests(testdir,
                prefixes=DEFAULT_PREFIXES, suffix=".py",
                excludes=(),
@@ -304,7 +304,7 @@ def _count(n, word):
         return "%d %ss" % (n, word)
 
 
-    
+
 
 ## PostMortem Debug facilities #####
 def start_interactive_mode(result):
@@ -367,7 +367,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def descrs_for(self, flavour):
         return getattr(self, '%s_descrs' % flavour.lower())
-    
+
     def _create_pdb(self, test_descr, flavour):
         self.descrs_for(flavour).append( (len(self.debuggers), test_descr) )
         if self.pdbmode:
@@ -417,7 +417,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def addError(self, test, err):
         """err ==  (exc_type, exc, tcbk)"""
-        exc_type, exc, _ = err # 
+        exc_type, exc, _ = err #
         if exc_type == TestSkipped:
             self.addSkipped(test, exc)
         else:
@@ -444,7 +444,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
     def printErrors(self):
         super(SkipAwareTestResult, self).printErrors()
         self.printSkippedList()
-        
+
     def printSkippedList(self):
         for _, descr, err in self.skipped: # test, descr, err
             self.stream.writeln(self.separator1)
@@ -575,7 +575,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                 tags = getattr(test, 'tags', Tags())
                 return tags.match(tags_pattern)
         return True # no pattern
-    
+
     def _makeResult(self):
         return SkipAwareTestResult(self.stream, self.descriptions,
                                    self.verbosity, self.exitfirst, self.capture,
@@ -607,7 +607,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                 self.stream.write("OK")
         failed, errored, skipped = map(len, (result.failures, result.errors,
              result.skipped))
-        
+
         det_results = []
         for name, value in (("failures", result.failures),
                             ("errors",result.errors),
@@ -638,7 +638,7 @@ class NonStrictTestLoader(unittest.TestLoader):
     specifying tests to run on command line.
 
     For example, if the file test_foo.py contains ::
-    
+
         class FooTC(TestCase):
             def test_foo1(self): # ...
             def test_foo2(self): # ...
@@ -692,7 +692,7 @@ class NonStrictTestLoader(unittest.TestLoader):
         # python2.3 does not implement __iter__ on suites, we need to return
         # _tests explicitly
         return suite._tests
-    
+
     def loadTestsFromName(self, name, module=None):
         parts = name.split('.')
         if module is None or len(parts) > 2:
@@ -741,7 +741,7 @@ class NonStrictTestLoader(unittest.TestLoader):
                 testCaseClass)
         return [testname for testname in testnames if not is_skipped(testname)]
 
-    
+
 class SkipAwareTestProgram(unittest.TestProgram):
     # XXX: don't try to stay close to unittest.py, use optparse
     USAGE = """\
@@ -780,7 +780,7 @@ Examples:
         super(SkipAwareTestProgram, self).__init__(
             module=module, defaultTest=defaultTest,
             testLoader=NonStrictTestLoader())
-    
+
     def parseArgs(self, argv):
         self.pdbmode = False
         self.exitfirst = False
@@ -895,7 +895,7 @@ Examples:
                 restartfile = open(FILE_RESTART, 'r')
                 try:
                     try:
-                        succeededtests = list(elem.rstrip('\n\r') for elem in 
+                        succeededtests = list(elem.rstrip('\n\r') for elem in
                             restartfile.readlines())
                         removeSucceededTests(self.test, succeededtests)
                     except Exception, e:
@@ -926,7 +926,7 @@ succeeded tests into", osp.join(os.getcwd(),FILE_RESTART)
 
 
 
-class FDCapture: 
+class FDCapture:
     """adapted from py lib (http://codespeak.net/py)
     Capture IO to/from a given os-level filedescriptor.
     """
@@ -951,14 +951,14 @@ class FDCapture:
                 self.tmpfile.write(line)
             else:
                 os.write(self._savefd, line)
-        
+
 ##     def maketempfile(self):
 ##         tmpf = os.tmpfile()
 ##         fd = os.dup(tmpf.fileno())
 ##         newf = os.fdopen(fd, tmpf.mode, 0) # No buffering
 ##         tmpf.close()
 ##         return newf
-        
+
     def restore(self):
         """restore original fd and returns captured output"""
         #XXX: hack hack hack
@@ -992,7 +992,7 @@ def _capture(which='stdout', printonly=None):
     else:
         fd = 2
     return FDCapture(fd, which, printonly)
-    
+
 def capture_stdout(printonly=None):
     """captures the standard output
 
@@ -1000,7 +1000,7 @@ def capture_stdout(printonly=None):
     The restore() method returns the captured stdout and restores it
     """
     return _capture('stdout', printonly)
-        
+
 def capture_stderr(printonly=None):
     """captures the standard error output
 
@@ -1060,7 +1060,7 @@ class ClassGetProperty(object):
     """this is a simple property-like class but for
     class attributes.
     """
-    
+
     def __init__(self, getter):
         self.getter = getter
 
@@ -1074,7 +1074,7 @@ class TestCase(unittest.TestCase):
 
     capture = False
     pdbclass = Debugger
-    
+
     def __init__(self, methodName='runTest'):
         super(TestCase, self).__init__(methodName)
         # internal API changed in python2.5
@@ -1091,9 +1091,9 @@ class TestCase(unittest.TestCase):
         self._current_test_descr = None
         self._options_ = None
 
-    def datadir(cls): # pylint: disable-msg=E0213 
+    def datadir(cls): # pylint: disable-msg=E0213
         """helper attribute holding the standard test's data directory
-        
+
         NOTE: this is a logilab's standard
         """
         mod = __import__(cls.__module__)
@@ -1122,7 +1122,7 @@ class TestCase(unittest.TestCase):
             return self._current_test_descr
         return super(TestCase, self).shortDescription()
 
-    
+
     def captured_output(self):
         """return a two tuple with standard output and error stripped"""
         return self._captured_stdout.strip(), self._captured_stderr.strip()
@@ -1135,7 +1135,7 @@ class TestCase(unittest.TestCase):
     def _stop_capture(self):
         """stop_capture and restore previous output"""
         self._force_output_restore()
-    
+
     def start_capture(self, printonly=None):
         """start_capture"""
         self._out.append(capture_stdout(printonly or self._printonly))
@@ -1149,7 +1149,7 @@ class TestCase(unittest.TestCase):
             self._err[-1].printonly = rgx
         else:
             self.start_capture(printonly=rgx)
-        
+
     def stop_capture(self):
         """stop output and error capture"""
         if self._out:
@@ -1157,13 +1157,13 @@ class TestCase(unittest.TestCase):
             _err = self._err.pop()
             return _out.restore(), _err.restore()
         return '', ''
-    
+
     def _force_output_restore(self):
         """remove all capture set"""
         while self._out:
             self._captured_stdout += self._out.pop().restore()
             self._captured_stderr += self._err.pop().restore()
-    
+
     def quiet_run(self, result, func, *args, **kwargs):
         self._start_capture()
         try:
@@ -1225,11 +1225,11 @@ class TestCase(unittest.TestCase):
                         restartfile = open(FILE_RESTART, 'a')
                         try:
                             try:
-                                descr = '.'.join((self.__class__.__module__, 
-                                    self.__class__.__name__, 
+                                descr = '.'.join((self.__class__.__module__,
+                                    self.__class__.__name__,
                                     self._testMethodName))
                                 restartfile.write(descr+os.linesep)
-                            except Exception, e: 
+                            except Exception, e:
                                 raise e
                         finally:
                             restartfile.close()
@@ -1244,7 +1244,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             result.stopTest(self)
 
 
-            
+
     def _proceed_generative(self, result, testfunc, runcondition=None):
         # cancel startTest()'s increment
         result.testsRun -= 1
@@ -1305,7 +1305,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             result.addError(self, self.__exc_info())
             return 2
         return 0
-            
+
     def defaultTestResult(self):
         """return a new instance of the defaultTestResult"""
         return SkipAwareTestResult()
@@ -1315,7 +1315,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         msg = msg or 'test was skipped'
         raise TestSkipped(msg)
     skipped_test = deprecated_function(skip)
-    
+
     def assertIn(self, object, set):
         """assert <object> are in <set>"""
         self.assert_(object in set, "%s not in %s" % (object, set))
@@ -1380,7 +1380,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                 "use assertUnorderedIterableEquals instead.",
                 DeprecationWarning, 2)
             return self.assertUnorderedIterableEquals(got,expected, msg)
-        
+
         items={}
         items['missing'] = expected - got
         items['unexpected'] = got - expected
@@ -1418,7 +1418,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                 msg = 'list_2 is lacking %r' % _l1
             self.fail(msg)
     assertListEqual = assertListEquals
-    
+
     def assertLinesEquals(self, list_1, list_2, msg=None):
         """assert list of lines are equal"""
         self.assertListEquals(list_1.splitlines(), list_2.splitlines(), msg)
@@ -1441,7 +1441,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         """asserts the XML string is well-formed (no DTD conformance check)"""
         stream = StringIO(xml_string)
         self.assertXMLWellFormed(stream, msg)
-        
+
     assertXMLStringValid = deprecated_function(
         assertXMLStringWellFormed,
         'assertXMLStringValid renamed to more precise assertXMLStringWellFormed'
@@ -1492,7 +1492,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             # lines that don't start with a ' ' are diff ones
             if not line.startswith(' '):
                 self.fail('\n'.join(['%s\n'%msg_prefix]+read + list(result)))
-        
+
     def assertTextEquals(self, text1, text2, junk=None,
             msg_prefix='Text differ'):
         """compare two multiline strings (using difflib and splitlines())"""
@@ -1506,7 +1506,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         self._difftext(text1.strip().splitlines(True), text2.strip().splitlines(True),
                        junk,  msg_prefix)
     assertTextEqual = assertTextEquals
-            
+
     def assertStreamEquals(self, stream1, stream2, junk=None,
             msg_prefix='Stream differ'):
         """compare two streams (using difflib and readlines())"""
@@ -1520,28 +1520,28 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         # ocmpare
         self._difftext(stream1.readlines(), stream2.readlines(), junk,
              msg_prefix)
-            
+
     assertStreamEqual = assertStreamEquals
     def assertFileEquals(self, fname1, fname2, junk=(' ', '\t')):
         """compares two files using difflib"""
         self.assertStreamEqual(file(fname1), file(fname2), junk,
             msg_prefix='Files differs\n-:%s\n+:%s\n'%(fname1, fname2))
     assertFileEqual = assertFileEquals
-   
-    
+
+
     def assertDirEquals(self, path_a, path_b):
         """compares two files using difflib"""
         assert osp.exists(path_a), "%s doesn't exists" % path_a
         assert osp.exists(path_b), "%s doesn't exists" % path_b
 
-        all_a = [ (ipath[len(path_a):].lstrip('/'), idirs, ifiles) 
+        all_a = [ (ipath[len(path_a):].lstrip('/'), idirs, ifiles)
                     for ipath, idirs, ifiles in os.walk(path_a)]
         all_a.sort(key=itemgetter(0))
-        
-        all_b = [ (ipath[len(path_b):].lstrip('/'), idirs, ifiles) 
+
+        all_b = [ (ipath[len(path_b):].lstrip('/'), idirs, ifiles)
                     for ipath, idirs, ifiles in os.walk(path_b)]
         all_b.sort(key=itemgetter(0))
-        
+
         iter_a, iter_b = iter(all_a), iter(all_b)
         partial_iter = True
         ipath_a, idirs_a, ifiles_a = data_a = None, None, None
@@ -1554,7 +1554,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
 
 
                 self.assert_(ipath_a == ipath_b,
-                    "unexpected %s in %s while looking %s from %s" % 
+                    "unexpected %s in %s while looking %s from %s" %
                     (ipath_a, path_a, ipath_b, path_b))
 
 
@@ -1570,9 +1570,9 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                 errors["missing files"] = sfiles_b - sfiles_a
 
 
-                msgs = [ "%s: %s"% (name, items) 
+                msgs = [ "%s: %s"% (name, items)
                     for name, items in errors.iteritems() if items]
-                
+
                 if msgs:
                     msgs.insert(0,"%s and %s differ :" % (
                         osp.join(path_a, ipath_a),
@@ -1593,7 +1593,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
 
     assertDirEqual = assertDirEquals
 
-            
+
     def assertIsInstance(self, obj, klass, msg=None, strict=False):
         """compares two files using difflib"""
         if msg is None:
@@ -1612,8 +1612,8 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         if msg is None:
             msg = "%r is not %r"%(obj, other)
         self.assert_(obj is other, msg)
-    
-    
+
+
     def assertIsNot(self, obj, other, msg=None):
         """compares identity of two reference"""
         if msg is None:
@@ -1625,7 +1625,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         if msg is None:
             msg = "reference to %r when None expected"%(obj,)
         self.assert_( obj is None, msg )
-    
+
     def assertNotNone(self, obj, msg=None):
         """assert obj is not None"""
         if msg is None:
@@ -1637,11 +1637,11 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         if msg is None:
             msg = "%r != %r" % (obj, other)
         self.assert_(math.fabs(obj - other) < prec, msg)
-    
+
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
         """override default failUnlessRaise method to return the raised
         exception instance.
-        
+
         Fail unless an exception of class excClass is thrown
         by callableObj when invoked with arguments args and keyword
         arguments kwargs. If a different type of exception is
@@ -1697,7 +1697,7 @@ else:
             self.skipped = skipped
             self.original_find_tests = doctest._find_tests
             doctest._find_tests = self._find_tests
-            
+
         def _find_tests(self, module, prefix=None):
             tests = []
             for testinfo  in self.original_find_tests(module, prefix):
@@ -1727,7 +1727,7 @@ class DocTest(TestCase):
             suite = SkippedSuite()
         return suite.run(result)
     run = __call__
-    
+
     def test(self):
         """just there to trigger test execution"""
 
@@ -1735,13 +1735,13 @@ MAILBOX = None
 
 class MockSMTP:
     """fake smtplib.SMTP"""
-    
+
     def __init__(self, host, port):
         self.host = host
         self.port = port
         global MAILBOX
         self.reveived = MAILBOX = []
-        
+
     def set_debuglevel(self, debuglevel):
         """ignore debug level"""
 
@@ -1755,7 +1755,7 @@ class MockSMTP:
 
 class MockConfigParser(ConfigParser):
     """fake ConfigParser.ConfigParser"""
-    
+
     def __init__(self, options):
         ConfigParser.__init__(self)
         for section, pairs in options.iteritems():
@@ -1768,12 +1768,12 @@ class MockConfigParser(ConfigParser):
 
 class MockConnection:
     """fake DB-API 2.0 connexion AND cursor (i.e. cursor() return self)"""
-    
+
     def __init__(self, results):
         self.received = []
         self.states = []
         self.results = results
-        
+
     def cursor(self):
         """Mock cursor method"""
         return self
@@ -1824,7 +1824,7 @@ def create_files(paths, chroot):
     >>> isdir('/tmp/a/b/c')
     True
     >>> isfile('/tmp/a/b/c/d/e.py')
-    True 
+    True
     >>> isfile('/tmp/a/b/foo.py')
     True
     """
@@ -1866,7 +1866,7 @@ def enable_dbc(*args):
         weaver.weave_module(arg, ContractAspect)
     return True
 
-    
+
 class AttrObject: # XXX cf mock_object
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -1888,7 +1888,7 @@ class Tags(set):
         return eval(exp, {}, self)
 
 def require_version(version):
-    """ Compare version of python interpretor to the given one. Skip the test 
+    """ Compare version of python interpretor to the given one. Skip the test
     if older.
     """
     def check_require_version(f):

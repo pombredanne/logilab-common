@@ -45,7 +45,7 @@ try:
     # python >= 2.3
     from optparse import OptionParser as BaseParser, Option as BaseOption, \
          OptionGroup, OptionValueError, OptionError, Values, HelpFormatter, \
-         NO_DEFAULT, SUPPRESS_HELP 
+         NO_DEFAULT, SUPPRESS_HELP
 except ImportError:
     # python < 2.3
     from optik import OptionParser as BaseParser, Option as BaseOption, \
@@ -82,7 +82,7 @@ def check_regexp(option, opt, value):
     except ValueError:
         raise OptionValueError(
             "option %s: invalid regexp value: %r" % (opt, value))
-    
+
 def check_csv(option, opt, value):
     """check a csv value by trying to split it
     return the list of separated values
@@ -174,7 +174,7 @@ def check_time(option, opt, value):
 def check_bytes(option, opt, value):
     from logilab.common.textutils import BYTE_UNITS, apply_units
     apply_units(value, BYTE_UNITS)
-    
+
 import types
 
 class Option(BaseOption):
@@ -202,7 +202,7 @@ class Option(BaseOption):
     def __init__(self, *opts, **attrs):
         BaseOption.__init__(self, *opts, **attrs)
         if hasattr(self, "hide") and self.hide:
-            self.help = SUPPRESS_HELP 
+            self.help = SUPPRESS_HELP
 
     def _check_choice(self):
         """FIXME: need to override this due to optik misdesign"""
@@ -237,7 +237,7 @@ class Option(BaseOption):
         # subclasses to add new actions.
         return self.take_action(
             self.action, self.dest, opt, value, values, parser)
-    
+
 class OptionParser(BaseParser):
     """override optik.OptionParser to use our Option class
     """
@@ -268,7 +268,7 @@ class ManHelpFormatter(HelpFormatter):
         except AttributeError:
             optstring = self.format_option_strings(option)
         if option.help:
-            help_text = self.expand_default(option)            
+            help_text = self.expand_default(option)
             help = ' '.join([l.strip() for l in help_text.splitlines()])
         else:
             help = ''
@@ -293,10 +293,10 @@ class ManHelpFormatter(HelpFormatter):
 
     def format_short_description(self, pgm, short_desc):
         return '''.SH NAME
-.B %s 
+.B %s
 \- %s
 ''' % (pgm, short_desc.strip())
-        
+
     def format_synopsis(self, pgm):
         return '''.SH SYNOPSIS
 .B  %s
@@ -306,7 +306,7 @@ class ManHelpFormatter(HelpFormatter):
 .I <arguments>
 ]
 ''' % pgm
-        
+
     def format_long_description(self, pgm, long_desc):
         long_desc = '\n'.join([line.lstrip()
                                for line in long_desc.splitlines()])
@@ -314,32 +314,32 @@ class ManHelpFormatter(HelpFormatter):
         if long_desc.lower().startswith(pgm):
             long_desc = long_desc[len(pgm):]
         return '''.SH DESCRIPTION
-.B %s 
+.B %s
 %s
 ''' % (pgm, long_desc.strip())
-        
+
     def format_tail(self, pkginfo):
         return '''.SH SEE ALSO
 /usr/share/doc/pythonX.Y-%s/
 
-.SH COPYRIGHT 
+.SH COPYRIGHT
 %s
 
-This program is free software; you can redistribute it and/or modify 
-it under the terms of the GNU General Public License as published 
-by the Free Software Foundation; either version 2 of the License, 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, 
-but WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License 
-along with this program; if not, write to the Free Software 
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 MA 02111-1307 USA.
-.SH BUGS 
+.SH BUGS
 Please report bugs on the project\'s mailing list:
 %s
 
@@ -357,6 +357,6 @@ def generate_manpage(optparser, pkginfo, section=1, stream=sys.stdout):
     print >> stream, optparser.format_option_help(formatter)
     print >> stream, formatter.format_tail(pkginfo)
 
-    
+
 __all__ = ('OptionParser', 'Option', 'OptionGroup', 'OptionValueError',
            'Values')

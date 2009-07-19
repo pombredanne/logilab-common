@@ -52,7 +52,7 @@ class ProcInfo(Node):
             return int(self.status()[VSIZE])
         except IOError:
             return 0
-    
+
     def lineage_memory_usage(self):
         return self.memory_usage() + sum(child.lineage_memory_usage() for child in self.children)
 
@@ -81,7 +81,7 @@ class ProcInfo(Node):
 
 class ProcInfoLoader:
     """manage process information"""
-    
+
     def __init__(self):
         self._loaded = {}
 
@@ -101,8 +101,8 @@ class ProcInfoLoader:
             procinfo.manager = self
             self._loaded[pid] = procinfo
             return procinfo
-        
-    
+
+
     def load_all(self):
         """load all processes information"""
         for pid in self.list_pids():
@@ -153,11 +153,11 @@ class MemorySentinel(Thread):
         self.interval = interval
         self.setDaemon(True)
         self.gpid = gpid
-        
+
     def stop(self):
         """stop ap"""
         self._stop.set()
-        
+
     def _run(self):
         pil = ProcInfoLoader()
         while not self._stop.isSet():
@@ -190,7 +190,7 @@ class ResourceController:
 
     def _hangle_sig_timeout(self, sig, frame):
         raise TimeoutError()
-    
+
     def _hangle_sig_memory(self, sig, frame):
         if self._abort_try < self._reprieve:
             self._abort_try += 1
@@ -214,7 +214,7 @@ class ResourceController:
                 self._timer.start()
         else:
             os.killpg(os.getpid(), SIGKILL)
-    
+
     def setup_limit(self):
         """set up the process limit"""
         assert currentThread().getName() == 'MainThread'

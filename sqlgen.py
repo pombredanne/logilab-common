@@ -17,7 +17,7 @@ class SQLGenerator :
     def where(self, keys, addon=None) :
         """
         :param keys: list of keys
-        
+
         >>> s = SQLGenerator()
         >>> s.where(['nom'])
         'nom = %(nom)s'
@@ -34,7 +34,7 @@ class SQLGenerator :
     def set(self, keys) :
         """
         :param keys: list of keys
-        
+
         >>> s = SQLGenerator()
         >>> s.set(['nom'])
         'nom = %(nom)s'
@@ -47,7 +47,7 @@ class SQLGenerator :
         """
         :param table: name of the table
         :param params:  dictionnary that will be used as in cursor.execute(sql,params)
-        
+
         >>> s = SQLGenerator()
         >>> s.insert('test',{'nom':'dupont'})
         'INSERT INTO test ( nom ) VALUES ( %(nom)s )'
@@ -221,8 +221,8 @@ def sql_repr(type, val):
         return "'%s'" % (val,)
     else:
         return val
-            
-        
+
+
 if __name__ == "__main__":
     import doctest
     from logilab.common import sqlgen
