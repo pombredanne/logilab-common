@@ -99,6 +99,8 @@ class wproperty(object):
 
 
 class classproperty(object):
+    """this is a simple property-like class but for class attributes.
+    """
     def __init__(self, get):
         self.get = get
     def __get__(self, inst, cls):
