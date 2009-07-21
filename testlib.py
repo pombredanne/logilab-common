@@ -1343,7 +1343,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         if dict1:
             msgs.append('dict2 is lacking %r' % dict1)
         if msgs:
-            self.fail(''.join(msgs))
+            self.fail('\n'.join(msgs))
     assertDictEqual = assertDictEquals
 
 
