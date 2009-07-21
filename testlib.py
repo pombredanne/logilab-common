@@ -62,7 +62,7 @@ from logilab.common.compat import set, enumerate, any, sorted
 # pylint: enable-msg=W0622
 from logilab.common.modutils import load_module_from_name
 from logilab.common.debugger import Debugger, colorize_source
-from logilab.common.decorators import cached
+from logilab.common.decorators import cached, classproperty
 from logilab.common import textutils
 
 
@@ -1056,18 +1056,6 @@ class InnerTest(tuple):
         instance.name = name
         return instance
 
-class ClassGetProperty(object):
-    """this is a simple property-like class but for
-    class attributes.
-    """
-
-    def __init__(self, getter):
-        self.getter = getter
-
-    def __get__(self, obj, objtype): # pylint: disable-msg=W0613
-        "__get__(objn objtype) -> objtype"
-        return self.getter(objtype)
-
 
 class TestCase(unittest.TestCase):
     """unittest.TestCase with some additional methods"""
@@ -1100,7 +1088,7 @@ class TestCase(unittest.TestCase):
         return osp.join(osp.dirname(osp.abspath(mod.__file__)), 'data')
     # cache it (use a class method to cache on class since TestCase is
     # instantiated for each test run)
-    datadir = ClassGetProperty(cached(datadir))
+    datadir = classproperty(cached(datadir))
 
     def datapath(self, fname):
         """joins the object's datadir and `fname`"""
