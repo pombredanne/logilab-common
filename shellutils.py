@@ -277,3 +277,19 @@ class ProgressBar(object):
         """Refresh the progression bar display."""
         self._stream.write(self._fstr % ('.' * min(self._progress, self._size)) )
         self._stream.flush()
+
+def confirm(question, default_is_yes=True):
+    """ask for confirmation and return true on positive answer"""
+    if default_is_yes:
+        input_str = '%s [Y/n]: '
+    else:
+        input_str = '%s [y/N]: '
+    answer = raw_input(input_str % (question)).strip().lower()
+    if default_is_yes:
+        if answer in ('n', 'no'):
+            return False
+        return True
+    if answer in ('y', 'yes'):
+        return True
+    return False
+
