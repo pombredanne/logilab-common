@@ -830,7 +830,7 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
             raise KeyError(key)
 
     def __setitem__(self, key, value):
-        self.set_option(self.option_name(key), value)
+        self.set_option(key, value)
 
     def get(self, key, default=None):
         try:

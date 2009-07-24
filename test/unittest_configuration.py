@@ -23,16 +23,16 @@ options = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar
 
            ('diffgroup', {'type':'string', 'default':'pouet', 'metavar': '<key=val>',
                           'group': 'agroup'}),
-           
+
            ]
 
 class MyConfiguration(Configuration):
     """test configuration"""
     def get_named(self):
         return {'key': 'val'}
-    
+
 class ConfigurationTC(TestCase):
-    
+
     def setUp(self):
         self.cfg = MyConfiguration(name='test', options=options, usage='Just do it ! (tm)')
 
@@ -76,7 +76,7 @@ class ConfigurationTC(TestCase):
         self.assertEquals(cfg['multiple'], ['1', '2', '3'])
         self.assertEquals(cfg['number'], 4)
         self.assertEquals(cfg['choice'], 'ye')
-        
+
     def test_load_configuration(self):
         cfg = self.cfg
         args = cfg.load_configuration(choice='ye', number='4',
@@ -125,7 +125,7 @@ diffgroup=zou
             self.assertEquals(self.cfg['diffgroup'], 'zou')
         finally:
             os.remove(file)
-        
+
     def test_generate_config(self):
         stream = StringIO()
         self.cfg.generate_config(stream)
@@ -153,7 +153,7 @@ named=key:val
 
 diffgroup=pouet
 """)
-        
+
     def test_generate_config_with_space_string(self):
         self.cfg['value'] = '    '
         stream = StringIO()
@@ -182,7 +182,7 @@ named=key:val
 
 diffgroup=pouet
 """)
-        
+
 
     def test_loopback(self):
         cfg = self.cfg
@@ -201,7 +201,13 @@ diffgroup=pouet
             self.assertEquals(cfg['multiple-choice'], new_cfg['multiple-choice'])
         finally:
             os.remove(f)
-        
+
+    def test_setitem(self):
+        self.assertRaises(OptionValueError,
+                          self.cfg.__setitem__, 'multiple-choice', ('a', 'b'))
+        self.cfg['multiple-choice'] = ('yi', 'ya')
+        self.assertEquals(self.cfg['multiple-choice'], ('yi', 'ya'))
+
     def test_help(self):
         self.cfg.add_help_section('bonus', 'a nice additional help')
         help = self.cfg.help().strip()
@@ -215,55 +221,55 @@ diffgroup=pouet
 
 Options:
   -h, --help            show this help message and exit
-  --dothis=<y or n>     
+  --dothis=<y or n>
   -v<string>, --value=<string>
   --multiple=<comma separated values>
                         you can also document the option [current: yop,yep]
   --number=<int>        boom [current: 2]
-  --choice=<yo|ye>      
+  --choice=<yo|ye>
   --multiple-choice=<yo|ye>
-  --named=<key=val>     
+  --named=<key=val>
 
   Agroup:
     --diffgroup=<key=val>
 
   Bonus:
     a nice additional help
-""".strip())
+""", striplines=True)
         elif version_info >= (2, 4):
             self.assertLinesEquals(help, """usage: Just do it ! (tm)
 
 options:
   -h, --help            show this help message and exit
-  --dothis=<y or n>     
+  --dothis=<y or n>
   -v<string>, --value=<string>
   --multiple=<comma separated values>
                         you can also document the option [current: yop,yep]
   --number=<int>        boom [current: 2]
-  --choice=<yo|ye>      
+  --choice=<yo|ye>
   --multiple-choice=<yo|ye>
-  --named=<key=val>     
+  --named=<key=val>
 
   Bonus:
     a nice additional help
-""".strip())
+""", striplines=True)
         else:
             self.assertLinesEquals(help, """usage: Just do it ! (tm)
 
 options:
   -h, --help            show this help message and exit
-  --dothis=<y or n>     
+  --dothis=<y or n>
   -v<string>, --value=<string>
   --multiple=<comma separated values>
                         you can also document the option
-  --number=<int>        
-  --choice=<yo|ye>      
+  --number=<int>
+  --choice=<yo|ye>
   --multiple-choice=<yo|ye>
-  --named=<key=val>     
+  --named=<key=val>
 
   Bonus:
     a nice additional help
-""".strip())
+""", striplines=True)
 
 
     def test_manpage(self):
@@ -301,7 +307,7 @@ named=key:val
 
 diffgroup=pouet
 """)
-        
+
 class Linter(OptionsManagerMixIn, OptionsProviderMixIn):
     options = (
         ('profile', {'type' : 'yn', 'metavar' : '<y_or_n>',
@@ -318,11 +324,11 @@ class RegrTC(TestCase):
 
     def setUp(self):
         self.linter = Linter()
-        
+
     def test_load_defaults(self):
         self.linter.load_command_line_configuration([])
         self.assertEquals(self.linter.config.profile, False)
-        
-        
+
+
 if __name__ == '__main__':
     unittest_main()
