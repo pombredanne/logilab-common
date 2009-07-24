@@ -433,6 +433,16 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     intersect_all_support = False
     alter_column_support = False
 
+    def backup_command(self, dbname, dbhost, dbuser, backupfile,
+                       keepownership=True):
+        """return a command to backup the given database"""
+        return 'gzip --stdout %s > %s' % (dbname, backupfile)
+
+    def restore_commands(self, dbname, dbhost, dbuser, backupfile,
+                         encoding='utf-8', keepownership=True, drop=True):
+        """return a list of commands to restore a backup the given database"""
+        return ['gunzip --stdout %s > %s' % (backupfile, dbname)]
+
     def sql_create_index(self, table, column, unique=False):
         idx = self._index_name(table, column, unique)
         if unique:
