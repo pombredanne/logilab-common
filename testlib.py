@@ -1408,9 +1408,15 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             self.fail(msg)
     assertListEqual = assertListEquals
 
-    def assertLinesEquals(self, list_1, list_2, msg=None):
+    def assertLinesEquals(self, list_1, list_2, msg=None, striplines=False):
         """assert list of lines are equal"""
-        self.assertListEquals(list_1.splitlines(), list_2.splitlines(), msg)
+        lines1 = list_1.splitlines()
+        if striplines:
+            lines1 = [l.strip() for l in lines1]
+        lines2 = list_2.splitlines()
+        if striplines:
+            lines2 = [l.strip() for l in lines2]
+        self.assertListEquals(lines1, lines2, msg)
     assertLineEqual = assertLinesEquals
 
     def assertXMLWellFormed(self, stream, msg=None):
