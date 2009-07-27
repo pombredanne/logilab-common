@@ -33,14 +33,14 @@ def get_nodes(node, klass):
         # recurse (FIXME: recursion controled by an option)
         for grandchild in get_nodes(child, klass):
             yield grandchild
-            
+
 def layout_title(layout):
     """try to return the layout's title as string, return None if not found
     """
     for child in layout.children:
         if isinstance(child, Title):
             return ' '.join([node.data for node in get_nodes(child, Text)])
-            
+
 def build_summary(layout, level=1):
     """make a summary for the report, including X level"""
     assert level > 0
@@ -70,7 +70,7 @@ def build_summary(layout, level=1):
 
 class BaseWriter(object):
     """base class for ureport writers"""
-    
+
     def format(self, layout, stream=None, encoding=None):
         """format and write the given layout into the stream object
 
@@ -88,7 +88,7 @@ class BaseWriter(object):
         self.begin_format(layout)
         layout.accept(self)
         self.end_format(layout)
-        
+
     def format_children(self, layout):
         """recurse on the layout children and call their accept method
         (see the Visitor pattern)
@@ -110,7 +110,7 @@ class BaseWriter(object):
     def begin_format(self, layout):
         """begin to format a layout"""
         self.section = 0
-        
+
     def end_format(self, layout):
         """finished to format a layout"""
 

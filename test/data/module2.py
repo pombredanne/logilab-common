@@ -23,7 +23,7 @@ class AbstractClass(object):
         if param:
             return 'toto'
         return
-    
+
 class Concrete0:
     __implements__ = MyIFace
 class Concrete1:
@@ -46,7 +46,7 @@ def raise_string(a=2, *args, **kwargs):
     raise 'pas glop'
     raise Exception, 'yo'
     yield 'coucou'
-    
+
 a = b + 2
 c = b * 2
 c = b / 2

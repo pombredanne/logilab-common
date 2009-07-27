@@ -45,7 +45,7 @@ class BindTC(TestCase):
                                      consts_dict, consts_list)
         self.assertEquals(consts_list, [None, 'hacked !'])
         self.assertEquals(modified, ['HELLO'])
-    
+
     def test_optimize_module2(self):
         """test optimize_module_2()"""
         f1_consts = Set(foomod.f1.func_code.co_consts)
@@ -57,7 +57,6 @@ class BindTC(TestCase):
         newf3_consts = Set(foomod.f3.func_code.co_consts)
         self.assert_(newf1_consts == newf2_consts == newf3_consts)
         self.assertEquals(newf1_consts, f1_consts | f2_consts | f3_consts)
-    
+
 if __name__ == '__main__':
     unittest_main()
-    

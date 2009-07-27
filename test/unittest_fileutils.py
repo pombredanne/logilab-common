@@ -17,7 +17,7 @@ class FirstleveldirectoryTC(TestCase):
         """return the first level directory of a path"""
         self.assertEqual(first_level_directory('truc/bidule/chouette'), 'truc', None)
         self.assertEqual(first_level_directory('/truc/bidule/chouette'), '/', None)
-        
+
 class IsBinaryTC(TestCase):
     def test(self):
         self.assertEqual(is_binary('toto.txt'), 0)
@@ -25,7 +25,7 @@ class IsBinaryTC(TestCase):
         self.assertEqual(is_binary('toto.bin'), 1)
         self.assertEqual(is_binary('toto.sxi'), 1)
         self.assertEqual(is_binary('toto.whatever'), 1)
-        
+
 class GetModeTC(TestCase):
     def test(self):
         self.assertEqual(write_open_mode('toto.txt'), 'w')
@@ -43,7 +43,7 @@ class LinesTC(TestCase):
     def test_known_values_lines(self):
         self.assertEqual(lines(NEWLINES_TXT),
                          ['# mixed new lines', '1', '2', '3'])
-        
+
     def test_known_values_lines_comment(self):
         self.assertEqual(lines(NEWLINES_TXT, comments='#'),
                          ['1', '2', '3'])
@@ -59,7 +59,7 @@ class ExportTC(TestCase):
         self.assert_(exists(join(self.tempdir, 'sub')))
         self.assert_(not exists(join(self.tempdir, '__init__.pyc')))
         self.assert_(not exists(join(self.tempdir, 'CVS')))
-        
+
     def tearDown(self):
         shutil.rmtree(self.tempdir)
 
@@ -101,7 +101,7 @@ class ProtectedFileTC(TestCase):
         self.assert_(os.access(self.rpath, os.W_OK))
         wp_file.close()
         self.assert_(not os.access(self.rpath, os.W_OK))
-        
+
 
 from logilab.common.testlib import DocTest
 class ModuleDocTest(DocTest):
@@ -109,7 +109,7 @@ class ModuleDocTest(DocTest):
     from logilab.common import fileutils as module
     skipped = ('abspath_listdir',)
 
-    
+
 del DocTest # necessary if we don't want it to be executed (we don't...)
 
 if __name__ == '__main__':

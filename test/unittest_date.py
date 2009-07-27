@@ -40,7 +40,7 @@ class DateTC(TestCase):
         self.assertEquals(add(self.datecls(2008, 1, 3), 8), self.datecls(2008, 1, 15))
         # skip holiday + week-end
         self.assertEquals(add(self.datecls(2008, 4, 30), 2), self.datecls(2008, 5, 5))
-        
+
     def test_get_national_holidays(self):
         holidays = get_national_holidays
         yield self.assertEquals, holidays(self.datecls(2008, 4, 29), self.datecls(2008, 5, 2)), \

@@ -46,7 +46,7 @@ class TableTC(TestCase):
         tab.append_row([2])
         self.assertEquals(tab, [[1],[2]])
         self.assertEquals(tab[:,0], [1,2])
-        
+
     def test_indexation(self):
         """we should be able to use [] to access rows"""
         self.assert_(self.table[0] == self.table.data[0])
@@ -65,7 +65,7 @@ class TableTC(TestCase):
         self.table.insert_column(1, range(3), 'supp')
         self.assertEquals(self.table, [[0, 0, 0], [0, 1, 0], [0, 2, 0]])
         self.assertEquals(self.table[:], [[0, 0, 0], [0, 1, 0], [0, 2, 0]])
-        
+
     def test_get_cells(self):
         self.table.insert_column(1, range(3), 'supp')
         self.assertEquals(self.table[0,1], 0)
@@ -76,13 +76,13 @@ class TableTC(TestCase):
         self.assertEquals(self.table['row3', 'supp'], 2)
         self.assertRaises(KeyError, self.table.__getitem__, ('row1', 'foo'))
         self.assertRaises(KeyError, self.table.__getitem__, ('foo', 'bar'))
-        
+
     def test_shape(self):
         """tests table shape"""
         self.assertEquals(self.table.shape, (3, 2))
         self.table.insert_column(1, range(3), 'supp')
         self.assertEquals(self.table.shape, (3, 3))
-        
+
     def test_set_column(self):
         """Tests that table.set_column() works fine.
         """
@@ -121,7 +121,7 @@ class TableTC(TestCase):
         self.assertRaises(KeyError, self.table.delete_row_by_id, 'tmprow')
         self.assertEquals(self.table[1], [0, 0])
         self.assertRaises(KeyError, self.table.__getitem__, 'tmprow')
-        
+
     def test_get_column(self):
         """Tests that table.get_column() works fine.
         """
@@ -136,7 +136,7 @@ class TableTC(TestCase):
         self.table.set_cell(0, 1, 12)
         self.table.set_cell(2, 1, 13)
         self.assertEquals(self.table.get_columns(), [[0,0,0], [12,0,13]])
-    
+
     def test_insert_column(self):
         """Tests that table.insert_column() works fine.
         """
@@ -175,7 +175,7 @@ class TableTC(TestCase):
         self.table.sort_by_column_index(1, 'desc')
         self.assertEquals(self.table.row_names, ['row3', 'row2', 'row1'])
         self.assertEquals(self.table.data, [[2, 3], [1, 2], [3, 1]])
-        
+
     def test_sort_by_id(self):
         """tests sort_by_column_id()"""
         self.table.set_column_by_id('col1', [3, 1, 2])
@@ -204,7 +204,7 @@ class GroupByTC(TestCase):
         t.append_row(['date2', 'ing3', 'task3', 0.3])
         t.append_row(['date3', 'ing4', 'task2', 0.3])
         t.append_row(['date1', 'ing1', 'task3', 0.3])
-        t.append_row(['date3', 'ing1', 'task3', 0.3])        
+        t.append_row(['date3', 'ing1', 'task3', 0.3])
         self.table = t
 
     def test_single_groupby(self):
@@ -264,7 +264,7 @@ class TableStyleSheetTC(TestCase):
 
     def tearDown(self):
         sys.stdout = self.stdout_backup
-        
+
     def test_add_rule(self):
         """Tests that the regex pattern works as expected.
         """
@@ -284,7 +284,7 @@ class TableStyleSheetTC(TestCase):
         sheet = TableStyleSheet([rule, 'bad rule'])
         self.assertEquals(len(sheet.rules), 1, "Ill-formed rule mustn't be added")
         self.assertEquals(len(sheet.instructions), 1, "Ill-formed rule mustn't be added")
-    
+
     def test_rowavg_rule(self):
         """Tests that add_rowavg_rule works as expected
         """
@@ -293,7 +293,7 @@ class TableStyleSheetTC(TestCase):
         self.table.apply_stylesheet(self.stylesheet)
         val = self.table[0,2]
         self.assert_(int(val) == 15)
-        
+
 
     def test_rowsum_rule(self):
         """Tests that add_rowsum_rule works as expected
@@ -303,7 +303,7 @@ class TableStyleSheetTC(TestCase):
         self.table.apply_stylesheet(self.stylesheet)
         val = self.table[0,2]
         self.assert_(val == 30)
-        
+
 
     def test_colavg_rule(self):
         """Tests that add_colavg_rule works as expected
@@ -315,7 +315,7 @@ class TableStyleSheetTC(TestCase):
         self.table.apply_stylesheet(self.stylesheet)
         val = self.table[2,0]
         self.assert_(int(val) == 11)
-        
+
 
     def test_colsum_rule(self):
         """Tests that add_colsum_rule works as expected
@@ -366,7 +366,7 @@ class TableStyleTC(TestCase):
             isetter('FOO', 1)
             self.assertEquals(getter('col1'), 'FOO')
             self.assertEquals(igetter(1), 'FOO')
-        
+
 
 class RendererTC(TestCase):
     """Test suite for DocbookRenderer"""
@@ -377,7 +377,7 @@ class RendererTC(TestCase):
         self.table.create_columns(['col1', 'col2'])
         self.style = TableStyle(self.table)
         self.base_renderer = TableCellRenderer()
-        
+
     def test_cell_content(self):
         """test how alignment is rendered"""
         entry_xml = self.renderer._render_cell_content('data', self.style, 1)
@@ -425,7 +425,7 @@ class DocbookTableWriterTC(TestCase):
         """tests that Abstract Writers can't be used !"""
         writer = TableWriter(self.stream, self.table, None)
         self.assertRaises(NotImplementedError, writer.write_table)
-    
-    
+
+
 if __name__ == '__main__':
     unittest_main()

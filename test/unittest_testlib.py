@@ -16,7 +16,7 @@ try:
     __file__
 except NameError:
     __file__ = sys.argv[0]
-    
+
 
 from unittest import TestSuite
 
@@ -64,12 +64,12 @@ class UtilTC(TestCase):
             self.assertEquals(dircontent('a/b/c/d'), ['e.py'])
         finally:
             shutil.rmtree(chroot)
-            
+
 
 class TestlibTC(TestCase):
 
     capture = True
-    
+
     def mkdir(self,path):
         if not exists(path):
             self._dirs.add(path)
@@ -109,7 +109,7 @@ class TestlibTC(TestCase):
         text
 """
         t2 = """some
-        
+
         text"""
         t3 = """some
         text"""
@@ -161,13 +161,13 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.tc.assertSetEquals, s1, s2)
         self.tc.assertSetEquals(s1, s1)
         self.tc.assertSetEquals(set(), set())
-    
+
     def test_file_equality(self):
         foo = join(dirname(__file__), 'data', 'foo.txt')
-        spam = join(dirname(__file__), 'data', 'spam.txt')        
+        spam = join(dirname(__file__), 'data', 'spam.txt')
         self.assertRaises(AssertionError, self.tc.assertFileEqual, foo, spam)
         self.tc.assertFileEqual(foo, foo)
-    
+
     def test_dir_equality(self):
         ref = join(dirname(__file__), 'data', 'reference_dir')
         same = join(dirname(__file__), 'data', 'same_dir')
@@ -188,24 +188,24 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.assertDirEquals, subdir_differ, ref)
         self.assertRaises(AssertionError, self.assertDirEquals, file_differ, ref)
         self.assertRaises(AssertionError, self.assertDirEquals, ref, content_differ)
-        
+
     def test_stream_equality(self):
         foo = join(dirname(__file__), 'data', 'foo.txt')
-        spam = join(dirname(__file__), 'data', 'spam.txt')        
+        spam = join(dirname(__file__), 'data', 'spam.txt')
         stream1 = file(foo)
         self.tc.assertStreamEqual(stream1, stream1)
         stream1 = file(foo)
         stream2 = file(spam)
         self.assertRaises(AssertionError, self.tc.assertStreamEqual, stream1, stream2)
-        
+
     def test_text_equality(self):
         self.assertRaises(AssertionError, self.tc.assertTextEqual, "toto", 12)
         self.assertRaises(AssertionError, self.tc.assertTextEqual, "toto", None)
         self.assertRaises(AssertionError, self.tc.assertTextEqual, 3.12, u"toto")
         self.assertRaises(AssertionError, self.tc.assertTextEqual, None, u"toto")
-        
+
         foo = join(dirname(__file__), 'data', 'foo.txt')
-        spam = join(dirname(__file__), 'data', 'spam.txt')        
+        spam = join(dirname(__file__), 'data', 'spam.txt')
         text1 = file(foo).read()
         self.tc.assertTextEqual(text1, text1)
         text2 = file(spam).read()
@@ -216,7 +216,7 @@ class TestlibTC(TestCase):
         exc = self.tc.assertRaises(KeyError, {}.__getitem__, 'foo')
         self.failUnless(isinstance(exc, KeyError))
         self.assertEquals(exc.args, ('foo',))
-        
+
 
     def test_default_datadir(self):
         expected_datadir = join(dirname(abspath(__file__)), 'data')
@@ -233,14 +233,14 @@ class TestlibTC(TestCase):
         self.assertEquals(tc.datapath('bar'), join('foo', 'bar'))
         # instance's custom datadir
         tc.datadir = 'spam'
-        self.assertEquals(tc.datapath('bar'), join('spam', 'bar'))        
+        self.assertEquals(tc.datapath('bar'), join('spam', 'bar'))
 
 
     def test_cached_datadir(self):
         """test datadir is cached on the class"""
         class MyTC(TestCase):
             def test_1(self): pass
-                
+
         expected_datadir = join(dirname(abspath(__file__)), 'data')
         tc = MyTC('test_1')
         self.assertEquals(tc.datadir, expected_datadir)
@@ -250,13 +250,13 @@ class TestlibTC(TestCase):
         # even on new instances
         tc2 = MyTC('test_1')
         self.assertEquals(tc2.datadir, expected_datadir)
-        
+
     def test_is(self):
         obj_1 = []
         obj_2 = []
         self.assertIs(obj_1,obj_1)
         self.assertRaises(AssertionError, self.assertIs, obj_1, obj_2)
-    
+
     def test_isnot(self):
         obj_1 = []
         obj_2 = []
@@ -282,7 +282,7 @@ class TestlibTC(TestCase):
 
 
 class GenerativeTestsTC(TestCase):
-    
+
     def setUp(self):
         output = StringIO()
         self.runner = SkipAwareTextTestRunner(stream=output)
@@ -316,7 +316,7 @@ class GenerativeTestsTC(TestCase):
                     if i == 5:
                         raise ValueError('STOP !')
                     yield self.assertEquals, i, i
-                    
+
         result = self.runner.run(FooTC('test_generative'))
         self.assertEquals(result.testsRun, 5)
         self.assertEquals(len(result.failures), 0)
@@ -344,7 +344,7 @@ class GenerativeTestsTC(TestCase):
             def test_generative(self):
                 for i in xrange(10):
                     yield self.assertEquals, i, i
-                    
+
         result = self.runner.run(FooTC('test_generative'))
         self.assertEquals(result.testsRun, 1)
         self.assertEquals(len(result.failures), 0)
@@ -366,7 +366,7 @@ class ExitFirstTC(TestCase):
         self.assertEquals(result.testsRun, 2)
         self.assertEquals(len(result.failures), 1)
         self.assertEquals(len(result.errors), 0)
-        
+
 
     def test_error_exit_first(self):
         class FooTC(TestCase):
@@ -378,7 +378,7 @@ class ExitFirstTC(TestCase):
         self.assertEquals(result.testsRun, 2)
         self.assertEquals(len(result.failures), 0)
         self.assertEquals(len(result.errors), 1)
-        
+
     def test_generative_exit_first(self):
         class FooTC(TestCase):
             def test_generative(self):
@@ -406,7 +406,7 @@ class TestLoaderTC(TestCase):
         self.module = TestLoaderTC # mock_object(FooTC=TestLoaderTC.FooTC, BarTC=TestLoaderTC.BarTC)
         self.output = StringIO()
         self.runner = SkipAwareTextTestRunner(stream=self.output)
-    
+
     def assertRunCount(self, pattern, module, expected_count, skipped=()):
         if pattern:
             suite = self.loader.loadTestsFromNames([pattern], module)
@@ -418,7 +418,7 @@ class TestLoaderTC(TestCase):
         self.runner.test_pattern = None
         self.runner.skipped_patterns = ()
         self.assertEquals(result.testsRun, expected_count)
-        
+
     def test_collect_everything(self):
         """make sure we don't change the default behaviour
         for loadTestsFromModule() and loadTestsFromTestCase
@@ -438,7 +438,7 @@ class TestLoaderTC(TestCase):
                 ]
         for pattern, expected_count in data:
             yield self.assertRunCount, pattern, self.module, expected_count
-        
+
     def test_collect_with_pattern(self):
         data = [('test_foo1', 1), ('test_foo', 2), ('test_bar', 2),
                 ('foo1', 1), ('foo', 2), ('bar', 2), ('ba', 2),
@@ -464,20 +464,20 @@ class TestLoaderTC(TestCase):
                 ]
         for pattern, expected_count in data:
             yield self.assertRunCount, pattern, MyMod, expected_count
-            
-        
+
+
     def test_collect_everything_and_skipped_patterns(self):
         testdata = [ (['foo1'], 3), (['foo'], 2),
                      (['foo', 'bar'], 0),
                      ]
         for skipped, expected_count in testdata:
             yield self.assertRunCount, None, self.module, expected_count, skipped
-        
+
 
     def test_collect_specific_pattern_and_skip_some(self):
         testdata = [ ('bar', ['foo1'], 2), ('bar', [], 2),
                      ('bar', ['bar'], 0), ]
-        
+
         for runpattern, skipped, expected_count in testdata:
             yield self.assertRunCount, runpattern, self.module, expected_count, skipped
 
@@ -507,7 +507,7 @@ class TestLoaderTC(TestCase):
                         else:
                             yield InnerTest('odd', lambda: None)
                     yield lambda: None
-                    
+
         data = [('foo', 7), ('test_foobar', 6), ('even', 3), ('odd', 2),
                 ]
         for pattern, expected_count in data:
@@ -533,7 +533,7 @@ class TestLoaderTC(TestCase):
             class MyTestCase(_Base):
                 def test_2(self): pass
         self.assertRunCount(None, MyMod, 2)
-            
+
 
 def bootstrap_print(msg, output=sys.stdout):
     """sys.stdout will be evaluated at function parsing time"""
@@ -541,7 +541,7 @@ def bootstrap_print(msg, output=sys.stdout):
     output.write(msg)
 
 class OutErrCaptureTC(TestCase):
-    
+
     def setUp(self):
         sys.stdout = sys.stderr = StringIO()
         self.runner = SkipAwareTextTestRunner(stream=StringIO(), exitfirst=True, capture=True)
@@ -559,8 +559,8 @@ class OutErrCaptureTC(TestCase):
         result = self.runner.run(test)
         captured_out, captured_err = test.captured_output()
         self.assertEqual(captured_out.strip(), "foo")
-        self.assertEqual(captured_err.strip(), "") 
-       
+        self.assertEqual(captured_err.strip(), "")
+
     def test_stderr_capture(self):
         class FooTC(TestCase):
             def test_stderr(self):
@@ -570,9 +570,9 @@ class OutErrCaptureTC(TestCase):
         result = self.runner.run(test)
         captured_out, captured_err = test.captured_output()
         self.assertEqual(captured_out.strip(), "")
-        self.assertEqual(captured_err.strip(), "foo") 
-        
-        
+        self.assertEqual(captured_err.strip(), "foo")
+
+
     def test_both_capture(self):
         class FooTC(TestCase):
             def test_stderr(self):
@@ -583,8 +583,8 @@ class OutErrCaptureTC(TestCase):
         result = self.runner.run(test)
         captured_out, captured_err = test.captured_output()
         self.assertEqual(captured_out.strip(), "bar")
-        self.assertEqual(captured_err.strip(), "foo") 
-        
+        self.assertEqual(captured_err.strip(), "foo")
+
     def test_no_capture(self):
         class FooTC(TestCase):
             def test_stderr(self):
@@ -597,8 +597,8 @@ class OutErrCaptureTC(TestCase):
         result = runner.run(test)
         captured_out, captured_err = test.captured_output()
         self.assertEqual(captured_out.strip(), "")
-        self.assertEqual(captured_err.strip(), "") 
-        
+        self.assertEqual(captured_err.strip(), "")
+
 
     def test_capture_core(self):
         # output = capture_stdout()
@@ -607,7 +607,7 @@ class OutErrCaptureTC(TestCase):
         output = capture_stdout()
         bootstrap_print("hello")
         self.assertEquals(output.restore(), "hello")
-        
+
     def test_unicode_non_ascii_messages(self):
         class FooTC(TestCase):
             def test_xxx(self):
@@ -615,7 +615,7 @@ class OutErrCaptureTC(TestCase):
         test = FooTC('test_xxx')
         # run the test and make sure testlib doesn't raise an exception
         result = self.runner.run(test)
-        
+
     def test_encoded_non_ascii_messages(self):
         class FooTC(TestCase):
             def test_xxx(self):
@@ -626,7 +626,7 @@ class OutErrCaptureTC(TestCase):
 
 
 class DecoratorTC(TestCase):
-    
+
     @with_tempdir
     def test_tmp_dir_normal(self):
 
@@ -650,9 +650,9 @@ class DecoratorTC(TestCase):
         self.assertFalse(witness)
         createfile(witness)
         self.assertTrue(witness)
-        
+
         self.assertEquals(tempfile.gettempdir(), tempdir)
-        
+
         # assert temp directory is empty
         self.assertListEquals(list(os.walk(tempdir)),
             [(tempdir,[],[])])
@@ -679,7 +679,7 @@ class DecoratorTC(TestCase):
             raise WitnessException()
 
         self.assertRaises(WitnessException, createfile)
-        
+
 
         # assert tempdir didn't change
         self.assertEquals(tempfile.gettempdir(), tempdir)
@@ -703,10 +703,10 @@ class DecoratorTC(TestCase):
         sys.version_info = (2, 5, 5, 'final', 4)
         current = sys.version_info[:3]
         compare = ('2.4', '2.5', '2.5.4', '2.5.5')
-        for version in compare: 
+        for version in compare:
             decorator = require_version(version)
             self.assertEquals(func, decorator(func), '%s =< %s : function \
-                return by the decorator should be the same.' % (version, 
+                return by the decorator should be the same.' % (version,
                 '.'.join([str(element) for element in current])))
 
     def test_require_version_bad(self):
@@ -717,10 +717,10 @@ class DecoratorTC(TestCase):
         sys.version_info = (2, 5, 5, 'final', 4)
         current = sys.version_info[:3]
         compare = ('2.5.6', '2.6', '2.6.5')
-        for version in compare: 
+        for version in compare:
             decorator = require_version(version)
             self.assertNotEquals(func, decorator(func), '%s >= %s : function \
-                 return by the decorator should NOT be the same.' 
+                 return by the decorator should NOT be the same.'
                  % ('.'.join([str(element) for element in current]), version))
 
     def test_require_version_exception(self):
@@ -729,7 +729,7 @@ class DecoratorTC(TestCase):
         def func() :
             pass
         compare = ('2.5.a', '2.a', 'azerty')
-        for version in compare: 
+        for version in compare:
             decorator = require_version(version)
             self.assertRaises(ValueError, decorator, func)
 
@@ -759,7 +759,7 @@ class DecoratorTC(TestCase):
                     not exist : function return by the decorator should \
                     NOT be the same.' % module)
                 return
-        print 'all modules in %s exist. Could not test %s' % (', '.join(modules), 
+        print 'all modules in %s exist. Could not test %s' % (', '.join(modules),
             sys._getframe().f_code.co_name)
 
 class TagTC(TestCase):
@@ -773,7 +773,7 @@ class TagTC(TestCase):
 
     def test_tag_decorator(self):
         bob = self.func
-        
+
         self.assertEquals(bob(2, 3, 7), 35)
         self.assertTrue(hasattr(bob, 'tags'))
         self.assertSetEquals(bob.tags, set(['testing','bob']))
@@ -801,4 +801,3 @@ class TagTC(TestCase):
 
 if __name__ == '__main__':
     unittest_main()
-

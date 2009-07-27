@@ -6,7 +6,7 @@ from logilab.common.umessage import UMessage, decode_QP
 import email
 
 class UMessageTC(TestCase):
-    
+
     def setUp(self):
         msg1 = email.message_from_file(open('data/test1.msg'))
         self.umessage1 = UMessage(msg1)
@@ -32,8 +32,7 @@ class UMessageTC(TestCase):
         test = decode_QP(test_line)
         self.assertEquals(type(test), unicode)
         self.assertEquals(test, u'Raphaël DUPONT<raphael.dupont@societe.fr>')
-        
+
 
 if __name__ == '__main__':
     unittest_main()
-

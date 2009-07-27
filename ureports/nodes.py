@@ -48,14 +48,14 @@ class BaseLayout(BaseComponent):
         """overridden to detect problems easily"""
         assert child not in self.parents()
         VNode.append(self, child)
-        
+
     def parents(self):
         """return the ancestor nodes"""
         assert self.parent is not self
         if self.parent is None:
             return []
         return [self.parent] + self.parent.parents()
-    
+
     def add_text(self, text):
         """shortcut to add text data"""
         self.children.append(Text(text))
@@ -85,7 +85,7 @@ class VerbatimText(Text):
     * BaseComponent attributes
     * data : the text value as an encoded or unicode string
     """
-        
+
 class Link(BaseComponent):
     """a labelled link
 
@@ -100,7 +100,7 @@ class Link(BaseComponent):
         self.url = url
         self.label = label or url
 
-        
+
 class Image(BaseComponent):
     """an embeded or a single image
 
@@ -118,15 +118,15 @@ class Image(BaseComponent):
         self.stream = stream
         self.title = title
 
-        
+
 # container nodes #############################################################
-        
+
 class Section(BaseLayout):
     """a section
 
     attributes :
     * BaseLayout attributes
-    
+
     a title may also be given to the constructor, it'll be added
     as a first element
     a description may also be given to the constructor, it'll be added
@@ -138,34 +138,34 @@ class Section(BaseLayout):
             self.insert(0, Paragraph([Text(description)]))
         if title:
             self.insert(0, Title(children=(title,)))
-        
+
 class Title(BaseLayout):
     """a title
-    
+
     attributes :
     * BaseLayout attributes
 
     A title must not contains a section nor a paragraph!
     """
-    
+
 class Span(BaseLayout):
     """a title
-    
+
     attributes :
     * BaseLayout attributes
 
     A span should only contains Text and Link nodes (in-line elements)
     """
-    
+
 class Paragraph(BaseLayout):
     """a simple text paragraph
-    
+
     attributes :
     * BaseLayout attributes
 
     A paragraph must not contains a section !
     """
-    
+
 class Table(BaseLayout):
     """some tabular data
 
@@ -175,7 +175,7 @@ class Table(BaseLayout):
     * rheaders : the first row's elements are table's header
     * cheaders : the first col's elements are table's header
     * title : the table's optional title
-    """    
+    """
     def __init__(self, cols, title=None,
                  rheaders=0, cheaders=0, rrheaders=0, rcheaders=0,
                  **kwargs):
@@ -187,10 +187,10 @@ class Table(BaseLayout):
         self.cheaders = cheaders
         self.rrheaders = rrheaders
         self.rcheaders = rcheaders
-        
+
 class List(BaseLayout):
     """some list data
 
     attributes :
     * BaseLayout attributes
-    """    
+    """

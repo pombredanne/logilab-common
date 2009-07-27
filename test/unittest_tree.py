@@ -19,11 +19,11 @@ def make_tree(tuple):
     for child in tuple[1]:
         n.append(make_tree(child))
     return n
-    
+
 class Node_ClassTest(TestCase):
     """ a basic tree node, caracterised by an id"""
     def setUp(self):
-        """ called before each test from this class """        
+        """ called before each test from this class """
         self.o = make_tree(tree)
 
 
@@ -38,15 +38,15 @@ class Node_ClassTest(TestCase):
         result = [r.id for r in resultnodes]
         expected = ['root', 'child_1_1', 'child_2_1', 'child_2_2', 'child_3_1', 'child_1_2', 'child_2_3']
         self.assertListEqual(result, expected)
-        
-        
+
+
     def test_known_values_remove(self):
-        """ 
+        """
         remove a child node
         """
         self.o.remove(self.o.get_node_by_id('child_1_1'))
         self.assertRaises(NodeNotFound, self.o.get_node_by_id, 'child_1_1')
-    
+
     def test_known_values_replace(self):
         """
         replace a child node with another
@@ -54,44 +54,44 @@ class Node_ClassTest(TestCase):
         self.o.replace(self.o.get_node_by_id('child_1_1'), Node('hoho'))
         self.assertRaises(NodeNotFound, self.o.get_node_by_id, 'child_1_1')
         self.assertEqual(self.o.get_node_by_id('hoho'), self.o.children[0])
-    
+
     def test_known_values_get_sibling(self):
         """
         return the sibling node that has given id
         """
         self.assertEqual(self.o.children[0].get_sibling('child_1_2'), self.o.children[1], None)
-    
+
     def test_raise_get_sibling_NodeNotFound(self):
         self.assertRaises(NodeNotFound, self.o.children[0].get_sibling, 'houhou')
-    
+
     def test_known_values_get_node_by_id(self):
         """
         return node in whole hierarchy that has given id
         """
         self.assertEqual(self.o.get_node_by_id('child_1_1'), self.o.children[0])
-    
+
     def test_raise_get_node_by_id_NodeNotFound(self):
         self.assertRaises(NodeNotFound, self.o.get_node_by_id, 'houhou')
-    
+
     def test_known_values_get_child_by_id(self):
         """
         return child of given id
         """
         self.assertEqual(self.o.get_child_by_id('child_2_1', recurse=1), self.o.children[0].children[0])
-    
+
     def test_raise_get_child_by_id_NodeNotFound(self):
         self.assertRaises(NodeNotFound, self.o.get_child_by_id, nid='child_2_1')
         self.assertRaises(NodeNotFound, self.o.get_child_by_id, 'houhou')
-    
+
     def test_known_values_get_child_by_path(self):
         """
         return child of given path (path is a list of ids)
         """
         self.assertEqual(self.o.get_child_by_path(['root', 'child_1_1', 'child_2_1']), self.o.children[0].children[0])
-    
+
     def test_raise_get_child_by_path_NodeNotFound(self):
         self.assertRaises(NodeNotFound, self.o.get_child_by_path, ['child_1_1', 'child_2_11'])
-    
+
     def test_known_values_depth_down(self):
         """
         return depth of this node in the tree
@@ -112,13 +112,13 @@ class Node_ClassTest(TestCase):
         """
         self.assertEqual(self.o.width(), 3)
         self.assertEqual(self.o.get_child_by_id('child_2_1',True).width(), 1)
-    
+
     def test_known_values_root(self):
         """
         return the root node of the tree
         """
         self.assertEqual(self.o.get_child_by_id('child_2_1', True).root(), self.o)
-    
+
     def test_known_values_leaves(self):
         """
         return a list with all the leaf nodes descendant from this task
@@ -126,7 +126,7 @@ class Node_ClassTest(TestCase):
         self.assertEqual(self.o.leaves(), [self.o.get_child_by_id('child_2_1',True),
                                           self.o.get_child_by_id('child_3_1',True),
                                           self.o.get_child_by_id('child_2_3',True)])
-    
+
     def test_known_values_lineage(self):
         c31 = self.o.get_child_by_id('child_3_1',True)
         self.assertEqual(c31.lineage(), [self.o.get_child_by_id('child_3_1',True),
@@ -134,7 +134,7 @@ class Node_ClassTest(TestCase):
                                          self.o.get_child_by_id('child_1_1',True),
                                          self.o])
 
-    
+
 class post_order_list_FunctionTest(TestCase):
     """"""
     def setUp(self):
@@ -142,7 +142,7 @@ class post_order_list_FunctionTest(TestCase):
         self.o = make_tree(tree)
 
     def test_known_values_post_order_list(self):
-        """ 
+        """
         create a list with tree nodes for which the <filter> function returned true
         in a post order foashion
         """
@@ -151,7 +151,7 @@ class post_order_list_FunctionTest(TestCase):
         self.assertEqual(l, L, l)
 
     def test_known_values_post_order_list2(self):
-        """ 
+        """
         create a list with tree nodes for which the <filter> function returned true
         in a post order foashion
         """
@@ -163,7 +163,7 @@ class post_order_list_FunctionTest(TestCase):
         l = [n.id for n in post_order_list(self.o, filter)]
         self.assertEqual(l, L, l)
 
-    
+
 class PostfixedDepthFirstIterator_ClassTest(TestCase):
     """"""
     def setUp(self):
@@ -179,16 +179,16 @@ class PostfixedDepthFirstIterator_ClassTest(TestCase):
             self.assertEqual(o.id, L[i])
             o = iter.next()
             i += 1
-        
-    
+
+
 class pre_order_list_FunctionTest(TestCase):
     """"""
     def setUp(self):
         """ called before each test from this class """
         self.o = make_tree(tree)
-    
+
     def test_known_values_pre_order_list(self):
-        """ 
+        """
         create a list with tree nodes for which the <filter> function returned true
         in a pre order fashion
         """
@@ -197,7 +197,7 @@ class pre_order_list_FunctionTest(TestCase):
         self.assertEqual(l, L, l)
 
     def test_known_values_pre_order_list2(self):
-        """ 
+        """
         create a list with tree nodes for which the <filter> function returned true
         in a pre order fashion
         """
@@ -226,6 +226,6 @@ class PrefixedDepthFirstIterator_ClassTest(TestCase):
             o = iter.next()
             i += 1
 
-       
+
 if __name__ == '__main__':
     unittest_main()

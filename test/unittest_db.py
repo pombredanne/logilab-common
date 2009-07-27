@@ -17,11 +17,11 @@ class PreferedDriverTC(TestCase):
     def setUp(self):
         self.drivers = {"pg":[('foo', None), ('bar', None)]}
         self.drivers = {'pg' : ["foo", "bar"]}
-        
+
     def testNormal(self):
         set_prefered_driver('pg','bar', self.drivers)
         self.assertEquals('bar', self.drivers['pg'][0])
-    
+
     def testFailuresDb(self):
         try:
             set_prefered_driver('oracle','bar', self.drivers)
@@ -58,7 +58,7 @@ class GetCnxTC(TestCase):
         self.db = 'template1'
         self.user = 'adim'
         self.passwd = 'adim'
-        
+
     def testPsyco(self):
         set_prefered_driver('postgres', 'psycopg')
         try:
@@ -114,7 +114,7 @@ class GetCnxTC(TestCase):
                              quiet=1, pywrap = True)
         self.failUnless(isinstance(cnx, PyConnection),
                         'cnx should be a PyConnection instance')
-        
+
 
     def test_cursor_wrap(self):
         """Tests cursor wrapping"""
@@ -151,7 +151,7 @@ class DBAPIAdaptersTC(TestCase):
 
     def test_raise(self):
         self.assertRaises(UnknownDriver, get_dbapi_compliant_module, 'pougloup')
-        
+
     def test_pgdb_types(self):
         """Tests that NUMBER really wraps all number types"""
         PREFERED_DRIVERS['postgres'] = ['pgdb']
@@ -160,8 +160,8 @@ class DBAPIAdaptersTC(TestCase):
             module = get_dbapi_compliant_module('postgres')
         except ImportError:
             self.skip('postgresql pgdb module not installed')
-        number_types = ('int2', 'int4', 'serial', 
-                        'int8', 'float4', 'float8', 
+        number_types = ('int2', 'int4', 'serial',
+                        'int8', 'float4', 'float8',
                         'numeric', 'bool', 'money', 'decimal')
         for num_type in number_types:
             yield self.assertEquals, num_type, module.NUMBER
@@ -173,23 +173,23 @@ class DBAPIAdaptersTC(TestCase):
         try:
             module = get_dbapi_compliant_module('postgres')
         except ImportError:
-            self.skip('postgresql dbapi module not installed')            
+            self.skip('postgresql dbapi module not installed')
         try:
             binary = module.BINARY
         except AttributeError, err:
             raise
-            self.fail(str(err))        
+            self.fail(str(err))
 
     def test_adv_func_helper(self):
         try:
             module = get_dbapi_compliant_module('postgres')
         except ImportError:
-            self.skip('postgresql dbapi module not installed')            
+            self.skip('postgresql dbapi module not installed')
         self.failUnless(isinstance(module.adv_func_helper, _PGAdvFuncHelper))
         try:
             module = get_dbapi_compliant_module('sqlite')
         except ImportError:
-            self.skip('sqlite dbapi module not installed')            
+            self.skip('sqlite dbapi module not installed')
         self.failUnless(isinstance(module.adv_func_helper, _SqliteAdvFuncHelper))
 
 
@@ -223,7 +223,7 @@ class DBAPIAdaptersTC(TestCase):
         self.assertEquals(pghelper.func_sqlname('MYFUNC'), 'MYFUNC')
         self.assertEquals(mshelper.func_sqlname('MYFUNC'), 'MYF')
         self.assertEquals(slhelper.func_sqlname('MYFUNC'), 'SQLITE_MYFUNC')
-            
+
 
 if __name__ == '__main__':
     unittest_main()

@@ -24,7 +24,7 @@ class FindTC(TestCase):
                             set([join(DATA_DIR, f) for f in ['__init__.py', 'module.py',
                                                        'module2.py', 'noendingnewline.py',
                                                        'nonregr.py']]))
-        
+
     def test_exclude(self):
         files = set(find(DATA_DIR, ('.py', '.pyc'), exclude=True))
         self.assertSetEqual(files,
@@ -71,7 +71,7 @@ class ProgressBarTC(TestCase):
         pgb.refresh()
         expected_stream.write("\r["+' '*35+"]")
         self.assertEquals(pgb_stream.getvalue(), expected_stream.getvalue())
-        
+
     def test_refresh_l_size(self):
         pgb_stream = StringIO()
         expected_stream = StringIO()
@@ -79,7 +79,7 @@ class ProgressBarTC(TestCase):
         pgb.refresh()
         expected_stream.write("\r["+' '*3+"]")
         self.assertEquals(pgb_stream.getvalue(), expected_stream.getvalue())
-    
+
     def _update_test(self, nbops, expected, size = None):
         pgb_stream = StringIO()
         expected_stream = StringIO()

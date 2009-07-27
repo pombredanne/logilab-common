@@ -14,7 +14,7 @@ class ChangeLogTC(TestCase):
         out = StringIO()
         cl.write(out)
         self.assertStreamEquals(open(self.cl_file), out)
-                          
+
 
 if __name__ == '__main__':
     unittest_main()

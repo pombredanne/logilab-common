@@ -10,14 +10,14 @@ class CompatTCMixIn:
     MODNAMES = {}
     BUILTINS = []
     ALTERED_BUILTINS = {}
-    
+
     def setUp(self):
         self.builtins_backup = {}
         self.modules_backup = {}
         self.remove_builtins()
         self.alter_builtins()
         self.remove_modules()
-    
+
     def tearDown(self):
         for modname in self.MODNAMES:
             del sys.modules[modname]
@@ -30,7 +30,7 @@ class CompatTCMixIn:
             del sys.modules['logilab.common.compat']
         except KeyError:
             pass
-            
+
     def remove_builtins(self):
         for builtin in self.BUILTINS:
             func = getattr(__builtin__, builtin, None)
@@ -45,13 +45,13 @@ class CompatTCMixIn:
                 self.builtins_backup[builtin] = old_func
                 setattr(__builtin__, builtin, func)
                 # setattr(__builtin__, 'builtin_%s' % builtin, func)
-                
+
     def remove_modules(self):
         for modname in self.MODNAMES:
             if modname in sys.modules:
                 self.modules_backup[modname] = sys.modules[modname]
             sys.modules[modname] = types.ModuleType('faked%s' % modname)
-    
+
     def test_removed_builtins(self):
         """tests that builtins are actually uncallable"""
         for builtin in self.BUILTINS:
@@ -77,7 +77,7 @@ class Py23CompatTC(CompatTCMixIn, TestCase):
         from logilab.common.compat import sum
         self.assertEquals(sum(range(5)), 10)
         self.assertRaises(TypeError, sum, 'abc')
-    
+
     def test_enumerate(self):
         from logilab.common.compat import enumerate
         self.assertEquals(list(enumerate([])), [])
@@ -120,11 +120,11 @@ class Py23CompatTC(CompatTCMixIn, TestCase):
         d[s] = 'bar'
         self.assertEquals(len(d), 1)
         self.assertEquals(d[s], 'bar')
-        
+
 
 class Py24CompatTC(CompatTCMixIn, TestCase):
     BUILTINS = ('reversed', 'sorted', 'set', 'frozenset',)
-    
+
     def test_sorted(self):
         from logilab.common.compat import sorted
         l = [3, 1, 2, 5, 4]
@@ -145,7 +145,7 @@ class Py24CompatTC(CompatTCMixIn, TestCase):
         r = reversed(l)
         self.assertEquals(r, [4, 3, 2, 1, 0])
         self.assertEquals(l, range(5))
-        
+
     def test_set(self):
         from logilab.common.compat import set
         s1 = set(range(5))
@@ -163,7 +163,7 @@ class _MaxFaker(object):
         if kargs:
             raise TypeError("max() takes no keyword argument")
         return self.func(*args)
-        
+
 
 class Py25CompatTC(CompatTCMixIn, TestCase):
     BUILTINS = ('any', 'all',)
@@ -178,7 +178,7 @@ class Py25CompatTC(CompatTCMixIn, TestCase):
         self.assertEquals(any('abc'), True)
         self.assertEquals(any(xrange(10)), True)
         self.assertEquals(any(xrange(0, -10, -1)), True)
-        # python2.5's any consumes iterables 
+        # python2.5's any consumes iterables
         irange = iter(range(10))
         self.assertEquals(any(irange), True)
         self.assertEquals(irange.next(), 2)
@@ -193,14 +193,14 @@ class Py25CompatTC(CompatTCMixIn, TestCase):
         self.assertEquals(all('abc'), True)
         self.assertEquals(all(xrange(10)), False)
         self.assertEquals(all(xrange(0, -10, -1)), False)
-        # python2.5's all consumes iterables 
+        # python2.5's all consumes iterables
         irange = iter(range(10))
         self.assertEquals(all(irange), False)
         self.assertEquals(irange.next(), 1)
 
     def test_max(self):
         from logilab.common.compat import max
-    
+
         # old apy
         self.assertEquals(max("fdjkmhsgmdfhsg"),'s')
         self.assertEquals(max(1,43,12,45,1337,34,2), 1337)
@@ -220,4 +220,3 @@ class Py25CompatTC(CompatTCMixIn, TestCase):
 
 if __name__ == '__main__':
     unittest_main()
-

@@ -96,7 +96,7 @@ class CacheTestCase(TestCase):
         self.assertRaises(KeyError, null_cache.__getitem__, 'foo')
         # Deleting element raises a KeyError
         self.assertRaises(KeyError, null_cache.__delitem__, 'foo')
-   
+
     def test_getitem(self):
         """ Checks that getitem doest not modify the _usage attribute
         """

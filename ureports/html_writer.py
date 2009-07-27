@@ -21,11 +21,11 @@ from logilab.common.ureports import BaseWriter
 
 class HTMLWriter(BaseWriter):
     """format layouts as HTML"""
-    
+
     def __init__(self, snippet=None):
         super(HTMLWriter, self).__init__()
         self.snippet = snippet
-        
+
     def handle_attrs(self, layout):
         """get an attribute string from layout member attributes"""
         attrs = ''
@@ -36,14 +36,14 @@ class HTMLWriter(BaseWriter):
         if nid:
             attrs += ' id="%s"' % nid
         return attrs
-    
+
     def begin_format(self, layout):
         """begin to format a layout"""
         super(HTMLWriter, self).begin_format(layout)
         if self.snippet is None:
             self.writeln('<html>')
             self.writeln('<body>')
-        
+
     def end_format(self, layout):
         """finished to format a layout"""
         if self.snippet is None:
@@ -88,26 +88,26 @@ class HTMLWriter(BaseWriter):
                     self.writeln('<td>%s</td>' % cell)
             self.writeln('</tr>')
         self.writeln('</table>')
-        
+
     def visit_list(self, layout):
         """display a list as html"""
         self.writeln('<ul%s>' % self.handle_attrs(layout))
         for row in list(self.compute_content(layout)):
             self.writeln('<li>%s</li>' % row)
         self.writeln('</ul>')
-        
+
     def visit_paragraph(self, layout):
         """display links (using <p>)"""
         self.write('<p>')
         self.format_children(layout)
         self.write('</p>')
-                   
+
     def visit_span(self, layout):
         """display links (using <p>)"""
         self.write('<span%s>' % self.handle_attrs(layout))
         self.format_children(layout)
         self.write('</span>')
-                   
+
     def visit_link(self, layout):
         """display links (using <a>)"""
         self.write(' <a href="%s"%s>%s</a>' % (layout.url,
@@ -118,7 +118,7 @@ class HTMLWriter(BaseWriter):
         self.write('<pre>')
         self.write(layout.data.replace('&', '&amp;').replace('<', '&lt;'))
         self.write('</pre>')
-        
+
     def visit_text(self, layout):
         """add some text"""
         data = layout.data

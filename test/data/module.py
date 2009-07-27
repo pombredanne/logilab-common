@@ -36,11 +36,11 @@ class YO:
             raise XXXError()
         except:
             raise
-        
-#print '*****>',YO.__dict__    
+
+#print '*****>',YO.__dict__
 class YOUPI(YO):
     class_attr = None
-    
+
     def __init__(self):
         self.member = None
 
@@ -63,12 +63,12 @@ class YOUPI(YO):
         """static method test"""
         assert MY_DICT, '???'
     static_method = staticmethod(static_method)
-    
+
     def class_method(cls):
         """class method test"""
         exec a in b
     class_method = classmethod(class_method)
-        
+
 
 def nested_args(a, (b, c, d)):
     """nested arguments test"""
@@ -84,5 +84,5 @@ def nested_args(a, (b, c, d)):
     else:
         c = a and b or d
     map(lambda x, y: (y, x), a)
-    
+
 redirect = nested_args

@@ -6,11 +6,11 @@ __revision__ = "$Id: unittest_patricia.py,v 1.3 2003-09-05 10:22:35 syt Exp $"
 
 from logilab.common.patricia import *
 from logilab.common.testlib import TestCase, unittest_main
-    
+
 class PatriciaTrieClassTest(TestCase):
-    
+
     def test_knownValues(self):
-        """ 
+        """
         remove a child node
         """
         p = PatriciaTrie()
@@ -50,7 +50,7 @@ class PatriciaTrieClassTest(TestCase):
         except KeyError:
             pass
         #print p
-    
+
 
 if __name__ == '__main__':
     unittest_main()

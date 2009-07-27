@@ -31,14 +31,14 @@ Sub section description
 
 
 '''
-    
+
     # List tests ##############################################################
     list_base = '''
 * item1
 * item2
 * item3
 * item4'''
-    
+
     nested_list = '''
 * blabla
   - 1
@@ -46,7 +46,7 @@ Sub section description
   - 3
 
 * an other point'''
-    
+
     # Table tests #############################################################
     table_base = '''
 +------+------+
@@ -83,6 +83,6 @@ f333: v333
     blablabla
 
 '''
-    
+
 if __name__ == '__main__':
     unittest_main()

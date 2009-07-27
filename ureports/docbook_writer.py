@@ -19,7 +19,7 @@ from logilab.common.ureports import HTMLWriter
 
 class DocbookWriter(HTMLWriter):
     """format layouts as HTML"""
-    
+
     def begin_format(self, layout):
         """begin to format a layout"""
         super(HTMLWriter, self).begin_format(layout)
@@ -29,7 +29,7 @@ class DocbookWriter(HTMLWriter):
 <book xmlns:xi='http://www.w3.org/2001/XInclude'
       lang='fr'>
 """)
-    
+
     def end_format(self, layout):
         """finished to format a layout"""
         if self.snippet is None:
@@ -58,9 +58,9 @@ class DocbookWriter(HTMLWriter):
         self.writeln(self._indent('  <table%s><title>%s</title>' \
                      % (self.handle_attrs(layout), layout.title)))
         self.writeln(self._indent('    <tgroup cols="%s">'% layout.cols))
-        for i in range(layout.cols): 
+        for i in range(layout.cols):
             self.writeln(self._indent('      <colspec colname="c%s" colwidth="1*"/>' % i))
-           
+
         table_content = self.get_table_content(layout)
         # write headers
         if layout.cheaders:
@@ -93,27 +93,27 @@ class DocbookWriter(HTMLWriter):
             cell = row[j] or '&#160;'
             self.writeln('          <entry>%s</entry>' % cell)
         self.writeln(self._indent('        </row>'))
-        
+
     def visit_list(self, layout):
         """display a list (using <itemizedlist>)"""
         self.writeln(self._indent('  <itemizedlist%s>' % self.handle_attrs(layout)))
         for row in list(self.compute_content(layout)):
             self.writeln('    <listitem><para>%s</para></listitem>' % row)
         self.writeln(self._indent('  </itemizedlist>'))
-        
+
     def visit_paragraph(self, layout):
         """display links (using <para>)"""
         self.write(self._indent('  <para>'))
         self.format_children(layout)
         self.writeln('</para>')
-                   
+
     def visit_span(self, layout):
         """display links (using <p>)"""
         #TODO: translate in docbook
         self.write('<literal %s>' % self.handle_attrs(layout))
         self.format_children(layout)
         self.write('</literal>')
-                   
+
     def visit_link(self, layout):
         """display links (using <ulink>)"""
         self.write('<ulink url="%s"%s>%s</ulink>' % (layout.url,
@@ -125,11 +125,11 @@ class DocbookWriter(HTMLWriter):
         self.writeln(self._indent('  <programlisting>'))
         self.write(layout.data.replace('&', '&amp;').replace('<', '&lt;'))
         self.writeln(self._indent('  </programlisting>'))
-        
+
     def visit_text(self, layout):
         """add some text"""
         self.write(layout.data.replace('&', '&amp;').replace('<', '&lt;'))
-        
+
     def _indent(self, string):
         """correctly indent string according to section"""
-        return ' ' * 2*(self.section) + string 
+        return ' ' * 2*(self.section) + string

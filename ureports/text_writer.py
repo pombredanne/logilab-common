@@ -20,7 +20,7 @@ from logilab.common.ureports import BaseWriter
 
 TITLE_UNDERLINES = ['', '=', '-', '`', '.', '~', '^']
 BULLETS = ['*', '-']
- 
+
 class TextWriter(BaseWriter):
     """format layouts as text
     (ReStructured inspiration but not totally handled yet)
@@ -29,7 +29,7 @@ class TextWriter(BaseWriter):
         super(TextWriter, self).begin_format(layout)
         self.list_level = 0
         self.pending_urls = []
-        
+
     def visit_section(self, layout):
         """display a section as text
         """
@@ -43,7 +43,7 @@ class TextWriter(BaseWriter):
             self.pending_urls = []
         self.section -= 1
         self.writeln()
-            
+
     def visit_title(self, layout):
         title = ''.join(list(self.compute_content(layout)))
         self.writeln(title)
@@ -51,16 +51,16 @@ class TextWriter(BaseWriter):
             self.writeln(TITLE_UNDERLINES[self.section] * len(title))
         except IndexError:
             print "FIXME TITLE TOO DEEP. TURNING TITLE INTO TEXT"
-        
+
     def visit_paragraph(self, layout):
         """enter a paragraph"""
         self.format_children(layout)
         self.writeln()
-         
+
     def visit_span(self, layout):
         """enter a span"""
         self.format_children(layout)
-         
+
     def visit_table(self, layout):
         """display a table as text"""
         table_content = self.get_table_content(layout)
@@ -75,7 +75,7 @@ class TextWriter(BaseWriter):
         else:
             self.default_table(layout, table_content, cols_width)
         self.writeln()
-        
+
     def default_table(self, layout, table_content, cols_width):
         """format a table"""
         cols_width = [size+1 for size in cols_width]
@@ -96,14 +96,14 @@ class TextWriter(BaseWriter):
                 self.write(headsep)
             else:
                 self.write(table_linesep)
- 
+
     def field_table(self, layout, table_content, cols_width):
         """special case for field table"""
         assert layout.cols == 2
         format_string = '%s%%-%ss: %%s' % (linesep, cols_width[0])
         for field, value in table_content:
             self.write(format_string % (field, value))
- 
+
 
     def visit_list(self, layout):
         """display a list layout as text"""
@@ -122,7 +122,7 @@ class TextWriter(BaseWriter):
             self.pending_urls.append( (layout.label, layout.url) )
         else:
             self.write(layout.url)
-            
+
     def visit_verbatimtext(self, layout):
         """display a verbatim layout as text (so difficult ;)
         """
@@ -130,9 +130,7 @@ class TextWriter(BaseWriter):
         for line in layout.data.splitlines():
             self.writeln('    ' + line)
         self.writeln()
-        
+
     def visit_text(self, layout):
         """add some text"""
         self.write(layout.data)
-            
-
