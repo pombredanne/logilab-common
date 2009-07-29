@@ -2,6 +2,8 @@
 unit tests for module logilab.common.db
 """
 
+import os
+import pwd
 import socket
 
 from logilab.common.testlib import TestCase, unittest_main
@@ -12,6 +14,13 @@ from logilab.common.adbh import (_GenericAdvFuncHelper, _SqliteAdvFuncHelper,
                                  FunctionDescr, get_adv_func_helper,
                                  auto_register_function)
 
+
+def getlogin():
+    """avoid usinng os.getlogin() because of strange tty / stdin problems
+    (man 3 getlogin)
+    Another solution would be to use $LOGNAME, $USER or $USERNAME
+    """
+    return pwd.getpwuid(os.getuid())[0]
 
 class PreferedDriverTC(TestCase):
     def setUp(self):
@@ -52,12 +61,14 @@ class PreferedDriverTC(TestCase):
 
 class GetCnxTC(TestCase):
     def setUp(self):
-        if not socket.gethostname().startswith('crater'):
+        try:
+            socket.gethostbyname('hercules')
+        except:
             self.skip("those tests require specific DB configuration")
-        self.host = 'localhost' # None
+        self.host = 'hercules'
         self.db = 'template1'
-        self.user = 'adim'
-        self.passwd = 'adim'
+        self.user = getlogin()
+        self.passwd = getlogin()
 
     def testPsyco(self):
         set_prefered_driver('postgres', 'psycopg')
@@ -96,8 +107,12 @@ class GetCnxTC(TestCase):
         except Exception, ex:
             # no mysql running ?
             import MySQLdb
-            if not (isinstance(ex, MySQLdb.OperationalError) and ex.args[0] == 2003):
-                raise
+            if isinstance(ex, MySQLdb.OperationalError):
+                if ex.args[0] == 1045: # find MysqlDb
+                    self.skip('mysql test requires a specific configuration')
+                elif ex.args[0] != 2003:
+                    raise
+            raise
 
     def test_connection_wrap(self):
         """Tests the connection wrapping"""
