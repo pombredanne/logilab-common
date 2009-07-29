@@ -1202,16 +1202,17 @@ class TestCase(unittest.TestCase):
         try:
             if not self.quiet_run(result, self.setUp):
                 return
+            generative = is_generator(testMethod.im_func)
             # generative tests
-            if is_generator(testMethod.im_func):
-                success = self._proceed_generative(result, testMethod,
-                    runcondition)
+            if generative:
+                self._proceed_generative(result, testMethod,
+                                         runcondition)
             else:
                 status = self._proceed(result, testMethod)
                 success = (status == 0)
             if not self.quiet_run(result, self.tearDown):
                 return
-            if success:
+            if not generative and success:
                 if hasattr(options, "exitfirst") and options.exitfirst:
                     # add this test to restart file
                     try:
