@@ -521,7 +521,8 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
     def __init__(self, stream=sys.stderr, verbosity=1,
                  exitfirst=False, capture=False, printonly=None,
                  pdbmode=False, cvg=None, test_pattern=None,
-                 skipped_patterns=(), colorize=False, options=None):
+                 skipped_patterns=(), colorize=False, batchmode=False,
+                 options=None):
         super(SkipAwareTextTestRunner, self).__init__(stream=stream,
                                                       verbosity=verbosity)
         self.exitfirst = exitfirst
@@ -532,6 +533,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         self.test_pattern = test_pattern
         self.skipped_patterns = skipped_patterns
         self.colorize = colorize
+        self.batchmode = batchmode
         self.options = options
 
     def _this_is_skipped(self, testedname):
@@ -594,35 +596,36 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         stopTime = time.time()
         timeTaken = stopTime - startTime
         result.printErrors()
-        self.stream.writeln(result.separator2)
-        run = result.testsRun
-        self.stream.writeln("Ran %d test%s in %.3fs" %
-                            (run, run != 1 and "s" or "", timeTaken))
-        self.stream.writeln()
-        if not result.wasSuccessful():
-            if self.colorize:
-                self.stream.write(textutils.colorize_ansi("FAILED", color='red'))
+        if not self.batchmode:
+            self.stream.writeln(result.separator2)
+            run = result.testsRun
+            self.stream.writeln("Ran %d test%s in %.3fs" %
+                                (run, run != 1 and "s" or "", timeTaken))
+            self.stream.writeln()
+            if not result.wasSuccessful():
+                if self.colorize:
+                    self.stream.write(textutils.colorize_ansi("FAILED", color='red'))
+                else:
+                    self.stream.write("FAILED")
             else:
-                self.stream.write("FAILED")
-        else:
-            if self.colorize:
-                self.stream.write(textutils.colorize_ansi("OK", color='green'))
-            else:
-                self.stream.write("OK")
-        failed, errored, skipped = map(len, (result.failures, result.errors,
-             result.skipped))
+                if self.colorize:
+                    self.stream.write(textutils.colorize_ansi("OK", color='green'))
+                else:
+                    self.stream.write("OK")
+            failed, errored, skipped = map(len, (result.failures, result.errors,
+                 result.skipped))
 
-        det_results = []
-        for name, value in (("failures", result.failures),
-                            ("errors",result.errors),
-                            ("skipped", result.skipped)):
-            if value:
-                det_results.append("%s=%i" % (name, len(value)))
-        if det_results:
-            self.stream.write(" (")
-            self.stream.write(', '.join(det_results))
-            self.stream.write(")")
-        self.stream.writeln("")
+            det_results = []
+            for name, value in (("failures", result.failures),
+                                ("errors",result.errors),
+                                ("skipped", result.skipped)):
+                if value:
+                    det_results.append("%s=%i" % (name, len(value)))
+            if det_results:
+                self.stream.write(" (")
+                self.stream.write(', '.join(det_results))
+                self.stream.write(")")
+            self.stream.writeln("")
         return result
 
 
@@ -874,6 +877,7 @@ Examples:
                                                   test_pattern=self.test_pattern,
                                                   skipped_patterns=self.skipped_patterns,
                                                   colorize=self.colorize,
+                                                  batchmode=self.batchmode,
                                                   options=self.options)
 
         def removeSucceededTests(obj, succTests):

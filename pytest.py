@@ -413,15 +413,10 @@ succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
 succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
                 raise e
         modname = osp.basename(filename)[:-3]
-        if batchmode:
-            from cStringIO import StringIO
-            outstream = StringIO()
-        else:
-            outstream = sys.stderr
         try:
-            print >> outstream, ('  %s  ' % osp.basename(filename)).center(70, '=')
+            print >> sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
         except TypeError: # < py 2.4 bw compat
-            print >> outstream, ('  %s  ' % osp.basename(filename)).center(70)
+            print >> sys.stderr, ('  %s  ' % osp.basename(filename)).center(70)
         try:
             tstart, cstart = time(), clock()
             try:
@@ -438,17 +433,13 @@ succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
                 return None
             except Exception:
                 self.report.failed_to_test_module(filename)
-                print >> outstream, 'unhandled exception occured while testing', modname
+                print >> sys.stderr, 'unhandled exception occured while testing', modname
                 import traceback
-                traceback.print_exc(file=outstream)
-                if batchmode:
-                    print >> sys.stderr, outstream.getvalue()
+                traceback.print_exc(file=sys.stderr)
                 return None
 
             tend, cend = time(), clock()
             ttime, ctime = (tend - tstart), (cend - cstart)
-            if testprog.result.testsRun and batchmode:
-                print >> sys.stderr, outstream.getvalue()
             self.report.feed(filename, testprog.result, ttime, ctime)
             return testprog
         finally:
