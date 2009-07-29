@@ -108,7 +108,7 @@ pytest --coverage test_foo.py
 import os, sys, re
 import os.path as osp
 from time import time, clock
-
+import warnings
 
 from logilab.common.fileutils import abspath_listdir
 from logilab.common import testlib
@@ -573,13 +573,16 @@ def make_parser():
         """carry the option to unittest_main"""
         parser.newargs.append(opt)
 
-
     def rebuild_and_store(option, opt, value, parser):
         """carry the option to unittest_main and store
         the value on current parser
         """
         parser.newargs.append(opt)
         setattr(parser.values, option.dest, True)
+
+    def capture_and_rebuild(option, opt, value, parser):
+        warnings.simplefilter('ignore', DeprecationWarning)
+        rebuild_cmdline(option, opt, value, parser)
 
     # pytest options
     parser.add_option('-t', dest='testdir', default=None,
@@ -601,7 +604,7 @@ def make_parser():
                       action="callback",
                       help="Restart tests from where it failed (implies exitfirst) "
                         "(only make sense if tests previously ran with exitfirst only)")
-    parser.add_option('-c', '--capture', callback=rebuild_cmdline,
+    parser.add_option('-c', '--capture', callback=capture_and_rebuild,
                       action="callback",
                       help="Captures and prints standard out/err only on errors "
                       "(only make sense when pytest run one test file)")

@@ -42,7 +42,7 @@ import tempfile
 import math
 from shutil import rmtree
 from operator import itemgetter
-from warnings import warn
+import warnings
 from compiler.consts import CO_GENERATOR
 from ConfigParser import ConfigParser
 from itertools import dropwhile
@@ -501,7 +501,7 @@ def run(self, result, runcondition=None, options=None):
         except TypeError:
             # this might happen if a raw unittest.TestCase is defined
             # and used with python (and not pytest)
-            warn("%s should extend lgc.testlib.TestCase instead of unittest.TestCase"
+            warnings.warn("%s should extend lgc.testlib.TestCase instead of unittest.TestCase"
                  % test)
             test(result)
     return result
@@ -918,8 +918,8 @@ succeeded tests into", osp.join(os.getcwd(),FILE_RESTART)
                 print 'teardown_module error:', exc
                 sys.exit(1)
         if os.environ.get('PYDEBUG'):
-            warn("PYDEBUG usage is deprecated, use -i / --pdb instead",
-                DeprecationWarning)
+            warnings.warn("PYDEBUG usage is deprecated, use -i / --pdb instead",
+                          DeprecationWarning)
             self.pdbmode = True
         if result.debuggers and self.pdbmode:
             start_interactive_mode(result)
@@ -1123,6 +1123,7 @@ class TestCase(unittest.TestCase):
     def _start_capture(self):
         """start_capture if enable"""
         if self.capture:
+            warnings.simplefilter('ignore', DeprecationWarning)
             self.start_capture()
 
     def _stop_capture(self):
@@ -1370,8 +1371,8 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
 
     def assertSetEquals(self,got,expected, msg=None):
         if not(isinstance(got, set) and isinstance(expected, set)):
-            warn("the assertSetEquals function if now intended for set only."\
-                "use assertUnorderedIterableEquals instead.",
+            warnings.warn("the assertSetEquals function if now intended for set only."\
+                          "use assertUnorderedIterableEquals instead.",
                 DeprecationWarning, 2)
             return self.assertUnorderedIterableEquals(got,expected, msg)
 
