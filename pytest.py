@@ -332,14 +332,23 @@ class PyTester(object):
         self.cvg = cvg
         self.options = options
         self.firstwrite = True
+        self._errcode = None
 
     def show_report(self):
         """prints the report and returns appropriate exitcode"""
         # everything has been ran, print report
         print "*" * 79
         print self.report
+
+    def get_errcode(self):
+        # errcode set explicity
+        if self._errcode is not None:
+            return self._errcode
         return self.report.failures + self.report.errors
 
+    def set_errcode(self, errcode):
+        self._errcode = errcode
+    errcode = property(get_errcode, set_errcode)
 
     def testall(self, exitfirst=False):
         """walks trhough current working directory, finds something
@@ -417,8 +426,11 @@ succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
             tstart, cstart = time(), clock()
             try:
                 testprog = testlib.unittest_main(modname, batchmode=batchmode, cvg=self.cvg,
-                                                 options=self.options, outstream=outstream)
-            except (KeyboardInterrupt, SystemExit):
+                                                 options=self.options, outstream=sys.stderr)
+            except KeyboardInterrupt:
+                raise
+            except SystemExit, exc:
+                self.errcode = exc.code
                 raise
             except testlib.TestSkipped:
                 print "Module skipped:", filename
@@ -722,7 +734,7 @@ def run():
             import traceback
             traceback.print_exc()
     finally:
-        errcode = tester.show_report()
+        tester.show_report()
         if covermode:
             cvg.stop()
             cvg.save()
@@ -735,4 +747,4 @@ def run():
                   morfdir
             cvg.annotate([morfdir])
             cvg.report([morfdir], False)
-        sys.exit(errcode)
+        sys.exit(tester.errcode)
