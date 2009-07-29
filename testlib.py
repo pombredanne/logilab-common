@@ -45,6 +45,7 @@ from operator import itemgetter
 from warnings import warn
 from compiler.consts import CO_GENERATOR
 from ConfigParser import ConfigParser
+from itertools import dropwhile
 
 try:
     from test import test_support
@@ -373,6 +374,15 @@ class SkipAwareTestResult(unittest._TextTestResult):
         if self.pdbmode:
             self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
 
+
+    def _iter_valid_frames(self, frames):
+        """only consider non-testlib frames when formatting  traceback"""
+        lgc_testlib = osp.abspath(__file__)
+        std_testlib = osp.abspath(unittest.__file__)
+        invalid = lambda fi: osp.abspath(fi[1]) in (lgc_testlib, std_testlib)
+        for frameinfo in dropwhile(invalid, frames):
+            yield frameinfo
+
     def _exc_info_to_string(self, err, test):
         """Converts a sys.exc_info()-style tuple of values into a string.
 
@@ -384,13 +394,8 @@ class SkipAwareTestResult(unittest._TextTestResult):
         output = ['Traceback (most recent call last)']
         frames = inspect.getinnerframes(tb)
         colorize = self.colorize
-        # count number of relevant levels in the traceback: skip first since
-        # it's our own _proceed function, and then start counting, using
-        # unittest's heuristic
-        nb_frames_skipped = self._count_relevant_tb_levels(tb.tb_next)
-        for index, (frame, filename, lineno, funcname, ctx, ctxindex) in enumerate(frames):
-            if not (0 < index <= nb_frames_skipped):
-                continue
+        frames = enumerate(self._iter_valid_frames(frames))
+        for index, (frame, filename, lineno, funcname, ctx, ctxindex) in frames:
             filename = osp.abspath(filename)
             if ctx is None: # pyc files or C extensions for instance
                 source = '<no source available>'
@@ -462,7 +467,6 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
-
             try:
                 output, errput = test.captured_output()
             except AttributeError:
