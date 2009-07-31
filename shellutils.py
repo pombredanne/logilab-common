@@ -327,3 +327,5 @@ class RawInput(object):
         default = default_is_yes and 'y' or 'n'
         answer = self.ask(question, ('y','n'), default)
         return answer == 'y'
+
+ASK = RawInput()
