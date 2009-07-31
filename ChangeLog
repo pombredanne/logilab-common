@@ -12,6 +12,8 @@ ChangeLog for logilab.common
      - simplify traceback manipulation (skip first frames corresponding to testlib functions)
      - -c now captures DeprecationWarnings
 
+    * sphinxutils: simplified API
+
 
 2009-07-17  --  0.42.0
     * pyro_ext: new module for pyro utilities
