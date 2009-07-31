@@ -99,28 +99,6 @@ def moved(modpath, objname):
         return getattr(m, objname)(*args, **kwargs)
     return callnew
 
-# from logilab.common.modutils import LazyObject
-
-# class WarnLazyObject(LazyObject):
-#     def __init__(self, oldname, newname):
-#         # XXX doesn't work if module isn't in a package
-#         package, module = newname.rsplit('.', 1)
-#         super(WarnLazyObject, self).__init__(package, module)
-#         self.oldname = oldname
-#         self.newname = newname
-#         print 'hop', oldname, newname
-#         sys.modules[oldname] = self
-
-#     def __getobj(self):
-#         if self._imported is None:
-#             message = "module %s has moved, it's now %s" % (
-#                 self.oldname, self.newname)
-#             warn(message, DeprecationWarning, stacklevel=2)
-#         return super(WarnLazyObject, self).__getobj()
-
-
-# module_moved = WarnLazyObject
-
 def obsolete(reason="This function is obsolete"):
     """this function is an alternative to `deprecated_function`
     when there's no real replacement for the deprecated function
