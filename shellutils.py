@@ -278,18 +278,52 @@ class ProgressBar(object):
         self._stream.write(self._fstr % ('.' * min(self._progress, self._size)) )
         self._stream.flush()
 
+from logilab.common.deprecation import deprecated
+
+@deprecated('confirm() is deprecated, use RawInput.confirm() instead')
 def confirm(question, default_is_yes=True):
     """ask for confirmation and return true on positive answer"""
-    if default_is_yes:
-        input_str = '%s [Y/n]: '
-    else:
-        input_str = '%s [y/N]: '
-    answer = raw_input(input_str % (question)).strip().lower()
-    if default_is_yes:
-        if answer in ('n', 'no'):
-            return False
-        return True
-    if answer in ('y', 'yes'):
-        return True
-    return False
+    return RawInput().confirm(question, default_is_yes)
 
+class RawInput(object):
+
+    def __init__(self, input=None, printer=None):
+        self._input = input or raw_input
+        self._print = printer
+
+    def ask(self, question, options, default):
+        assert default in options
+        choices = []
+        for option in options:
+            if option == default:
+                label = option[0].upper()
+            else:
+                label = option[0].lower()
+            if len(option) > 1:
+                label += '(%s)' % option[1:].lower()
+            choices.append((option, label))
+        prompt = "%s [%s]: " % (question,
+                                '/'.join(opt[1] for opt in choices))
+        tries = 3
+        while tries > 0:
+            answer = self._input(prompt).strip().lower()
+            if answer:
+                possible = [option for option, label in choices
+                            if option.lower().startswith(answer)]
+                if len(possible) == 1:
+                    return possible[0]
+            else:
+                return default
+            msg = ('%s is an ambiguous answer, do you mean %s ?' % (
+                    answer, ' or '.join(possible)))
+            if self._print:
+                self._print(msg)
+            else:
+                print msg
+            tries -= 1
+        raise Exception('unable to get a sensible answer')
+
+    def confirm(self, question, default_is_yes=True):
+        default = default_is_yes and 'y' or 'n'
+        answer = self.ask(question, ('y','n'), default)
+        return answer == 'y'

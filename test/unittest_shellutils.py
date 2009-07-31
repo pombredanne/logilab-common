@@ -6,7 +6,10 @@ import datetime, time
 
 from logilab.common.testlib import TestCase, unittest_main
 
-from logilab.common.shellutils import globfind, find, ProgressBar, acquire_lock, release_lock
+from logilab.common.shellutils import (globfind, find, ProgressBar,
+                                       acquire_lock, release_lock,
+                                       RawInput, confirm)
+
 from logilab.common.proc import NoSuchProcess
 from StringIO import StringIO
 
@@ -163,6 +166,66 @@ class AcquireLockTC(TestCase):
         os.system("touch -t %s %s" % (touch, self.lock))
         self.assertRaises(UserWarning, acquire_lock, self.lock, max_try=2, delay=1)
 
+class RawInputTC(TestCase):
+
+    def auto_input(self, *args):
+        self.input_args = args
+        return self.input_answer
+
+    def setUp(self):
+        null_printer = lambda x: None
+        self.qa = RawInput(self.auto_input, null_printer)
+
+    def test_ask_default(self):
+        self.input_answer = ''
+        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        self.assertEquals(answer, 'yes')
+        self.input_answer = '  '
+        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        self.assertEquals(answer, 'yes')
+
+    def test_ask_case(self):
+        self.input_answer = 'no'
+        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        self.assertEquals(answer, 'no')
+        self.input_answer = 'No'
+        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        self.assertEquals(answer, 'no')
+        self.input_answer = 'NO'
+        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        self.assertEquals(answer, 'no')
+        self.input_answer = 'nO'
+        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        self.assertEquals(answer, 'no')
+        self.input_answer = 'YES'
+        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        self.assertEquals(answer, 'yes')
+
+    def test_ask_prompt(self):
+        self.input_answer = ''
+        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        self.assertEquals(self.input_args[0], 'text [Y(es)/n(o)]: ')
+        answer = self.qa.ask('text', ('y','n'), 'y')
+        self.assertEquals(self.input_args[0], 'text [Y/n]: ')
+        answer = self.qa.ask('text', ('n','y'), 'y')
+        self.assertEquals(self.input_args[0], 'text [n/Y]: ')
+        answer = self.qa.ask('text', ('yes','no','maybe','1'), 'yes')
+        self.assertEquals(self.input_args[0], 'text [Y(es)/n(o)/m(aybe)/1]: ')
+
+    def test_ask_ambiguous(self):
+        self.input_answer = 'y'
+        self.assertRaises(Exception, self.qa.ask, 'text', ('yes','yep'), 'yes')
+
+    def test_confirm(self):
+        self.input_answer = 'y'
+        self.assertEquals(self.qa.confirm('Say yes'), True)
+        self.assertEquals(self.qa.confirm('Say yes', default_is_yes=False), True)
+        self.input_answer = 'n'
+        self.assertEquals(self.qa.confirm('Say yes'), False)
+        self.assertEquals(self.qa.confirm('Say yes', default_is_yes=False), False)
+        self.input_answer = ''
+        self.assertEquals(self.qa.confirm('Say default'), True)
+        self.assertEquals(self.qa.confirm('Say default', default_is_yes=False), False)
 
 if __name__ == '__main__':
     unittest_main()
