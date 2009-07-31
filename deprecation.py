@@ -35,7 +35,7 @@ def class_renamed(old_name, new_class, message=None):
     clsdict['__deprecation_warning__'] = message
     try:
         # new-style class
-        return deprecated(old_name, (new_class,), clsdict)
+        return class_deprecated(old_name, (new_class,), clsdict)
     except (NameError, TypeError):
         # old-style class
         class DeprecatedClass(new_class):
@@ -72,17 +72,8 @@ def deprecated(reason=None):
         return wrapped
     return deprecated_decorator
 
+@deprecated('replace deprecated_function(f,m) with deprecated(m)(f)')
 def deprecated_function(func, message=None):
-    """Creates a function which fires a DeprecationWarning when used.
-
-    For example, if <bar> is deprecated in favour of <foo>:
-
-    >>> bar = deprecated_function(foo, 'bar is deprecated')
-    >>> bar()
-    sample.py:57: DeprecationWarning: bar is deprecated
-      bar()
-    >>>
-    """
     return deprecated(message)(func)
 
 def moved(modpath, objname):
@@ -104,5 +95,5 @@ def moved(modpath, objname):
         return getattr(m, objname)(*args, **kwargs)
     return callnew
 
-obsolete = deprecated_function(deprecated, 'obsolete is deprecated, use deprecated instead')
+obsolete = deprecated('obsolete is deprecated, use deprecated instead')(deprecated)
 

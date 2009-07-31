@@ -56,8 +56,7 @@ except ImportError:
             pass
     test_support = TestSupport()
 
-from logilab.common.deprecation import class_renamed, deprecated_function, \
-     deprecated
+from logilab.common.deprecation import class_renamed, deprecated
 # pylint: disable-msg=W0622
 from logilab.common.compat import set, enumerate, any, sorted
 # pylint: enable-msg=W0622
@@ -1314,7 +1313,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         """mark a test as skipped for the <msg> reason"""
         msg = msg or 'test was skipped'
         raise TestSkipped(msg)
-    skipped_test = deprecated_function(skip)
+    skipped_test = deprecated()(skip)
 
     def assertIn(self, object, set):
         """assert <object> are in <set>"""
@@ -1440,18 +1439,18 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             if msg is None:
                 msg = 'XML stream not well formed'
             self.fail(msg)
-    assertXMLValid = deprecated_function(assertXMLWellFormed,
-         'assertXMLValid renamed to more precise assertXMLWellFormed')
+    assertXMLValid = deprecated('assertXMLValid renamed to more precise '
+                                'assertXMLWellFormed')(assertXMLWellFormed)
+
 
     def assertXMLStringWellFormed(self, xml_string, msg=None):
         """asserts the XML string is well-formed (no DTD conformance check)"""
         stream = StringIO(xml_string)
         self.assertXMLWellFormed(stream, msg)
 
-    assertXMLStringValid = deprecated_function(
-        assertXMLStringWellFormed,
-        'assertXMLStringValid renamed to more precise assertXMLStringWellFormed'
-        )
+    assertXMLStringValid = deprecated(
+        'assertXMLStringValid renamed to more precise assertXMLStringWellFormed')(
+        assertXMLStringWellFormed)
 
     def assertXMLEqualsTuple(self, element, tup):
         """compare an ElementTree Element to a tuple formatted as follow:

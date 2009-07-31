@@ -18,23 +18,27 @@ class RawInputTC(TestCase):
     def tearDown(self):
         warnings.simplefilter("default")
 
+    def mk_func(self):
+        def any_func():
+            pass
+        return any_func
+
     def test_class_deprecated(self):
         class AnyClass:
             __metaclass__ = deprecation.class_deprecated
 
-    def test_deprecated_function(self):
-        def any_func():
-            pass
-        any_func = deprecation.deprecated_function(any_func)
+    def test_deprecated_func(self):
+        any_func = deprecation.deprecated()(self.mk_func())
         any_func()
-        any_func = deprecation.deprecated_function(any_func,'message')
+        any_func = deprecation.deprecated('message')(self.mk_func())
         any_func()
+
+    def test_deprecated_decorator(self):
         @deprecation.deprecated_function
         def any_func():
             pass
         any_func()
 
-    def test_deprecated(self):
         @deprecation.deprecated()
         def any_func():
             pass
