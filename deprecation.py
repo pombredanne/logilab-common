@@ -9,8 +9,7 @@ __docformat__ = "restructuredtext en"
 import sys
 from warnings import warn
 
-
-class deprecated(type):
+class class_deprecated(type):
     """metaclass to print a warning on instantiation of a deprecated class"""
 
     def __call__(cls, *args, **kwargs):
@@ -59,8 +58,21 @@ def class_moved(new_class, old_name=None, message=None):
             old_name, new_class.__module__, new_class.__name__)
     return class_renamed(old_name, new_class, message)
 
+def deprecated(reason=None):
+    """Decorator that raises a DeprecationWarning to print a message
+    when the decorated function is called.
+    """
+    def deprecated_decorator(func):
+        message = reason or 'this function is deprecated, use %s instead'
+        if '%s' in message:
+            message = message % func.func_name
+        def wrapped(*args, **kwargs):
+            warn(message, DeprecationWarning, stacklevel=2)
+            return func(*args, **kwargs)
+        return wrapped
+    return deprecated_decorator
 
-def deprecated_function(new_func, message=None):
+def deprecated_function(func, message=None):
     """Creates a function which fires a DeprecationWarning when used.
 
     For example, if <bar> is deprecated in favour of <foo>:
@@ -71,14 +83,7 @@ def deprecated_function(new_func, message=None):
       bar()
     >>>
     """
-    if message is None:
-        message = "this function is deprecated, use %s instead" % (
-            new_func.func_name)
-    def deprecated(*args, **kwargs):
-        warn(message, DeprecationWarning, stacklevel=2)
-        return new_func(*args, **kwargs)
-    return deprecated
-
+    return deprecated(message)(func)
 
 def moved(modpath, objname):
     """use to tell that a callable has been moved to a new module.
@@ -99,14 +104,5 @@ def moved(modpath, objname):
         return getattr(m, objname)(*args, **kwargs)
     return callnew
 
-def obsolete(reason="This function is obsolete"):
-    """this function is an alternative to `deprecated_function`
-    when there's no real replacement for the deprecated function
-    """
-    def newdecorator(func):
-        def wrapped(*args, **kwargs):
-            warn(reason, DeprecationWarning, stacklevel=2)
-            return func(*args, **kwargs)
-        return wrapped
-    return newdecorator
+obsolete = deprecated_function(deprecated, 'obsolete is deprecated, use deprecated instead')
 
