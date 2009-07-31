@@ -57,7 +57,7 @@ except ImportError:
     test_support = TestSupport()
 
 from logilab.common.deprecation import class_renamed, deprecated_function, \
-     obsolete
+     deprecated
 # pylint: disable-msg=W0622
 from logilab.common.compat import set, enumerate, any, sorted
 # pylint: enable-msg=W0622
@@ -98,6 +98,7 @@ def with_tempdir(callable):
     return proxy
 
 
+@deprecated("testlib.main() is obsolete, use the pytest tool instead")
 def main(testdir=None, exitafter=True):
     """Execute a test suite.
 
@@ -205,7 +206,7 @@ def main(testdir=None, exitafter=True):
     else:
         sys.path.pop(0)
         return len(bad)
-main = obsolete("testlib.main() is obsolete, use the pytest tool instead")(main)
+
 
 
 def run_tests(tests, quiet, verbose, runner=None, capture=0):

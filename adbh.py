@@ -16,7 +16,7 @@ Helpers are provided for postgresql, mysql and sqlite.
 """
 __docformat__ = "restructuredtext en"
 
-from logilab.common.deprecation import obsolete
+from logilab.common.deprecation import deprecated
 
 class BadQuery(Exception): pass
 class UnsupportedFunction(BadQuery): pass
@@ -158,19 +158,19 @@ class _GenericAdvFuncHelper:
             raise UnsupportedFunction(funcname)
     function_description = classmethod(function_description)
 
-    #@obsolete('use users_support attribute')
+    #@deprecated('use users_support attribute')
     def support_users(self):
         """return True if the DBMS support users (this is usually
         not true for in memory DBMS)
         """
         return self.users_support
-    support_user = obsolete('use users_support attribute')(support_users)
+    support_user = deprecated('use users_support attribute')(support_users)
 
-    #@obsolete('use groups_support attribute')
+    #@deprecated('use groups_support attribute')
     def support_groups(self):
         """return True if the DBMS support groups"""
         return self.groups_support
-    support_user = obsolete('use groups_support attribute')(support_groups)
+    support_user = deprecated('use groups_support attribute')(support_groups)
 
     def func_sqlname(self, funcname):
         funcdef = self.function_description(funcname)
