@@ -7,7 +7,7 @@
 
 :group text formatting: normalize_text, normalize_paragraph, pretty_match,\
 unquote, colorize_ansi
-:group text manipulation: searchall, get_csv
+:group text manipulation: searchall, splitstrip
 :sort: text formatting, text manipulation
 
 :type ANSI_STYLES: dict(str)
@@ -37,6 +37,7 @@ try:
 except ImportError:
     linesep = '\n' # gae
 
+from logilab.common.deprecation import deprecated
 
 MANUAL_UNICODE_MAP = {
     u'\xa1': u'!',    # INVERTED EXCLAMATION MARK
@@ -211,12 +212,13 @@ def splittext(text, line_len):
     return text[:pos], text[pos+1:].strip()
 
 
-def get_csv(string, sep=','):
-    """return a list of string in from a csv formatted line
+def splitstrip(string, sep=','):
+    """return a list of stripped string by splitting the string given as
+    argument on `sep` (',' by default). Empty string are discarded.
 
-    >>> get_csv('a, b, c   ,  4')
+    >>> splitstrip('a, b, c   ,  4,,')
     ['a', 'b', 'c', '4']
-    >>> get_csv('a')
+    >>> splitstrip('a')
     ['a']
     >>>
 
@@ -230,6 +232,8 @@ def get_csv(string, sep=','):
     :return: the unquoted string (or the input string if it wasn't quoted)
     """
     return [word.strip() for word in string.split(sep) if word.strip()]
+
+get_csv = deprecated()(splitstrip)
 
 _BLANK_URE = r'(\s|,)+'
 _BLANK_RE = re.compile(_BLANK_URE)
@@ -392,7 +396,7 @@ def _get_ansi_code(color=None, style=None):
     """
     ansi_code = []
     if style:
-        style_attrs = get_csv(style)
+        style_attrs = splitstrip(style)
         for effect in style_attrs:
             ansi_code.append(ANSI_STYLES[effect])
     if color:

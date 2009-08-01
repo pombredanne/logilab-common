@@ -69,7 +69,7 @@ except ImportError:
 
 OPTPARSE_FORMAT_DEFAULT = sys.version_info >= (2, 4)
 
-from logilab.common.textutils import get_csv
+from logilab.common.textutils import splitstrip
 
 def check_regexp(option, opt, value):
     """check a regexp value by trying to compile it
@@ -90,7 +90,7 @@ def check_csv(option, opt, value):
     if isinstance(value, (list, tuple)):
         return value
     try:
-        return get_csv(value)
+        return splitstrip(value)
     except ValueError:
         raise OptionValueError(
             "option %s: invalid csv value: %r" % (opt, value))
