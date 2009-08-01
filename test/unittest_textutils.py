@@ -101,7 +101,7 @@ the tests.""", indent=' ', line_len=70)),
 class GetCsvTC(TestCase):
 
     def test_known(self):
-        self.assertEquals(tu.get_csv('a, b,c '), ['a', 'b', 'c'])
+        self.assertEquals(tu.splitstrip('a, b,c '), ['a', 'b', 'c'])
 
 class UnitsTC(TestCase):
 
