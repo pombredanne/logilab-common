@@ -132,10 +132,12 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
     return handler
 
 # map logilab.common.logger thresholds to logging thresholds
-THRESHOLD_MAP = {'LOG_DEBUG':  'DEBUG',
-                 'LOG_INFO':   'INFO',
-                 'LOG_NOTICE': 'INFO',
-                 'LOG_WARN':   'WARNING',
-                 'LOG_ERR':    'ERROR',
-                 'LOG_CRIT':   'CRITICAL',
+THRESHOLD_MAP = {'LOG_DEBUG':   'DEBUG',
+                 'LOG_INFO':    'INFO',
+                 'LOG_NOTICE':  'INFO',
+                 'LOG_WARN':    'WARNING',
+                 'LOG_WARNING': 'WARNING',
+                 'LOG_ERR':     'ERROR',
+                 'LOG_ERROR':   'ERROR',
+                 'LOG_CRIT':    'CRITICAL',
                  }
