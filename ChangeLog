@@ -14,6 +14,9 @@ ChangeLog for logilab.common
 
     * sphinxutils: simplified API
 
+    * modutils: new cleanup_sys_modules function that removes modules under a list
+      of directories from sys.modules
+
 
 2009-07-17  --  0.42.0
     * pyro_ext: new module for pyro utilities
