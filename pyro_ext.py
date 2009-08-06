@@ -1,5 +1,12 @@
 """Python Remote Object utilities
 
+Main functions available:
+
+* `register_object` to expose arbitrary object through pyro using delegation
+  approach and register it in the nameserver.
+* `ns_unregister` unregister an object identifier from the nameserver.
+* `ns_get_proxy` get a pyro proxy from a nameserver object identifier.
+
 :organization: Logilab
 :copyright: 2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
