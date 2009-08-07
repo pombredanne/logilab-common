@@ -23,7 +23,7 @@ ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
 	# we need this hack because we have to import "logilab.common.pytest"
 	# but since it's a namespace package, we need to "simulate" it
 	touch $(CURDIR)/build/lib/logilab/__init__.py
-	-PYTHONPATH=$(CURDIR)/build/lib/ $(CURDIR)/build/scripts-2.5/pytest
+	PYTHONPATH=$(CURDIR)/build/lib/ $(CURDIR)/build/scripts-2.5/pytest
 	rm -f $(CURDIR)/build/lib/logilab/__init__.py
 endif
 
