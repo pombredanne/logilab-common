@@ -4,14 +4,14 @@ Unittests for date helpers
 from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.date import date_range, endOfMonth
+from logilab.common.date import add_days_worked, nb_open_days, \
+         get_national_holidays
 
 from datetime import date, datetime, timedelta
 
 try:
     from mx.DateTime import Date as mxDate, DateTime as mxDateTime, \
          now as mxNow, RelativeDateTime, RelativeDate
-    from logilab.common.date import add_days_worked, nb_open_days, \
-         get_national_holidays
 except ImportError:
     mxDate = mxDateTime = RelativeDateTime = mxNow = None
 

@@ -103,7 +103,6 @@ class CacheTestCase(TestCase):
         try:
             self.cache['toto']
         except KeyError:
-            print self.cache._usage
             self.assertTrue('toto' not in self.cache._usage)
         else:
             self.fail('excepted KeyError')
