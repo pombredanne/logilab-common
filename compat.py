@@ -14,8 +14,6 @@ from warnings import warn
 
 import __builtin__
 
-from logilab.common.deprecation import class_renamed
-
 try:
     set = set
     frozenset = frozenset
@@ -113,9 +111,6 @@ except NameError:
                 raise TypeError("set objects are not hashable")
 
         del _baseset # don't explicity provide this class
-
-Set = class_renamed('Set', set, 'logilab.common.compat.Set is deprecated, '
-                    'use logilab.common.compat.set instead')
 
 try:
     from itertools import izip, chain, imap

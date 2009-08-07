@@ -6,8 +6,6 @@
 """
 __docformat__ = "restructuredtext en"
 
-from warnings import warn
-
 from logilab.common.compat import enumerate, sum, set
 
 class Table(object):
@@ -353,30 +351,9 @@ class Table(object):
             else:
                 return tab.data[0][0]
 
-    def get_dimensions(self):
-        """Returns a tuple which represents the table's shape
-        """
-        warn('table.get_dimensions() is deprecated, use table.shape instead',
-             DeprecationWarning, stacklevel=2)
-        return self.shape
-
-    def get_element(self, row_index, col_index):
-        """Returns the element at [row_index][col_index]
-        """
-        warn('Table.get_element() is deprecated, use Table.get_cell instead',
-             DeprecationWarning, stacklevel=2)
-        return self.data[row_index][col_index]
-
-    def get_cell(self, row_index, col_index):
-        warn('table.get_cell(i,j) is deprecated, use table[i,j] instead',
-             DeprecationWarning, stacklevel=2)
-        return self.data[row_index][col_index]
-
     def get_cell_by_ids(self, row_id, col_id):
         """Returns the element at [row_id][col_id]
         """
-        #warn('table.get_cell_by_ids(i,j) is deprecated, use table[i,j] instead',
-        #     DeprecationWarning, stacklevel=2)
         try:
             row_index = self.row_names.index(row_id)
         except ValueError:
@@ -388,53 +365,23 @@ class Table(object):
                 raise KeyError("Column (%s) not found in table" % (col_id))
         return self.data[row_index][col_index]
 
-    def get_row(self, row_index):
-        """Returns the 'row_index' row
-        """
-        warn('table.get_row(i) is deprecated, use table[i] instead',
-             DeprecationWarning, stacklevel=2)
-        return self.data[row_index]
-
     def get_row_by_id(self, row_id):
         """Returns the 'row_id' row
         """
-        #warn('table.get_row_by_id(i) is deprecated, use table[i] instead',
-        #     DeprecationWarning, stacklevel=2)
         try:
             row_index = self.row_names.index(row_id)
         except ValueError:
             raise KeyError("Row (%s) not found in table" % (row_id))
         return self.data[row_index]
 
-    def get_column(self, col_index, distinct=False):
-        """Returns the 'col_index' col
-        """
-        warn('table.get_column(i) is deprecated, use table[:,i] instead',
-             DeprecationWarning, stacklevel=2)
-        col = [row[col_index] for row in self.data]
-        if distinct:
-            return set(col)
-        else:
-            return col
-
     def get_column_by_id(self, col_id, distinct=False):
         """Returns the 'col_id' col
         """
-        #warn('table.get_column_by_id(i) is deprecated, use table[:,i] instead',
-        #     DeprecationWarning, stacklevel=2)
         try:
             col_index = self.col_names.index(col_id)
         except ValueError:
             raise KeyError("Column (%s) not found in table" % (col_id))
         return self.get_column(col_index, distinct)
-
-
-    def get_rows(self):
-        """Returns all the rows in the table
-        """
-        warn('table.get_rows() is deprecated, just iterate over table instead',
-             DeprecationWarning, stacklevel=2)
-        return self.data
 
 
     def get_columns(self):

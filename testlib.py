@@ -56,7 +56,6 @@ except ImportError:
             pass
     test_support = TestSupport()
 
-from logilab.common.deprecation import class_renamed, deprecated
 # pylint: disable-msg=W0622
 from logilab.common.compat import set, enumerate, any, sorted
 # pylint: enable-msg=W0622
@@ -95,117 +94,6 @@ def with_tempdir(callable):
             finally:
                 tempfile.tempdir = old_tmpdir
     return proxy
-
-
-@deprecated("testlib.main() is obsolete, use the pytest tool instead")
-def main(testdir=None, exitafter=True):
-    """Execute a test suite.
-
-    This also parses command-line options and modifies its behaviour
-    accordingly.
-
-    tests -- a list of strings containing test names (optional)
-    testdir -- the directory in which to look for tests (optional)
-
-    Users other than the Python test suite will certainly want to
-    specify testdir; if it's omitted, the directory containing the
-    Python test suite is searched for.
-
-    If the tests argument is omitted, the tests listed on the
-    command-line will be used.  If that's empty, too, then all *.py
-    files beginning with test_ will be used.
-
-    """
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvqxr:t:pcd', ['help'])
-    except getopt.error, msg:
-        print msg
-        print __doc__
-        return 2
-    verbose = 0
-    quiet = False
-    profile = False
-    exclude = []
-    capture = 0
-    for o, a in opts:
-        if o == '-v':
-            verbose += 1
-        elif o == '-q':
-            quiet = True
-            verbose = 0
-        elif o == '-x':
-            exclude.append(a)
-        elif o == '-t':
-            testdir = a
-        elif o == '-p':
-            profile = True
-        elif o == '-c':
-            capture += 1
-        elif o == '-d':
-            global ENABLE_DBC
-            ENABLE_DBC = True
-        elif o in ('-h', '--help'):
-            print __doc__
-            sys.exit(0)
-
-    args = [item.rstrip('.py') for item in args]
-    exclude = [item.rstrip('.py') for item in exclude]
-
-    if testdir is not None:
-        os.chdir(testdir)
-    sys.path.insert(0, '')
-    tests = find_tests('.', args or DEFAULT_PREFIXES, excludes=exclude)
-    # Tell tests to be moderately quiet
-    test_support.verbose = verbose
-    if profile:
-        print >> sys.stderr, '** profiled run'
-        from hotshot import Profile
-        prof = Profile('stones.prof')
-        start_time, start_ctime = time.time(), time.clock()
-        good, bad, skipped, all_result = prof.runcall(run_tests, tests, quiet,
-                                                      verbose, None, capture)
-        end_time, end_ctime = time.time(), time.clock()
-        prof.close()
-    else:
-        start_time, start_ctime = time.time(), time.clock()
-        good, bad, skipped, all_result = run_tests(tests, quiet, verbose, None,
-            capture)
-        end_time, end_ctime = time.time(), time.clock()
-    if not quiet:
-        print '*'*80
-        if all_result:
-            print 'Ran %s test cases in %0.2fs (%0.2fs CPU)' % (
-                all_result.testsRun, end_time - start_time,
-                end_ctime - start_ctime),
-            if all_result.errors:
-                print ', %s errors' % len(all_result.errors),
-            if all_result.failures:
-                print ', %s failed' % len(all_result.failures),
-            if all_result.skipped:
-                print ', %s skipped' % len(all_result.skipped),
-            print
-        if good:
-            if not bad and not skipped and len(good) > 1:
-                print "All",
-            print _count(len(good), "test"), "OK."
-        if bad:
-            print _count(len(bad), "test"), "failed:",
-            print ', '.join(bad)
-        if skipped:
-            print _count(len(skipped), "test"), "skipped:",
-            print ', '.join(['%s (%s)' % (test, msg) for test, msg in skipped])
-    if profile:
-        from hotshot import stats
-        stats = stats.load('stones.prof')
-        stats.sort_stats('time', 'calls')
-        stats.print_stats(30)
-    if exitafter:
-        sys.exit(len(bad) + len(skipped))
-    else:
-        sys.path.pop(0)
-        return len(bad)
-
 
 
 def run_tests(tests, quiet, verbose, runner=None, capture=0):
@@ -921,10 +809,6 @@ succeeded tests into", osp.join(os.getcwd(),FILE_RESTART)
             except Exception, exc:
                 print 'teardown_module error:', exc
                 sys.exit(1)
-        if os.environ.get('PYDEBUG'):
-            warnings.warn("PYDEBUG usage is deprecated, use -i / --pdb instead",
-                          DeprecationWarning)
-            self.pdbmode = True
         if result.debuggers and self.pdbmode:
             start_interactive_mode(result)
         if not self.batchmode:
@@ -1313,7 +1197,6 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         """mark a test as skipped for the <msg> reason"""
         msg = msg or 'test was skipped'
         raise TestSkipped(msg)
-    skipped_test = deprecated()(skip)
 
     def assertIn(self, object, set):
         """assert <object> are in <set>"""
@@ -1439,18 +1322,11 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             if msg is None:
                 msg = 'XML stream not well formed'
             self.fail(msg)
-    assertXMLValid = deprecated('assertXMLValid renamed to more precise '
-                                'assertXMLWellFormed')(assertXMLWellFormed)
-
 
     def assertXMLStringWellFormed(self, xml_string, msg=None):
         """asserts the XML string is well-formed (no DTD conformance check)"""
         stream = StringIO(xml_string)
         self.assertXMLWellFormed(stream, msg)
-
-    assertXMLStringValid = deprecated(
-        'assertXMLStringValid renamed to more precise assertXMLStringWellFormed')(
-        assertXMLStringWellFormed)
 
     def assertXMLEqualsTuple(self, element, tup):
         """compare an ElementTree Element to a tuple formatted as follow:
@@ -1801,7 +1677,6 @@ class MockConnection:
         """Mock close method"""
         pass
 
-MockConnexion = class_renamed('MockConnexion', MockConnection)
 
 def mock_object(**params):
     """creates an object using params to set attributes
