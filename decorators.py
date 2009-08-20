@@ -81,7 +81,6 @@ def copy_cache(obj, funcname, cacheobj):
     except KeyError:
         pass
 
-
 class wproperty(object):
     """Simple descriptor expecting to take a modifier function as first argument
     and looking for a _<function name> to retrieve the attribute.
