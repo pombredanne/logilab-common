@@ -27,12 +27,13 @@ modules,
   * writing interactive command line tools
   * manipulation files and character strings
   * interfacing to OmniORB
-  * generating of SQL queries
+  * generating SQL queries
   * running unit tests
   * manipulating tree structures
   * accessing RDBMS (currently postgreSQL, mysql and sqlite)
   * generating text and HTML reports
   * logging
+  * parsing XML processing instructions
   * more...
 """
 
