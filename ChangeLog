@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+--
+    * configuration: fix #8849 Using plugins, options and .pylintrc crashes PyLint
+
 2009-08-26  --  0.45.0
     * added function for parsing XML processing instructions
 
