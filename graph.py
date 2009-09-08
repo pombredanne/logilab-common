@@ -12,6 +12,8 @@ __metaclass__ = type
 
 import os.path as osp
 import os
+import subprocess
+import sys
 import tempfile
 
 def escape(value):
@@ -93,9 +95,13 @@ class DotBackend:
             pdot.write(self.source)
         pdot.close()
         if target != 'dot':
-            os.system('%s -T%s %s -o%s' % (self.renderer, target,
-                        dot_sourcepath, outputfile))
-            os.unlink(dot_sourcepath)
+            subprocess.call('%s -T%s %s -o%s' % (self.renderer, target,
+                            dot_sourcepath, outputfile), shell=True)
+            try:
+                os.unlink(dot_sourcepath)
+            except OSError:
+                if sys.platform != 'win32':
+                     raise
         return outputfile
 
     def emit(self, line):
