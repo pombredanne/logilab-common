@@ -82,12 +82,15 @@ class DotBackend:
             storedir, basename, target = target_info_from_filename(outputfile)
             if target != "dot":
                 pdot, dot_sourcepath = tempfile.mkstemp(".dot", name)
+                os.close(pdot)
             else:
                 dot_sourcepath = osp.join(storedir, dotfile)
         else:
             target = 'png'
             pdot, dot_sourcepath = tempfile.mkstemp(".dot", name)
             ppng, outputfile = tempfile.mkstemp(".png", name)
+            os.close(pdot)
+            os.close(ppng)
         pdot = open(dot_sourcepath,'w')
         if isinstance(self.source, unicode):
             pdot.write(self.source.encode('UTF8'))
@@ -97,11 +100,7 @@ class DotBackend:
         if target != 'dot':
             subprocess.call('%s -T%s %s -o%s' % (self.renderer, target,
                             dot_sourcepath, outputfile), shell=True)
-            try:
-                os.unlink(dot_sourcepath)
-            except OSError:
-                if sys.platform != 'win32':
-                     raise
+            os.unlink(dot_sourcepath)
         return outputfile
 
     def emit(self, line):
