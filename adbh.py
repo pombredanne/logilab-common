@@ -318,7 +318,7 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
             cmd.append('--username=%s' % dbuser)
         if not keepownership:
             cmd.append('--no-owner')
-        cmd.append('--file=%s' % backupfile)
+        cmd.append('--file="%s"' % backupfile)
         cmd.append(dbname)
         return ' '.join(cmd)
 
@@ -337,7 +337,7 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         cmd.append('--dbname %s' % dbname)
         if not keepownership:
             cmd.append('--no-owner')
-        cmd.append(backupfile)
+        cmd.append('"%s"' % backupfile)
         cmds.append(' '.join(cmd))
         return cmds
 
