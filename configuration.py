@@ -98,7 +98,8 @@ import sys
 import re
 from os.path import exists, expanduser
 from copy import copy
-from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+from ConfigParser import ConfigParser, NoOptionError, NoSectionError, \
+     DuplicateSectionError
 
 from logilab.common.compat import set
 from logilab.common.textutils import normalize_text, unquote
@@ -358,6 +359,7 @@ class OptionsManagerMixIn(object):
         self._all_options = {}
         self._short_options = {}
         self._nocallback_options = {}
+        self._mygroups = set()
         # verbosity
         self.quiet = quiet
 
@@ -400,7 +402,15 @@ class OptionsManagerMixIn(object):
         """
         # add section to the config file
         if group_name != "DEFAULT":
-            self._config_parser.add_section(group_name)
+            try:
+                self._config_parser.add_section(group_name)
+            except DuplicateSectionError:
+                # section may be implicitly added by reading the configuration
+                # file (see http://www.logilab.org/ticket/8849 for description
+                # of a case where this may happen)
+                if group_name in self._mygroups:
+                    raise
+            self._mygroups.add(group_name)
         # add option group to the command line parser
         if options:
             group = OptionGroup(self._optik_parser,
@@ -422,6 +432,8 @@ class OptionsManagerMixIn(object):
         else:
             opt_dict['action'] = 'callback'
             opt_dict['callback'] = self.cb_set_provider_option
+        if 'choices' in opt_dict:
+            opt_dict['help'] += ': %s' % '|'.join(opt_dict['choices'])
         # default is handled here and *must not* be given to optik if you
         # want the whole machinery to work
         if 'default' in opt_dict:

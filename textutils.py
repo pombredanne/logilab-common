@@ -30,6 +30,7 @@ unquote, colorize_ansi
 """
 __docformat__ = "restructuredtext en"
 
+import sys
 import re
 from unicodedata import normalize as _uninormalize
 try:
@@ -433,4 +434,21 @@ def colorize_ansi(msg, color=None, style=None):
     if escape_code:
         return '%s%s%s' % (escape_code, msg, ANSI_RESET)
     return msg
+
+DIFF_STYLE = {'separator': 'cyan', 'remove': 'red', 'add': 'green'}
+
+def diff_colorize_ansi(lines, out=sys.stdout, style=DIFF_STYLE):
+    for line in lines:
+        if line[:4] in ('--- ', '+++ '):
+            out.write(colorize_ansi(line, style['separator']))
+        elif line[0] == '-':
+            out.write(colorize_ansi(line, style['remove']))
+        elif line[0] == '+':
+            out.write(colorize_ansi(line, style['add']))
+        elif line[:4] == '--- ':
+            out.write(colorize_ansi(line, style['separator']))
+        elif line[:4] == '+++ ':
+            out.write(colorize_ansi(line, style['separator']))
+        else:
+            out.write(line)
 
