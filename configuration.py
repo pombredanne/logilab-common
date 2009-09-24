@@ -646,9 +646,9 @@ class Method(object):
         if self._inst is None:
             self._inst = instance
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         assert self._inst, 'unbound method'
-        return getattr(self._inst, self.method)()
+        return getattr(self._inst, self.method)(*args, **kwargs)
 
 
 class OptionsProviderMixIn(object):
@@ -668,6 +668,8 @@ class OptionsProviderMixIn(object):
                 raise Exception('Bad option: %r' % option)
             if isinstance(optdict.get('default'), Method):
                 optdict['default'].bind(self)
+            elif isinstance(optdict.get('callback'), Method):
+                optdict['callback'].bind(self)
         self.load_defaults()
 
     def load_defaults(self):
