@@ -141,6 +141,7 @@ def check_file(option, opt, value):
     msg = "option %s: file %r does not exist"
     raise OptionValueError(msg % (opt, value))
 
+# XXX use python datetime
 def check_date(option, opt, value):
     """check a file value
     return the filepath
@@ -169,11 +170,15 @@ def check_color(option, opt, value):
 
 def check_time(option, opt, value):
     from logilab.common.textutils import TIME_UNITS, apply_units
-    apply_units(value, TIME_UNITS)
+    if isinstance(value, (int, long)):
+        return value
+    return apply_units(value, TIME_UNITS)
 
 def check_bytes(option, opt, value):
     from logilab.common.textutils import BYTE_UNITS, apply_units
-    apply_units(value, BYTE_UNITS)
+    if instance(value, (int, long)):
+        return value
+    return apply_units(value, BYTE_UNITS)
 
 import types
 
