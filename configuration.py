@@ -306,6 +306,10 @@ def format_option_value(optdict, value):
         value = value and 'yes' or 'no'
     elif isinstance(value, (str, unicode)) and value.isspace():
         value = "'%s'" % value
+    elif optdict.get('type') == 'time' and isinstance(value, (float, int, long)):
+        value = "%ss" % value
+    elif optdict.get('type') == 'bytes' and isinstance(value, (int, long)):
+        value = "%sB" % value
     return value
 
 def ini_format_section(stream, section, options, encoding=None, doc=None):
