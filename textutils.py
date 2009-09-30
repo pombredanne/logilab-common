@@ -280,8 +280,6 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
     """
     if inter is None:
         inter = final
-
-
     string = _BLANK_RE.sub('',string)
     values = []
     for match in value_reg.finditer(string):
@@ -293,7 +291,6 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
         if unit is not None:
             value *= units[unit]
         values.append(value)
-
     return final(sum(values))
 
 _LINE_RGX = re.compile('\r\n|\r+|\n')
