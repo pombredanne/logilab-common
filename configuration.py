@@ -103,9 +103,12 @@ from ConfigParser import ConfigParser, NoOptionError, NoSectionError, \
 
 from logilab.common.compat import set
 from logilab.common.textutils import normalize_text, unquote
+from logilab.common.deprecation import deprecated
 from logilab.common import optik_ext as opt
 
 REQUIRED = []
+
+check_csv = deprecated('use lgc.optik_ext.check_csv')(opt.check_csv)
 
 class UnsupportedAction(Exception):
     """raised by set_option when it doesn't know what to do for an action"""
