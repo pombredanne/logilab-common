@@ -446,8 +446,6 @@ class OptionsManagerMixIn(object):
         else:
             opt_dict['action'] = 'callback'
             opt_dict['callback'] = self.cb_set_provider_option
-        if 'choices' in opt_dict:
-            opt_dict['help'] += ': %s' % '|'.join(opt_dict['choices'])
         # default is handled here and *must not* be given to optik if you
         # want the whole machinery to work
         if 'default' in opt_dict:
