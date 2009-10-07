@@ -174,6 +174,14 @@ def install(**kwargs):
             sys.argv.remove('--force-manifest')
     except:
         pass
+    try:
+        if not USE_SETUPTOOLS:
+            from distutils import __version__ as distutils_version
+            if distutils_version.split('.') <= (2, 5, 1):
+                sys.argv.remove('--install-layout=deb')
+                print "W: remove '--install-layout=deb' option"
+    except:
+        pass
     if subpackage_of:
         package = subpackage_of + '.' + modname
         kwargs['package_dir'] = {package : '.'}

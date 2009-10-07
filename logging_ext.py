@@ -118,7 +118,7 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
     # setHandler method, so do it this way :$
     logger.handlers = [handler]
     isatty = hasattr(sys.__stdout__, 'isatty') and sys.__stdout__.isatty()
-    if debug and isatty:
+    if debug and isatty and sys.platform != 'win32':
         fmt = ColorFormatter(logformat, logdateformat)
         def col_fact(record):
             if 'XXX' in record.message:

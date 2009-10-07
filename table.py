@@ -383,12 +383,17 @@ class Table(object):
             raise KeyError("Column (%s) not found in table" % (col_id))
         return self.get_column(col_index, distinct)
 
-
     def get_columns(self):
         """Returns all the columns in the table
         """
         return [self[:,index] for index in range(len(self.col_names))]
 
+    def get_column(self, col_index, distinct=False):
+        """get a column by index"""
+        col = [row[col_index] for row in self.data]
+        if distinct:
+            col = list(set(col))
+        return col
 
     def apply_stylesheet(self, stylesheet):
         """Applies the stylesheet to this table

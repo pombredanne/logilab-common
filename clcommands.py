@@ -4,7 +4,7 @@ one command.
 e.g called as "tool command [options] args..." where <options> and <args> are
 command'specific
 
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2003-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -18,7 +18,7 @@ from logilab.common.configuration import Configuration
 
 
 DEFAULT_COPYRIGHT = '''\
-Copyright (c) 2004-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+Copyright (c) 2004-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
 
 

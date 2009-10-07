@@ -4,7 +4,8 @@ from cStringIO import StringIO
 from sys import version_info
 
 from logilab.common.testlib import TestCase, unittest_main
-from logilab.common.configuration import Configuration, OptionValueError, \
+from logilab.common.optik_ext import OptionValueError
+from logilab.common.configuration import Configuration, \
      OptionsManagerMixIn, OptionsProviderMixIn, Method, read_old_config
 
 options = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar': '<y or n>'}),

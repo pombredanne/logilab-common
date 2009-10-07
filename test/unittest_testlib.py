@@ -641,12 +641,14 @@ class DecoratorTC(TestCase):
 
         @with_tempdir
         def createfile(list):
-            tempfile.mkstemp()
-            tempfile.mkstemp()
+            fd1, fn1 = tempfile.mkstemp()
+            fd2, fn2 = tempfile.mkstemp()
             dir = tempfile.mkdtemp()
-            tempfile.mkstemp(dir=dir)
+            fd3, fn3 = tempfile.mkstemp(dir=dir)
             tempfile.mkdtemp()
             list.append(True)
+            for fd in (fd1, fd2, fd3):
+                os.close(fd)
 
         self.assertFalse(witness)
         createfile(witness)
@@ -672,11 +674,13 @@ class DecoratorTC(TestCase):
 
         @with_tempdir
         def createfile():
-            tempfile.mkstemp()
-            tempfile.mkstemp()
+            fd1, fn1 = tempfile.mkstemp()
+            fd2, fn2 = tempfile.mkstemp()
             dir = tempfile.mkdtemp()
-            tempfile.mkstemp(dir=dir)
+            fd3, fn3 = tempfile.mkstemp(dir=dir)
             tempfile.mkdtemp()
+            for fd in (fd1, fd2, fd3):
+                os.close(fd)
             raise WitnessException()
 
         self.assertRaises(WitnessException, createfile)
