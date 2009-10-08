@@ -74,11 +74,12 @@ class Debugger(Pdb):
     - overrides list command to search for current block instead
       of using 5 lines of context
     """
-    def __init__(self, tcbk):
+    def __init__(self, tcbk=None):
         Pdb.__init__(self)
         self.reset()
-        while tcbk.tb_next is not None:
-            tcbk = tcbk.tb_next
+        if tcbk:
+            while tcbk.tb_next is not None:
+                tcbk = tcbk.tb_next
         self._tcbk = tcbk
         self._histfile = osp.join(os.environ["HOME"], ".pdbhist")
 
@@ -187,3 +188,5 @@ def pm():
     dbg = Debugger(sys.last_traceback)
     dbg.start()
 
+def set_trace():
+    Debugger().set_trace(sys._getframe().f_back)
