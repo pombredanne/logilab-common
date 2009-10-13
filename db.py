@@ -410,14 +410,45 @@ class _PySqlite2Adapter(DBAPIAdapter):
             sqlite.register_converter('time', convert_mxtime)
         # else use datetime.datetime
         else:
-            from datetime import time
+            from datetime import time, timedelta
+            # datetime.time
             def adapt_time(data):
                 return data.strftime('%H:%M:%S')
             sqlite.register_adapter(time, adapt_time)
             def convert_time(data):
                return time(*[int(i) for i in data.split(':')])
             sqlite.register_converter('time', convert_time)
-
+            # datetime.timedelta
+            def adapt_timedelta(data):
+                '''the sign in the result only refers to the number of days.  day
+                fractions always indicate a positive offset.  this may seem strange,
+                but it is the same that is done by the default __str__ method.  we
+                redefine it here anyways (instead of simply doing "str") because we
+                do not want any "days," string within the representation.
+                '''
+                days = data.days
+                frac = data - timedelta(days)
+                return "%d %s" % (data.days, frac)
+            sqlite.register_adapter(timedelta, adapt_timedelta)
+            def convert_timedelta(data):
+                parts = data.split(" ")
+                if len(parts) == 2:
+                    daypart, timepart = parts
+                    days = int(daypart)
+                else:
+                    days = 0
+                    timepart = parts[-1]
+                timepart_full = timepart.split(".")
+                hours, minutes, seconds = map(int, timepart_full[0].split(":"))
+                if len(timepart_full) == 2:
+                    microseconds = int(float("0." + timepart_full[1]) * 1000000)
+                else:
+                    microseconds = 0
+                data = timedelta(days,
+                                 hours*3600 + minutes*60 + seconds,
+                                 microseconds)
+                return data
+            sqlite.register_converter('interval', convert_timedelta)
 
 
     def connect(self, host='', database='', user='', password='', port=None):
