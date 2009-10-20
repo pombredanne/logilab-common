@@ -725,17 +725,10 @@ def run():
             import traceback
             traceback.print_exc()
     finally:
-        tester.show_report()
         if covermode:
             cvg.stop()
             cvg.save()
-            here = osp.abspath(os.getcwd())
-            if this_is_a_testdir(here):
-                morfdir = osp.normpath(osp.join(here, '..'))
-            else:
-                morfdir = here
-            print "computing code coverage (%s), this might take some time" % \
-                  morfdir
-            cvg.annotate([morfdir])
-            cvg.report([morfdir], False)
+        tester.show_report()
+        if covermode:
+            print 'coverage information stored, use it with pycoverage -ra'
         sys.exit(tester.errcode)
