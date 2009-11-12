@@ -6,6 +6,8 @@ ChangeLog for logilab.common
       - proper bytes and time option types support
       - make Method usable as 'callback' value
       - fix #8849 Using plugins, options and .pylintrc crashes PyLint
+    * graph: fix has_path returned value to include the destination node, else we get
+      an empty list which makes think there is no path (test added)
 
 2009-08-26  --  0.45.0
     * added function for parsing XML processing instructions

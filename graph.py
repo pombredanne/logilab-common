@@ -189,16 +189,16 @@ def has_path(graph_dict, fromnode, tonode, path=None):
     node has key associated to a list of nodes directly reachable from it.
 
     Return None if no path exists to go from `fromnode` to `tonode`, else the
-    first path found
+    first path found (as a list including the destination node at last)
     """
     if path is None:
         path = []
     elif fromnode in path:
-        return False
+        return None
     path.append(fromnode)
     for destnode in graph_dict[fromnode]:
         if destnode == tonode or has_path(graph_dict, destnode, tonode, path):
-            return path[1:]
+            return path[1:] + [tonode]
     path.pop()
     return None
 
