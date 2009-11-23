@@ -14,11 +14,14 @@ Main functions available:
 __docformat__ = "restructuredtext en"
 
 import logging
+import tempfile
 
 from Pyro import core, naming, errors, util, config
 
 _LOGGER = logging.getLogger('pyro')
 _MARKER = object()
+
+config.PYRO_STORAGE = tempfile.gettempdir()
 
 def ns_group_and_id(idstr, defaultnsgroup=_MARKER):
     try:

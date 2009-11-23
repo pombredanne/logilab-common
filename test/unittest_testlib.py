@@ -20,7 +20,7 @@ except NameError:
 
 from unittest import TestSuite
 
-from logilab.common.testlib import TestCase, SkipAwareTextTestRunner
+from logilab.common.testlib import TestCase, SkipAwareTextTestRunner, Tags
 from logilab.common.testlib import mock_object, NonStrictTestLoader, create_files
 from logilab.common.testlib import capture_stdout, unittest_main, InnerTest
 from logilab.common.testlib import with_tempdir, tag
@@ -776,6 +776,21 @@ class TagTC(TestCase):
 
         self.func = bob
 
+        class TagTestTC(TestCase):
+            tags = Tags(('one', 'two'))
+            
+            def test_one(self):
+                self.assertTrue(True)
+
+            @tag('two', 'three')
+            def test_two(self):
+                self.assertTrue(True)
+
+            @tag('three')
+            def test_three(self):
+                self.assertTrue(True)
+        self.cls = TagTestTC
+        
     def test_tag_decorator(self):
         bob = self.func
 
@@ -803,6 +818,46 @@ class TagTC(TestCase):
 
         self.assertTrue(tags.match('not other or (testing and bibi)'))
         self.assertTrue(tags.match('other or (testing and bob)'))
+
+    def test_tagged_class(self):
+        def options(tags):
+            class Options(object):
+                tags_pattern = tags
+            return Options()
+        
+        cls = self.cls
+        
+        runner = SkipAwareTextTestRunner()        
+        self.assertTrue(runner.does_match_tags(cls.test_one))
+        self.assertTrue(runner.does_match_tags(cls.test_two))
+        self.assertTrue(runner.does_match_tags(cls.test_three))
+
+        runner = SkipAwareTextTestRunner(options=options('one'))        
+        self.assertTrue(runner.does_match_tags(cls.test_one))
+        self.assertFalse(runner.does_match_tags(cls.test_two))
+        self.assertFalse(runner.does_match_tags(cls.test_three))
+
+        runner = SkipAwareTextTestRunner(options=options('two'))        
+        self.assertTrue(runner.does_match_tags(cls.test_one))
+        self.assertTrue(runner.does_match_tags(cls.test_two))
+        self.assertFalse(runner.does_match_tags(cls.test_three))
+
+        runner = SkipAwareTextTestRunner(options=options('three'))        
+        self.assertFalse(runner.does_match_tags(cls.test_one))
+        self.assertTrue(runner.does_match_tags(cls.test_two))
+        self.assertTrue(runner.does_match_tags(cls.test_three))
+
+        runner = SkipAwareTextTestRunner(options=options('two or three'))        
+        self.assertTrue(runner.does_match_tags(cls.test_one))
+        self.assertTrue(runner.does_match_tags(cls.test_two))
+        self.assertTrue(runner.does_match_tags(cls.test_three))
+
+        runner = SkipAwareTextTestRunner(options=options('two and three'))        
+        self.assertFalse(runner.does_match_tags(cls.test_one))
+        self.assertTrue(runner.does_match_tags(cls.test_two))
+        self.assertFalse(runner.does_match_tags(cls.test_three))
+
+
 
 if __name__ == '__main__':
     unittest_main()

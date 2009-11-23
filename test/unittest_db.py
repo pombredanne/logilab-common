@@ -1,12 +1,10 @@
 """
 unit tests for module logilab.common.db
 """
-
-import os
-import pwd
 import socket
 
 from logilab.common.testlib import TestCase, unittest_main
+from logilab.common.shellutils import getlogin
 from logilab.common.db import *
 from logilab.common.db import PREFERED_DRIVERS
 from logilab.common.adbh import (_GenericAdvFuncHelper, _SqliteAdvFuncHelper,
@@ -14,13 +12,6 @@ from logilab.common.adbh import (_GenericAdvFuncHelper, _SqliteAdvFuncHelper,
                                  FunctionDescr, get_adv_func_helper,
                                  auto_register_function)
 
-
-def getlogin():
-    """avoid usinng os.getlogin() because of strange tty / stdin problems
-    (man 3 getlogin)
-    Another solution would be to use $LOGNAME, $USER or $USERNAME
-    """
-    return pwd.getpwuid(os.getuid())[0]
 
 class PreferedDriverTC(TestCase):
     def setUp(self):

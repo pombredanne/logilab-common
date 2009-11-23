@@ -466,8 +466,13 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         if self.options is not None:
             tags_pattern = getattr(self.options, 'tags_pattern', None)
             if tags_pattern is not None:
-                tags = getattr(test, 'tags', Tags())
-                return tags.match(tags_pattern)
+                tags = getattr(test, 'tags', None)
+                if tags is not None:
+                    return tags.match(tags_pattern)
+                if isinstance(test, types.MethodType):
+                    tags = getattr(test.im_class, 'tags', Tags())
+                    return tags.match(tags_pattern)
+                return False
         return True # no pattern
 
     def _makeResult(self):
