@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
 
---
+2009-11-23  --  0.45.2
     * configuration:
       - proper bytes and time option types support
       - make Method usable as 'callback' value
