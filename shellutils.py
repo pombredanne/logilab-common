@@ -339,8 +339,9 @@ def getlogin():
     (man 3 getlogin)
     Another solution would be to use $LOGNAME, $USER or $USERNAME
     """
-    import pwd # Platforms: Unix
-    return pwd.getpwuid(os.getuid())[0]
-
-
+    if sys.platform != 'win32':
+        import pwd # Platforms: Unix
+        return pwd.getpwuid(os.getuid())[0]
+    else:
+        return os.environ['USERNAME']
 
