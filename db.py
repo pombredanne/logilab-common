@@ -601,7 +601,97 @@ class _MySqlDBAdapter(DBAPIAdapter):
         finally:
             cursor.execute("DROP TABLE _type_code_test")
 
+class _PyodbcAdapter(DBAPIAdapter):
+    driver = 'Override in subclass'
+    
+    def connect(self, host='', database='', user='', password='', port=None):
+        """Handles pyodbc connection format"""
+        pyodbc = self._native_module
 
+        class PyodbcCursor(object):
+            """cursor adapting usual dict format to pyodbc format
+            in SQL queries
+            """
+            def __init__(self, cursor):
+                self._cursor = cursor
+            def _replace_parameters(self, sql, kwargs):
+                if isinstance(kwargs, dict):
+                    new_sql = re.sub(r'%\(([^\)]+)\)s', r'?', sql)
+                    key_order = re.findall(r'%\(([^\)]+)\)s', sql)
+                    args = tuple([kwargs[key] for key in key_order])
+                    return new_sql, args
+                        
+                # XXX dumb
+                return re.sub(r'%s', r'?', sql), kwargs
+
+            def execute(self, sql, kwargs=None):
+                if kwargs is None:
+                    self._cursor.execute(sql)
+                else:
+                    final_sql, args = self._replace_parameters(sql, kwargs)
+                    self._cursor.execute(final_sql , args)
+
+            def executemany(self, sql, kwargss):
+                if not isinstance(kwargss, (list, tuple)):
+                    kwargss = tuple(kwargss)
+                self._cursor.executemany(self, self._replace_parameters(sql, kwargss[0]), kwargss)
+            def __getattr__(self, attrname):
+                return getattr(self._cursor, attrname)
+
+        class PyodbcCnxWrapper:
+            def __init__(self, cnx):
+                self._cnx = cnx
+            def cursor(self):
+                return PyodbcCursor(self._cnx.cursor())
+            def __getattr__(self, attrname):
+                return getattr(self._cnx, attrname)
+
+        cnx_string_bits = ['DRIVER={%(driver)s}']
+        if host:
+            cnx_string_bits.append('SERVER=%(host)s')
+        if database:
+            cnx_string_bits.append('DATABASE=%(database)s')
+        if user:
+            cnx_string_bits.append('UID=%(user)s')
+        if password:
+            cnx_string_bits.append('PWD=%(password)s')
+        variables = {'host' : host,
+                     'database' : database,
+                     'user' : user, 'password' : password,
+                     'driver': self.driver}
+        cnx_string = ';'.join(cnx_string_bits) % variables
+        cnx = self._native_module.connect(cnx_string)
+        return self._wrap_if_needed(PyodbcCnxWrapper(cnx), user)
+
+    def process_value(self, value, description, encoding='utf-8', binarywrap=None):
+        # if the dbapi module isn't supporting type codes, override to return value directly
+        typecode = description[1]
+        assert typecode is not None, self
+        if typecode == self.STRING:
+            if isinstance(value, str):
+                return unicode(value, encoding, 'replace')
+        elif typecode == self.BINARY:  # value is a python buffer
+            if binarywrap is not None:
+                return binarywrap(value[:])
+            else:
+                return value[:]
+        elif typecode == self.UNKNOWN:
+            # may occurs on constant selection for instance (e.g. SELECT 'hop')
+            # with postgresql at least
+            if isinstance(value, str):
+                return unicode(value, encoding, 'replace')
+
+        return value
+
+
+class _PyodbcSqlServer2000Adapter(_PyodbcAdapter):
+    driver = "SQL Server"
+    
+class _PyodbcSqlServer2005Adapter(_PyodbcAdapter):
+    driver = "SQL Native Client"
+
+class _PyodbcSqlServer2008Adapter(_PyodbcAdapter):
+    driver = "SQL Native Client 10.0"
 
 ## Drivers, Adapters and helpers registries ###################################
 
@@ -610,6 +700,9 @@ PREFERED_DRIVERS = {
     "postgres" : [ 'psycopg2', 'psycopg', 'pgdb', 'pyPgSQL.PgSQL', ],
     "mysql" : [ 'MySQLdb', ], # 'pyMySQL.MySQL, ],
     "sqlite" : ['pysqlite2.dbapi2', 'sqlite', 'sqlite3',],
+    "sqlserver2000" : ['pyodbc'],
+    "sqlserver2005" : ['pyodbc'],
+    "sqlserver2008" : ['pyodbc'],
     }
 
 _ADAPTERS = {
@@ -622,6 +715,9 @@ _ADAPTERS = {
     'sqlite' : { 'pysqlite2.dbapi2' : _PySqlite2Adapter,
                  'sqlite' : _SqliteAdapter,
                  'sqlite3' : _PySqlite2Adapter, },
+    "sqlserver2000" : {'pyodbc': _PyodbcSqlServer2000Adapter},
+    "sqlserver2005" : {'pyodbc': _PyodbcSqlServer2005Adapter},
+    "sqlserver2008" : {'pyodbc': _PyodbcSqlServer2008Adapter},
     }
 
 # _AdapterDirectory could be more generic by adding a 'protocol' parameter

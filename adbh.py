@@ -570,11 +570,37 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
             allindices += self.list_indices(cursor, table)
         return allindices
 
+class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
+    backend_name = 'sqlserver2005'
+    ilike_support = False
+    # modifiable but should not be shared
+    FUNCTIONS = _GenericAdvFuncHelper.FUNCTIONS.copy()
+    TYPE_MAPPING = {
+        'String' :   'ntext',
+        'Int' :      'integer',
+        'Float' :    'float',
+        'Decimal' :  'decimal',
+        'Boolean' :  'bit',
+        'Date' :     'datetime',
+        'Time' :     'time',
+        'Datetime' : 'datetime',
+        'Interval' : 'interval',
+        'Password' : 'varbinary(255)',
+        'Bytes' :    'varbinary(max)',
+        'TIMESTAMP': 'datetime',
+        }
+
+    def list_tables(self, cursor):
+        """return the list of tables of a database"""
+        return  [row.table_name for row in cursor.tables()]
+    def binary_value(self, value):
+        return StringIO.StringIO(value)
 
 
 ADV_FUNC_HELPER_DIRECTORY = {'postgres': _PGAdvFuncHelper(),
                              'sqlite': _SqliteAdvFuncHelper(),
                              'mysql': _MyAdvFuncHelper(),
+                             'sqlserver2005': _SqlServer2005FuncHelper(),
                              }
 
 
