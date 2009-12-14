@@ -136,6 +136,7 @@ class _GenericAdvFuncHelper:
         'Interval' : 'interval',
         'Password' : 'bytea',
         'Bytes' :    'bytea',
+        'TIMESTAMP': 'TIMESTAMP',
         }
 
 
@@ -229,6 +230,9 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
             return 'TRUE'
         else:
             return 'FALSE'
+
+    def binary_value(self, value):
+        return value
 
     def increment_sequence(self, cursor, seq_name):
         for sql in self.sqls_increment_sequence(seq_name):
