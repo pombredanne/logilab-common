@@ -187,10 +187,6 @@ class _GenericAdvFuncHelper:
     def sql_current_timestamp(self):
         return 'CURRENT_TIMESTAMP'
 
-    def sql_create_sequence(self, seq_name):
-        return '''CREATE TABLE %s (last INTEGER);
-INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
-
     def sql_create_index(self, table, column, unique=False):
         idx = self._index_name(table, column, unique)
         if unique:
@@ -204,6 +200,10 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
             return 'ALTER TABLE %s DROP CONSTRAINT %s' % (table, idx)
         else:
             return 'DROP INDEX %s' % idx
+
+    def sql_create_sequence(self, seq_name):
+        return '''CREATE TABLE %s (last INTEGER);
+INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
 
     def sql_drop_sequence(self, seq_name):
         return 'DROP TABLE %s;' % seq_name
