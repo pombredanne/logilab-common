@@ -578,8 +578,6 @@ class _MySqlDBAdapter(DBAPIAdapter):
         return DBAPIAdapter.process_value(self, value, description, encoding, binarywrap)
 
     def type_code_test(self, cursor):
-        print '*'*80
-        print 'module type codes'
         for typename in ('STRING', 'BOOLEAN', 'BINARY', 'DATETIME', 'NUMBER'):
             print typename, getattr(self, typename)
         try:
