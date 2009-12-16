@@ -581,7 +581,7 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
         'Float' :    'float',
         'Decimal' :  'decimal',
         'Boolean' :  'bit',
-        'Date' :     'datetime',
+        'Date' :     'smalldatetime',
         'Time' :     'time',
         'Datetime' : 'datetime',
         'Interval' : 'interval',

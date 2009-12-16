@@ -28,6 +28,7 @@ from warnings import warn
 
 import logilab.common as lgc
 from logilab.common.deprecation import obsolete
+import datetime
 
 try:
     from mx.DateTime import DateTimeType, DateTimeDeltaType, strptime
@@ -612,12 +613,18 @@ class _PyodbcAdapter(DBAPIAdapter):
             """
             def __init__(self, cursor):
                 self._cursor = cursor
-            def _replace_parameters(self, sql, kwargs):
+            def _replace_parameters(self, sql, kwargs, _date_class=datetime.date):
                 if isinstance(kwargs, dict):
                     new_sql = re.sub(r'%\(([^\)]+)\)s', r'?', sql)
                     key_order = re.findall(r'%\(([^\)]+)\)s', sql)
-                    args = tuple([kwargs[key] for key in key_order])
-                    return new_sql, args
+                    args = []
+                    for key in key_order:
+                        arg = kwargs[key]
+                        if isinstance(arg, _date_class):
+                            arg = datetime.datetime.combine(arg, datetime.time(0))
+                        args.append(arg)
+
+                    return new_sql, tuple(args)
                         
                 # XXX dumb
                 return re.sub(r'%s', r'?', sql), kwargs
@@ -627,12 +634,42 @@ class _PyodbcAdapter(DBAPIAdapter):
                     self._cursor.execute(sql)
                 else:
                     final_sql, args = self._replace_parameters(sql, kwargs)
-                    self._cursor.execute(final_sql , args)
-
+                    try:
+                        self._cursor.execute(final_sql , args)
+                    except:
+                        raise
             def executemany(self, sql, kwargss):
                 if not isinstance(kwargss, (list, tuple)):
                     kwargss = tuple(kwargss)
                 self._cursor.executemany(self, self._replace_parameters(sql, kwargss[0]), kwargss)
+
+            def _get_smalldate_columns(self):
+                cols = []
+                for i, coldef in enumerate(self._cursor.description):
+                    if coldef[1] is datetime.datetime and coldef[3] == 16:
+                        cols.append(i)
+                return cols
+
+            def fetchone(self):
+                smalldate_cols = self._get_smalldate_columns()
+                row = self._cursor.fetchone()
+                return self._replace_smalldate(row, smalldate_cols)
+
+            def fetchall (self):
+                smalldate_cols = self._get_smalldate_columns()
+                rows = []
+                for row in self._cursor.fetchall():
+                    rows.append(self._replace_smalldate(row, smalldate_cols))
+                return rows
+
+            def _replace_smalldate(self, row, smalldate_cols):
+                if smalldate_cols:
+                    new_row = row[:]
+                    for col in smalldate_cols:
+                        new_row[col] = new_row[col].date()
+                    return new_row
+                else:
+                    return row
             def __getattr__(self, attrname):
                 return getattr(self._cursor, attrname)
 
