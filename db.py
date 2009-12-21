@@ -629,7 +629,8 @@ class _PyodbcAdapter(DBAPIAdapter):
         required.
         """
         pyodbc = self._native_module
-        self._process_extra_args(extra_args)
+        if extra_args is not None:
+            self._process_extra_args(extra_args)
         class PyodbcCursor(object):
             """cursor adapting usual dict format to pyodbc format
             in SQL queries
@@ -861,7 +862,7 @@ def get_connection(driver='postgres', host='', database='', user='',
             pass
     if port:
         port = int(port)
-    return adapted_module.connect(host, database, user, password, port=port)
+    return adapted_module.connect(host, database, user, password, port=port, extra_args=extra_args)
 
 
 from logilab.common.deprecation import moved
