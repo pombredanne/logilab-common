@@ -184,7 +184,7 @@ class DBAPIAdapter:
             except AttributeError:
                 print 'WARNING: %s adapter has no %s type code' % (self, typecode)
 
-    def connect(self, host='', database='', user='', password='', port=''):
+    def connect(self, host='', database='', user='', password='', port='', extra_args=None):
         """Wraps the native module connect method"""
         kwargs = {'host' : host, 'port' : port, 'database' : database,
                   'user' : user, 'password' : password}
@@ -246,7 +246,7 @@ class _PgdbAdapter(DBAPIAdapter):
                                              'int8', 'float4', 'float8',
                                              'numeric', 'bool', 'money')
 
-    def connect(self, host='', database='', user='', password='', port=''):
+    def connect(self, host='', database='', user='', password='', port='', extra_args=None):
         """Wraps the native module connect method"""
         if port:
             warn("pgdb doesn't support 'port' parameter in connect()", UserWarning)
@@ -259,7 +259,7 @@ class _PgdbAdapter(DBAPIAdapter):
 class _PsycopgAdapter(DBAPIAdapter):
     """Simple Psycopg Adapter to DBAPI (cnx_string differs from classical ones)
     """
-    def connect(self, host='', database='', user='', password='', port=''):
+    def connect(self, host='', database='', user='', password='', port='', extra_args=None):
         """Handles psycopg connection format"""
         if host:
             cnx_string = 'host=%s  dbname=%s  user=%s' % (host, database, user)
@@ -316,7 +316,7 @@ class _Psycopg2Adapter(_PsycopgAdapter):
 class _PgsqlAdapter(DBAPIAdapter):
     """Simple pyPgSQL Adapter to DBAPI
     """
-    def connect(self, host='', database='', user='', password='', port=''):
+    def connect(self, host='', database='', user='', password='', port='', extra_args=None):
         """Handles psycopg connection format"""
         kwargs = {'host' : host, 'port': port or None,
                   'database' : database,
@@ -452,7 +452,7 @@ class _PySqlite2Adapter(DBAPIAdapter):
             sqlite.register_converter('interval', convert_timedelta)
 
 
-    def connect(self, host='', database='', user='', password='', port=None):
+    def connect(self, host='', database='', user='', password='', port=None, extra_args=None):
         """Handles sqlite connection format"""
         sqlite = self._native_module
 
@@ -502,7 +502,7 @@ class _SqliteAdapter(DBAPIAdapter):
         DBAPIAdapter.__init__(self, native_module, pywrap)
         self.DATETIME = native_module.TIMESTAMP
 
-    def connect(self, host='', database='', user='', password='', port=''):
+    def connect(self, host='', database='', user='', password='', port='', extra_args=None):
         """Handles sqlite connection format"""
         cnx = self._native_module.connect(database)
         return self._wrap_if_needed(cnx, user)
@@ -537,7 +537,7 @@ class _MySqlDBAdapter(DBAPIAdapter):
             times.DateTimeDeltaType = mxdt.DateTimeDeltaType
 
     def connect(self, host='', database='', user='', password='', port=None,
-                unicode=True, charset='utf8'):
+                unicode=True, charset='utf8', extra_args=None):
         """Handles mysqldb connection format
         the unicode named argument asks to use Unicode objects for strings
         in result sets and query parameters
@@ -602,11 +602,34 @@ class _MySqlDBAdapter(DBAPIAdapter):
 
 class _PyodbcAdapter(DBAPIAdapter):
     driver = 'Override in subclass'
+    _use_trusted_connection = False
     
-    def connect(self, host='', database='', user='', password='', port=None):
-        """Handles pyodbc connection format"""
-        pyodbc = self._native_module
+    @classmethod
+    def use_trusted_connection(klass, use_trusted=False):
+        """
+        pass True to this class method to enable Windows
+        Authentication (i.e. passwordless auth)
+        """
+        klass._use_trusted_connection = use_trusted
+    @classmethod
+    def _process_extra_args(klass, arguments):
+        arguments = arguments.lower().split(';')
+        if 'trusted_connection' in arguments:
+            klass.use_trusted_connection(True)
 
+    def connect(self, host='', database='', user='', password='', port=None, extra_args=None):
+        """Handles pyodbc connection format
+        
+        If extra_args is not None, it is expected to be a string
+        containing a list of semicolon separated keywords. The only
+        keyword currently supported is Trusted_Connection : if found
+        the connection string to the database will include
+        Trusted_Connection=yes (which for SqlServer will trigger using
+        Windows Authentication, and therefore no login/password is
+        required.
+        """
+        pyodbc = self._native_module
+        self._process_extra_args(extra_args)
         class PyodbcCursor(object):
             """cursor adapting usual dict format to pyodbc format
             in SQL queries
@@ -682,20 +705,15 @@ class _PyodbcAdapter(DBAPIAdapter):
                 return getattr(self._cnx, attrname)
 
         cnx_string_bits = ['DRIVER={%(driver)s}']
-        if host:
-            cnx_string_bits.append('SERVER=%(host)s')
-        if database:
-            cnx_string_bits.append('DATABASE=%(database)s')
-        if user:
-            cnx_string_bits.append('UID=%(user)s')
-        if password:
-            cnx_string_bits.append('PWD=%(password)s')
         variables = {'host' : host,
                      'database' : database,
                      'user' : user, 'password' : password,
                      'driver': self.driver}
-        cnx_string = ';'.join(cnx_string_bits) % variables
-        cnx = self._native_module.connect(cnx_string)
+        if self._use_trusted_connection:
+            variables['Trusted_Connection'] = 'yes'
+            del variables['user']
+            del variables['password']
+        cnx = self._native_module.connect(**variables)
         return self._wrap_if_needed(PyodbcCnxWrapper(cnx), user)
 
     def process_value(self, value, description, encoding='utf-8', binarywrap=None):
@@ -824,7 +842,7 @@ def get_dbapi_compliant_module(driver, prefered_drivers = None, quiet = False,
 
 def get_connection(driver='postgres', host='', database='', user='',
                   password='', port='', quiet=False, drivers=PREFERED_DRIVERS,
-                  pywrap=False):
+                  pywrap=False, extra_args=None):
     """return a db connection according to given arguments"""
     module, modname = _import_driver_module(driver, drivers, ['connect'])
     try:
