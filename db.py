@@ -357,12 +357,6 @@ class _PySqlite2Adapter(DBAPIAdapter):
             return
         sqlite._lc_initialized = 1
 
-        # XXX not clear why this is necessary while buffer (aka self.Binary)
-        #     is pysqlite2 default binary type....
-        def adapt_buffer(buffer):
-            return str(buffer)
-        sqlite.register_adapter(self.Binary, adapt_buffer)
-
         # bytea type handling
         from StringIO import StringIO
         def adapt_bytea(data):
