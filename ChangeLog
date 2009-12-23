@@ -1,6 +1,13 @@
 ChangeLog for logilab.common
 ============================
 
+	--
+    * db / adbh: added SQL Server support using Pyodbc
+    * db:
+	- New optional extra_args argument to get_connection.
+	- Support Windows Auth for SQLServer by giving
+	  extra_args='Trusted_Connection' to the sqlserver2005 driver
+
 2009-11-23  --  0.45.2
     * configuration:
       - proper bytes and time option types support
