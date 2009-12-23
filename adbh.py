@@ -136,7 +136,6 @@ class _GenericAdvFuncHelper:
         'Interval' : 'interval',
         'Password' : 'bytea',
         'Bytes' :    'bytea',
-        'TIMESTAMP': 'TIMESTAMP',
         }
 
 
@@ -587,7 +586,6 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
         'Interval' : 'interval',
         'Password' : 'varbinary(255)',
         'Bytes' :    'varbinary(max)',
-        'TIMESTAMP': 'datetime',
         }
 
     def list_tables(self, cursor):

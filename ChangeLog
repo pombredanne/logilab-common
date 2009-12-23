@@ -1,16 +1,30 @@
 ChangeLog for logilab.common
 ============================
 
+2009-12-23  --  0.46.0
+    * db / adbh: added SQL Server support using Pyodbc
+
+    * db:
+	- New optional extra_args argument to get_connection.
+	- Support Windows Auth for SQLServer by giving
+	  extra_args='Trusted_Connection' to the sqlserver2005 driver
+
+
+
 2009-11-23  --  0.45.2
     * configuration:
       - proper bytes and time option types support
       - make Method usable as 'callback' value
       - fix #8849 Using plugins, options and .pylintrc crashes PyLint
+
     * graph: fix has_path returned value to include the destination node, else we get
       an empty list which makes think there is no path (test added)
 
+
+
 2009-08-26  --  0.45.0
     * added function for parsing XML processing instructions
+
 
 
 2009-08-07  --  0.44.0
