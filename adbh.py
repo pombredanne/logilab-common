@@ -165,14 +165,14 @@ class _GenericAdvFuncHelper:
         """return the system database for the given driver"""
         raise NotImplementedError('not supported by this DBMS')
 
-    def backup_command(self, dbname, dbhost, dbuser, dbpassword, backupfile,
+    def backup_command(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
         """return a command to backup the given database"""
         raise NotImplementedError('not supported by this DBMS')
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup the given database"""
+        """return a list of commands to restore a backup of the given database"""
         raise NotImplementedError('not supported by this DBMS')
 
     # helpers to standardize SQL according to the database
