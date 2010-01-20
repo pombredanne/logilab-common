@@ -794,9 +794,9 @@ PREFERED_DRIVERS = {
     "postgres" : [ 'psycopg2', 'psycopg', 'pgdb', 'pyPgSQL.PgSQL', ],
     "mysql" : [ 'MySQLdb', ], # 'pyMySQL.MySQL, ],
     "sqlite" : ['pysqlite2.dbapi2', 'sqlite', 'sqlite3',],
-    "sqlserver2000" : ['adodbapi', 'pyodbc'],
-    "sqlserver2005" : ['adodbapi', 'pyodbc'],
-    "sqlserver2008" : ['adodbapi', 'pyodbc'],
+    "sqlserver2000" : ['pyodbc', 'adodbapi', ],
+    "sqlserver2005" : ['pyodbc', 'adodbapi', ],
+    "sqlserver2008" : ['pyodbc', 'adodbapi', ],
     }
 
 _ADAPTERS = {
