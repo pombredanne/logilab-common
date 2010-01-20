@@ -16,6 +16,8 @@ Helpers are provided for postgresql, mysql and sqlite.
 """
 __docformat__ = "restructuredtext en"
 
+import os
+import sys
 
 class BadQuery(Exception): pass
 class UnsupportedFunction(BadQuery): pass
@@ -174,6 +176,7 @@ class _GenericAdvFuncHelper:
                          encoding='utf-8', keepownership=True, drop=True):
         """return a list of commands to restore a backup of the given database"""
         raise NotImplementedError('not supported by this DBMS')
+
 
     # helpers to standardize SQL according to the database
 
@@ -595,6 +598,59 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
         return StringIO.StringIO(value)
 
 
+    def backup_command(self, dbname, dbhost, dbuser, backupfile,
+                       keepownership=True):
+        """return a command to backup the given database"""
+        return [sys.executable, os.path.normpath(__file__), 
+                "_SqlServer2005FuncHelper._do_backup", dbhost, dbname, backupfile]
+
+    def restore_commands(self, dbname, dbhost, dbuser, backupfile,
+                         encoding='utf-8', keepownership=True, drop=True):
+        """return a list of commands to restore a backup of the given database"""
+        return [[sys.executable, os.path.normpath(__file__), 
+                "_SqlServer2005FuncHelper._do_restore", dbhost, dbname, backupfile],
+                ]
+    
+    @staticmethod
+    def _do_backup():
+        import time
+        from logilab.common.db import get_connection
+        dbhost = sys.argv[2]
+        dbname = sys.argv[3]
+        filename = sys.argv[4]
+        cnx = get_connection(driver='sqlserver2005', host=dbhost, database=dbname, extra_args='autocommit;trusted_connection')
+        cursor = cnx.cursor()
+        cursor.execute("BACKUP DATABASE ? TO DISK= ? ", (dbname, filename,))
+        prev_size = -1
+        err_count = 0
+        same_size_count = 0
+        while err_count < 10 and same_size_count < 10:
+            time.sleep(1)
+            try:
+                size = os.path.getsize(filename)
+            except OSError, exc:
+                err_count +=1
+                print exc
+            if size > prev_size:
+                same_size_count = 0
+                prev_size = size
+            else:
+               same_size_count += 1
+        cnx.close()
+        sys.exit(0)
+        
+    @staticmethod
+    def _do_restore():
+        """return the SQL statement to restore a backup of the given database"""
+        from logilab.common.db import get_connection
+        dbhost = sys.argv[2]
+        dbname = sys.argv[3]
+        filename = sys.argv[4]
+        cnx = get_connection(driver='sqlserver2005', host=dbhost, database='master', extra_args='autocommit;trusted_connection')
+        cursor = cnx.cursor()
+        cursor.execute("RESTORE DATABASE ? FROM DISK= ? WITH REPLACE", (dbname, filename,))
+        sys.exit(0)
+
 ADV_FUNC_HELPER_DIRECTORY = {'postgres': _PGAdvFuncHelper(),
                              'sqlite': _SqliteAdvFuncHelper(),
                              'mysql': _MyAdvFuncHelper(),
@@ -616,3 +672,7 @@ def auto_register_function(funcdef):
     """register the function `funcdef` on supported backends"""
     for driver in  funcdef.supported_backends:
         register_function(driver, funcdef)
+
+if __name__ == "__main__": # used to backup sql server db
+    func_call = sys.argv[1]
+    eval(func_call+'()')

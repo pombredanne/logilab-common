@@ -604,6 +604,7 @@ class _MySqlDBAdapter(DBAPIAdapter):
 class _BaseSqlServerAdapter(DBAPIAdapter):
     driver = 'Override in subclass'
     _use_trusted_connection = False
+    _use_autocommit = False
     _fetch_lock = threading.Lock()
 
     @classmethod
@@ -613,11 +614,22 @@ class _BaseSqlServerAdapter(DBAPIAdapter):
         Authentication (i.e. passwordless auth)
         """
         klass._use_trusted_connection = use_trusted
+
+    @classmethod
+    def use_autocommit(klass, use_autocommit=False):
+        """
+        pass True to this class method to enable autocommit (required
+        for backup and restore)
+        """
+        klass._use_autocommit = use_autocommit
+
     @classmethod
     def _process_extra_args(klass, arguments):
         arguments = arguments.lower().split(';')
         if 'trusted_connection' in arguments:
             klass.use_trusted_connection(True)
+        if 'autocommit' in arguments:
+            klass.use_autocommit(True)
 
     def connect(self, host='', database='', user='', password='', port=None, extra_args=None):
         """Handles pyodbc connection format
@@ -750,6 +762,8 @@ class _PyodbcAdapter(_BaseSqlServerAdapter):
             variables['Trusted_Connection'] = 'yes'
             del variables['user']
             del variables['password']
+        if self._use_autocommit:
+            variables['autocommit'] = True
         return self._native_module.connect(**variables)
 
 class _PyodbcSqlServer2000Adapter(_PyodbcAdapter):
