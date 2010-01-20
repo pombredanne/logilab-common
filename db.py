@@ -25,10 +25,11 @@ __docformat__ = "restructuredtext en"
 import sys
 import re
 from warnings import warn
+import threading 
+import datetime
 
 import logilab.common as lgc
 from logilab.common.deprecation import obsolete
-import datetime
 
 try:
     from mx.DateTime import DateTimeType, DateTimeDeltaType, strptime
@@ -603,6 +604,7 @@ class _MySqlDBAdapter(DBAPIAdapter):
 class _BaseSqlServerAdapter(DBAPIAdapter):
     driver = 'Override in subclass'
     _use_trusted_connection = False
+    _fetch_lock = threading.Lock()
 
     @classmethod
     def use_trusted_connection(klass, use_trusted=False):
@@ -628,12 +630,14 @@ class _BaseSqlServerAdapter(DBAPIAdapter):
         Windows Authentication, and therefore no login/password is
         required.
         """
+        lock = self._fetch_lock
         class SqlServerCursor(object):
             """cursor adapting usual dict format to pyodbc/adobdapi format
             in SQL queries
             """
             def __init__(self, cursor):
                 self._cursor = cursor
+                self._fetch_lock = lock
             def _replace_parameters(self, sql, kwargs, _date_class=datetime.date):
                 if isinstance(kwargs, dict):
                     new_sql = re.sub(r'%\(([^\)]+)\)s', r'?', sql)
@@ -673,14 +677,26 @@ class _BaseSqlServerAdapter(DBAPIAdapter):
 
             def fetchone(self):
                 smalldate_cols = self._get_smalldate_columns()
-                row = self._cursor.fetchone()
+                self._fetch_lock.acquire()
+                try:
+                    row = self._cursor.fetchone()
+                finally:
+                    self._fetch_lock.release()
                 return self._replace_smalldate(row, smalldate_cols)
 
             def fetchall (self):
                 smalldate_cols = self._get_smalldate_columns()
                 rows = []
-                for row in self._cursor.fetchall():
-                    rows.append(self._replace_smalldate(row, smalldate_cols))
+                while True:
+                    self._fetch_lock.acquire()
+                    try:
+                        batch = self._cursor.fetchmany(1024)
+                    finally:
+                        self._fetch_lock.release()
+                    if not batch:
+                        break
+                    for row in batch:
+                        rows.append(self._replace_smalldate(row, smalldate_cols))
                 return rows
 
             def _replace_smalldate(self, row, smalldate_cols):
