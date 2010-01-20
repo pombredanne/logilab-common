@@ -659,10 +659,7 @@ class _BaseSqlServerAdapter(DBAPIAdapter):
                     self._cursor.execute(sql)
                 else:
                     final_sql, args = self._replace_parameters(sql, kwargs)
-                    try:
-                        self._cursor.execute(final_sql , args)
-                    except:
-                        raise
+                    self._cursor.execute(final_sql , args)
             def executemany(self, sql, kwargss):
                 if not isinstance(kwargss, (list, tuple)):
                     kwargss = tuple(kwargss)
