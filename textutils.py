@@ -289,7 +289,11 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
         lit, unit = dic["value"], dic.get("unit")
         value = inter(lit)
         if unit is not None:
-            value *= units[unit]
+            try:
+                value *= units[unit]
+            except KeyError:
+                raise KeyError('invalid unit %s. valid units are %s' %
+                                unit, units.keys())
         values.append(value)
     return final(sum(values))
 
