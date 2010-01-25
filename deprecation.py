@@ -58,7 +58,7 @@ def class_moved(new_class, old_name=None, message=None):
             old_name, new_class.__module__, new_class.__name__)
     return class_renamed(old_name, new_class, message)
 
-def deprecated(reason=None):
+def deprecated(reason=None, stacklevel=2):
     """Decorator that raises a DeprecationWarning to print a message
     when the decorated function is called.
     """
@@ -67,7 +67,7 @@ def deprecated(reason=None):
         if '%s' in message:
             message = message % func.func_name
         def wrapped(*args, **kwargs):
-            warn(message, DeprecationWarning, stacklevel=2)
+            warn(message, DeprecationWarning, stacklevel=stacklevel)
             return func(*args, **kwargs)
         return wrapped
     return deprecated_decorator
