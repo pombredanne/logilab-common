@@ -169,12 +169,23 @@ class _GenericAdvFuncHelper:
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        """return a list of commands to backup the given database"""
+        """return a list of commands to backup the given database.
+
+        Each command may be given as a list or as a string. In the latter case,
+        expected to be used with a subshell (for instance using `os.system(cmd)`
+        or `subprocess.call(cmd, shell=True)`
+        """
         raise NotImplementedError('not supported by this DBMS')
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup of the given database"""
+        """return a list of commands to restore a backup of the given database
+
+
+        Each command may be given as a list or as a string. In the latter case,
+        expected to be used with a subshell (for instance using `os.system(cmd)`
+        or `subprocess.call(cmd, shell=True)`
+        """
         raise NotImplementedError('not supported by this DBMS')
 
 
@@ -317,7 +328,6 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        """return a command to backup the given database"""
         cmd = ['pg_dump', '-Fc']
         if dbhost:
             cmd.append('--host=%s' % dbhost)
@@ -332,7 +342,6 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup the given database"""
         cmds = []
         if drop:
             cmd = pgdbcmd('dropdb', dbhost, dbuser)
@@ -429,12 +438,10 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        """return a list of commands to backup the given database"""
         return [['gzip', dbname], ['mv', dbname + '.gz', backupfile]]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup the given database"""
         gunziped, ext = os.pathsplitext(backupfile)
         assert ext.lower() in ('.gz', '.z') # else gunzip will fail anyway
         return [['gunzip', backupfile], ['mv', gunziped, dbname]]
@@ -487,7 +494,6 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        """return a command to backup the given database"""
         cmd = ['mysqldump']
         # XXX compress
         if dbhost is not None:
@@ -497,8 +503,6 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup the given database"""
-        # XXX to upgrade to use command as list (pipe usage...)
         cmds = []
         host_option = ''
         if dbhost is not None:
@@ -605,14 +609,12 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        """return a command to backup the given database"""
         return [[sys.executable, os.path.normpath(__file__),
                  "_SqlServer2005FuncHelper._do_backup", dbhost, dbname, backupfile]
                 ]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup of the given database"""
         return [[sys.executable, os.path.normpath(__file__),
                 "_SqlServer2005FuncHelper._do_restore", dbhost, dbname, backupfile],
                 ]
