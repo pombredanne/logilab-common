@@ -80,16 +80,15 @@ def register_commands(commands):
         _COMMANDS[command_klass.name] = command_klass
 
 
-def main_usage(status=0, __doc__=DEFAULT_DOC, copyright=DEFAULT_COPYRIGHT):
+def main_usage(status=0, doc=DEFAULT_DOC, copyright=DEFAULT_COPYRIGHT):
     """display usage for the main program (i.e. when no command supplied)
     and exit
     """
     commands = _COMMANDS.keys()
     commands.sort()
-    doc = __doc__
     if doc != DEFAULT_DOC:
         try:
-            doc = __doc__ % ('<command>', '<command arguments>',
+            doc = doc % ('<command>', '<command arguments>',
                              '''\
 Type "%prog <command> --help" for more information about a specific
 command. Available commands are :\n''')
@@ -104,7 +103,8 @@ command. Available commands are :\n''')
         if not cmd.hidden:
             title = cmd.__doc__.split('.')[0]
             print ' ', (command+padding)[:max_len], title
-    print '\n', copyright
+    if copyright:
+        print '\n', copyright
     sys.exit(status)
 
 
@@ -124,19 +124,19 @@ def cmd_run(cmdname, *args):
         print command.help()
 
 
-def main_run(args, doc=DEFAULT_DOC):
+def main_run(args, doc=DEFAULT_DOC, copyright=DEFAULT_COPYRIGHT):
     """command line tool"""
     try:
         arg = args.pop(0)
     except IndexError:
-        main_usage(status=1, __doc__=doc)
+        main_usage(status=1, doc=doc, copyright=copyright)
     if arg in ('-h', '--help'):
-        main_usage(__doc__=doc)
+        main_usage(doc=doc, copyright=copyright)
     try:
         cmd_run(arg, *args)
     except BadCommandUsage, err:
         print 'ERROR: ', err
-        main_usage(1, doc)
+        main_usage(1, doc=doc, copyright=copyright)
 
 
 class ListCommandsCommand(Command):
