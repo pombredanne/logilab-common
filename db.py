@@ -16,7 +16,7 @@ Additional helpers are also provided for advanced functionalities such
 as listing existing users or databases, creating database... Get the
 helper for your database using the `get_adv_func_helper` function.
 
-:copyright: 2002-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2002-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
