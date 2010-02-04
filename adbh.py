@@ -3,7 +3,7 @@
 Helpers are provided for postgresql, mysql and sqlite.
 
 :copyright:
-  2000-2009 `LOGILAB S.A. <http://www.logilab.fr>`_ (Paris, FRANCE),
+  2000-2010 `LOGILAB S.A. <http://www.logilab.fr>`_ (Paris, FRANCE),
   all rights reserved.
 
 :contact:
@@ -16,6 +16,8 @@ Helpers are provided for postgresql, mysql and sqlite.
 """
 __docformat__ = "restructuredtext en"
 
+import os
+import sys
 
 class BadQuery(Exception): pass
 class UnsupportedFunction(BadQuery): pass
@@ -165,15 +167,27 @@ class _GenericAdvFuncHelper:
         """return the system database for the given driver"""
         raise NotImplementedError('not supported by this DBMS')
 
-    def backup_command(self, dbname, dbhost, dbuser, dbpassword, backupfile,
+    def backup_command(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        """return a command to backup the given database"""
+        """return a list of commands to backup the given database.
+
+        Each command may be given as a list or as a string. In the latter case,
+        expected to be used with a subshell (for instance using `os.system(cmd)`
+        or `subprocess.call(cmd, shell=True)`
+        """
         raise NotImplementedError('not supported by this DBMS')
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup the given database"""
+        """return a list of commands to restore a backup of the given database
+
+
+        Each command may be given as a list or as a string. In the latter case,
+        expected to be used with a subshell (for instance using `os.system(cmd)`
+        or `subprocess.call(cmd, shell=True)`
+        """
         raise NotImplementedError('not supported by this DBMS')
+
 
     # helpers to standardize SQL according to the database
 
@@ -291,8 +305,9 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
 
 
 
-def pgdbcmd(cmd, dbhost, dbuser):
+def pgdbcmd(cmd, dbhost, dbuser, *args):
     cmd = [cmd]
+    cmd += args
     if dbhost:
         cmd.append('--host=%s' % dbhost)
     if dbuser:
@@ -313,35 +328,35 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
 
     def backup_command(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        """return a command to backup the given database"""
-        cmd = ['pg_dump -Fc']
+        cmd = ['pg_dump', '-Fc']
         if dbhost:
             cmd.append('--host=%s' % dbhost)
         if dbuser:
             cmd.append('--username=%s' % dbuser)
         if not keepownership:
             cmd.append('--no-owner')
-        cmd.append('--file="%s"' % backupfile)
+        cmd.append('--file')
+        cmd.append(backupfile)
         cmd.append(dbname)
-        return ' '.join(cmd)
+        return cmd
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup the given database"""
         cmds = []
         if drop:
             cmd = pgdbcmd('dropdb', dbhost, dbuser)
             cmd.append(dbname)
-            cmds.append(' '.join(cmd))
-        cmd = pgdbcmd('createdb -T template0 -E %s' % encoding, dbhost, dbuser)
+            cmds.append(cmd)
+        cmd = pgdbcmd('createdb', dbhost, dbuser, '-T', 'template0', '-E', encoding)
         cmd.append(dbname)
-        cmds.append(' '.join(cmd))
-        cmd = pgdbcmd('pg_restore -Fc', dbhost, dbuser)
-        cmd.append('--dbname %s' % dbname)
+        cmds.append(cmd)
+        cmd = pgdbcmd('pg_restore', dbhost, dbuser, '-Fc')
+        cmd.append('--dbname')
+        cmd.append(dbname)
         if not keepownership:
             cmd.append('--no-owner')
-        cmd.append('"%s"' % backupfile)
-        cmds.append(' '.join(cmd))
+        cmd.append(backupfile)
+        cmds.append(cmd)
         return cmds
 
     def sql_create_sequence(self, seq_name):
@@ -423,13 +438,13 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 
     def backup_command(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        """return a command to backup the given database"""
-        return 'gzip --stdout %s > %s' % (dbname, backupfile)
+        return ['gzip', dbname], ['mv', dbname + '.gz', backupfile]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup the given database"""
-        return ['gunzip --stdout %s > %s' % (backupfile, dbname)]
+        gunziped, ext = os.pathsplitext(backupfile)
+        assert ext.lower() in ('.gz', '.z') # else gunzip will fail anyway
+        return [['gunzip', backupfile], ['mv', gunziped, dbname]]
 
     def sql_create_index(self, table, column, unique=False):
         idx = self._index_name(table, column, unique)
@@ -479,18 +494,15 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
 
     def backup_command(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        """return a command to backup the given database"""
+        cmd = ['mysqldump']
         # XXX compress
         if dbhost is not None:
-            host_option = '-h %s' % dbhost
-        else:
-            host_option = ''
-        return 'mysqldump %s -u %s -p -r %s %s' % (host_option, dbuser,
-                                                   backupfile, dbname)
+            cmd += ('-h', dbhost)
+        cmd += ['-u', dbuser, '-p', '-r', backupfile, dbname]
+        return cmd
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
-        """return a list of commands to restore a backup the given database"""
         cmds = []
         host_option = ''
         if dbhost is not None:
@@ -593,7 +605,6 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
         return  [row.table_name for row in cursor.tables()]
     def binary_value(self, value):
         return StringIO.StringIO(value)
-
 
 ADV_FUNC_HELPER_DIRECTORY = {'postgres': _PGAdvFuncHelper(),
                              'sqlite': _SqliteAdvFuncHelper(),

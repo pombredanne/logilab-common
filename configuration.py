@@ -311,8 +311,8 @@ def format_option_value(optdict, value):
         value = "'%s'" % value
     elif optdict.get('type') == 'time' and isinstance(value, (float, int, long)):
         value = "%ss" % value
-    elif optdict.get('type') == 'bytes' and isinstance(value, (int, long)):
-        value = "%sB" % value
+    elif optdict.get('type') == 'bytes' and hasattr(value, '__int__'):
+        value = "%iB" % value
     return value
 
 def ini_format_section(stream, section, options, encoding=None, doc=None):
