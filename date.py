@@ -152,19 +152,31 @@ def nb_open_days(start, end):
                             if weekday(x) < 5 and x < end])
     return open_days - nb_week_holidays
 
-def date_range(begin, end, step=None):
+def date_range(begin, end, incday=None, incmonth=None):
+    """yields each date between begin and end
+    :param begin: the start date
+    :param end: the end date
+    :param incr: the step to use to iterate over dates. Default is
+                 one day.
+    :param include: None (means no exclusion) or a function taking a
+                    date as parameter, and returning True if the date
+                    should be included.
     """
-    enumerate dates between begin and end dates.
-
-    step can either be oneDay, oneHour, oneMinute, oneSecond, oneWeek
-    use endOfMonth to enumerate months
-    """
-    if step is None:
-        step = get_step(begin)
-    date = begin
-    while date < end :
-        yield date
-        date += step
+    assert not (incday and incmonth)
+    begin = todate(begin)
+    end = todate(end)
+    if incmonth:
+        while begin < end:
+            begin = next_month(begin, incmonth)
+            yield begin
+    else:
+        if not incday:
+            incr = ONEDAY
+        else:
+            incr = datetime.timedelta(incday)
+        while begin <= end:
+           yield begin
+           begin += incr
 
 # makes py datetime usable #####################################################
 
