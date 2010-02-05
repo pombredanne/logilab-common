@@ -338,7 +338,11 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         cmd.append('--file')
         cmd.append(backupfile)
         cmd.append(dbname)
+<<<<<<< /home/syt/src/fcubicweb/logilab/common/adbh.py
         return [cmd]
+=======
+        return cmd
+>>>>>>> /tmp/adbh.py~other.u7LzGS
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
@@ -438,7 +442,11 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
+<<<<<<< /home/syt/src/fcubicweb/logilab/common/adbh.py
         return [['gzip', dbname], ['mv', dbname + '.gz', backupfile]]
+=======
+        return ['gzip', dbname], ['mv', dbname + '.gz', backupfile]
+>>>>>>> /tmp/adbh.py~other.u7LzGS
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
@@ -497,9 +505,15 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
         cmd = ['mysqldump']
         # XXX compress
         if dbhost is not None:
+<<<<<<< /home/syt/src/fcubicweb/logilab/common/adbh.py
             cmd += ('-h', dbhost)
         cmd += ('-u', dbuser, '-p', '-r', backupfile, dbname)
         return [cmd]
+=======
+            cmd += ('-h', dbhost)
+        cmd += ['-u', dbuser, '-p', '-r', backupfile, dbname]
+        return cmd
+>>>>>>> /tmp/adbh.py~other.u7LzGS
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
@@ -606,6 +620,7 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
     def binary_value(self, value):
         return StringIO.StringIO(value)
 
+<<<<<<< /home/syt/src/fcubicweb/logilab/common/adbh.py
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
@@ -659,6 +674,8 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
         cursor.execute("RESTORE DATABASE ? FROM DISK= ? WITH REPLACE", (dbname, filename,))
         sys.exit(0)
 
+=======
+>>>>>>> /tmp/adbh.py~other.u7LzGS
 ADV_FUNC_HELPER_DIRECTORY = {'postgres': _PGAdvFuncHelper(),
                              'sqlite': _SqliteAdvFuncHelper(),
                              'mysql': _MyAdvFuncHelper(),
