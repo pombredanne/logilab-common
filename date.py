@@ -7,7 +7,7 @@
 __docformat__ = "restructuredtext en"
 
 import math
-
+from locale import getpreferredencoding
 from datetime import date, time, datetime, timedelta
 from time import strptime as time_strptime, mktime
 from calendar import monthrange
@@ -234,5 +234,5 @@ def ustrftime(somedate, fmt='%Y-%m-%d'):
     encoding is guessed by locale.getpreferredencoding()
     """
     # date format may depend on the locale
-    encoding = locale.getpreferredencoding(do_setlocale=False) or 'UTF-8'
+    encoding = getpreferredencoding(do_setlocale=False) or 'UTF-8'
     return unicode(somedate.strftime(str(fmt)), encoding)
