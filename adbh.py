@@ -225,6 +225,10 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
         return ('UPDATE %s SET last=last+1;' % seq_name,
                 'SELECT last FROM %s;' % seq_name)
 
+    def sql_rename_col(self, table, column, newname, coltype, null_allowed):
+        return 'ALTER TABLE %s RENAME COLUMN %s TO %s' % (
+            table, column, newname)
+
     def sql_change_col_type(self, table, column, coltype, null_allowed):
         return 'ALTER TABLE %s ALTER COLUMN %s TYPE %s' % (
             table, column, coltype)
@@ -531,6 +535,14 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
         if encoding:
             sql += " CHARACTER SET %(encoding)s"
         return sql % locals()
+
+    def sql_rename_col(self, table, column, newname, coltype, null_allowed):
+        if null_allowed:
+            cmd = 'DEFAULT'
+        else:
+            cmd = 'NOT'
+        return 'ALTER TABLE %s CHANGE %s %s %s %s NULL' % (
+            table, column, newname, coltype, cmd)
 
     def sql_change_col_type(self, table, column, coltype, null_allowed):
         if null_allowed:
