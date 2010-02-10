@@ -1,6 +1,6 @@
 """logilab.common packaging information.
 
-:copyright: 2000-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2000-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -8,12 +8,10 @@ __docformat__ = "restructuredtext en"
 
 distname = 'logilab-common'
 modname = 'common'
-numversion = (0, 46, 1)
+numversion = (0, 47, 0)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'GPL'
-copyright = '''Copyright (c) 2003-2009 LOGILAB S.A. (Paris, FRANCE).
-http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
 
 author = "Logilab"
 author_email = "devel@logilab.fr"
