@@ -781,9 +781,9 @@ class OptionsProviderMixIn(object):
     def get_option_def(self, opt_name):
         """return the dictionary defining an option given it's name"""
         assert self.options
-        for opt in self.options:
-            if opt[0] == opt_name:
-                return opt[1]
+        for option in self.options:
+            if option[0] == opt_name:
+                return option[1]
         raise opt.OptionError('no such option in section %r' % self.name, opt_name)
 
 
