@@ -610,6 +610,7 @@ ADV_FUNC_HELPER_DIRECTORY = {'postgres': _PGAdvFuncHelper(),
                              'sqlite': _SqliteAdvFuncHelper(),
                              'mysql': _MyAdvFuncHelper(),
                              'sqlserver2005': _SqlServer2005FuncHelper(),
+                             'sqlserver2005_mt': _SqlServer2005FuncHelper(),
                              }
 
 
