@@ -9,8 +9,8 @@ __docformat__ = "restructuredtext en"
 import math
 from locale import getpreferredencoding
 from datetime import date, time, datetime, timedelta
-from time import strptime as time_strptime, mktime
-from calendar import monthrange
+from time import strptime as time_strptime
+from calendar import monthrange, timegm
 
 try:
     from mx.DateTime import RelativeDateTime, Date
@@ -206,7 +206,7 @@ def todatetime(somedate):
     return datetime(somedate.year, somedate.month, somedate.day)
 
 def datetime2ticks(somedate):
-    return mktime(somedate.timetuple()) * 1000
+    return timegm(somedate.timetuple()) * 1000
 
 ONEDAY = timedelta(days=1)
 ONEWEEK = timedelta(days=7)
