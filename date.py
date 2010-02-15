@@ -13,18 +13,17 @@ from time import strptime as time_strptime
 from calendar import monthrange, timegm
 
 try:
-    from mx.DateTime import RelativeDateTime, Date
+    from mx.DateTime import RelativeDateTime, Date, DateTimeType
 except ImportError:
     from warnings import warn
     warn("mxDateTime not found, endsOfMonth won't be available")
     endOfMonth = None
+    DateTimeType = datetime
 else:
     endOfMonth = RelativeDateTime(months=1, day=-1)
 
 # NOTE: should we implement a compatibility layer between date representations
 #       as we have in lgc.db ?
-
-PYDATE_STEP = timedelta(days=1)
 
 FRENCH_FIXED_HOLIDAYS = {
     'jour_an'        : '%s-01-01',
@@ -77,11 +76,11 @@ FRENCH_MOBILE_HOLIDAYS = {
 
 # XXX this implementation cries for multimethod dispatching
 
-def get_step(dateobj):
+def get_step(dateobj, nbdays=1):
     # assume date is either a python datetime or a mx.DateTime object
     if isinstance(dateobj, date):
-        return PYDATE_STEP
-    return 1 # mx.DateTime is ok with integers
+        return ONEDAY * nbdays
+    return nbdays # mx.DateTime is ok with integers
 
 def datefactory(year, month, day, sampledate):
     # assume date is either a python datetime or a mx.DateTime object
@@ -154,6 +153,7 @@ def nb_open_days(start, end):
 
 def date_range(begin, end, incday=None, incmonth=None):
     """yields each date between begin and end
+
     :param begin: the start date
     :param end: the end date
     :param incr: the step to use to iterate over dates. Default is
@@ -161,6 +161,10 @@ def date_range(begin, end, incday=None, incmonth=None):
     :param include: None (means no exclusion) or a function taking a
                     date as parameter, and returning True if the date
                     should be included.
+
+    When using mx datetime, you should *NOT* use incmonth argument, use insteazd
+    oneDay, oneHour, oneMinute, oneSecond, oneWeek or endOfMonth (to enumerate
+    months) as `incday` argument
     """
     assert not (incday and incmonth)
     begin = todate(begin)
@@ -170,15 +174,15 @@ def date_range(begin, end, incday=None, incmonth=None):
             begin = next_month(begin, incmonth)
             yield begin
     else:
-        if not incday:
-            incr = ONEDAY
-        else:
-            incr = timedelta(incday)
+        incr = get_step(begin, incday or 1)
         while begin < end:
            yield begin
            begin += incr
 
 # makes py datetime usable #####################################################
+
+ONEDAY = timedelta(days=1)
+ONEWEEK = timedelta(days=7)
 
 try:
     strptime = datetime.strptime
@@ -194,7 +198,7 @@ def todate(somedate):
     """return a date from a date (leaving unchanged) or a datetime"""
     if isinstance(somedate, datetime):
         return date(somedate.year, somedate.month, somedate.day)
-    assert isinstance(somedate, date), repr(somedate)
+    assert isinstance(somedate, (date, DateTimeType)), repr(somedate)
     return somedate
 
 def todatetime(somedate):
@@ -202,14 +206,11 @@ def todatetime(somedate):
     # take care, datetime is a subclass of date
     if isinstance(somedate, datetime):
         return somedate
-    assert isinstance(somedate, date), repr(somedate)
+    assert isinstance(somedate, (date, DateTimeType)), repr(somedate)
     return datetime(somedate.year, somedate.month, somedate.day)
 
 def datetime2ticks(somedate):
     return timegm(somedate.timetuple()) * 1000
-
-ONEDAY = timedelta(days=1)
-ONEWEEK = timedelta(days=7)
 
 def days_in_month(somedate):
     return monthrange(somedate.year, somedate.month)[1]
