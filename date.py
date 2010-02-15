@@ -216,7 +216,7 @@ def days_in_month(somedate):
     return monthrange(somedate.year, somedate.month)[1]
 
 def days_in_year(somedate):
-    feb = pydatetime.date(somedate.year, 2, 1)
+    feb = date(somedate.year, 2, 1)
     if days_in_month(feb) == 29:
         return 366
     else:
