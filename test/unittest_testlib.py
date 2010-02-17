@@ -373,7 +373,7 @@ class GenerativeTestsTC(TestCase):
                     self.skip("no 5")
                 else:
                     self.assertEquals(val, val)
-                    
+
             def test_generative(self):
                 for i in xrange(10):
                     yield InnerTest("check_%s"%i, self.check, i)
@@ -847,7 +847,7 @@ class TagTC(TestCase):
 
         class TagTestTC(TestCase):
             tags = Tags(('one', 'two'))
-            
+
             def test_one(self):
                 self.assertTrue(True)
 
@@ -859,7 +859,7 @@ class TagTC(TestCase):
             def test_three(self):
                 self.assertTrue(True)
         self.cls = TagTestTC
-        
+
     def test_tag_decorator(self):
         bob = self.func
 
@@ -893,35 +893,35 @@ class TagTC(TestCase):
             class Options(object):
                 tags_pattern = tags
             return Options()
-        
+
         cls = self.cls
-        
-        runner = SkipAwareTextTestRunner()        
+
+        runner = SkipAwareTextTestRunner()
         self.assertTrue(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertTrue(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('one'))        
+        runner = SkipAwareTextTestRunner(options=options('one'))
         self.assertTrue(runner.does_match_tags(cls.test_one))
         self.assertFalse(runner.does_match_tags(cls.test_two))
         self.assertFalse(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('two'))        
+        runner = SkipAwareTextTestRunner(options=options('two'))
         self.assertTrue(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertFalse(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('three'))        
+        runner = SkipAwareTextTestRunner(options=options('three'))
         self.assertFalse(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertTrue(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('two or three'))        
+        runner = SkipAwareTextTestRunner(options=options('two or three'))
         self.assertTrue(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertTrue(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('two and three'))        
+        runner = SkipAwareTextTestRunner(options=options('two and three'))
         self.assertFalse(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertFalse(runner.does_match_tags(cls.test_three))
