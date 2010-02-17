@@ -774,9 +774,9 @@ class _PyodbcAdapterMT(_PyodbcAdapter):
                 return unicode(value, encoding, 'replace')
         elif typecode == self.BINARY:  # value is a python buffer
             if binarywrap is not None:
-                return binarywrap(value.value)
+                return binarywrap(value.getbinary())
             else:
-                return value.value
+                return value.getbinary()
         elif typecode == self.UNKNOWN:
             # may occurs on constant selection for instance (e.g. SELECT 'hop')
             # with postgresql at least
@@ -789,19 +789,19 @@ class _PyodbcSqlServer2000Adapter(_PyodbcAdapter):
     driver = "SQL Server"
 
 class _PyodbcSqlServer2005Adapter(_PyodbcAdapter):
-    driver = "SQL Native Client"
+    driver = "SQL Server Native Client 10.0"
 
 class _PyodbcSqlServer2008Adapter(_PyodbcAdapter):
-    driver = "SQL Native Client 10.0"
+    driver = "SQL Server Native Client 10.0"
 
 class _PyodbcSqlServer2000AdapterMT(_PyodbcAdapterMT):
     driver = "SQL Server"
 
 class _PyodbcSqlServer2005AdapterMT(_PyodbcAdapterMT):
-    driver = "SQL Native Client 10.0"
+    driver = "SQL Server Native Client 10.0"
 
 class _PyodbcSqlServer2008AdapterMT(_PyodbcAdapterMT):
-    driver = "SQL Native Client 10.0"
+    driver = "SQL Server Native Client 10.0"
 
 ## Drivers, Adapters and helpers registries ###################################
 

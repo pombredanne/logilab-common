@@ -602,7 +602,8 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
 
     def list_tables(self, cursor):
         """return the list of tables of a database"""
-        return  [row.table_name for row in cursor.tables()]
+        cursor.tables()
+        return  [row.table_name for row in cursor.fetchall()]
     def binary_value(self, value):
         return StringIO.StringIO(value)
 

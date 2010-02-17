@@ -24,18 +24,17 @@ import sys
 import subprocess
 from cPickle import dumps, loads, HIGHEST_PROTOCOL
 import struct # if we need binary protocol
+from exceptions import *
 
 if sys.platform == 'win32':
     #pylint:disable-msg=F0401
     import pyodbc as dbapimodule 
     from pyodbc import *
+    import pyodbc
 else:
     import psycopg2 as dbapimodule
     from psycopg2 import *
     from psycopg2 import _psycopg
-
-sys.stderr.write('*!'*80 + '\n')
-
 
 class ProtocolError(OperationalError):
     pass
@@ -95,7 +94,9 @@ class Proxy(object):
                 if answer_head[0] == 'VAL':
                     return value
                 else: # 'EXC':
-                    raise value
+                    exc_class_name, args = value
+                    exc = globals()[exc_class_name](*args)
+                    raise exc
         except IOError, exc:
             raise ProtocolError('IOError %s' % exc)
 
@@ -126,7 +127,9 @@ class Proxy(object):
             else: # exception
                 data = pipe.stdout.read(length)
                 value = loads(data)
-                raise value
+                exc_class_name, args = value
+                exc = globals()[exc_class_name](*args)
+                raise exc
         except IOError, exc:
             raise ProtocolError('IOError %s' % exc)
 
@@ -146,7 +149,7 @@ class ConnectionProxy(Proxy):
     remote_class = 'RemoteConnection'
     @classmethod
     def _new_connection(cls, *args, **kwargs):
-        cmd = [sys.executable, __file__]
+        cmd = [sys.executable, '-u', __file__]
         pipe = subprocess.Popen(cmd,
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
@@ -171,10 +174,10 @@ class ConnectionProxy(Proxy):
 
 
 class CursorProxy(Proxy):
-    def execute(self, sql, params=None):
+    def execute(self, sql, params=()):
         self._call('execute', (sql, params))
 
-    def executemany(self, sql, params=None):
+    def executemany(self, sql, params=()):
         self._call('executemany', (sql, params))
 
     def fetchone(self):
@@ -194,8 +197,22 @@ class CursorProxy(Proxy):
 
     def close(self):
         return self._call('close')
+        
+    # pyodbc specific
+    def tables(self):
+        return self._call('tables')
 
 class RowProxy(Proxy):
+    def __iter__(self):
+        i = 0
+        while True:
+            try:
+                col = self[i]
+            except IndexError:
+                break
+            yield col
+            i += 1
+
     def __getitem__(self, index):
         return self._call('__getitem__', (index,), proxy_class=BinaryProxy)
 
@@ -204,13 +221,23 @@ class BinaryProxy(Proxy):
         return self._call('getvalue')
 
 class RowListProxy(Proxy):
+    def __iter__(self):
+        i = 0
+        while True:
+            try:
+                row = self[i]
+            except IndexError:
+                break
+            yield row
+            i += 1
+    
     def __getitem__(self, index):
         return self._call('__getitem__', (index,), proxy_class=RowProxy)
 
 if __name__ == '__main__':
-    sys.stderr.write('-%'*80 + '\n')
     import os
     #log = open('/dev/null', 'a')
+    log = sys.stderr
     import traceback
     from logilab.common._pyodbcwrap import Binary # otherwise the isinstance test below will fail
 
@@ -271,8 +298,9 @@ if __name__ == '__main__':
                             msg_data = dumps(result)
                             msg_head = 'VAL %d\r\n' % len(msg_data)
                     except Exception, exc:
-                        #traceback.print_exc(file=sys.stderr)
-                        msg_data = dumps(exc)
+                        if not isinstance(exc, IndexError):
+                            traceback.print_exc(file=sys.stderr)
+                        msg_data = dumps((exc.__class__.__name__, exc.args))
                         msg_head = 'EXC %d\r\n' % len(msg_data)
                         #print >> log, 'EXC'
                 elif command == 'NEW':
@@ -283,8 +311,8 @@ if __name__ == '__main__':
                         msg_head = 'REF 0 %d\r\n' % result.obj_id
                         msg_data = ''
                     except Exception, exc:
-                        #traceback.print_exc(file=sys.stderr)
-                        msg_data = dumps(exc)
+                        traceback.print_exc(file=sys.stderr)
+                        msg_data = dumps((exc.__class__.__name__, exc.args))
                         msg_head = 'EXC %d\r\n' % len(msg_data)
 
                 elif command == 'DEL':
@@ -293,11 +321,14 @@ if __name__ == '__main__':
                     msg_data = None
 
                 if msg_head is not None:
-                    self.output.write(msg_head)
-                    self.output.flush()
-                    if msg_data:
-                        self.output.write(msg_data)
+                    try:
+                        self.output.write(msg_head)
                         self.output.flush()
+                        if msg_data:
+                            self.output.write(msg_data)
+                            self.output.flush()
+                    except IOError:
+                        break
                 #print >> log, 'STATS:', len(self.objects), 'objs alive'
 
     class RemoteWrapper(object):
@@ -330,6 +361,7 @@ if __name__ == '__main__':
             super(RemoteCursor, self).__init__(cursor)
 
         def _require_row_wrap(self):
+            return True
             for col_desc in  self.wrapped.description:
                 if col_desc[1] == dbapimodule.BINARY:
                     #print >> log, 'require wrap'
@@ -374,6 +406,10 @@ if __name__ == '__main__':
                 return RemoteRowList(rows)
             else:
                 return rows
+                
+        def tables(self):
+            self.wrapped.tables()
+            
 
     class RemoteRow(RemoteWrapper):
         def __init__(self, row):
