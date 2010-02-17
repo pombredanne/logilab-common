@@ -28,7 +28,7 @@ from exceptions import *
 
 if sys.platform == 'win32':
     #pylint:disable-msg=F0401
-    import pyodbc as dbapimodule 
+    import pyodbc as dbapimodule
     from pyodbc import *
     import pyodbc
 else:
@@ -197,7 +197,7 @@ class CursorProxy(Proxy):
 
     def close(self):
         return self._call('close')
-        
+
     # pyodbc specific
     def tables(self):
         return self._call('tables')
@@ -230,7 +230,7 @@ class RowListProxy(Proxy):
                 break
             yield row
             i += 1
-    
+
     def __getitem__(self, index):
         return self._call('__getitem__', (index,), proxy_class=RowProxy)
 
@@ -406,10 +406,10 @@ if __name__ == '__main__':
                 return RemoteRowList(rows)
             else:
                 return rows
-                
+
         def tables(self):
             self.wrapped.tables()
-            
+
 
     class RemoteRow(RemoteWrapper):
         def __init__(self, row):

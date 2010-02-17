@@ -230,6 +230,117 @@ class DBAPIAdaptersTC(TestCase):
         self.assertEquals(mshelper.func_sqlname('MYFUNC'), 'MYF')
         self.assertEquals(slhelper.func_sqlname('MYFUNC'), 'SQLITE_MYFUNC')
 
+class BaseSqlServer(TestCase):
+    def tearDown(self):
+        cursor = self.cnx.cursor()
+        cursor.execute('drop table TestBlob')
+        cursor.execute('drop table TestLargeString')
+        self.cnx.commit()
+        cursor.close()
+        self.cnx.close()
+
+    def blob(self):
+        cursor = self.cnx.cursor()
+        data_length = xrange(400*1024-10, 400*1024+10)
+        for length in data_length:
+            data = buffer('\x00'*length)
+            print "inserting string of length", len(data)
+            cursor.execute('insert into TestBlob(id, data) VALUES(%(id)s, %(data)s)',
+                           {'id': length, 'data': data})
+            self.cnx.commit()
+        cursor.execute('select count(*) from TestBlob')
+        print '%d rows in table' % (cursor.fetchone()[0])
+        cursor.close()
+
+    def large_string(self):
+        cursor = self.cnx.cursor()
+        data_length = xrange(400*1024-10, 400*1024+10)
+        for length in data_length:
+            data = '1'*length
+            print "inserting string of length", len(data)
+            cursor.execute('insert into TestLargeString(id, data) VALUES(%(id)s, %(data)s)',
+                           {'id': length, 'data': data})
+            self.cnx.commit()
+        cursor.execute('select count(*) from TestLargeString')
+        print '%d rows in table' % (cursor.fetchone()[0])
+        cursor.close()
+
+    def varbinary_none(self):
+        cursor = self.cnx.cursor()
+        cursor.execute('insert into TestBlob (id) values (42)')
+        self.cnx.commit()
+        cursor.execute('select * from TestBlob where id=42')
+        print cursor.fetchall()
+        cursor.execute('update TestBlob set id=43, data=NULL where id=42')
+        self.cnx.commit()
+        cursor.execute('select * from TestBlob where id=43')
+        print cursor.fetchall()
+        cursor.execute('update TestBlob set id = %(id)s, data=%(data)s where id=%(old_id)s', {'data': None, 'id': 42, 'old_id': 43})
+        self.cnx.commit()
+        cursor.execute('select * from TestBlob where id=42')
+        print cursor.fetchall()
+        cursor.close()
+
+
+try:
+    import pyodbc
+except ImportError:
+    print "pyodbc tests skipped"
+else:
+    class pyodbcTC(BaseSqlServer):
+        def setUp(self):
+            try:
+                self.cnx = get_connection(driver='sqlserver2005', database='alf',
+                                      host='localhost', extra_args='Trusted_Connection')
+            except pyodbc.Error, exc:
+                self.skip(str(exc))
+            cursor = self.cnx.cursor()
+            try:
+                cursor.execute('create table TestLargeString (id int, data varchar(max))')
+                cursor.execute('create table TestBlob (id int, data varbinary(max))')
+            except Exception, exc:
+                print exc
+            cursor.close()
+
+        def test_blob(self):
+            self.blob()
+
+        def test_large_string(self):
+            self.large_string()
+
+        def test_varbinary_none(self):
+            self.varbinary_none()
+
+try:
+    import adodbapi as adb
+except ImportError:
+    print "adodbapi tests skipped"
+else:
+    class adodbapiTC(BaseSqlServer):
+        def setUp(self):
+            try:
+                self.cnx = get_connection(driver='sqlserver2005', database='alf',
+                                      host='localhost', extra_args='Trusted_Connection')
+            except adb.Error, exc:
+                self.skip(str(exc))
+            cursor = self.cnx.cursor()
+            try:
+
+                cursor.execute('create table TestLargeString (id int, data varchar(max))')
+                cursor.execute('create table TestBlob (id int, data varbinary(max))')
+            except Exception, exc:
+                print exc
+            cursor.close()
+
+        def test_blob(self):
+            self.blob()
+
+        def test_large_string(self):
+            self.large_string()
+
+        def test_varbinary_none(self):
+            self.varbinary_none()
+
 
 if __name__ == '__main__':
     unittest_main()

@@ -1,30 +1,29 @@
 """Date manipulation helper functions.
 
-:copyright: 2006-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2006-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
 __docformat__ = "restructuredtext en"
 
 import math
+from locale import getpreferredencoding
+from datetime import date, time, datetime, timedelta
+from time import strptime as time_strptime
+from calendar import monthrange, timegm
 
-from datetime import date, datetime, timedelta
 try:
-    from mx.DateTime import RelativeDateTime, Date
+    from mx.DateTime import RelativeDateTime, Date, DateTimeType
 except ImportError:
     from warnings import warn
     warn("mxDateTime not found, endsOfMonth won't be available")
-    from datetime import date, timedelta
-    def weekday(date):
-        return date.weekday()
     endOfMonth = None
+    DateTimeType = datetime
 else:
     endOfMonth = RelativeDateTime(months=1, day=-1)
 
 # NOTE: should we implement a compatibility layer between date representations
 #       as we have in lgc.db ?
-
-PYDATE_STEP = timedelta(days=1)
 
 FRENCH_FIXED_HOLIDAYS = {
     'jour_an'        : '%s-01-01',
@@ -75,13 +74,13 @@ FRENCH_MOBILE_HOLIDAYS = {
     'pentecote2012' : '2012-05-28',
     }
 
-# this implementation cries for multimethod dispatching
+# XXX this implementation cries for multimethod dispatching
 
-def get_step(dateobj):
+def get_step(dateobj, nbdays=1):
     # assume date is either a python datetime or a mx.DateTime object
     if isinstance(dateobj, date):
-        return PYDATE_STEP
-    return 1 # mx.DateTime is ok with integers
+        return ONEDAY * nbdays
+    return nbdays # mx.DateTime is ok with integers
 
 def datefactory(year, month, day, sampledate):
     # assume date is either a python datetime or a mx.DateTime object
@@ -152,16 +151,101 @@ def nb_open_days(start, end):
                             if weekday(x) < 5 and x < end])
     return open_days - nb_week_holidays
 
-def date_range(begin, end, step=None):
-    """
-    enumerate dates between begin and end dates.
+def date_range(begin, end, incday=None, incmonth=None):
+    """yields each date between begin and end
 
-    step can either be oneDay, oneHour, oneMinute, oneSecond, oneWeek
-    use endOfMonth to enumerate months
+    :param begin: the start date
+    :param end: the end date
+    :param incr: the step to use to iterate over dates. Default is
+                 one day.
+    :param include: None (means no exclusion) or a function taking a
+                    date as parameter, and returning True if the date
+                    should be included.
+
+    When using mx datetime, you should *NOT* use incmonth argument, use insteazd
+    oneDay, oneHour, oneMinute, oneSecond, oneWeek or endOfMonth (to enumerate
+    months) as `incday` argument
     """
-    if step is None:
-        step = get_step(begin)
-    date = begin
-    while date < end :
-        yield date
-        date += step
+    assert not (incday and incmonth)
+    begin = todate(begin)
+    end = todate(end)
+    if incmonth:
+        while begin < end:
+            begin = next_month(begin, incmonth)
+            yield begin
+    else:
+        incr = get_step(begin, incday or 1)
+        while begin < end:
+           yield begin
+           begin += incr
+
+# makes py datetime usable #####################################################
+
+ONEDAY = timedelta(days=1)
+ONEWEEK = timedelta(days=7)
+
+try:
+    strptime = datetime.strptime
+except AttributeError: # py < 2.5
+    from time import strptime as time_strptime
+    def strptime(value, format):
+        return datetime(*time_strptime(value, format)[:6])
+
+def strptime_time(value, format='%H:%M'):
+    return time(*time_strptime(value, format)[3:6])
+
+def todate(somedate):
+    """return a date from a date (leaving unchanged) or a datetime"""
+    if isinstance(somedate, datetime):
+        return date(somedate.year, somedate.month, somedate.day)
+    assert isinstance(somedate, (date, DateTimeType)), repr(somedate)
+    return somedate
+
+def todatetime(somedate):
+    """return a date from a date (leaving unchanged) or a datetime"""
+    # take care, datetime is a subclass of date
+    if isinstance(somedate, datetime):
+        return somedate
+    assert isinstance(somedate, (date, DateTimeType)), repr(somedate)
+    return datetime(somedate.year, somedate.month, somedate.day)
+
+def datetime2ticks(somedate):
+    return timegm(somedate.timetuple()) * 1000
+
+def days_in_month(somedate):
+    return monthrange(somedate.year, somedate.month)[1]
+
+def days_in_year(somedate):
+    feb = date(somedate.year, 2, 1)
+    if days_in_month(feb) == 29:
+        return 366
+    else:
+        return 365
+
+def previous_month(somedate, nbmonth=1):
+    while nbmonth:
+        somedate = first_day(somedate) - ONEDAY
+        nbmonth -= 1
+    return somedate
+
+def next_month(somedate, nbmonth=1):
+    while nbmonth:
+        somedate = last_day(somedate) + ONEDAY
+        nbmonth -= 1
+    return somedate
+
+def first_day(somedate):
+    return date(somedate.year, somedate.month, 1)
+
+def last_day(somedate):
+    return date(somedate.year, somedate.month, days_in_month(somedate))
+
+def ustrftime(somedate, fmt='%Y-%m-%d'):
+    """like strftime, but returns a unicode string instead of an encoded
+    string which' may be problematic with localized date.
+
+    encoding is guessed by locale.getpreferredencoding()
+    """
+    # date format may depend on the locale
+    encoding = getpreferredencoding(do_setlocale=False) or 'UTF-8'
+    return unicode(somedate.strftime(str(fmt)), encoding)
