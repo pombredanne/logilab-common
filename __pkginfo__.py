@@ -10,7 +10,7 @@ distname = 'logilab-common'
 modname = 'common'
 numversion = (0, 47, 0)
 version = '.'.join([str(num) for num in numversion])
-
+copyright = '2000-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.'
 license = 'GPL'
 
 author = "Logilab"
