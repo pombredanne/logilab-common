@@ -19,7 +19,7 @@ Command line options:
 If no non-option arguments are present, prefixes used are 'test',
 'regrtest', 'smoketest' and 'unittest'.
 
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2003-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -918,6 +918,9 @@ def unittest_main(module='__main__', defaultTest=None,
 class TestSkipped(Exception):
     """raised when a test is skipped"""
 
+class InnerTestSkipped(TestSkipped):
+    """raised when a test is skipped"""
+
 def is_generator(function):
     flags = function.func_code.co_flags
     return flags & CO_GENERATOR
@@ -1188,6 +1191,9 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         except KeyboardInterrupt:
             self._stop_capture()
             raise
+        except InnerTestSkipped, e:
+            result.addSkipped(self, e)
+            return 1
         except:
             self._stop_capture()
             result.addError(self, self.__exc_info())
@@ -1202,6 +1208,11 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         """mark a test as skipped for the <msg> reason"""
         msg = msg or 'test was skipped'
         raise TestSkipped(msg)
+
+    def innerSkip(self, msg=None):
+        """mark a generative test as skipped for the <msg> reason"""
+        msg = msg or 'test was skipped'
+        raise InnerTestSkipped(msg)
 
     def assertIn(self, object, set):
         """assert <object> are in <set>"""

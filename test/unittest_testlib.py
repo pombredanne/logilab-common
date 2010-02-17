@@ -1,7 +1,5 @@
 """unittest module for logilab.comon.testlib"""
 
-__revision__ = '$Id: unittest_testlib.py,v 1.5 2006-02-09 22:37:46 nico Exp $'
-
 import unittest
 import os
 import sys
@@ -323,7 +321,6 @@ class GenerativeTestsTC(TestCase):
         self.assertEquals(len(result.failures), 0)
         self.assertEquals(len(result.errors), 1)
 
-
     def test_generative_error2(self):
         class FooTC(TestCase):
             def test_generative(self):
@@ -350,6 +347,78 @@ class GenerativeTestsTC(TestCase):
         self.assertEquals(result.testsRun, 1)
         self.assertEquals(len(result.failures), 0)
         self.assertEquals(len(result.errors), 1)
+
+    def test_generative_inner_skip(self):
+        class FooTC(TestCase):
+            def check(self, val):
+                if val == 5:
+                    self.innerSkip("no 5")
+                else:
+                    self.assertEquals(val, val)
+
+            def test_generative(self):
+                for i in xrange(10):
+                    yield InnerTest("check_%s"%i, self.check, i)
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 10)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 0)
+        self.assertEquals(len(result.skipped), 1)
+
+    def test_generative_skip(self):
+        class FooTC(TestCase):
+            def check(self, val):
+                if val == 5:
+                    self.skip("no 5")
+                else:
+                    self.assertEquals(val, val)
+                    
+            def test_generative(self):
+                for i in xrange(10):
+                    yield InnerTest("check_%s"%i, self.check, i)
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 6)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 0)
+        self.assertEquals(len(result.skipped), 1)
+
+    def test_generative_inner_error(self):
+        class FooTC(TestCase):
+            def check(self, val):
+                if val == 5:
+                    raise ValueError("no 5")
+                else:
+                    self.assertEquals(val, val)
+
+            def test_generative(self):
+                for i in xrange(10):
+                    yield InnerTest("check_%s"%i, self.check, i)
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 6)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 1)
+        self.assertEquals(len(result.skipped), 0)
+
+    def test_generative_inner_failure(self):
+        class FooTC(TestCase):
+            def check(self, val):
+                if val == 5:
+                    self.assertEquals(val, val+1)
+                else:
+                    self.assertEquals(val, val)
+
+            def test_generative(self):
+                for i in xrange(10):
+                    yield InnerTest("check_%s"%i, self.check, i)
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 10)
+        self.assertEquals(len(result.failures), 1)
+        self.assertEquals(len(result.errors), 0)
+        self.assertEquals(len(result.skipped), 0)
 
 
 class ExitFirstTC(TestCase):
