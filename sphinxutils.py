@@ -101,5 +101,5 @@ if __name__ == '__main__':
     title, code_dir, outfile = sys.argv[1:]
     generator = ModuleGenerator(title, code_dir)
     # XXX modnames = ['logilab']
-    generator.make(outfile, ('test', 'tests', 'examples',
+    generator.generate(outfile, ('test', 'tests', 'examples',
                              'data', 'doc', '.hg', 'migration'))

@@ -1,7 +1,5 @@
 """unittest module for logilab.comon.testlib"""
 
-__revision__ = '$Id: unittest_testlib.py,v 1.5 2006-02-09 22:37:46 nico Exp $'
-
 import unittest
 import os
 import sys
@@ -323,7 +321,6 @@ class GenerativeTestsTC(TestCase):
         self.assertEquals(len(result.failures), 0)
         self.assertEquals(len(result.errors), 1)
 
-
     def test_generative_error2(self):
         class FooTC(TestCase):
             def test_generative(self):
@@ -350,6 +347,78 @@ class GenerativeTestsTC(TestCase):
         self.assertEquals(result.testsRun, 1)
         self.assertEquals(len(result.failures), 0)
         self.assertEquals(len(result.errors), 1)
+
+    def test_generative_inner_skip(self):
+        class FooTC(TestCase):
+            def check(self, val):
+                if val == 5:
+                    self.innerSkip("no 5")
+                else:
+                    self.assertEquals(val, val)
+
+            def test_generative(self):
+                for i in xrange(10):
+                    yield InnerTest("check_%s"%i, self.check, i)
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 10)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 0)
+        self.assertEquals(len(result.skipped), 1)
+
+    def test_generative_skip(self):
+        class FooTC(TestCase):
+            def check(self, val):
+                if val == 5:
+                    self.skip("no 5")
+                else:
+                    self.assertEquals(val, val)
+
+            def test_generative(self):
+                for i in xrange(10):
+                    yield InnerTest("check_%s"%i, self.check, i)
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 6)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 0)
+        self.assertEquals(len(result.skipped), 1)
+
+    def test_generative_inner_error(self):
+        class FooTC(TestCase):
+            def check(self, val):
+                if val == 5:
+                    raise ValueError("no 5")
+                else:
+                    self.assertEquals(val, val)
+
+            def test_generative(self):
+                for i in xrange(10):
+                    yield InnerTest("check_%s"%i, self.check, i)
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 6)
+        self.assertEquals(len(result.failures), 0)
+        self.assertEquals(len(result.errors), 1)
+        self.assertEquals(len(result.skipped), 0)
+
+    def test_generative_inner_failure(self):
+        class FooTC(TestCase):
+            def check(self, val):
+                if val == 5:
+                    self.assertEquals(val, val+1)
+                else:
+                    self.assertEquals(val, val)
+
+            def test_generative(self):
+                for i in xrange(10):
+                    yield InnerTest("check_%s"%i, self.check, i)
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEquals(result.testsRun, 10)
+        self.assertEquals(len(result.failures), 1)
+        self.assertEquals(len(result.errors), 0)
+        self.assertEquals(len(result.skipped), 0)
 
 
 class ExitFirstTC(TestCase):
@@ -778,7 +847,7 @@ class TagTC(TestCase):
 
         class TagTestTC(TestCase):
             tags = Tags(('one', 'two'))
-            
+
             def test_one(self):
                 self.assertTrue(True)
 
@@ -790,7 +859,7 @@ class TagTC(TestCase):
             def test_three(self):
                 self.assertTrue(True)
         self.cls = TagTestTC
-        
+
     def test_tag_decorator(self):
         bob = self.func
 
@@ -824,35 +893,35 @@ class TagTC(TestCase):
             class Options(object):
                 tags_pattern = tags
             return Options()
-        
+
         cls = self.cls
-        
-        runner = SkipAwareTextTestRunner()        
+
+        runner = SkipAwareTextTestRunner()
         self.assertTrue(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertTrue(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('one'))        
+        runner = SkipAwareTextTestRunner(options=options('one'))
         self.assertTrue(runner.does_match_tags(cls.test_one))
         self.assertFalse(runner.does_match_tags(cls.test_two))
         self.assertFalse(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('two'))        
+        runner = SkipAwareTextTestRunner(options=options('two'))
         self.assertTrue(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertFalse(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('three'))        
+        runner = SkipAwareTextTestRunner(options=options('three'))
         self.assertFalse(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertTrue(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('two or three'))        
+        runner = SkipAwareTextTestRunner(options=options('two or three'))
         self.assertTrue(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertTrue(runner.does_match_tags(cls.test_three))
 
-        runner = SkipAwareTextTestRunner(options=options('two and three'))        
+        runner = SkipAwareTextTestRunner(options=options('two and three'))
         self.assertFalse(runner.does_match_tags(cls.test_one))
         self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertFalse(runner.does_match_tags(cls.test_three))
