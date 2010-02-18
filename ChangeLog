@@ -1,7 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
- --
+	--
+    * adbh: added dbport optional argument to [backup|restore]_commands
+
+2010-02-10 -- 0.47.0
     * adbh: changed backup / restore api (BREAKS COMPAT):
       - backup_command is now backup_commands (eg return a list of commands)
       - each command returned in backup_commands/restore_commands may now

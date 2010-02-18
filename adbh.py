@@ -168,7 +168,7 @@ class _GenericAdvFuncHelper:
         raise NotImplementedError('not supported by this DBMS')
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
-                       keepownership=True):
+                       keepownership=True, dbport=None):
         """return a list of commands to backup the given database.
 
         Each command may be given as a list or as a string. In the latter case,
@@ -178,7 +178,8 @@ class _GenericAdvFuncHelper:
         raise NotImplementedError('not supported by this DBMS')
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
-                         encoding='utf-8', keepownership=True, drop=True):
+                         encoding='utf-8', keepownership=True, drop=True,
+                         dbport=None):
         """return a list of commands to restore a backup of the given database
 
 
@@ -309,11 +310,13 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
 
 
 
-def pgdbcmd(cmd, dbhost, dbuser, *args):
+def pgdbcmd(cmd, dbhost, dbport, dbuser, *args):
     cmd = [cmd]
     cmd += args
     if dbhost:
         cmd.append('--host=%s' % dbhost)
+    if dbport:
+        cmd.append('--port=%s' % dbport)
     if dbuser:
         cmd.append('--username=%s' % dbuser)
     return cmd
@@ -331,12 +334,8 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         return 'template1'
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
-                       keepownership=True):
-        cmd = ['pg_dump', '-Fc']
-        if dbhost:
-            cmd.append('--host=%s' % dbhost)
-        if dbuser:
-            cmd.append('--username=%s' % dbuser)
+                       keepownership=True, dbport=None):
+        cmd = pgdbcmd('pg_dump', dbhost, dbport, dbuser, '-Fc')
         if not keepownership:
             cmd.append('--no-owner')
         cmd.append('--file')
@@ -345,16 +344,17 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         return [cmd]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
-                         encoding='utf-8', keepownership=True, drop=True):
+                         encoding='utf-8', keepownership=True, drop=True,
+                         dbport=None):
         cmds = []
         if drop:
-            cmd = pgdbcmd('dropdb', dbhost, dbuser)
+            cmd = pgdbcmd('dropdb', dbhost, dbport, dbuser)
             cmd.append(dbname)
             cmds.append(cmd)
-        cmd = pgdbcmd('createdb', dbhost, dbuser, '-T', 'template0', '-E', encoding)
+        cmd = pgdbcmd('createdb', dbhost, dbport, dbuser, '-T', 'template0', '-E', encoding)
         cmd.append(dbname)
         cmds.append(cmd)
-        cmd = pgdbcmd('pg_restore', dbhost, dbuser, '-Fc')
+        cmd = pgdbcmd('pg_restore', dbhost, dbport, dbuser, '-Fc')
         cmd.append('--dbname')
         cmd.append(dbname)
         if not keepownership:
@@ -441,11 +441,12 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     alter_column_support = False
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
-                       keepownership=True):
+                       keepownership=True, dbport=None):
         return [['gzip', dbname], ['mv', dbname + '.gz', backupfile]]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
-                         encoding='utf-8', keepownership=True, drop=True):
+                         encoding='utf-8', keepownership=True, drop=True,
+                         dbport=None):
         gunziped, ext = os.pathsplitext(backupfile)
         assert ext.lower() in ('.gz', '.z') # else gunzip will fail anyway
         return [['gunzip', backupfile], ['mv', gunziped, dbname]]
@@ -475,6 +476,17 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
         return [r[0] for r in cursor.fetchall()]
 
 
+def mycmd(cmd, dbhost, dbport, dbuser):
+    cmd = [cmd]
+    # XXX compress
+    if dbhost is not None:
+        cmd += ('-h', dbhost)
+    if dbport is not None:
+        cmd += ('-P', str(dbport))
+    cmd += ('-u', dbuser)
+    return cmd
+
+
 class _MyAdvFuncHelper(_GenericAdvFuncHelper):
     """MySQL helper, taking advantage of postgres SEQUENCE support
     """
@@ -497,28 +509,24 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
         return ''
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
-                       keepownership=True):
-        cmd = ['mysqldump']
-        # XXX compress
-        if dbhost is not None:
-            cmd += ('-h', dbhost)
-        cmd += ('-u', dbuser, '-p', '-r', backupfile, dbname)
+                       keepownership=True, dbport=None):
+        cmd = mycmd('mysqldump', dbhost, dbport, dbuser)
+        cmd += ('-p', '-r', backupfile, dbname)
         return [cmd]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
-                         encoding='utf-8', keepownership=True, drop=True):
+                         encoding='utf-8', keepownership=True, drop=True,
+                         dbport=None):
         cmds = []
-        host_option = ''
-        if dbhost is not None:
-            host_option = '-h %s' % dbhost
+        mysqlcmd = ' '.join(mycmd('mysql', dbhost, dbport, dbuser))
         if drop:
-            cmd = 'echo "DROP DATABASE %s;" | mysql %s -u %s -p' % (
-                dbname, host_option, dbuser)
+            cmd = 'echo "DROP DATABASE %s;" | %s -p' % (
+                dbname, mysqlcmd)
             cmds.append(cmd)
-        cmd = 'echo "%s;" | mysql %s -u %s -p' % (
-            self.sql_create_database(dbname, encoding), host_option, dbuser)
+        cmd = 'echo "%s;" | %s -p' % (
+            self.sql_create_database(dbname, encoding), mysqlcmd)
         cmds.append(cmd)
-        cmd = 'mysql %s -u %s -p %s < %s' % (host_option, dbuser, dbname, backupfile)
+        cmd = '%s -p %s < %s' % (mysqlcmd, dbname, backupfile)
         cmds.append(cmd)
         return cmds
 
@@ -621,13 +629,14 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
         return StringIO.StringIO(value)
 
     def backup_commands(self, dbname, dbhost, dbuser, backupfile,
-                       keepownership=True):
+                       keepownership=True, dbport=None):
         return [[sys.executable, os.path.normpath(__file__),
                  "_SqlServer2005FuncHelper._do_backup", dbhost, dbname, backupfile]
                 ]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
-                         encoding='utf-8', keepownership=True, drop=True):
+                         encoding='utf-8', keepownership=True, drop=True,
+                         dbport=None):
         return [[sys.executable, os.path.normpath(__file__),
                 "_SqlServer2005FuncHelper._do_restore", dbhost, dbname, backupfile],
                 ]
