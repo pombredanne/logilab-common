@@ -167,7 +167,7 @@ class _GenericAdvFuncHelper:
         """return the system database for the given driver"""
         raise NotImplementedError('not supported by this DBMS')
 
-    def backup_command(self, dbname, dbhost, dbuser, backupfile,
+    def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
         """return a list of commands to backup the given database.
 
@@ -224,6 +224,10 @@ INSERT INTO %s VALUES (0);''' % (seq_name, seq_name)
     def sqls_increment_sequence(self, seq_name):
         return ('UPDATE %s SET last=last+1;' % seq_name,
                 'SELECT last FROM %s;' % seq_name)
+
+    def sql_rename_col(self, table, column, newname, coltype, null_allowed):
+        return 'ALTER TABLE %s RENAME COLUMN %s TO %s' % (
+            table, column, newname)
 
     def sql_change_col_type(self, table, column, coltype, null_allowed):
         return 'ALTER TABLE %s ALTER COLUMN %s TYPE %s' % (
@@ -326,7 +330,7 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         """return the system database for the given driver"""
         return 'template1'
 
-    def backup_command(self, dbname, dbhost, dbuser, backupfile,
+    def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
         cmd = ['pg_dump', '-Fc']
         if dbhost:
@@ -338,7 +342,7 @@ class _PGAdvFuncHelper(_GenericAdvFuncHelper):
         cmd.append('--file')
         cmd.append(backupfile)
         cmd.append(dbname)
-        return cmd
+        return [cmd]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
@@ -436,9 +440,9 @@ class _SqliteAdvFuncHelper(_GenericAdvFuncHelper):
     intersect_all_support = False
     alter_column_support = False
 
-    def backup_command(self, dbname, dbhost, dbuser, backupfile,
+    def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
-        return ['gzip', dbname], ['mv', dbname + '.gz', backupfile]
+        return [['gzip', dbname], ['mv', dbname + '.gz', backupfile]]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
@@ -492,14 +496,14 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
         """return the system database for the given driver"""
         return ''
 
-    def backup_command(self, dbname, dbhost, dbuser, backupfile,
+    def backup_commands(self, dbname, dbhost, dbuser, backupfile,
                        keepownership=True):
         cmd = ['mysqldump']
         # XXX compress
         if dbhost is not None:
             cmd += ('-h', dbhost)
-        cmd += ['-u', dbuser, '-p', '-r', backupfile, dbname]
-        return cmd
+        cmd += ('-u', dbuser, '-p', '-r', backupfile, dbname)
+        return [cmd]
 
     def restore_commands(self, dbname, dbhost, dbuser, backupfile,
                          encoding='utf-8', keepownership=True, drop=True):
@@ -531,6 +535,14 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
         if encoding:
             sql += " CHARACTER SET %(encoding)s"
         return sql % locals()
+
+    def sql_rename_col(self, table, column, newname, coltype, null_allowed):
+        if null_allowed:
+            cmd = 'DEFAULT'
+        else:
+            cmd = 'NOT'
+        return 'ALTER TABLE %s CHANGE %s %s %s %s NULL' % (
+            table, column, newname, coltype, cmd)
 
     def sql_change_col_type(self, table, column, coltype, null_allowed):
         if null_allowed:
@@ -581,6 +593,7 @@ class _MyAdvFuncHelper(_GenericAdvFuncHelper):
             allindices += self.list_indices(cursor, table)
         return allindices
 
+
 class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
     backend_name = 'sqlserver2005'
     ilike_support = False
@@ -607,6 +620,59 @@ class _SqlServer2005FuncHelper(_GenericAdvFuncHelper):
     def binary_value(self, value):
         return StringIO.StringIO(value)
 
+    def backup_commands(self, dbname, dbhost, dbuser, backupfile,
+                       keepownership=True):
+        return [[sys.executable, os.path.normpath(__file__),
+                 "_SqlServer2005FuncHelper._do_backup", dbhost, dbname, backupfile]
+                ]
+
+    def restore_commands(self, dbname, dbhost, dbuser, backupfile,
+                         encoding='utf-8', keepownership=True, drop=True):
+        return [[sys.executable, os.path.normpath(__file__),
+                "_SqlServer2005FuncHelper._do_restore", dbhost, dbname, backupfile],
+                ]
+
+    @staticmethod
+    def _do_backup():
+        import time
+        from logilab.common.db import get_connection
+        dbhost = sys.argv[2]
+        dbname = sys.argv[3]
+        filename = sys.argv[4]
+        cnx = get_connection(driver='sqlserver2005', host=dbhost, database=dbname, extra_args='autocommit;trusted_connection')
+        cursor = cnx.cursor()
+        cursor.execute("BACKUP DATABASE ? TO DISK= ? ", (dbname, filename,))
+        prev_size = -1
+        err_count = 0
+        same_size_count = 0
+        while err_count < 10 and same_size_count < 10:
+            time.sleep(1)
+            try:
+                size = os.path.getsize(filename)
+            except OSError, exc:
+                err_count +=1
+                print exc
+            if size > prev_size:
+                same_size_count = 0
+                prev_size = size
+            else:
+               same_size_count += 1
+        cnx.close()
+        sys.exit(0)
+
+    @staticmethod
+    def _do_restore():
+        """return the SQL statement to restore a backup of the given database"""
+        from logilab.common.db import get_connection
+        dbhost = sys.argv[2]
+        dbname = sys.argv[3]
+        filename = sys.argv[4]
+        cnx = get_connection(driver='sqlserver2005', host=dbhost, database='master', extra_args='autocommit;trusted_connection')
+        cursor = cnx.cursor()
+        cursor.execute("RESTORE DATABASE ? FROM DISK= ? WITH REPLACE", (dbname, filename,))
+        sys.exit(0)
+
+
 ADV_FUNC_HELPER_DIRECTORY = {'postgres': _PGAdvFuncHelper(),
                              'sqlite': _SqliteAdvFuncHelper(),
                              'mysql': _MyAdvFuncHelper(),
@@ -629,3 +695,7 @@ def auto_register_function(funcdef):
     """register the function `funcdef` on supported backends"""
     for driver in  funcdef.supported_backends:
         register_function(driver, funcdef)
+
+if __name__ == "__main__": # used to backup sql server db
+    func_call = sys.argv[1]
+    eval(func_call+'()')

@@ -29,6 +29,9 @@ class DateTC(TestCase):
         r = list(date_range(self.datecls(2000,1,31), self.datecls(2000,2,3)))
         expected = [self.datecls(2000,1,31), self.datecls(2000,2,1), self.datecls(2000,2,2)]
         self.assertListEquals(r, expected)
+        r = list(date_range(self.datecls(2000,1,1), self.datecls(2000,1,6), 2))
+        expected = [self.datecls(2000,1,1), self.datecls(2000,1,3), self.datecls(2000,1,5)]
+        self.assertListEquals(r, expected)
 
     def test_add_days_worked(self):
         add = add_days_worked

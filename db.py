@@ -25,10 +25,11 @@ __docformat__ = "restructuredtext en"
 import sys
 import re
 from warnings import warn
+import threading
+import datetime
 
 import logilab.common as lgc
 from logilab.common.deprecation import obsolete
-import datetime
 
 try:
     from mx.DateTime import DateTimeType, DateTimeDeltaType, strptime
@@ -315,7 +316,7 @@ class _Psycopg2Adapter(_PsycopgAdapter):
 class _pyodbcwrappedPsycoPg2Adapter(_Psycopg2Adapter):
     """
     used to test and debug _pyodbcwrap under Linux.
-    No sense in using this class in production. 
+    No sense in using this class in production.
     """
     def process_value(self, value, description, encoding='utf-8', binarywrap=None):
         #return _Psycopg2Adapter.process_value(self, value, description, encoding, binarywrap)
@@ -626,10 +627,12 @@ class _MySqlDBAdapter(DBAPIAdapter):
         finally:
             cursor.execute("DROP TABLE _type_code_test")
 
-class _PyodbcAdapter(DBAPIAdapter):
+class _BaseSqlServerAdapter(DBAPIAdapter):
     driver = 'Override in subclass'
     _use_trusted_connection = False
-    
+    _use_autocommit = False
+    _fetch_lock = threading.Lock()
+
     @classmethod
     def use_trusted_connection(klass, use_trusted=False):
         """
@@ -637,15 +640,26 @@ class _PyodbcAdapter(DBAPIAdapter):
         Authentication (i.e. passwordless auth)
         """
         klass._use_trusted_connection = use_trusted
+
+    @classmethod
+    def use_autocommit(klass, use_autocommit=False):
+        """
+        pass True to this class method to enable autocommit (required
+        for backup and restore)
+        """
+        klass._use_autocommit = use_autocommit
+
     @classmethod
     def _process_extra_args(klass, arguments):
         arguments = arguments.lower().split(';')
         if 'trusted_connection' in arguments:
             klass.use_trusted_connection(True)
+        if 'autocommit' in arguments:
+            klass.use_autocommit(True)
 
     def connect(self, host='', database='', user='', password='', port=None, extra_args=None):
         """Handles pyodbc connection format
-        
+
         If extra_args is not None, it is expected to be a string
         containing a list of semicolon separated keywords. The only
         keyword currently supported is Trusted_Connection : if found
@@ -654,15 +668,14 @@ class _PyodbcAdapter(DBAPIAdapter):
         Windows Authentication, and therefore no login/password is
         required.
         """
-        pyodbc = self._native_module
-        if extra_args is not None:
-            self._process_extra_args(extra_args)
-        class PyodbcCursor(object):
-            """cursor adapting usual dict format to pyodbc format
+        lock = self._fetch_lock
+        class SqlServerCursor(object):
+            """cursor adapting usual dict format to pyodbc/adobdapi format
             in SQL queries
             """
             def __init__(self, cursor):
                 self._cursor = cursor
+                self._fetch_lock = lock
             def _replace_parameters(self, sql, kwargs, _date_class=datetime.date):
                 if isinstance(kwargs, dict):
                     new_sql = re.sub(r'%\(([^\)]+)\)s', r'?', sql)
@@ -675,7 +688,7 @@ class _PyodbcAdapter(DBAPIAdapter):
                         args.append(arg)
 
                     return new_sql, tuple(args)
-                        
+
                 # XXX dumb
                 return re.sub(r'%s', r'?', sql), kwargs
 
@@ -684,10 +697,7 @@ class _PyodbcAdapter(DBAPIAdapter):
                     self._cursor.execute(sql)
                 else:
                     final_sql, args = self._replace_parameters(sql, kwargs)
-                    try:
-                        self._cursor.execute(final_sql , args)
-                    except:
-                        raise
+                    self._cursor.execute(final_sql , args)
             def executemany(self, sql, kwargss):
                 if not isinstance(kwargss, (list, tuple)):
                     kwargss = tuple(kwargss)
@@ -702,14 +712,26 @@ class _PyodbcAdapter(DBAPIAdapter):
 
             def fetchone(self):
                 smalldate_cols = self._get_smalldate_columns()
-                row = self._cursor.fetchone()
+                self._fetch_lock.acquire()
+                try:
+                    row = self._cursor.fetchone()
+                finally:
+                    self._fetch_lock.release()
                 return self._replace_smalldate(row, smalldate_cols)
 
             def fetchall (self):
                 smalldate_cols = self._get_smalldate_columns()
                 rows = []
-                for row in self._cursor.fetchall():
-                    rows.append(self._replace_smalldate(row, smalldate_cols))
+                while True:
+                    self._fetch_lock.acquire()
+                    try:
+                        batch = self._cursor.fetchmany(1024)
+                    finally:
+                        self._fetch_lock.release()
+                    if not batch:
+                        break
+                    for row in batch:
+                        rows.append(self._replace_smalldate(row, smalldate_cols))
                 return rows
 
             def _replace_smalldate(self, row, smalldate_cols):
@@ -723,25 +745,15 @@ class _PyodbcAdapter(DBAPIAdapter):
             def __getattr__(self, attrname):
                 return getattr(self._cursor, attrname)
 
-        class PyodbcCnxWrapper:
+        class SqlServerCnxWrapper:
             def __init__(self, cnx):
                 self._cnx = cnx
             def cursor(self):
-                return PyodbcCursor(self._cnx.cursor())
+                return SqlServerCursor(self._cnx.cursor())
             def __getattr__(self, attrname):
                 return getattr(self._cnx, attrname)
-
-        cnx_string_bits = ['DRIVER={%(driver)s}']
-        variables = {'host' : host,
-                     'database' : database,
-                     'user' : user, 'password' : password,
-                     'driver': self.driver}
-        if self._use_trusted_connection:
-            variables['Trusted_Connection'] = 'yes'
-            del variables['user']
-            del variables['password']
-        cnx = self._native_module.connect(**variables)
-        return self._wrap_if_needed(PyodbcCnxWrapper(cnx), user)
+        cnx = self._connect(host=host, database=database, user=user, password=password, port=port, extra_args=extra_args)
+        return self._wrap_if_needed(SqlServerCnxWrapper(cnx), user)
 
     def process_value(self, value, description, encoding='utf-8', binarywrap=None):
         # if the dbapi module isn't supporting type codes, override to return value directly
@@ -763,6 +775,22 @@ class _PyodbcAdapter(DBAPIAdapter):
 
         return value
 
+class _PyodbcAdapter(_BaseSqlServerAdapter):
+    def _connect(self, host='', database='', user='', password='', port=None, extra_args=None):
+        if extra_args is not None:
+            self._process_extra_args(extra_args)
+        cnx_string_bits = ['DRIVER={%(driver)s}']
+        variables = {'host' : host,
+                     'database' : database,
+                     'user' : user, 'password' : password,
+                     'driver': self.driver}
+        if self._use_trusted_connection:
+            variables['Trusted_Connection'] = 'yes'
+            del variables['user']
+            del variables['password']
+        if self._use_autocommit:
+            variables['autocommit'] = True
+        return self._native_module.connect(**variables)
 
 class _PyodbcAdapterMT(_PyodbcAdapter):
     def process_value(self, value, description, encoding='utf-8', binarywrap=None):
@@ -803,6 +831,30 @@ class _PyodbcSqlServer2005AdapterMT(_PyodbcAdapterMT):
 class _PyodbcSqlServer2008AdapterMT(_PyodbcAdapterMT):
     driver = "SQL Server Native Client 10.0"
 
+class _AdodbapiAdapter(_BaseSqlServerAdapter):
+
+    def _connect(self, host='', database='', user='', password='', port=None, extra_args=None):
+        if extra_args is not None:
+            self._process_extra_args(extra_args)
+        if self._use_trusted_connection:
+            # this will open a MS-SQL table with Windows authentication
+            auth = 'Integrated Security=SSPI'
+        else:
+            # this set opens a MS-SQL table with SQL authentication
+            auth = 'user ID=%s; Password=%s;' % (user, password)
+        constr = r"Initial Catalog=%s; Data Source=%s; Provider=SQLOLEDB.1; %s"  %(database, host, auth)
+        return self._native_module.connect(constr)
+
+class _AdodbapiSqlServer2000Adapter(_AdodbapiAdapter):
+    driver = "SQL Server"
+
+class _AdodbapiSqlServer2005Adapter(_AdodbapiAdapter):
+    driver = "SQL Server Native Client 10.0"
+
+class _AdodbapiSqlServer2008Adapter(_AdodbapiAdapter):
+    driver = "SQL Server Native Client 10.0"
+
+
 ## Drivers, Adapters and helpers registries ###################################
 
 
@@ -812,9 +864,9 @@ PREFERED_DRIVERS = {
                    ],
     "mysql" : [ 'MySQLdb', ], # 'pyMySQL.MySQL, ],
     "sqlite" : ['pysqlite2.dbapi2', 'sqlite', 'sqlite3',],
-    "sqlserver2000" : ['pyodbc'],
-    "sqlserver2005" : ['pyodbc'],
-    "sqlserver2008" : ['pyodbc'],
+    "sqlserver2000" : ['pyodbc', 'adodbapi', ],
+    "sqlserver2005" : ['pyodbc', 'adodbapi', ],
+    "sqlserver2008" : ['pyodbc', 'adodbapi', ],
     # for use in multithreaded applications, e.g. CubicWeb
     "sqlserver2000_mt" : ['logilab.common._pyodbcwrap'],
     "sqlserver2005_mt" : ['logilab.common._pyodbcwrap'],
@@ -832,9 +884,12 @@ _ADAPTERS = {
     'sqlite' : { 'pysqlite2.dbapi2' : _PySqlite2Adapter,
                  'sqlite' : _SqliteAdapter,
                  'sqlite3' : _PySqlite2Adapter, },
-    "sqlserver2000" : {'pyodbc': _PyodbcSqlServer2000Adapter},
-    "sqlserver2005" : {'pyodbc': _PyodbcSqlServer2005Adapter},
-    "sqlserver2008" : {'pyodbc': _PyodbcSqlServer2008Adapter},
+    "sqlserver2000" : {'adodbapi': _AdodbapiSqlServer2000Adapter,
+                       'pyodbc': _PyodbcSqlServer2000Adapter},
+    "sqlserver2005" : {'adodbapi': _AdodbapiSqlServer2005Adapter,
+                       'pyodbc': _PyodbcSqlServer2005Adapter},
+    "sqlserver2008" : {'adodbapi': _AdodbapiSqlServer2008Adapter,
+                       'pyodbc': _PyodbcSqlServer2008Adapter},
     "sqlserver2000_mt" : {'logilab.common._pyodbcwrap': _PyodbcSqlServer2000AdapterMT},
     "sqlserver2005_mt" : {'logilab.common._pyodbcwrap': _PyodbcSqlServer2005AdapterMT},
     "sqlserver2008_mt" : {'logilab.common._pyodbcwrap': _PyodbcSqlServer2008AdapterMT},
