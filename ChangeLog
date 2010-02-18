@@ -4,6 +4,10 @@ ChangeLog for logilab.common
 	--
     * adbh: added dbport optional argument to [backup|restore]_commands
 
+2010-02-17 -- 0.48.0
+   * date: fixed mx date time compat for date_range (#20651)
+   * testlib: generative test should not be interrupted by self.skip() (#20648)
+
 2010-02-10 -- 0.47.0
     * adbh: changed backup / restore api (BREAKS COMPAT):
       - backup_command is now backup_commands (eg return a list of commands)
