@@ -683,7 +683,7 @@ class _BaseSqlServerAdapter(DBAPIAdapter):
                     args = []
                     for key in key_order:
                         arg = kwargs[key]
-                        if isinstance(arg, _date_class):
+                        if arg.__class__ == _date_class:
                             arg = datetime.datetime.combine(arg, datetime.time(0))
                         args.append(arg)
 
