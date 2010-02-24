@@ -1328,21 +1328,82 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         self.assertListEquals(lines1, lines2, msg)
     assertLineEqual = assertLinesEquals
 
-    def assertXMLWellFormed(self, stream, msg=None):
-        """asserts the XML stream is well-formed (no DTD conformance check)"""
-        from xml.sax import make_parser, SAXParseException
-        parser = make_parser()
+    def assertXMLWellFormed(self, stream, msg=None, context=2):
+        """asserts the XML stream is well-formed (no DTD conformance check)
+        :context: number of context lines in standard msg. all data if negativ
+                  only available with element tree
+        """
         try:
-            parser.parse(stream)
-        except SAXParseException:
+            from xml.etree.ElementTree import parse
+            self._assertETXMLWellFormed(stream, parse, msg)
+        except ImportError:
+            from xml.sax import make_parser, SAXParseException
+            parser = make_parser()
+            try:
+                parser.parse(stream)
+            except SAXParseException, ex:
+                if msg is None:
+                    stream.seek(0)
+                    for _ in xrange(ex.getLineNumber()):
+                        line = stream.readline()
+                    pointer = ('' * (ex.getLineNumber() - 1)) + '^'
+                    msg = 'XML stream not well formed: %s\n%s%s' % (ex, line, pointer)
+                self.fail(msg)
+
+    def assertXMLStringWellFormed(self, xml_string, msg=None, context=2):
+        """asserts the XML string is well-formed (no DTD conformance check)
+        :context: number of context lines in standard msg. all data if negativ
+                  only available with element tree
+        """
+        try:
+            from xml.etree.ElementTree import fromstring
+            self._assertETXMLWellFormed(xml_string, fromstring, msg)
+        except ImportError:
+            raise
+            stream = StringIO(xml_string)
+            self.assertXMLWellFormed(stream, msg)
+
+    def _assertETXMLWellFormed(self, data, parse, msg=None, context=2):
+        """internal function used by /assertXML(String)?WellFormed/ functions
+        :data: xml_data
+        :parse: appropriate parser function for this data
+        :msg: error message
+        :context: number of context lines in standard msg. all data if negativ
+                  only available with element tree
+        """
+        from xml.parsers.expat import ExpatError
+        try:
+            parse(data)
+        except ExpatError, ex:
             if msg is None:
-                msg = 'XML stream not well formed'
+                if hasattr(data, 'readlines'): #file like object
+                    stream.seek(0)
+                    lines = stream.readlines()
+                else:
+                    lines =data.splitlines(True)
+                nb_lines = len(lines)
+                context_lines = []
+
+                if  context < 0:
+                    start = 1
+                    end   = nb_lines
+                else:
+                    start = max(ex.lineno-context, 1)
+                    end   = min(ex.lineno+context, nb_lines)
+                line_number_length = len('%i' % end)
+                line_pattern = " %%%ii: %%s" % line_number_length
+
+                for line_no in xrange(start, ex.lineno):
+                    context_lines.append(line_pattern % (line_no, lines[line_no-1]))
+                context_lines.append(line_pattern % (ex.lineno, lines[ex.lineno-1]))
+                context_lines.append('%s^\n' % (' ' * (1 + line_number_length + 2 +ex.offset)))
+                for line_no in xrange(ex.lineno+1, end+1):
+                    context_lines.append(line_pattern % (line_no, lines[line_no-1]))
+
+                rich_context = ''.join(context_lines)
+                msg = 'XML stream not well formed: %s\n%s' % (ex, rich_context)
             self.fail(msg)
 
-    def assertXMLStringWellFormed(self, xml_string, msg=None):
-        """asserts the XML string is well-formed (no DTD conformance check)"""
-        stream = StringIO(xml_string)
-        self.assertXMLWellFormed(stream, msg)
 
     def assertXMLEqualsTuple(self, element, tup):
         """compare an ElementTree Element to a tuple formatted as follow:
