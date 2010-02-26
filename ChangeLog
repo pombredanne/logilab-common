@@ -4,6 +4,10 @@ ChangeLog for logilab.common
 2010-02-26  --  0.48.1
     * adbh: added dbport optional argument to [backup|restore]_commands
 
+    * db: fix date processing for SQLServer 2005
+
+    * testlib: improve XML assertion by using ElementTree parser and a new 'context' lines argument
+
 
 
 2010-02-17  --  0.48.0
