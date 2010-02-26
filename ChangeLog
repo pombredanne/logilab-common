@@ -1,23 +1,35 @@
 ChangeLog for logilab.common
 ============================
 
-	--
+2010-02-26  --  0.48.1
     * adbh: added dbport optional argument to [backup|restore]_commands
 
-2010-02-17 -- 0.48.0
-   * date: fixed mx date time compat for date_range (#20651)
-   * testlib: generative test should not be interrupted by self.skip() (#20648)
+    * db: fix date processing for SQLServer 2005
 
-2010-02-10 -- 0.47.0
+    * testlib: improve XML assertion by using ElementTree parser and a new 'context' lines argument
+
+
+
+2010-02-17  --  0.48.0
+    * date: fixed mx date time compat for date_range (#20651)
+
+    * testlib: generative test should not be interrupted by self.skip() (#20648)
+
+
+
+2010-02-10  --  0.47.0
     * adbh: changed backup / restore api (BREAKS COMPAT):
       - backup_command is now backup_commands (eg return a list of commands)
       - each command returned in backup_commands/restore_commands may now
         be list that may be used as argument to subprocess.call, or a string
 	which will the requires a subshell
       - new sql_rename_col method
+
     * deprecation: deprecated now takes an optional 'stacklevel' argument, default to 2
+
     * date: some functions to ease python's datetime module usage have been backported
       from cubicweb
+
 
 
 2009-12-23  --  0.46.0
