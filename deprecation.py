@@ -69,6 +69,8 @@ def deprecated(reason=None, stacklevel=2):
         def wrapped(*args, **kwargs):
             warn(message, DeprecationWarning, stacklevel=stacklevel)
             return func(*args, **kwargs)
+        wrapped.__name__ = func.__name__
+        wrapped.__doc__ = func.__doc__
         return wrapped
     return deprecated_decorator
 
