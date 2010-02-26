@@ -1,6 +1,6 @@
 """Deprecation utilities.
 
-:copyright: 2006-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2006-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -69,6 +69,8 @@ def deprecated(reason=None, stacklevel=2):
         def wrapped(*args, **kwargs):
             warn(message, DeprecationWarning, stacklevel=stacklevel)
             return func(*args, **kwargs)
+        wrapped.__name__ = func.__name__
+        wrapped.__doc__ = func.__doc__
         return wrapped
     return deprecated_decorator
 
