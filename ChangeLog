@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+--
+    * date: new 'totime' function
+    * adbh, db, sqlgen modules moved to the new logilab-database package
+
 2010-02-26  --  0.48.1
     * adbh: added dbport optional argument to [backup|restore]_commands
 
