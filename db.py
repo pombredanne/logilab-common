@@ -26,5 +26,11 @@ from warnings import warn
 warn('this module is deprecated, use logilab.db instead',
      DeprecationWarning, stacklevel=1)
 
-from logilab.common.db import (get_connection, set_prefered_driver,
-                               get_dbapi_compliant_module)
+from logilab.db import (get_connection, set_prefered_driver,
+                        get_dbapi_compliant_module as _gdcm,
+                        get_db_helper as _gdh)
+
+def get_dbapi_compliant_module(driver, *args, **kwargs):
+    module = _gdcm(driver, *args, **kwargs)
+    module.adv_func_helper = _gdh(driver)
+    return module
