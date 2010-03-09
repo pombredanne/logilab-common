@@ -25,7 +25,8 @@ from logilab.db import (FunctionDescr, get_db_helper as get_adv_func_helper,
                         _ADV_FUNC_HELPER_DIRECTORY as ADV_FUNC_HELPER_DIRECTORY)
 from logilab.common.decorators import monkeypatch
 
-@monkeypatch(_GenericAdvFuncHelper)
-def func_sqlname(self, funcname):
-    funcdef = self.function_description(funcname)
-    return funcdef.name_mapping.get(self.backend_name, funcname)
+@monkeypatch(_GenericAdvFuncHelper, 'func_sqlname')
+@classmethod
+def func_sqlname(cls, funcname):
+    funcdef = cls.function_description(funcname)
+    return funcdef.name_mapping.get(cls.backend_name, funcname)
