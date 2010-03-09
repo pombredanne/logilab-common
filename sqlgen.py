@@ -9,6 +9,6 @@ __docformat__ = "restructuredtext en"
 
 
 from warnings import warn
-warn('this module is deprecated, use logilab.db instead',
+warn('this module is deprecated, use logilab.database instead',
      DeprecationWarning, stacklevel=1)
-from logilab.db.sqlgen import *
+from logilab.database.sqlgen import *

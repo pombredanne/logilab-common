@@ -23,10 +23,10 @@ helper for your database using the `get_adv_func_helper` function.
 __docformat__ = "restructuredtext en"
 
 from warnings import warn
-warn('this module is deprecated, use logilab.db instead',
+warn('this module is deprecated, use logilab.database instead',
      DeprecationWarning, stacklevel=1)
 
-from logilab.db import (get_connection, set_prefered_driver,
+from logilab.database import (get_connection, set_prefered_driver,
                         get_dbapi_compliant_module as _gdcm,
                         get_db_helper as _gdh)
 
