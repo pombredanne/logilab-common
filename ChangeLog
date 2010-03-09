@@ -4,6 +4,8 @@ ChangeLog for logilab.common
 --
     * date: new 'totime' function
     * adbh, db, sqlgen modules moved to the new logilab-database package
+    * pytest: when -x option is given, stop on the first error even if
+      there are multiple test directories
 
 2010-02-26  --  0.48.1
     * adbh: added dbport optional argument to [backup|restore]_commands

@@ -363,7 +363,8 @@ class PyTester(object):
             if this_is_a_testdir(basename):
                 print "going into", dirname
                 # we found a testdir, let's explore it !
-                self.testonedir(dirname, exitfirst)
+                if not self.testonedir(dirname, exitfirst):
+                    break
                 dirs[:] = []
         if self.report.ran == 0:
             print "no test dir found testing here:", here
@@ -373,7 +374,11 @@ class PyTester(object):
             self.testonedir(here)
 
     def testonedir(self, testdir, exitfirst=False):
-        """finds each testfile in the `testdir` and runs it"""
+        """finds each testfile in the `testdir` and runs it
+
+        return true when all tests has been executed, false if exitfirst and
+        some test has failed.
+        """
         for filename in abspath_listdir(testdir):
             if this_is_a_testfile(filename):
                 if self.options.exitfirst and not self.options.restart:
@@ -388,11 +393,11 @@ succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
                 # run test and collect information
                 prog = self.testfile(filename, batchmode=True)
                 if exitfirst and (prog is None or not prog.result.wasSuccessful()):
-                    break
+                    return False
                 self.firstwrite = True
         # clean local modules
         remove_local_modules_from_sys(testdir)
-
+        return True
 
     def testfile(self, filename, batchmode=False):
         """runs every test in `filename`
@@ -498,19 +503,25 @@ class DjangoTester(PyTester):
                 if skipped in dirs:
                     dirs.remove(skipped)
             if 'tests.py' in files:
-                self.testonedir(dirname, exitfirst)
+                if not self.testonedir(dirname, exitfirst):
+                    break
                 dirs[:] = []
             else:
                 basename = osp.basename(dirname)
                 if basename in ('test', 'tests'):
                     print "going into", dirname
                     # we found a testdir, let's explore it !
-                    self.testonedir(dirname, exitfirst)
+                    if not self.testonedir(dirname, exitfirst):
+                        break
                     dirs[:] = []
 
 
     def testonedir(self, testdir, exitfirst=False):
-        """finds each testfile in the `testdir` and runs it"""
+        """finds each testfile in the `testdir` and runs it
+
+        return true when all tests has been executed, false if exitfirst and
+        some test has failed.
+        """
         # special django behaviour : if tests are splitted in several files,
         # remove the main tests.py file and tests each test file separately
         testfiles = [fpath for fpath in abspath_listdir(testdir)
@@ -524,9 +535,10 @@ class DjangoTester(PyTester):
             # run test and collect information
             prog = self.testfile(filename, batchmode=True)
             if exitfirst and (prog is None or not prog.result.wasSuccessful()):
-                break
+                return False
         # clean local modules
         remove_local_modules_from_sys(testdir)
+        return True
 
 
     def testfile(self, filename, batchmode=False):
