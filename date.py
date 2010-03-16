@@ -201,6 +201,14 @@ def todate(somedate):
     assert isinstance(somedate, (date, DateTimeType)), repr(somedate)
     return somedate
 
+def totime(somedate):
+    """return a time from a time (leaving unchanged), date or datetime"""
+    # XXX mx compat
+    if not isinstance(somedate, time):
+        return time(somedate.hour, somedate.minute, somedate.second)
+    assert isinstance(somedate, (time)), repr(somedate)
+    return somedate
+
 def todatetime(somedate):
     """return a date from a date (leaving unchanged) or a datetime"""
     # take care, datetime is a subclass of date

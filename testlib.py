@@ -19,7 +19,7 @@ Command line options:
 If no non-option arguments are present, prefixes used are 'test',
 'regrtest', 'smoketest' and 'unittest'.
 
-:copyright: 2003-2009 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2003-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: General Public License version 2 - http://www.gnu.org/licenses
 """
@@ -808,6 +808,9 @@ Examples:
 succeeded tests into", osp.join(os.getcwd(),FILE_RESTART)
 
         result = self.testRunner.run(self.test)
+        # help garbage collection: we want TestSuite, which hold refs to every
+        # executed TestCase, to be gc'ed
+        del self.test
         if hasattr(self.module, 'teardown_module'):
             try:
                 self.module.teardown_module(self.options, result)
