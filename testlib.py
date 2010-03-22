@@ -1010,9 +1010,9 @@ class TestCase(unittest.TestCase):
     # instantiated for each test run)
     datadir = classproperty(cached(datadir))
 
-    def datapath(cls, fname):
+    def datapath(cls, *fname):
         """joins the object's datadir and `fname`"""
-        return osp.join(cls.datadir, fname)
+        return osp.join(cls.datadir, *fname)
     datapath = classmethod(datapath)
 
     def set_description(self, descr):

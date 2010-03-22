@@ -221,6 +221,11 @@ class TestlibTC(TestCase):
         self.assertEquals(self.datadir, expected_datadir)
         self.assertEquals(self.datapath('foo'), join(expected_datadir, 'foo'))
 
+    def test_multiple_args_datadir(self):
+        expected_datadir = join(dirname(abspath(__file__)), 'data')
+        self.assertEquals(self.datadir, expected_datadir)
+        self.assertEquals(self.datapath('foo', 'bar'), join(expected_datadir, 'foo', 'bar'))
+
     def test_custom_datadir(self):
         class MyTC(TestCase):
             datadir = 'foo'
