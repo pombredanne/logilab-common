@@ -10,6 +10,7 @@ Uploaders: David Douard <david.douard@logilab.fr>,
 	   Nicolas Chauvat <nicolas.chauvat@logilab.fr>
 Build-Depends: debhelper (>= 5.0.38), python (>= 2.4.6-2)
 Build-Depends-Indep: python-support, python-epydoc, graphviz
+XS-Python-Version: all
 Standards-Version: 3.8.2
 Homepage: http://www.logilab.org/project/logilab-common
 Vcs-Svn: svn://svn.debian.org/svn/python-modules/packages/logilab-common/trunk/
