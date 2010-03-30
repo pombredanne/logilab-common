@@ -1,12 +1,12 @@
-"""
-Sphinx utils:
+"""Sphinx utils
 
-* ModuleGenerator: Generate a file that lists all the modules of a list of
-    packages in order to pull all the docstring.
-    /!\ This should not be used in a makefile to systematically generate
-    sphinx documentation!
+ModuleGenerator: Generate a file that lists all the modules of a list of
+packages in order to pull all the docstring.
+This should not be used in a makefile to systematically generate sphinx
+documentation!
 
 Typical usage:
+
 >>> from logilab.common.sphinxutils import ModuleGenerator
 >>> mgen = ModuleGenerator('logilab common', '/home/adim/src/logilab/common')
 >>> mgen.generate('api_logilab_common.rst', exclude_dirs=('test',))

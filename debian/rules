@@ -12,6 +12,14 @@
 #export DH_VERBOSE=1
 PY_VERSION:=$(shell pyversions -vd)
 
+-include /usr/share/python/python.mk
+ifeq (,$(py_sitename))
+	py_sitename = site-packages
+	py_libdir = /usr/lib/python$(subst python,,$(1))/site-packages
+	py_sitename_sh = $(py_sitename)
+	py_libdir_sh = $(py_libdir)
+endif
+
 build: build-stamp
 build-stamp: 
 	dh_testdir
@@ -24,13 +32,13 @@ ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
 	# we need this hack because we have to import "logilab.common.pytest"
 	# but since it's a namespace package, we need to "simulate" it
 	touch $(CURDIR)/build/lib/logilab/__init__.py
-	-PYTHONPATH=$(CURDIR)/build/lib/ $(CURDIR)/build/scripts-$(PY_VERSION)/pytest
-	rm -f $(CURDIR)/build/lib/logilab/__init__.py
+	PYTHONPATH=$(CURDIR)/build/lib/ $(CURDIR)/build/scripts-$(PY_VERSION)/pytest
 endif
 
 	# build doc
 	$(MAKE) -C doc
 
+	rm -f $(CURDIR)/build/lib/logilab/__init__.py
 	touch build-stamp
 
 clean: 
@@ -56,7 +64,7 @@ install: build
 
 	NO_SETUPTOOLS=1 python setup.py -q install --prefix=/usr --no-compile \
 		--root=$(CURDIR)/debian/python-logilab-common/ \
-		--install-layout=deb
+		${py_setup_install_args}
 	# remove test directory
 	rm -rf debian/python-logilab-common/usr/lib/python*/site-packages/logilab/common/test
 

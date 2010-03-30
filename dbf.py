@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-"""
-This is a DBF reader which reads Visual Fox Pro DBF format with Memo field.
+"""This is a DBF reader which reads Visual Fox Pro DBF format with Memo field
 
 Usage:
-    rec = readDbf('test.dbf')
-    for line in rec:
-        print line['name']
 
-@author Yusdi Santoso
-@date 13/07/2007
+>>> rec = readDbf('test.dbf')
+>>> for line in rec:
+>>>     print line['name']
+
+:author: Yusdi Santoso
+:date: 13/07/2007
+
 http://www.physics.ox.ac.uk/users/santoso/Software.Repository.html
 page says code is "available as is without any warranty or support".
 """
@@ -191,8 +192,9 @@ def readDbf(filename):
     """
     Read the DBF file specified by the filename and
     return the records as a list of dictionary.
-    @param filename File name of the DBF
-    @return List of rows
+
+    :param: filename File name of the DBF
+    :return: List of rows
     """
     db = Dbase()
     db.open(filename)
