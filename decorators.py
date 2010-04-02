@@ -7,7 +7,7 @@
 __docformat__ = "restructuredtext en"
 
 from types import MethodType
-from time import clock
+from time import clock, time
 import sys, re
 
 # XXX rewrite so we can use the decorator syntax when keyarg has to be specified
@@ -122,10 +122,11 @@ class iclassmethod(object):
 
 def timed(f):
     def wrap(*args, **kwargs):
-        t = clock()
-        #for i in range(100):
+        t = time()
+        c = clock()
         res = f(*args, **kwargs)
-        print '%s time: %.9f' % (f.__name__, clock() - t)
+        print '%s clock: %.9f / time: %.9f' % (f.__name__,
+                                               clock() - c, time() - t)
         return res
     return wrap
 
