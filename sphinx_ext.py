@@ -11,6 +11,12 @@ class DocstringOnlyModuleDocumenter(autodoc.ModuleDocumenter):
     def document_members(self, all_members=False):
         pass
 
+    def resolve_name(self, modname, parents, path, base):
+        if modname is not None:
+            return modname, parents + [base]
+        return (path or '') + base, []
+
+
 #autodoc.add_documenter(DocstringOnlyModuleDocumenter)
 
 def setup(app):
