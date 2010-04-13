@@ -62,7 +62,7 @@ class DotBackend:
 
     source = property(get_source)
 
-    def generate(self, outputfile=None, dotfile=None):
+    def generate(self, outputfile=None, dotfile=None, mapfile=None):
         """Generates a graph file.
 
         :param outputfile: filename and path [defaults to graphname.png]
@@ -98,7 +98,11 @@ class DotBackend:
             pdot.write(self.source)
         pdot.close()
         if target != 'dot':
-            subprocess.call('%s -T%s %s -o%s' % (self.renderer, target,
+            if mapfile:
+                subprocess.call('%s -Tcmapx -o%s -T%s %s -o%s' % (self.renderer, mapfile,
+                           target, dot_sourcepath, outputfile), shell=True)
+            else:
+                subprocess.call('%s -T%s %s -o%s' % (self.renderer, target,
                             dot_sourcepath, outputfile), shell=True)
             os.unlink(dot_sourcepath)
         return outputfile
@@ -131,7 +135,7 @@ class GraphGenerator:
         # the backend is responsible to output the graph in a particular format
         self.backend = backend
 
-    def generate(self, visitor, propshdlr, outputfile=None):
+    def generate(self, visitor, propshdlr, outputfile=None, mapfile=None):
         # the visitor
         # the property handler is used to get node and edge properties
         # according to the graph and to the backend
@@ -142,7 +146,7 @@ class GraphGenerator:
         for subjnode, objnode, edge in visitor.edges():
             props = propshdlr.edge_properties(edge, subjnode, objnode)
             self.backend.emit_edge(subjnode, objnode, **props)
-        return self.backend.generate(outputfile)
+        return self.backend.generate(outputfile=outputfile, mapfile=mapfile)
 
 
 

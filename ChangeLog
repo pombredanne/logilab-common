@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+--
+   * graph: generate methods now takes an optional mapfile argument to generate
+     html image maps
+
 2010-03-16  --  0.49.0
     * date: new 'totime' function
 
