@@ -95,6 +95,23 @@ def with_tempdir(callable):
                 tempfile.tempdir = old_tmpdir
     return proxy
 
+def in_tempdir(callable):
+    """A decorator moving the enclosed function inside the tempfile.tempfdir
+    """
+    def proxy(*args, **kargs):
+
+        old_cwd = os.getcwd()
+        os.chdir(tempfile.tempdir)
+        try:
+            return callable(*args, **kargs)
+        finally:
+            os.chdir(old_cwd)
+    return proxy
+
+def within_tempdir(callable):
+    """A decorator run the enclosed function inside a tmpdir removed after execution
+    """
+    return with_tempdir(in_tempdir(callable))
 
 def run_tests(tests, quiet, verbose, runner=None, capture=0):
     """Execute a list of tests.
@@ -993,9 +1010,9 @@ class TestCase(unittest.TestCase):
     # instantiated for each test run)
     datadir = classproperty(cached(datadir))
 
-    def datapath(cls, fname):
+    def datapath(cls, *fname):
         """joins the object's datadir and `fname`"""
-        return osp.join(cls.datadir, fname)
+        return osp.join(cls.datadir, *fname)
     datapath = classmethod(datapath)
 
     def set_description(self, descr):
