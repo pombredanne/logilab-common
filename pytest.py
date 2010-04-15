@@ -1,3 +1,6 @@
+# copyright 2000-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
+# Licensed under the General Public License version 2 - http://www.gnu.org/licenses
 """pytest is a tool that eases test running and debugging.
 
 To be able to use pytest, you should either write tests using
@@ -77,15 +80,6 @@ you can filter the function with a simple python expression
  * ``tata`` and ``titi`` match``rouge ^ carre``
 
  * ``titi`` match ``rouge and not carre``
-
-
-
-
-
-
-:copyright: 2000-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
-:contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
-:license: GNU Lesser General Public License, v2.1 - http://www.gnu.org/licenses
 """
 __docformat__ = "restructuredtext en"
 
