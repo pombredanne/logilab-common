@@ -78,7 +78,7 @@ class HTMLWriter(BaseWriter):
             else:
                 self.writeln('<tr class="%s">' % (i%2 and 'even' or 'odd'))
             for j in range(len(row)):
-                cell = row[j] or '&nbsp;'
+                cell = row[j] or '&#160;'
                 if (layout.rheaders and i == 0) or \
                    (layout.cheaders and j == 0) or \
                    (layout.rrheaders and i+1 == len(table_content)) or \
