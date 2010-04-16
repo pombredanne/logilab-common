@@ -373,7 +373,7 @@ class OptionsManagerMixIn(object):
         self._all_options = {}
         self._short_options = {}
         self._nocallback_options = {}
-        self._mygroups = set()
+        self._mygroups = dict()
         # verbosity
         self.quiet = quiet
         self._maxlevel = 0
@@ -398,7 +398,7 @@ class OptionsManagerMixIn(object):
         non_group_spec_options = [option for option in provider.options
                                   if 'group' not in option[1]]
         groups = getattr(provider, 'option_groups', ())
-        if own_group:
+        if own_group and non_group_spec_options:
             self.add_option_group(provider.name.upper(), provider.__doc__,
                                   non_group_spec_options, provider)
         else:
@@ -413,23 +413,19 @@ class OptionsManagerMixIn(object):
     def add_option_group(self, group_name, doc, options, provider):
         """add an option group including the listed options
         """
-        # add section to the config file
-        if group_name != "DEFAULT":
-            try:
-                self._config_parser.add_section(group_name)
-            except DuplicateSectionError:
-                # section may be implicitly added by reading the configuration
-                # file (see http://www.logilab.org/ticket/8849 for description
-                # of a case where this may happen)
-                if group_name in self._mygroups:
-                    raise
-            self._mygroups.add(group_name)
+        assert options
         # add option group to the command line parser
-        if options:
+        if group_name in self._mygroups:
+            group = self._mygroups[group_name]
+        else:
             group = optparse.OptionGroup(self._optik_parser,
                                          title=group_name.capitalize())
             self._optik_parser.add_option_group(group)
             group.level = provider.level
+            self._mygroups[group_name] = group
+            # add section to the config file
+            if group_name != "DEFAULT":
+                self._config_parser.add_section(group_name)
         # add provider's specific options
         for opt, optdict in options:
             self.add_optik_option(provider, group, opt, optdict)
