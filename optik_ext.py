@@ -29,7 +29,7 @@ It also defines three new types for optik/optparse command line parser :
     argument of this type will be converted to a float value in bytes
     according to byte units (b, kb, mb, gb, tb)
 
-:copyright: 2003-2008 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+:copyright: 2003-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 :contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
 :license: GNU Lesser General Public License, v2.1 - http://www.gnu.org/licenses
 """
@@ -41,24 +41,10 @@ import time
 from copy import copy
 from os.path import exists
 
-try:
-    # python >= 2.3
-    from optparse import OptionParser as BaseParser, Option as BaseOption, \
-         OptionGroup, OptionValueError, OptionError, Values, HelpFormatter, \
-         NO_DEFAULT, SUPPRESS_HELP
-except ImportError:
-    # python < 2.3
-    from optik import OptionParser as BaseParser, Option as BaseOption, \
-         OptionGroup, OptionValueError, OptionError, Values, HelpFormatter
-    try:
-        from optik import NO_DEFAULT
-    except:
-        NO_DEFAULT = []
-    # XXX check SUPPRESS_HELP availability
-    try:
-        from optik import SUPPRESS_HELP
-    except:
-        SUPPRESS_HELP = None
+# python >= 2.3
+from optparse import OptionParser as BaseParser, Option as BaseOption, \
+     OptionGroup, OptionContainer, OptionValueError, OptionError, \
+     Values, HelpFormatter, NO_DEFAULT, SUPPRESS_HELP
 
 try:
     from mx import DateTime
@@ -188,7 +174,7 @@ class Option(BaseOption):
     TYPES = BaseOption.TYPES + ('regexp', 'csv', 'yn', 'named', 'password',
                                 'multiple_choice', 'file', 'color',
                                 'time', 'bytes')
-    ATTRS = BaseOption.ATTRS + ['hide']
+    ATTRS = BaseOption.ATTRS + ['hide', 'level']
     TYPE_CHECKER = copy(BaseOption.TYPE_CHECKER)
     TYPE_CHECKER['regexp'] = check_regexp
     TYPE_CHECKER['csv'] = check_csv
@@ -249,6 +235,37 @@ class OptionParser(BaseParser):
     def __init__(self, option_class=Option, *args, **kwargs):
         BaseParser.__init__(self, option_class=Option, *args, **kwargs)
 
+    def format_option_help(self, formatter=None):
+        if formatter is None:
+            formatter = self.formatter
+        outputlevel = getattr(formatter, 'output_level', 0)
+        formatter.store_option_strings(self)
+        result = []
+        result.append(formatter.format_heading(_("Options")))
+        formatter.indent()
+        if self.option_list:
+            result.append(OptionContainer.format_option_help(self, formatter))
+            result.append("\n")
+        for group in self.option_groups:
+            if group.level <= outputlevel:
+                result.append(group.format_help(formatter))
+                result.append("\n")
+        formatter.dedent()
+        # Drop the last "\n", or the header if no options or option groups:
+        return "".join(result[:-1])
+
+
+OptionGroup.level = 0
+
+def format_option_help(self, formatter):
+    result = []
+    outputlevel = getattr(formatter, 'output_level', 0)
+    for option in self.option_list:
+        if option.level <= outputlevel and not option.help is SUPPRESS_HELP:
+            result.append(formatter.format_option(option))
+    return "".join(result)
+OptionContainer.format_option_help = format_option_help
+OptionContainer.format_option_help = format_option_help
 
 class ManHelpFormatter(HelpFormatter):
     """Format help using man pages ROFF format"""
