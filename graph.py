@@ -149,6 +149,33 @@ class GraphGenerator:
         return self.backend.generate(outputfile=outputfile, mapfile=mapfile)
 
 
+class UnorderableGraph(Exception):
+    def __init__(self, cycles):
+        self.cycles = cycles
+
+    def __str__(self):
+        return 'cycles in graph: %s' % self.cycles
+
+def ordered_nodes(graph):
+    cycles = get_cycles(graph)
+    if cycles:
+        cycles = '\n'.join(' -> '.join(cycle) for cycle in cycles)
+        raise UnorderableGraph(cycles)
+    ordered = []
+    while graph:
+        # sorted to get predictable results
+        for node, deps in sorted(graph.items()):
+            if not deps:
+                ordered.append(node)
+                del graph[node]
+                for deps in graph.itervalues():
+                    try:
+                        deps.remove(node)
+                    except KeyError:
+                        continue
+    return tuple(reversed(ordered))
+
+
 
 def get_cycles(graph_dict, vertices=None):
     '''given a dictionary representing an ordered graph (i.e. key are vertices
