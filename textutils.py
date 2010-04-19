@@ -243,11 +243,11 @@ __UNITS_URE = r'[a-zA-Z]+'
 _VALUE_RE = re.compile(r'(?P<value>%s)(?P<unit>%s)?'%(__VALUE_URE,__UNITS_URE))
 
 BYTE_UNITS = {
-     "B": 1,
-    "KB": 1024,
-    "MB": 1024 ** 2,
-    "GB": 1024 ** 3,
-    "TB": 1024 ** 4,
+    "b": 1,
+    "kb": 1024,
+    "mb": 1024 ** 2,
+    "gb": 1024 ** 3,
+    "tb": 1024 ** 4,
 }
 
 TIME_UNITS = {
@@ -290,7 +290,7 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
         value = inter(lit)
         if unit is not None:
             try:
-                value *= units[unit]
+                value *= units[unit.lower()]
             except KeyError:
                 raise KeyError('invalid unit %s. valid units are %s' %
                                 unit, units.keys())
