@@ -296,6 +296,38 @@ def comment(string):
     lines = [line.strip() for line in string.splitlines()]
     return '# ' + ('%s# ' % os.linesep).join(lines)
 
+def format_time(value):
+    if not value:
+        return '0'
+    if value != int(value):
+        return '%.2fs' % value
+    value = int(value)
+    nbmin, nbsec = divmod(value, 60)
+    if nbsec:
+        return '%ss' % value
+    nbhour, nbmin_ = divmod(nbmin, 60)
+    if nbmin_:
+        return '%smin' % nbmin
+    nbday, nbhour_ = divmod(nbhour, 24)
+    if nbhour_:
+        return '%sh' % nbhour
+    return '%sd' % nbday
+
+def format_bytes(value):
+    if not value:
+        return '0'
+    if value != int(value):
+        return '%.2fB' % value
+    value = int(value)
+    prevunit = 'B'
+    for unit in ('KB', 'MB', 'GB', 'TB'):
+        next, remain = divmod(value, 1024)
+        if remain:
+            return '%s%s' % (value, prevunit)
+        prevunit = unit
+        value = next
+    return '%s%s' % (value, unit)
+
 def format_option_value(optdict, value):
     """return the user input's value from a 'compiled' value"""
     if isinstance(value, (list, tuple)):
@@ -310,9 +342,9 @@ def format_option_value(optdict, value):
     elif isinstance(value, (str, unicode)) and value.isspace():
         value = "'%s'" % value
     elif optdict.get('type') == 'time' and isinstance(value, (float, int, long)):
-        value = "%ss" % value
+        value = format_time(value)
     elif optdict.get('type') == 'bytes' and hasattr(value, '__int__'):
-        value = "%iB" % value
+        value = format_bytes(value)
     return value
 
 def ini_format_section(stream, section, options, encoding=None, doc=None):
