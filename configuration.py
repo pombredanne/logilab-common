@@ -579,6 +579,8 @@ class OptionsManagerMixIn(object):
         helplevel = 1
         while helplevel <= self._maxlevel:
             opt = '-'.join(['long'] * helplevel) + '-help'
+            if opt in self._all_options:
+                break # already processed
             def helpfunc(option, opt, val, p, level=helplevel):
                 print self.help(level)
                 sys.exit(0)
