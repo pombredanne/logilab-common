@@ -491,28 +491,31 @@ class OptionsManagerMixIn(object):
         """write a configuration file according to the current configuration
         into the given stream or stdout
         """
-        stream = stream or sys.stdout
-        encoding = _get_encoding(encoding, stream)
-        printed = False
+        options_by_section = {}
+        sections = []
         for provider in self.options_providers:
-            default_options = []
-            sections = {}
             for section, options in provider.options_by_section():
+                if section is None:
+                    section = provider.name
                 if section in skipsections:
                     continue
                 options = [(n, d, v) for (n, d, v) in options
                            if d.get('type') is not None]
                 if not options:
                     continue
-                if section is None:
-                    section = provider.name
-                    doc = provider.__doc__
-                else:
-                    doc = None
-                if printed:
-                    print >> stream, '\n'
-                format_section(stream, section.upper(), options, encoding, doc)
-                printed = True
+                if not section in sections:
+                    sections.append(section)
+                alloptions = options_by_section.setdefault(section, [])
+                alloptions += options
+        stream = stream or sys.stdout
+        encoding = _get_encoding(encoding, stream)
+        printed = False
+        for section in sections:
+            if printed:
+                print >> stream, '\n'
+            format_section(stream, section.upper(), options_by_section[section],
+                           encoding)
+            printed = True
 
     def generate_manpage(self, pkginfo, section=1, stream=None):
         """write a man page for the current configuration into the given
@@ -832,6 +835,12 @@ class OptionsProviderMixIn(object):
             yield None, sections.pop(None)
         for section, options in sections.items():
             yield section.upper(), options
+
+    def options_and_values(self, options=None):
+        if options is None:
+            options = self.options
+        for optname, optdict in options:
+            yield (optname, optdict, self.option_value(optname))
 
 
 class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
