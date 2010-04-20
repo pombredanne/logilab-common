@@ -157,6 +157,13 @@ class UnorderableGraph(Exception):
         return 'cycles in graph: %s' % self.cycles
 
 def ordered_nodes(graph):
+    """takes a dependency graph dict as arguments and return an ordered tuple of
+    nodes starting with nodes without dependencies and up to the outermost node.
+
+    If there is some cycle in the graph, :exc:`UnorderableGraph` will be raised.
+
+    Also the given graph dict will be emptied.
+    """
     cycles = get_cycles(graph)
     if cycles:
         cycles = '\n'.join(' -> '.join(cycle) for cycle in cycles)
