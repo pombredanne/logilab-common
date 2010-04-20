@@ -37,7 +37,7 @@ Blabla bla</p></div>
     # Table tests #############################################################
     table_base = '''<table>\n<tr class="odd">\n<td>head1</td>\n<td>head2</td>\n</tr>\n<tr class="even">\n<td>cell1</td>\n<td>cell2</td>\n</tr>\n</table>\n'''
     field_table = '''<table class="field" id="mytable">\n<tr class="odd">\n<td>f1</td>\n<td>v1</td>\n</tr>\n<tr class="even">\n<td>f22</td>\n<td>v22</td>\n</tr>\n<tr class="odd">\n<td>f333</td>\n<td>v333</td>\n</tr>\n</table>\n'''
-    advanced_table = '''<table class="whatever" id="mytable">\n<tr class="header">\n<th>field</th>\n<th>value</th>\n</tr>\n<tr class="even">\n<td>f1</td>\n<td>v1</td>\n</tr>\n<tr class="odd">\n<td>f22</td>\n<td>v22</td>\n</tr>\n<tr class="even">\n<td>f333</td>\n<td>v333</td>\n</tr>\n<tr class="odd">\n<td> <a href="http://www.perdu.com">toi perdu ?</a></td>\n<td>&nbsp;</td>\n</tr>\n</table>\n'''
+    advanced_table = '''<table class="whatever" id="mytable">\n<tr class="header">\n<th>field</th>\n<th>value</th>\n</tr>\n<tr class="even">\n<td>f1</td>\n<td>v1</td>\n</tr>\n<tr class="odd">\n<td>f22</td>\n<td>v22</td>\n</tr>\n<tr class="even">\n<td>f333</td>\n<td>v333</td>\n</tr>\n<tr class="odd">\n<td> <a href="http://www.perdu.com">toi perdu ?</a></td>\n<td>&#160;</td>\n</tr>\n</table>\n'''
 
 
     # VerbatimText tests ######################################################

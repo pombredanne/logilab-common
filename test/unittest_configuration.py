@@ -94,8 +94,7 @@ class ConfigurationTC(TestCase):
         file = tempfile.mktemp()
         stream = open(file, 'w')
         try:
-            stream.write("""# test configuration
-[Test]
+            stream.write("""[Test]
 
 dothis=no
 
@@ -130,8 +129,7 @@ diffgroup=zou
     def test_generate_config(self):
         stream = StringIO()
         self.cfg.generate_config(stream)
-        self.assertLinesEquals(stream.getvalue().strip(), """# test configuration
-[TEST]
+        self.assertLinesEquals(stream.getvalue().strip(), """[TEST]
 
 dothis=yes
 
@@ -159,8 +157,7 @@ diffgroup=pouet
         self.cfg['value'] = '    '
         stream = StringIO()
         self.cfg.generate_config(stream)
-        self.assertLinesEquals(stream.getvalue().strip(), """# test configuration
-[TEST]
+        self.assertLinesEquals(stream.getvalue().strip(), """[TEST]
 
 dothis=yes
 
@@ -284,8 +281,7 @@ options:
         read_old_config(self.cfg, changes, 'data/test.ini')
         stream = StringIO()
         self.cfg.generate_config(stream)
-        self.assertLinesEquals(stream.getvalue().strip(), """# test configuration
-[TEST]
+        self.assertLinesEquals(stream.getvalue().strip(), """[TEST]
 
 dothis=yes
 

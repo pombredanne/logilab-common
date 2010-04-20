@@ -108,8 +108,8 @@ class UnitsTC(TestCase):
     def setUp(self):
         self.units = {
             'm':60,
-            'KB':1024,
-            'MB':1024*1024,
+            'kb':1024,
+            'mb':1024*1024,
             }
 
     def test_empty_base(self):
@@ -153,15 +153,19 @@ class UnitsTC(TestCase):
 
     def test_unit_singleunit_multipleletter(self):
         result = tu.apply_units('47KB', self.units)
-        self.assertEquals(result, 47 * self.units['KB'] )
+        self.assertEquals(result, 47 * self.units['kb'] )
+
+    def test_unit_singleunit_caseinsensitive(self):
+        result = tu.apply_units('47kb', self.units)
+        self.assertEquals(result, 47 * self.units['kb'] )
 
     def test_unit_multipleunit(self):
         result = tu.apply_units('47KB 1.5MB', self.units)
-        self.assertEquals(result, 47 * self.units['KB'] + 1.5 * self.units['MB'])
+        self.assertEquals(result, 47 * self.units['kb'] + 1.5 * self.units['mb'])
 
     def test_unit_with_blank(self):
         result = tu.apply_units('1 000 KB', self.units)
-        self.assertEquals(result, 1000 * self.units['KB'])
+        self.assertEquals(result, 1000 * self.units['kb'])
 
 RGX = re.compile('abcd')
 class PrettyMatchTC(TestCase):
