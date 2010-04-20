@@ -258,12 +258,29 @@ class ProgressBar(object):
     """A simple text progression bar."""
 
     def __init__(self, nbops, size=20, stream=sys.stdout, title=''):
-        self._fstr = '\r%s[%%-%ss]' % (title, int(size))
+        if title:
+            self._fstr = '\r%s [%%-%ss]' % (title, int(size))
+        else:
+            self._fstr = '\r[%%-%ss]' % int(size)
         self._stream = stream
         self._total = nbops
         self._size = size
         self._current = 0
         self._progress = 0
+        self._current_text = None
+        self._last_text_write_size = 0
+
+    def _get_text(self):
+        return self._current_text
+
+    def _set_text(self, text=None):
+        self._current_text = text
+        self.refresh()
+
+    def _del_text(self):
+        self.text = None
+
+    text = property(_get_text, _set_text, _del_text)
 
     def update(self):
         """Update the progression bar."""
@@ -276,6 +293,14 @@ class ProgressBar(object):
     def refresh(self):
         """Refresh the progression bar display."""
         self._stream.write(self._fstr % ('.' * min(self._progress, self._size)) )
+        draw_text = False
+        if self._last_text_write_size or self._current_text:
+            template = ' %%-%is' % (self._last_text_write_size)
+            text = self._current_text
+            if text is None:
+                text = ''
+            self._stream.write(template % text)
+            self._last_text_write_size = len(text.rstrip())
         self._stream.flush()
 
 from logilab.common.deprecation import deprecated
