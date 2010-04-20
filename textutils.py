@@ -293,7 +293,7 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
                 value *= units[unit.lower()]
             except KeyError:
                 raise KeyError('invalid unit %s. valid units are %s' %
-                                unit, units.keys())
+                               (unit, units.keys()))
         values.append(value)
     return final(sum(values))
 
