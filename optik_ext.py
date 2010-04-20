@@ -241,7 +241,7 @@ class OptionParser(BaseParser):
         outputlevel = getattr(formatter, 'output_level', 0)
         formatter.store_option_strings(self)
         result = []
-        result.append(formatter.format_heading(_("Options")))
+        result.append(formatter.format_heading("Options"))
         formatter.indent()
         if self.option_list:
             result.append(OptionContainer.format_option_help(self, formatter))
