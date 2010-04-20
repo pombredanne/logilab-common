@@ -852,6 +852,8 @@ class OptionsProviderMixIn(object):
         """
         for section, options in self.options_by_section():
             if section is None:
+                if self.name is None:
+                    continue
                 section = self.name.upper()
             for option, optiondict, value in options:
                 yield section, option, optiondict
