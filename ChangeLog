@@ -1,9 +1,29 @@
 ChangeLog for logilab.common
 ============================
 
---
-   * graph: generate methods now takes an optional mapfile argument to generate
-     html image maps
+2010-04-20  --  0.50.0
+    * graph:
+     - generate methods now takes an optional mapfile argument to generate
+       html image maps
+     - new ordered_nodes function taking a dependency graph dict as arguments
+       and returning an ordered list of nodes
+
+    * configuration:
+     - nicer serialization of bytes / time option
+     - may now contains several option provider with the same name
+     - consider 'level' in option dict, --help displaying only option with level
+       0, and automatically adding --long-help options for higher levels
+
+    * textutils: case insensitive apply_unit
+
+    * sphinx_ext: new module usable as a sphinx pluggin and containing a new
+     'autodocstring' directive
+
+    * ureports: output &#160; instead of &nbsp; for strict xhtml compliance
+
+    * decorators: @cached propery copy inner function docstring
+
+
 
 2010-03-16  --  0.49.0
     * date: new 'totime' function
