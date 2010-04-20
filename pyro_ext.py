@@ -113,12 +113,12 @@ def ns_get_proxy(nsid, defaultnsgroup=_MARKER, nshost=None):
         nsd = locate_ns(nshost)
         pyrouri = nsd.resolve('%s.%s' % (nsgroup, nsid))
     except errors.ProtocolError, ex:
-        raise Exception('Could not connect to the Pyro name server (host: %s)'
-                        % nshost)
+        raise errors.PyroError(
+            'Could not connect to the Pyro name server (host: %s)' % nshost)
     except errors.NamingError:
-        raise Exception('Could not get proxy for %s (not registered in Pyro), '
-                        'you may have to restart your server-side application'
-                        % nsid)
+        raise errors.PyroError(
+            'Could not get proxy for %s (not registered in Pyro), '
+            'you may have to restart your server-side application' % nsid)
     return core.getProxyForURI(pyrouri)
 
 
