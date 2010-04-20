@@ -38,7 +38,7 @@ subpackage_of = getattr(__pkginfo__, 'subpackage_of', None)
 include_dirs = getattr(__pkginfo__, 'include_dirs', [])
 ext_modules = getattr(__pkginfo__, 'ext_modules', None)
 install_requires = getattr(__pkginfo__, 'install_requires', None)
-dependency_links = getattr(__pkginfo__, 'dependency_links', None)
+dependency_links = getattr(__pkginfo__, 'dependency_links', [])
 
 STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 
