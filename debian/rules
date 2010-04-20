@@ -21,9 +21,9 @@ ifeq (,$(py_sitename))
 endif
 
 build: build-stamp
-build-stamp: 
+build-stamp:
 	dh_testdir
-	
+
 	# python module build
 	NO_SETUPTOOLS=1 python setup.py -q build --build-purelib=build/lib
 
@@ -41,10 +41,10 @@ endif
 	rm -f $(CURDIR)/build/lib/logilab/__init__.py
 	touch build-stamp
 
-clean: 
+clean:
 	dh_testdir
 	dh_testroot
-	
+
 	# clean doc
 	$(MAKE) -C doc clean
 
@@ -70,10 +70,10 @@ install: build
 
 # Build architecture-independent files here.
 binary-indep: build install
-	dh_testdir 
-	dh_testroot 
+	dh_testdir
+	dh_testroot
 	dh_install -i
-	dh_pysupport -i 
+	dh_pysupport -i
 	dh_installchangelogs -i ChangeLog
 	dh_installexamples -i
 	dh_installdocs -i 	README doc/apidoc/
@@ -82,7 +82,7 @@ binary-indep: build install
 	dh_compress -i		-X.py -X.ini -X.xml -Xtest/ -Xapidoc/
 	dh_fixperms -i
 	dh_installdeb -i
-	dh_gencontrol -i 
+	dh_gencontrol -i
 	dh_md5sums -i
 	dh_builddeb -i
 
