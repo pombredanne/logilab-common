@@ -617,6 +617,9 @@ class OptionsManagerMixIn(object):
             for section, option, optdict in provider.all_options():
                 if onlysection is not None and section != onlysection:
                     continue
+                if not 'type' in optdict:
+                    # ignore action without type (callback, store_true...)
+                    continue
                 provider.input_option(option, optdict, inputlevel)
         # now we can generate the configuration file
         if stream is not None:
