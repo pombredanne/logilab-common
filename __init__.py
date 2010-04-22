@@ -50,6 +50,8 @@ class dictattr(dict):
             raise KeyError(attr)
 
 class nullobject(object):
+    def __repr__(self):
+        return '<nullobject>'
     def __nonzero__(self):
         return False
 
