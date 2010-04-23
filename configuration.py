@@ -412,11 +412,11 @@ class OptionsManagerMixIn(object):
 
     def reset_parsers(self, usage='', version=None):
         # configuration file parser
-        self._config_parser = ConfigParser()
+        self.cfgfile_parser = ConfigParser()
         # command line parser
-        self._optik_parser = optparse.OptionParser(usage=usage, version=version)
-        self._optik_parser.options_manager = self
-        self._optik_option_attrs = set(self._optik_parser.option_class.ATTRS)
+        self.cmdline_parser = optparse.OptionParser(usage=usage, version=version)
+        self.cmdline_parser.options_manager = self
+        self._optik_option_attrs = set(self.cmdline_parser.option_class.ATTRS)
 
     def register_options_provider(self, provider, own_group=True):
         """register an options provider"""
@@ -435,7 +435,7 @@ class OptionsManagerMixIn(object):
                                   non_group_spec_options, provider)
         else:
             for opt, optdict in non_group_spec_options:
-                self.add_optik_option(provider, self._optik_parser, opt, optdict)
+                self.add_optik_option(provider, self.cmdline_parser, opt, optdict)
         for gname, gdoc in groups:
             gname = gname.upper()
             goptions = [option for option in provider.options
@@ -450,14 +450,14 @@ class OptionsManagerMixIn(object):
         if group_name in self._mygroups:
             group = self._mygroups[group_name]
         else:
-            group = optparse.OptionGroup(self._optik_parser,
+            group = optparse.OptionGroup(self.cmdline_parser,
                                          title=group_name.capitalize())
-            self._optik_parser.add_option_group(group)
+            self.cmdline_parser.add_option_group(group)
             group.level = provider.level
             self._mygroups[group_name] = group
             # add section to the config file
             if group_name != "DEFAULT":
-                self._config_parser.add_section(group_name)
+                self.cfgfile_parser.add_section(group_name)
         # add provider's specific options
         for opt, optdict in options:
             self.add_optik_option(provider, group, opt, optdict)
@@ -555,7 +555,7 @@ class OptionsManagerMixIn(object):
         """
         self._monkeypatch_expand_default()
         try:
-            optparse.generate_manpage(self._optik_parser, pkginfo,
+            optparse.generate_manpage(self.cmdline_parser, pkginfo,
                                  section, stream=stream or sys.stdout)
         finally:
             self._unmonkeypatch_expand_default()
@@ -588,7 +588,7 @@ class OptionsManagerMixIn(object):
             optdict = {'action' : 'callback', 'callback' : helpfunc,
                        'help' : helpmsg}
             provider = self.options_providers[0]
-            self.add_optik_option(provider, self._optik_parser, opt, optdict)
+            self.add_optik_option(provider, self.cmdline_parser, opt, optdict)
             provider.options += ( (opt, optdict), )
             helplevel += 1
         if config_file is None:
@@ -596,7 +596,7 @@ class OptionsManagerMixIn(object):
         if config_file is not None:
             config_file = expanduser(config_file)
         if config_file and exists(config_file):
-            parser = self._config_parser
+            parser = self.cfgfile_parser
             parser.read([config_file])
             # normalize sections'title
             for sect, values in parser._sections.items():
@@ -629,7 +629,7 @@ class OptionsManagerMixIn(object):
         """dispatch values previously read from a configuration file to each
         options provider)
         """
-        parser = self._config_parser
+        parser = self.cfgfile_parser
         for provider in self.options_providers:
             for section, option, optdict in provider.all_options():
                 try:
@@ -657,7 +657,7 @@ class OptionsManagerMixIn(object):
                 args = sys.argv[1:]
             else:
                 args = list(args)
-            (options, args) = self._optik_parser.parse_args(args=args)
+            (options, args) = self.cmdline_parser.parse_args(args=args)
             for provider in self._nocallback_options.keys():
                 config = provider.config
                 for attr in config.__dict__.keys():
@@ -674,12 +674,12 @@ class OptionsManagerMixIn(object):
 
     def add_help_section(self, title, description, level=0):
         """add a dummy option section for help purpose """
-        group = optparse.OptionGroup(self._optik_parser,
+        group = optparse.OptionGroup(self.cmdline_parser,
                                      title=title.capitalize(),
                                      description=description)
         group.level = level
         self._maxlevel = max(self._maxlevel, level)
-        self._optik_parser.add_option_group(group)
+        self.cmdline_parser.add_option_group(group)
 
     def _monkeypatch_expand_default(self):
         # monkey patch optparse to deal with our default values
@@ -697,12 +697,24 @@ class OptionsManagerMixIn(object):
 
     def help(self, level=0):
         """return the usage string for available options """
-        self._optik_parser.formatter.output_level = level
+        self.cmdline_parser.formatter.output_level = level
         self._monkeypatch_expand_default()
         try:
-            return self._optik_parser.format_help()
+            return self.cmdline_parser.format_help()
         finally:
             self._unmonkeypatch_expand_default()
+
+    @property
+    def _optik_parser(self):
+        msg = '"_optik_parser" attribute has been renamed to "cmdline_parser"'
+        warn(msg, DeprecationWarning)
+        return self.cmdline_parser
+
+    @property
+    def _config_parser(self):
+        msg ='"_config_parser" attribute has been renamed to "cfgfile_parser"'
+        warn(msg, DeprecationWarning)
+        return self.cfgfile_parser
 
 
 class Method(object):
