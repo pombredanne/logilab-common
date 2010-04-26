@@ -10,7 +10,9 @@
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
-PY_VERSION:=$(shell pyversions -vd)
+
+# Python default version number
+PYDEF := $(shell pyversions -d -v)
 
 -include /usr/share/python/python.mk
 ifeq (,$(py_sitename))
@@ -25,20 +27,21 @@ build-stamp:
 	dh_testdir
 
 	# python module build
-	NO_SETUPTOOLS=1 python setup.py -q build --build-purelib=build/lib
+	NO_SETUPTOOLS=1 python setup.py -q build --build-purelib build/lib
 
 	# run tests
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
 	# we need this hack because we have to import "logilab.common.pytest"
 	# but since it's a namespace package, we need to "simulate" it
 	touch $(CURDIR)/build/lib/logilab/__init__.py
-	PYTHONPATH=$(CURDIR)/build/lib/ $(CURDIR)/build/scripts-$(PY_VERSION)/pytest
+	# use the default python version to select the script dir to run the tests
+	PYTHONPATH=$(CURDIR)/build/lib/ $(CURDIR)/build/scripts-$(PYDEF)/pytest -t test
+	rm -f $(CURDIR)/build/lib/logilab/__init__.py
 endif
 
 	# build doc
 	$(MAKE) -C doc
 
-	rm -f $(CURDIR)/build/lib/logilab/__init__.py
 	touch build-stamp
 
 clean:
@@ -62,11 +65,11 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	NO_SETUPTOOLS=1 python setup.py -q install --prefix=/usr --no-compile \
+	NO_SETUPTOOLS=1 python setup.py -q install --no-compile \
 		--root=$(CURDIR)/debian/python-logilab-common/ \
 		${py_setup_install_args}
 	# remove test directory
-	rm -rf debian/python-logilab-common/usr/lib/python*/site-packages/logilab/common/test
+	rm -rf debian/python-logilab-common/usr/lib/python*/*-packages/logilab/common/test
 
 # Build architecture-independent files here.
 binary-indep: build install
