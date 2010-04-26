@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # copyright 2003-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact: http://www.logilab.fr/ -- mailto:contact@logilab.fr
-# license: General Public License version 2 - http://www.gnu.org/licenses
+# license: GNU Lesser General Public License, v2.1 - http://www.gnu.org/licenses
 """Run tests.
 
 This will find all modules whose name match a given prefix in the test
