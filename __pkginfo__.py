@@ -8,7 +8,7 @@ __docformat__ = "restructuredtext en"
 
 distname = 'logilab-common'
 modname = 'common'
-numversion = (0, 50, 0)
+numversion = (0, 50, 1)
 version = '.'.join([str(num) for num in numversion])
 copyright = '2000-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.'
 license = 'LGPL'
