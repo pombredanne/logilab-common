@@ -1,6 +1,6 @@
 # copyright 2000-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
-# Licensed under the General Public License version 2 - http://www.gnu.org/licenses
+# Licensed under the Lesser General Public License version 2 - http://www.gnu.org/licenses
 """pytest is a tool that eases test running and debugging.
 
 To be able to use pytest, you should either write tests using

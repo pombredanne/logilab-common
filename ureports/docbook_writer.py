@@ -9,8 +9,7 @@
   mailto:python-projects@logilab.org
 
 :license:
-  `General Public License version 2
-  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>`_
+  `General Public License version 2`
 """
 from __future__ import generators
 __docformat__ = "restructuredtext en"

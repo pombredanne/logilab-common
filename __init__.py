@@ -16,8 +16,7 @@
   mailto:python-projects@logilab.org
 
 :license:
-  `General Public License version 2
-  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>`_
+  `Lesser General Public License version 2`
 """
 __docformat__ = "restructuredtext en"
 from logilab.common.__pkginfo__ import version as __version__
@@ -50,6 +49,8 @@ class dictattr(dict):
             raise KeyError(attr)
 
 class nullobject(object):
+    def __repr__(self):
+        return '<nullobject>'
     def __nonzero__(self):
         return False
 
