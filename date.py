@@ -33,7 +33,7 @@ try:
     from mx.DateTime import RelativeDateTime, Date, DateTimeType
 except ImportError:
     from warnings import warn
-    warn("mxDateTime not found, endsOfMonth won't be available")
+    warn("mxDateTime not found, endOfMonth won't be available")
     endOfMonth = None
     DateTimeType = datetime
 else:
