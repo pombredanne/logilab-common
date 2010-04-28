@@ -15,7 +15,7 @@
 # details.
 #
 # You should have received a copy of the GNU Lesser General Public License along
-# with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Wrappers around some builtins introduced in python 2.3, 2.4 and
 2.5, making them available in for earlier versions of python.
 

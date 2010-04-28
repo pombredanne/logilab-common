@@ -14,7 +14,7 @@
 # details.
 #
 # You should have received a copy of the GNU Lesser General Public License along
-# with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Graph manipulation utilities.
 
 (dot generation adapted from pypy/translator/tool/make_dot.py)

@@ -14,7 +14,7 @@
 # details.
 #
 # You should have received a copy of the GNU Lesser General Public License along
-# with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Wrappers to get actually replaceable DBAPI2 compliant modules and
 database connection whatever the database and client lib used.
 

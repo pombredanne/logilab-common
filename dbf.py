@@ -15,7 +15,7 @@
 # details.
 #
 # You should have received a copy of the GNU Lesser General Public License along
-# with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """This is a DBF reader which reads Visual Fox Pro DBF format with Memo field
 
 Usage:

@@ -14,7 +14,7 @@
 # details.
 #
 # You should have received a copy of the GNU Lesser General Public License along
-# with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Manipulation of upstream change log files.
 
 The upstream change log files format handled is simpler than the one

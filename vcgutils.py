@@ -14,7 +14,7 @@
 # details.
 #
 # You should have received a copy of the GNU Lesser General Public License along
-# with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Functions to generate files readable with Georg Sander's vcg
 (Visualization of Compiler Graphs).
 

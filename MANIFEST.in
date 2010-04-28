@@ -1,7 +1,7 @@
 include ChangeLog
 include README
 include COPYING
-include DEPENDS
+include COPYING.LESSER
 include bin/pytest
 include bin/pytest.bat
 include test/data/ChangeLog
