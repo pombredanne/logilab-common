@@ -305,7 +305,6 @@ class ProgressBar(object):
     def refresh(self):
         """Refresh the progression bar display."""
         self._stream.write(self._fstr % ('.' * min(self._progress, self._size)) )
-        draw_text = False
         if self._last_text_write_size or self._current_text:
             template = ' %%-%is' % (self._last_text_write_size)
             text = self._current_text
