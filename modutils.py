@@ -498,11 +498,10 @@ def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
       - is located on the path listed in one of the directory in `std_path`
       - is a built-in module
     """
-    modpath = modname.split('.')
-    modname = modpath[0]
+    modname = modname.split('.')[0]
     try:
-        filename = file_from_modpath(modpath)
-    except ImportError:
+        filename = file_from_modpath([modname])
+    except ImportError, ex:
         # import failed, i'm probably not so wrong by supposing it's
         # not standard...
         return 0
