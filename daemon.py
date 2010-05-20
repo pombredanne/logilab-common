@@ -15,16 +15,61 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
-"""A daemon mix-in class.
+"""A daemonize function (for Unices) and daemon mix-in class"""
 
-
-
-
-"""
 __docformat__ = "restructuredtext en"
 
-import os, signal, sys, time
+import os
+import errno
+import signal
+import sys
+import time
+import warnings
+
 from logilab.common.logger import make_logger, LOG_ALERT, LOG_NOTICE
+
+
+def daemonize(pidfile):
+    # See http://www.erlenstar.demon.co.uk/unix/faq_toc.html#TOC16
+    # XXX unix specific
+    #
+    # fork so the parent can exit
+    if os.fork():   # launch child and...
+        return 1
+    # deconnect from tty and create a new session
+    os.setsid()
+    # fork again so the parent, (the session group leader), can exit.
+    # as a non-session group leader, we can never regain a controlling
+    # terminal.
+    if os.fork():   # launch child again.
+        return 1
+    # move to the root to avoit mount pb
+    os.chdir('/')
+    # set paranoid umask
+    os.umask(077)
+    # redirect standard descriptors
+    null = os.open('/dev/null', os.O_RDWR)
+    for i in range(3):
+        try:
+            os.dup2(null, i)
+        except OSError, e:
+            if e.errno != errno.EBADF:
+                raise
+    os.close(null)
+    # filter warnings
+    warnings.filterwarnings('ignore')
+    # write pid in a file
+    if pidfile:
+        # ensure the directory where the pid-file should be set exists (for
+        # instance /var/run/cubicweb may be deleted on computer restart)
+        piddir = os.path.dirname(pidfile)
+        if not os.path.exists(piddir):
+            os.makedirs(piddir)
+        f = file(pidfile, 'w')
+        f.write(str(os.getpid()))
+        f.close()
+    return None
+
 
 class DaemonMixIn:
     """Mixin to make a daemon from watchers/queriers.
@@ -48,31 +93,12 @@ If it i not the case, remove the file %s''' % (self.name, self._pid_file))
 
     def _daemonize(self):
         if not self.config.NODETACH:
-            # fork so the parent can exist
-            if (os.fork()):
+            if daemonize(self._pid_file) is None:
+                # put signal handler
+                signal.signal(signal.SIGTERM, self.signal_handler)
+                signal.signal(signal.SIGHUP, self.signal_handler)
+            else:
                 return -1
-            # disconnect from tty and create a new session
-            os.setsid()
-            # fork again so the parent, (the session group leader), can exit.
-            # as a non-session group leader, we can never regain a controlling
-            # terminal.
-            if (os.fork()):
-                return -1
-            # move to the root to avoid mount pb
-            os.chdir('/')
-            # set paranoid umask
-            os.umask(077)
-            # write pid in a file
-            f = open(self._pid_file, 'w')
-            f.write(str(os.getpid()))
-            f.close()
-            # close standard descriptors
-            sys.stdin.close()
-            sys.stdout.close()
-            sys.stderr.close()
-            # put signal handler
-            signal.signal(signal.SIGTERM, self.signal_handler)
-            signal.signal(signal.SIGHUP, self.signal_handler)
 
     def run(self):
         """ optionally go in daemon mode and
