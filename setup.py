@@ -40,7 +40,7 @@ except ImportError:
 
 sys.modules.pop('__pkginfo__', None)
 # import required features
-from __pkginfo__ import modname, version, license, short_desc, long_desc, \
+from __pkginfo__ import modname, version, license, description, \
      web, author, author_email
 # import optional features
 import __pkginfo__
@@ -57,11 +57,13 @@ STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 
 IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc', '~')
 
-
+if exists('README'):
+    long_description = file('README').read()
+else:
+    long_description = ''
 
 def ensure_scripts(linux_scripts):
-    """
-    Creates the proper script names required for each platform
+    """Creates the proper script names required for each platform
     (taken from 4Suite)
     """
     from distutils import util
@@ -71,10 +73,8 @@ def ensure_scripts(linux_scripts):
         scripts_ = linux_scripts
     return scripts_
 
-
 def get_packages(directory, prefix):
-    """return a list of subpackages for the given directory
-    """
+    """return a list of subpackages for the given directory"""
     result = []
     for package in os.listdir(directory):
         absfile = join(directory, package)
@@ -185,8 +185,8 @@ def install(**kwargs):
     return setup(name = distname,
                  version = version,
                  license = license,
-                 description = short_desc,
-                 long_description = long_desc,
+                 description = description,
+                 long_description = long_description,
                  author = author,
                  author_email = author_email,
                  url = web,

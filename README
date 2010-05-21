@@ -12,6 +12,20 @@ It is released under the GNU Public License.
 There is no documentation available yet but the source code should be
 clean and well documented.
 
+Designed to ease:
+
+* handling command line options and configuration files
+* writing interactive command line tools
+* manipulation files and character strings
+* interfacing to OmniORB
+* generating SQL queries
+* running unit tests
+* manipulating tree structures
+* generating text and HTML reports
+* logging
+* parsing XML processing instructions
+* more...
+
 
 Installation
 ------------
