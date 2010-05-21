@@ -26,8 +26,6 @@ import sys
 import time
 import warnings
 
-from logilab.common.logger import make_logger, LOG_ALERT, LOG_NOTICE
-
 
 def daemonize(pidfile):
     # See http://www.erlenstar.demon.co.uk/unix/faq_toc.html#TOC16
@@ -84,11 +82,6 @@ class DaemonMixIn:
 If it i not the case, remove the file %s''' % (self.name, self._pid_file))
         self._alive = 1
         self._sleeping = 0
-        treshold = configmod.LOG_TRESHOLD
-        if configmod.NODETACH:
-            configmod.log = make_logger('print', treshold, self.name).log
-        else:
-            configmod.log = make_logger('syslog', treshold, self.name).log
         self.config = configmod
 
     def _daemonize(self):
@@ -107,17 +100,16 @@ If it i not the case, remove the file %s''' % (self.name, self._pid_file))
         """
         if self._daemonize() == -1:
             return
-        self.config.log(LOG_NOTICE, '%s instance started' % self.name)
         if self.delay < 0:
             self.delay = -self.delay
             time.sleep(self.delay)
         while 1:
             try:
                 self._run()
-            except Exception, e:
+            except Exception, ex:
                 # display for info, sleep, and hope the problem will be solved
                 # later.
-                self.config.log(LOG_ALERT, 'Internal error: %s'%(e))
+                self.config.exception('Internal error: %s', ex)
             if not self._alive:
                 break
             try:
@@ -126,7 +118,7 @@ If it i not the case, remove the file %s''' % (self.name, self._pid_file))
                 self._sleeping = 0
             except SystemExit:
                 break
-        self.config.log(LOG_NOTICE, '%s instance exited'%self.name)
+        self.config.info('%s instance exited', self.name)
         # remove pid file
         os.remove(self._pid_file)
 
@@ -134,18 +126,23 @@ If it i not the case, remove the file %s''' % (self.name, self._pid_file))
         if sig_num == signal.SIGTERM:
             if self._sleeping:
                 # we are sleeping so we can exit without fear
-                self.config.log(LOG_NOTICE, 'exit on SIGTERM')
+                self.config.debug('exit on SIGTERM')
                 sys.exit(0)
             else:
-                self.config.log(LOG_NOTICE, 'exit on SIGTERM (on next turn)')
+                self.config.debug('exit on SIGTERM (on next turn)')
                 self._alive = 0
         elif sig_num == signal.SIGHUP:
-            self.config.log(LOG_NOTICE, 'reloading configuration on SIGHUP')
+            self.config.info('reloading configuration on SIGHUP')
             reload(self.config)
 
     def _run(self):
         """should be overridden in the mixed class"""
         raise NotImplementedError()
+
+
+import logging
+from logilab.common.logging_ext import set_log_methods
+set_log_methods(DaemonMixIn, logging.getLogger('lgc.daemon'))
 
 ## command line utilities ######################################################
 
