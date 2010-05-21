@@ -7,8 +7,15 @@ ChangeLog for logilab.common
     * daemon: new daemonize function
 
     * modutils: fix some false negative of is_standard_module with
-	'from module import something" where something isn't a submodule
+     'from module import something" where something isn't a submodule
 
+    * optik_ext: fix help generation for normal optparse using script if
+      optik_ext has been imported (#24450)
+
+    * textutils support 256 colors when available
+
+
+    * testlib] add option splitlines to assertTextEquals
 
 
 2010-04-26  --  0.50.1
