@@ -418,11 +418,12 @@ def _get_ansi_code(color=None, style=None):
         style_attrs = splitstrip(style)
         for effect in style_attrs:
             ansi_code.append(ANSI_STYLES[effect])
-    if color.isdigit():
-        ansi_code.extend(['38','5'])
-        ansi_code.append(color)
-    else:
-        ansi_code.append(ANSI_COLORS[color])
+    if color:
+        if color.isdigit():
+            ansi_code.extend(['38','5'])
+            ansi_code.append(color)
+        else:
+            ansi_code.append(ANSI_COLORS[color])
     if ansi_code:
         return ANSI_PREFIX + ';'.join(ansi_code) + ANSI_END
     return ''
