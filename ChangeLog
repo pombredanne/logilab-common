@@ -1,21 +1,26 @@
 ChangeLog for logilab.common
 ============================
 
-	-- 
+2010-05-21  --  0.50.2
+    * fix licensing information: LGPL v2.1 or greater
 
-	* fix licensing information: LGPL v2.1 or greater
-	* daemon: new daemonize function
+    * daemon: new daemonize function
 
-	* modutils: fix some false negative of is_standard_module with
+    * modutils: fix some false negative of is_standard_module with
 	'from module import something" where something isn't a submodule
 
-2010-04-26  --  0.50.1
 
-	* implements __repr__ on nullobject
-	* configuration: avoid crash by skipping option without 'type'
+
+2010-04-26  --  0.50.1
+    * implements __repr__ on nullobject
+
+    * configuration: avoid crash by skipping option without 'type'
           entry while input a config
-        * pyro_ext: raise PyroError instead of exception
-	
+
+    * pyro_ext: raise PyroError instead of exception
+
+
+
 2010-04-20  --  0.50.0
     * graph:
      - generate methods now takes an optional mapfile argument to generate

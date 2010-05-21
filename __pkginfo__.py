@@ -20,7 +20,7 @@ __docformat__ = "restructuredtext en"
 
 distname = 'logilab-common'
 modname = 'common'
-numversion = (0, 50, 1)
+numversion = (0, 50, 2)
 version = '.'.join([str(num) for num in numversion])
 copyright = '2003-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.'
 license = 'LGPL' # 2.1 or later
@@ -58,6 +58,4 @@ subpackage_master = True
 scripts = ('bin/pytest',)
 from os.path import join
 include_dirs = [join('test', 'data')]
-pyversions = ['2.3', '2.4', '2.5']
-debian_maintainer = 'Alexandre Fayolle'
-debian_maintainer_email = 'afayolle@debian.org'
+pyversions = ['2.4', '2.5', '2.6']
