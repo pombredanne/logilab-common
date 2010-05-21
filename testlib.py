@@ -1491,7 +1491,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                 self.fail('\n'.join(['%s\n'%msg_prefix]+read + list(result)))
 
     def assertTextEquals(self, text1, text2, junk=None,
-            msg_prefix='Text differ'):
+            msg_prefix='Text differ', striplines=False):
         """compare two multiline strings (using difflib and splitlines())"""
         msg = []
         if not isinstance(text1, basestring):
@@ -1500,8 +1500,12 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             msg.append('text2 is not a string (%s)'%(type(text2)))
         if msg:
             self.fail('\n'.join(msg))
-        self._difftext(text1.strip().splitlines(True), text2.strip().splitlines(True),
-                       junk,  msg_prefix)
+        lines1 = text1.strip().splitlines(True)
+        lines2 = text2.strip().splitlines(True)
+        if striplines:
+            lines1 = [line.strip() for line in lines1]
+            lines2 = [line.strip() for line in lines2]
+        self._difftext(lines1, lines2, junk,  msg_prefix)
     assertTextEqual = assertTextEquals
 
     def assertStreamEquals(self, stream1, stream2, junk=None,

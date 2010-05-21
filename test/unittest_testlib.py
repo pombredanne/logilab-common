@@ -218,7 +218,9 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.tc.assertTextEqual, "toto", None)
         self.assertRaises(AssertionError, self.tc.assertTextEqual, 3.12, u"toto")
         self.assertRaises(AssertionError, self.tc.assertTextEqual, None, u"toto")
-
+        self.tc.assertTextEqual('toto\ntiti', 'toto\ntiti')
+        self.tc.assertTextEqual('toto\ntiti', 'toto\n titi\n', striplines=True)
+        self.assertRaises(AssertionError, self.tc.assertTextEqual, 'toto\ntiti', 'toto\n titi\n')
         foo = join(dirname(__file__), 'data', 'foo.txt')
         spam = join(dirname(__file__), 'data', 'spam.txt')
         text1 = file(foo).read()

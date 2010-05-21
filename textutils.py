@@ -395,13 +395,13 @@ ANSI_COLORS = {
     'white'   : "37",
 }
 
-
 def _get_ansi_code(color=None, style=None):
     """return ansi escape code corresponding to color and style
 
     :type color: str or None
     :param color:
-      the color identifier (see `ANSI_COLORS` for available values)
+      the color name (see `ANSI_COLORS` for available values)
+      or the color number when 256 colors are available
 
     :type style: str or None
     :param style:
@@ -418,7 +418,10 @@ def _get_ansi_code(color=None, style=None):
         style_attrs = splitstrip(style)
         for effect in style_attrs:
             ansi_code.append(ANSI_STYLES[effect])
-    if color:
+    if color.isdigit():
+        ansi_code.extend(['38','5'])
+        ansi_code.append(color)
+    else:
         ansi_code.append(ANSI_COLORS[color])
     if ansi_code:
         return ANSI_PREFIX + ';'.join(ansi_code) + ANSI_END
