@@ -8,8 +8,8 @@ Uploaders: David Douard <david.douard@logilab.fr>,
 	   Dorothe Sénéchal <dorothee.senechal@logilab.fr>,
 	   Adrien Di Mascio <Adrien.DiMascio@logilab.fr>,
 	   Nicolas Chauvat <nicolas.chauvat@logilab.fr>
-Build-Depends: debhelper (>= 5.0.38), python (>= 2.4.6-2), python-egenix-mxdatetime
-Build-Depends-Indep: python-support, python-epydoc, graphviz
+Build-Depends: debhelper (>= 5.0.38), python (>= 2.4.6-2)
+Build-Depends-Indep: python-support, python-epydoc, graphviz, python-egenix-mxdatetime
 XS-Python-Version: all
 Standards-Version: 3.8.2
 Homepage: http://www.logilab.org/project/logilab-common

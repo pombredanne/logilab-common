@@ -199,7 +199,6 @@ class Debugger(Pdb):
 
     do_o = do_open
 
-
 def pm():
     """use our custom debugger"""
     dbg = Debugger(sys.last_traceback)
