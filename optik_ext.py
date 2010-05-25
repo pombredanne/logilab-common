@@ -370,9 +370,10 @@ Please report bugs on the project\'s mailing list:
        pkginfo.mailinglist, pkginfo.author, pkginfo.author_email)
 
 
-def generate_manpage(optparser, pkginfo, section=1, stream=sys.stdout):
+def generate_manpage(optparser, pkginfo, section=1, stream=sys.stdout, level=0):
     """generate a man page from an optik parser"""
     formatter = ManHelpFormatter()
+    formatter.output_level = level
     formatter.parser = optparser
     print >> stream, formatter.format_head(optparser, pkginfo, section)
     print >> stream, optparser.format_option_help(formatter)

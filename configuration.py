@@ -573,7 +573,8 @@ class OptionsManagerMixIn(object):
         self._monkeypatch_expand_default()
         try:
             optparse.generate_manpage(self.cmdline_parser, pkginfo,
-                                 section, stream=stream or sys.stdout)
+                                      section, stream=stream or sys.stdout,
+                                      level=self._maxlevel)
         finally:
             self._unmonkeypatch_expand_default()
 
