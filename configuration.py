@@ -1069,7 +1069,7 @@ def read_old_config(newconfig, changes, configfile):
             newconfig[optname] = newvalue
             done.add(optname)
     for optname, optdef in newconfig.options:
-        if not optname in done:
+        if optdef.get('type') and not optname in done:
             newconfig.set_option(optname, oldconfig[optname], optdict=optdef)
 
 
