@@ -166,7 +166,10 @@ def nb_open_days(start, end):
     open_days = weeks * 5 + plus
     nb_week_holidays = len([x for x in get_national_holidays(start, end+step)
                             if weekday(x) < 5 and x < end])
-    return open_days - nb_week_holidays
+    open_days -= nb_week_holidays
+    if open_days < 0:
+        return 0
+    return open_days
 
 def date_range(begin, end, incday=None, incmonth=None):
     """yields each date between begin and end
