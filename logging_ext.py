@@ -103,7 +103,8 @@ LOG_FORMAT = '%(asctime)s - (%(name)s) %(levelname)s: %(message)s'
 LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
-             logformat=LOG_FORMAT, logdateformat=LOG_DATE_FORMAT):
+             logformat=LOG_FORMAT, logdateformat=LOG_DATE_FORMAT,
+             rotation_parameters=None):
     """init the log service"""
     if os.environ.get('APYCOT_ROOT'):
         logthreshold = logging.CRITICAL
@@ -120,7 +121,12 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
                 handler = logging.StreamHandler()
         else:
             try:
-                handler = logging.FileHandler(logfile)
+                if rotation_parameters is None:
+                    handler = logging.FileHandler(logfile)
+                else:
+                    from logging.handlers import TimedRotatingFileHandler
+                    handler = TimedRotatingFileHandler(logfile, 
+                                                       **rotation_parameters)
             except IOError:
                 handler = logging.StreamHandler()
         if logthreshold is None:
