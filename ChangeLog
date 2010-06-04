@@ -1,6 +1,17 @@
 ChangeLog for logilab.common
 ============================
 
+2010-06-04  --  0.50.3
+    * logging: added new optional kw argument to init_log rotating_parameters
+
+    * date: fix nb_open_days() codomain, positive natural numbers are expected
+
+    * configuration:
+	 - skip option with no type, avoid pb with generated option such as long-help
+	- handle level on man page generation
+
+
+
 2010-05-21  --  0.50.2
     * fix licensing information: LGPL v2.1 or greater
 
@@ -14,8 +25,8 @@ ChangeLog for logilab.common
 
     * textutils support 256 colors when available
 
-
     * testlib] add option splitlines to assertTextEquals
+
 
 
 2010-04-26  --  0.50.1
