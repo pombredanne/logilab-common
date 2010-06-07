@@ -317,10 +317,9 @@ class ManHelpFormatter(HelpFormatter):
         except AttributeError:
             # py >= 2.4.X (dunno which X exactly, at least 2)
             pgm = optparser.get_prog_name()
-        short_desc = self.format_short_description(pgm, pkginfo.short_desc)
-        long_desc = self.format_long_description(pgm, pkginfo.long_desc)
-        return '%s\n%s\n%s\n%s' % (self.format_title(pgm, section), short_desc,
-                                   self.format_synopsis(pgm), long_desc)
+        short_desc = self.format_short_description(pgm, pkginfo.description)
+        return '%s\n%s\n%s' % (self.format_title(pgm, section), short_desc,
+                               self.format_synopsis(pgm))
 
     def format_title(self, pgm, section):
         date = '-'.join([str(num) for num in time.localtime()[:3]])
@@ -370,9 +369,10 @@ Please report bugs on the project\'s mailing list:
        pkginfo.mailinglist, pkginfo.author, pkginfo.author_email)
 
 
-def generate_manpage(optparser, pkginfo, section=1, stream=sys.stdout):
+def generate_manpage(optparser, pkginfo, section=1, stream=sys.stdout, level=0):
     """generate a man page from an optik parser"""
     formatter = ManHelpFormatter()
+    formatter.output_level = level
     formatter.parser = optparser
     print >> stream, formatter.format_head(optparser, pkginfo, section)
     print >> stream, optparser.format_option_help(formatter)

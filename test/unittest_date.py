@@ -114,6 +114,10 @@ class DateTC(TestCase):
         x = self.now()
         self.assertOpenDays(x, x, 0)
 
+    def test_open_days_now_now2(self):
+        x = self.datetimecls(2010, 5, 24)
+        self.assertOpenDays(x, x, 0)
+
     def test_open_days_afternoon_before_holiday(self):
         self.assertOpenDays(self.datetimecls(2008, 5, 7, 14), self.datetimecls(2008, 5, 8, 0), 1)
 

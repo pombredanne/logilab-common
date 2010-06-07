@@ -21,10 +21,9 @@ __docformat__ = "restructuredtext en"
 distname = 'logilab-common'
 modname = 'common'
 
-numversion = (0, 50, 2)
+numversion = (0, 50, 3)
 version = '.'.join([str(num) for num in numversion])
 
-copyright = 'Copyright (c) 2003-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.'
 license = 'LGPL' # 2.1 or later
 
 author = "Logilab"

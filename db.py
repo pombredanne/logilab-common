@@ -32,10 +32,6 @@ you can control which one you want to use using the
 Additional helpers are also provided for advanced functionalities such
 as listing existing users or databases, creating database... Get the
 helper for your database using the `get_adv_func_helper` function.
-
-
-
-
 """
 __docformat__ = "restructuredtext en"
 
