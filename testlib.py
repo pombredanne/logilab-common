@@ -502,13 +502,10 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         if self.options is not None:
             tags_pattern = getattr(self.options, 'tags_pattern', None)
             if tags_pattern is not None:
-                tags = getattr(test, 'tags', None)
-                if tags is not None:
-                    return tags.match(tags_pattern)
-                if isinstance(test, types.MethodType):
-                    tags = getattr(test.im_class, 'tags', Tags())
-                    return tags.match(tags_pattern)
-                return False
+                tags = getattr(test, 'tags', Tags())
+                if tags.inherit and isinstance(test, types.MethodType):
+                    tags = tags | getattr(test.im_class, 'tags', Tags())
+                return tags.match(tags_pattern)
         return True # no pattern
 
     def _makeResult(self):
@@ -995,12 +992,30 @@ class InnerTest(tuple):
         instance.name = name
         return instance
 
+class Tags(set):
+    """A set of tag able validate an expression"""
+
+    def __init__(self, *tags, **kwargs):
+        self.inherit = kwargs.pop('inherit', True)
+        if kwargs:
+           raise TypeError("%s are an invalid keyword argument for this function" % kwargs.keys())
+
+        if len(tags) == 1 and not isinstance(tags[0], basestring):
+            tags = tags[0]
+        super(Tags, self).__init__(tags, **kwargs)
+
+    def __getitem__(self, key):
+        return key in self
+
+    def match(self, exp):
+        return eval(exp, {}, self)
 
 class TestCase(unittest.TestCase):
     """A unittest.TestCase extension with some additional methods."""
 
     capture = False
     pdbclass = Debugger
+    tags = Tags()
 
     def __init__(self, methodName='runTest'):
         super(TestCase, self).__init__(methodName)
@@ -1945,21 +1960,13 @@ class AttrObject: # XXX cf mock_object
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
-def tag(*args):
+def tag(*args, **kwargs):
     """descriptor adding tag to a function"""
     def desc(func):
         assert not hasattr(func, 'tags')
-        func.tags = Tags(args)
+        func.tags = Tags(*args, **kwargs)
         return func
     return desc
-
-class Tags(set):
-    """A set of tag able validate an expression"""
-    def __getitem__(self, key):
-        return key in self
-
-    def match(self, exp):
-        return eval(exp, {}, self)
 
 def require_version(version):
     """ Compare version of python interpreter to the given one. Skip the test
