@@ -27,7 +27,7 @@ version = '.'.join([str(num) for num in numversion])
 license = 'LGPL' # 2.1 or later
 
 author = "Logilab"
-author_email = "devel@logilab.fr"
+author_email = "contact@logilab.fr"
 
 description = "collection of low-level Python packages and modules used by Logilab projects"
 web = "http://www.logilab.org/project/%s" % distname

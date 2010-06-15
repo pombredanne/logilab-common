@@ -353,11 +353,8 @@ class ManHelpFormatter(HelpFormatter):
 ''' % (pgm, long_desc.strip())
 
     def format_tail(self, pkginfo):
-        return '''.SH SEE ALSO
+        tail = '''.SH SEE ALSO
 /usr/share/doc/pythonX.Y-%s/
-
-.SH COPYRIGHT
-%s
 
 .SH BUGS
 Please report bugs on the project\'s mailing list:
@@ -365,9 +362,16 @@ Please report bugs on the project\'s mailing list:
 
 .SH AUTHOR
 %s <%s>
-''' % (getattr(pkginfo, 'debian_name', pkginfo.modname), pkginfo.copyright,
+''' % (getattr(pkginfo, 'debian_name', pkginfo.modname),
        pkginfo.mailinglist, pkginfo.author, pkginfo.author_email)
 
+        if hasattr(pkginfo, "copyright"):
+            tail += '''
+.SH COPYRIGHT
+%s
+''' % pkginfo.copyright
+
+        return tail
 
 def generate_manpage(optparser, pkginfo, section=1, stream=sys.stdout, level=0):
     """generate a man page from an optik parser"""

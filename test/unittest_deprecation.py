@@ -22,8 +22,6 @@ import warnings
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common import deprecation
 
-def moving_target():
-    pass
 
 class RawInputTC(TestCase):
 
@@ -67,8 +65,7 @@ class RawInputTC(TestCase):
         any_func()
 
     def test_moved(self):
-        # this test needs l.c.test.__init__
-        module = 'logilab.common.test.unittest_deprecation'
+        module = 'data.deprecation'
         any_func = deprecation.moved(module, 'moving_target')
         any_func()
 
