@@ -60,8 +60,14 @@ import warnings
 from compiler.consts import CO_GENERATOR
 from ConfigParser import ConfigParser
 from itertools import dropwhile
-from functools import wraps
-
+try:
+    from functools import wraps
+except ImportError:
+    def wraps(wrapped):
+        def proxy(callable):
+            callable.__name__ = wrapped.__name__
+            return callable
+        return proxy
 try:
     from test import test_support
 except ImportError:
