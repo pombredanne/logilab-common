@@ -1402,11 +1402,9 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         """
         try:
             from xml.etree.ElementTree import fromstring
-            self._assertETXMLWellFormed(xml_string, fromstring, msg)
         except ImportError:
-            raise
-            stream = StringIO(xml_string)
-            self.assertXMLWellFormed(stream, msg)
+            from elementtree.ElementTree import fromstring
+        self._assertETXMLWellFormed(xml_string, fromstring, msg)
 
     def _assertETXMLWellFormed(self, data, parse, msg=None, context=2):
         """internal function used by /assertXML(String)?WellFormed/ functions

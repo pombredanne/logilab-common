@@ -231,8 +231,7 @@ diffgroup=pouet
         # it is not unlikely some optik/optparse versions do print -v<string>
         # so accept both
         help = help.replace(' -v <string>, ', ' -v<string>, ')
-        if version_info >= (2, 5):
-            self.assertLinesEquals(help, """Usage: Just do it ! (tm)
+        USAGE = """Usage: Just do it ! (tm)
 
 Options:
   -h, --help            show this help message and exit
@@ -245,31 +244,17 @@ Options:
   --multiple-choice=<yo|ye>
   --named=<key=val>
 
-  Agroup:
-    --diffgroup=<key=val>
+Agroup:
+  --diffgroup=<key=val>
 
-  Bonus:
-    a nice additional help
-""", striplines=True)
-        elif version_info >= (2, 4):
-            self.assertLinesEquals(help, """usage: Just do it ! (tm)
-
-options:
-  -h, --help            show this help message and exit
-  --dothis=<y or n>
-  -v<string>, --value=<string>
-  --multiple=<comma separated values>
-                        you can also document the option [current: yop,yep]
-  --number=<int>        boom [current: 2]
-  --choice=<yo|ye>
-  --multiple-choice=<yo|ye>
-  --named=<key=val>
-
-  Bonus:
-    a nice additional help
-""", striplines=True)
-        else:
-            self.assertLinesEquals(help, """usage: Just do it ! (tm)
+Bonus:
+  a nice additional help
+"""
+        if version_info < (2, 5):
+            # 'usage' header is not capitalized in this version
+            USAGE = USAGE.replace('Usage: ', 'usage: ')
+        elif version_info < (2, 4):
+            USAGE = """usage: Just do it ! (tm)
 
 options:
   -h, --help            show this help message and exit
@@ -284,7 +269,9 @@ options:
 
   Bonus:
     a nice additional help
-""", striplines=True)
+"""
+
+        self.assertLinesEquals(help, USAGE, striplines=True)
 
 
     def test_manpage(self):
