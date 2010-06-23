@@ -870,7 +870,7 @@ class TagTC(TestCase):
         self.func = bob
 
         class TagTestTC(TestCase):
-            tags = Tags(('one', 'two'))
+            tags = Tags('one', 'two')
 
             def test_one(self):
                 self.assertTrue(True)
@@ -879,7 +879,7 @@ class TagTC(TestCase):
             def test_two(self):
                 self.assertTrue(True)
 
-            @tag('three')
+            @tag('three', inherit=False)
             def test_three(self):
                 self.assertTrue(True)
         self.cls = TagTestTC
@@ -927,7 +927,7 @@ class TagTC(TestCase):
 
         runner = SkipAwareTextTestRunner(options=options('one'))
         self.assertTrue(runner.does_match_tags(cls.test_one))
-        self.assertFalse(runner.does_match_tags(cls.test_two))
+        self.assertTrue(runner.does_match_tags(cls.test_two))
         self.assertFalse(runner.does_match_tags(cls.test_three))
 
         runner = SkipAwareTextTestRunner(options=options('two'))

@@ -508,13 +508,10 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         if self.options is not None:
             tags_pattern = getattr(self.options, 'tags_pattern', None)
             if tags_pattern is not None:
-                tags = getattr(test, 'tags', None)
-                if tags is not None:
-                    return tags.match(tags_pattern)
-                if isinstance(test, types.MethodType):
-                    tags = getattr(test.im_class, 'tags', Tags())
-                    return tags.match(tags_pattern)
-                return False
+                tags = getattr(test, 'tags', Tags())
+                if tags.inherit and isinstance(test, types.MethodType):
+                    tags = tags | getattr(test.im_class, 'tags', Tags())
+                return tags.match(tags_pattern)
         return True # no pattern
 
     def _makeResult(self):
@@ -1001,12 +998,30 @@ class InnerTest(tuple):
         instance.name = name
         return instance
 
+class Tags(set):
+    """A set of tag able validate an expression"""
+
+    def __init__(self, *tags, **kwargs):
+        self.inherit = kwargs.pop('inherit', True)
+        if kwargs:
+           raise TypeError("%s are an invalid keyword argument for this function" % kwargs.keys())
+
+        if len(tags) == 1 and not isinstance(tags[0], basestring):
+            tags = tags[0]
+        super(Tags, self).__init__(tags, **kwargs)
+
+    def __getitem__(self, key):
+        return key in self
+
+    def match(self, exp):
+        return eval(exp, {}, self)
 
 class TestCase(unittest.TestCase):
-    """unittest.TestCase with some additional methods"""
+    """A unittest.TestCase extension with some additional methods."""
 
     capture = False
     pdbclass = Debugger
+    tags = Tags()
 
     def __init__(self, methodName='runTest'):
         super(TestCase, self).__init__(methodName)
@@ -1260,11 +1275,19 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         raise InnerTestSkipped(msg)
 
     def assertIn(self, object, set):
-        """assert <object> are in <set>"""
+        """assert <object> is in <set>
+
+        :param object: a Python Object
+        :param set: a Python Container
+        """
         self.assert_(object in set, "%s not in %s" % (object, set))
 
     def assertNotIn(self, object, set):
-        """assert <object> are not in <set>"""
+        """assert <object> is not in <set>
+
+        :param object: a Python Object
+        :param set: the Python container to contain <object>
+        """
         self.assert_(object not in set, "%s in %s" % (object, set))
 
     def assertDictEquals(self, dict1, dict2):
@@ -1272,6 +1295,8 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
 
         If the two dict differ, the first difference is shown in the error
         message
+        :param dict1: a Python Dictionary
+        :param dict2: a Python Dictionary
         """
         dict1 = dict(dict1)
         msgs = []
@@ -1290,9 +1315,13 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
     assertDictEqual = assertDictEquals
 
 
-
     def assertUnorderedIterableEquals(self, got, expected, msg=None):
-        """compares two iterable and shows difference between both"""
+        """compares two iterable and shows difference between both
+
+        :param got: the unordered Iterable that we found
+        :param expected: the expected unordered Iterable
+        :param msg: custom message (String) in case of failure
+        """
         got, expected = list(got), list(expected)
         self.assertSetEqual(set(got), set(expected), msg)
         if len(got) != len(expected):
@@ -1318,6 +1347,15 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
     assertUnordIterEquals = assertUnordIterEqual = assertUnorderedIterableEqual
 
     def assertSetEquals(self,got,expected, msg=None):
+        """compares two sets and shows difference between both
+
+        Don't use it for iterables other than sets.
+
+        :param got: the Set that we found
+        :param expected: the second Set to be compared to the first one
+        :param msg: custom message (String) in case of failure
+        """
+
         if not(isinstance(got, set) and isinstance(expected, set)):
             warnings.warn("the assertSetEquals function if now intended for set only."\
                           "use assertUnorderedIterableEquals instead.",
@@ -1341,6 +1379,10 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
 
         If the two list differ, the first difference is shown in the error
         message
+
+        :param list_1: a Python List
+        :param list_2: a second Python List
+        :param msg: custom message (String) in case of failure
         """
         _l1 = list_1[:]
         for i, value in enumerate(list_2):
@@ -1362,21 +1404,29 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             self.fail(msg)
     assertListEqual = assertListEquals
 
-    def assertLinesEquals(self, list_1, list_2, msg=None, striplines=False):
-        """assert list of lines are equal"""
-        lines1 = list_1.splitlines()
+    def assertLinesEquals(self, string1, string2, msg=None, striplines=False):
+        """compare two strings and assert that the text lines of the strings
+        are equal.
+
+        :param string1: a String
+        :param string2: a String
+        :param msg: custom message (String) in case of failure
+        :param striplines: Boolean to trigger line stripping before comparing
+        """
+        lines1 = string1.splitlines()
+        lines2 = string2.splitlines()
         if striplines:
             lines1 = [l.strip() for l in lines1]
-        lines2 = list_2.splitlines()
-        if striplines:
             lines2 = [l.strip() for l in lines2]
         self.assertListEquals(lines1, lines2, msg)
     assertLineEqual = assertLinesEquals
 
     def assertXMLWellFormed(self, stream, msg=None, context=2):
         """asserts the XML stream is well-formed (no DTD conformance check)
-        :context: number of context lines in standard msg. all data if negativ
-                  only available with element tree
+
+        :param context: number of context lines in standard message
+                        (show all data if negative).
+                        Only available with element tree
         """
         try:
             from xml.etree.ElementTree import parse
@@ -1397,8 +1447,10 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
 
     def assertXMLStringWellFormed(self, xml_string, msg=None, context=2):
         """asserts the XML string is well-formed (no DTD conformance check)
-        :context: number of context lines in standard msg. all data if negativ
-                  only available with element tree
+
+        :param context: number of context lines in standard message
+                        (show all data if negative).
+                        Only available with element tree
         """
         try:
             from xml.etree.ElementTree import fromstring
@@ -1408,11 +1460,13 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
 
     def _assertETXMLWellFormed(self, data, parse, msg=None, context=2):
         """internal function used by /assertXML(String)?WellFormed/ functions
-        :data: xml_data
-        :parse: appropriate parser function for this data
-        :msg: error message
-        :context: number of context lines in standard msg. all data if negativ
-                  only available with element tree
+
+        :param data: xml_data
+        :param parse: appropriate parser function for this data
+        :param msg: error message
+        :param context: number of context lines in standard message
+                        (show all data if negative).
+                        Only available with element tree
         """
         from xml.parsers.expat import ExpatError
         try:
@@ -1496,7 +1550,14 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
 
     def assertTextEquals(self, text1, text2, junk=None,
             msg_prefix='Text differ', striplines=False):
-        """compare two multiline strings (using difflib and splitlines())"""
+        """compare two multiline strings (using difflib and splitlines())
+        
+        :param text1: a Python BaseString
+        :param text2: a second Python Basestring
+        :param junk: List of Caracters
+        :param msg_prefix: String (message prefix)
+        :param striplines: Boolean to trigger line stripping before comparing
+        """
         msg = []
         if not isinstance(text1, basestring):
             msg.append('text1 is not a string (%s)'%(type(text1)))
@@ -1600,7 +1661,14 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
 
 
     def assertIsInstance(self, obj, klass, msg=None, strict=False):
-        """compares two files using difflib"""
+        """check if an object is an instance of a class
+
+        :param obj: the Python Object to be checked
+        :param klass: the target class
+        :param msg: a String for a custom message
+        :param strict: if True, check that the class of <obj> is <klass>;
+                       else check with 'isinstance'
+        """
         if msg is None:
             if strict:
                 msg = '%r is not of class %s but of %s'
@@ -1613,7 +1681,12 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             self.assert_(isinstance(obj, klass), msg)
 
     def assertIs(self, obj, other, msg=None):
-        """compares identity of two reference"""
+        """compares identity of two reference
+
+        :param obj: a Python Object
+        :param other: another Python Object
+        :param msg: a String for a custom message
+        """
         if msg is None:
             msg = "%r is not %r"%(obj, other)
         self.assert_(obj is other, msg)
@@ -1626,7 +1699,10 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         self.assert_(obj is not other, msg )
 
     def assertNone(self, obj, msg=None):
-        """assert obj is None"""
+        """assert obj is None
+
+        :param obj: Python Object to be tested
+        """
         if msg is None:
             msg = "reference to %r when None expected"%(obj,)
         self.assert_( obj is None, msg )
@@ -1638,7 +1714,15 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         self.assert_( obj is not None, msg )
 
     def assertFloatAlmostEquals(self, obj, other, prec=1e-5, msg=None):
-        """compares two floats"""
+        """compares if two floats have a distance smaller than expected
+        precision.
+
+        :param obj: a Float
+        :param other: another Float to be comparted to <obj>
+        :param prec: a Float describing the precision
+        :param msg: a String for a custom message
+        """
+
         if msg is None:
             msg = "%r != %r" % (obj, other)
         self.assert_(math.fabs(obj - other) < prec, msg)
@@ -1653,6 +1737,11 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         thrown, it will not be caught, and the test case will be
         deemed to have suffered an error, exactly as for an
         unexpected exception.
+
+        :param excClass: the Exception to be raised
+        :param callableObj: a callable Object which should raise <excClass>
+        :param args: a List of arguments for <callableObj>
+        :param kwargs: a List of keyword arguments  for <callableObj>
         """
         try:
             callableObj(*args, **kwargs)
@@ -1875,21 +1964,13 @@ class AttrObject: # XXX cf mock_object
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
-def tag(*args):
+def tag(*args, **kwargs):
     """descriptor adding tag to a function"""
     def desc(func):
         assert not hasattr(func, 'tags')
-        func.tags = Tags(args)
+        func.tags = Tags(*args, **kwargs)
         return func
     return desc
-
-class Tags(set):
-    """A set of tag able validate an expression"""
-    def __getitem__(self, key):
-        return key in self
-
-    def match(self, exp):
-        return eval(exp, {}, self)
 
 def require_version(version):
     """ Compare version of python interpreter to the given one. Skip the test
