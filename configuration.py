@@ -481,8 +481,8 @@ class OptionsManagerMixIn(object):
 
     def add_optik_option(self, provider, optikcontainer, opt, optdict):
         if 'inputlevel' in optdict:
-            warn('"inputlevel" in option dictionary for %s is deprecated, use'
-                 '"level"' % opt, DeprecationWarning)
+            warn('[0.50] "inputlevel" in option dictionary for %s is deprecated,'
+                 ' use "level"' % opt, DeprecationWarning)
             optdict['level'] = optdict.pop('inputlevel')
         args, optdict = self.optik_option(provider, opt, optdict)
         option = optikcontainer.add_option(*args, **optdict)
