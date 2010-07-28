@@ -1036,6 +1036,8 @@ class TestCase(unittest.TestCase):
         self._current_test_descr = None
         self._options_ = None
 
+    @classproperty
+    @cached
     def datadir(cls): # pylint: disable-msg=E0213
         """helper attribute holding the standard test's data directory
 
@@ -1045,12 +1047,11 @@ class TestCase(unittest.TestCase):
         return osp.join(osp.dirname(osp.abspath(mod.__file__)), 'data')
     # cache it (use a class method to cache on class since TestCase is
     # instantiated for each test run)
-    datadir = classproperty(cached(datadir))
 
+    @classmethod
     def datapath(cls, *fname):
         """joins the object's datadir and `fname`"""
         return osp.join(cls.datadir, *fname)
-    datapath = classmethod(datapath)
 
     def set_description(self, descr):
         """sets the current test's description.
