@@ -29,7 +29,7 @@ from logilab.common.__pkginfo__ import version as __version__
 
 STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 
-IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc', '~', '.swp')
+IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc', '~', '.swp', '.orig')
 
 # set this to False if you've mx DateTime installed but you don't want your db
 # adapter to use it (should be set before you got a connection)
