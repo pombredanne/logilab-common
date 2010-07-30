@@ -88,11 +88,8 @@ With those tag::
 you can filter the function with a simple python expression
 
  * ``toto`` and ``titi`` match ``rouge``
-
  * ``toto``, ``tata`` and ``titi``, match ``rouge or carre``
-
  * ``tata`` and ``titi`` match``rouge ^ carre``
-
  * ``titi`` match ``rouge and not carre``
 """
 __docformat__ = "restructuredtext en"
@@ -119,7 +116,7 @@ from time import time, clock
 import warnings
 
 from logilab.common.fileutils import abspath_listdir
-from logilab.common import testlib
+from logilab.common import testlib, STD_BLACKLIST
 import doctest
 import unittest
 
@@ -221,8 +218,7 @@ def load_pytest_conf(path, parser):
 
 def project_root(parser, projdir=os.getcwd()):
     """try to find project's root and add it to sys.path"""
-    curdir = osp.abspath(projdir)
-    previousdir = curdir
+    previousdir = curdir = osp.abspath(projdir)
     testercls = PyTester
     conf_file_path = osp.join(curdir, CONF_FILE)
     if osp.isfile(conf_file_path):
@@ -364,7 +360,7 @@ class PyTester(object):
         """
         here = os.getcwd()
         for dirname, dirs, _ in os.walk(here):
-            for skipped in ('CVS', '.svn', '.hg'):
+            for skipped in STD_BLACKLIST:
                 if skipped in dirs:
                     dirs.remove(skipped)
             basename = osp.basename(dirname)
