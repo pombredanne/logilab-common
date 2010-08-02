@@ -1268,29 +1268,32 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         msg = msg or 'test was skipped'
         raise InnerTestSkipped(msg)
 
-    def assertIn(self, object, set):
+    def assertIn(self, object, set, msg=None):
         """assert <object> is in <set>
 
         :param object: a Python Object
         :param set: a Python Container
+        :param msg: custom message (String) in case of failure
         """
-        self.assert_(object in set, "%s not in %s" % (object, set))
+        self.assert_(object in set, msg or "%s not in %s" % (object, set))
 
-    def assertNotIn(self, object, set):
+    def assertNotIn(self, object, set, msg=None):
         """assert <object> is not in <set>
 
         :param object: a Python Object
         :param set: the Python container to contain <object>
+        :param msg: custom message (String) in case of failure
         """
-        self.assert_(object not in set, "%s in %s" % (object, set))
+        self.assert_(object not in set, msg or "%s in %s" % (object, set))
 
-    def assertDictEquals(self, dict1, dict2):
+    def assertDictEquals(self, dict1, dict2, msg=None):
         """compares two dicts
 
         If the two dict differ, the first difference is shown in the error
         message
         :param dict1: a Python Dictionary
         :param dict2: a Python Dictionary
+        :param msg: custom message (String) in case of failure
         """
         dict1 = dict(dict1)
         msgs = []
@@ -1304,10 +1307,11 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                 msgs.append('missing %r key' % key)
         if dict1:
             msgs.append('dict2 is lacking %r' % dict1)
-        if msgs:
+        if msg:
+            self.failureException(msg)
+        elif msgs:
             self.fail('\n'.join(msgs))
     assertDictEqual = assertDictEquals
-
 
     def assertUnorderedIterableEquals(self, got, expected, msg=None):
         """compares two iterable and shows difference between both
@@ -1716,7 +1720,6 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         :param prec: a Float describing the precision
         :param msg: a String for a custom message
         """
-
         if msg is None:
             msg = "%r != %r" % (obj, other)
         self.assert_(math.fabs(obj - other) < prec, msg)
