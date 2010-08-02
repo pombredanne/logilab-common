@@ -27,7 +27,7 @@ class class_deprecated(type):
 
     def __call__(cls, *args, **kwargs):
         msg = getattr(cls, "__deprecation_warning__",
-                      "%s is deprecated" % cls.__name__)
+                      "%(cls)s is deprecated") % {'cls': cls.__name__}
         warn(msg, DeprecationWarning, stacklevel=2)
         return type.__call__(cls, *args, **kwargs)
 
