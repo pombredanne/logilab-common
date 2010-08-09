@@ -20,11 +20,8 @@ one command.
 
 e.g called as "tool command [options] args..." where <options> and <args> are
 command'specific
-
-
-
-
 """
+
 __docformat__ = "restructuredtext en"
 
 # XXX : merge with optparser ?
@@ -142,7 +139,10 @@ def cmd_run(cmdname, *args):
 
 
 def main_run(args, doc=DEFAULT_DOC, copyright=DEFAULT_COPYRIGHT):
-    """command line tool"""
+    """command line tool
+
+    >>> main_run(sys.argv[1:])
+    """
     try:
         arg = args.pop(0)
     except IndexError:

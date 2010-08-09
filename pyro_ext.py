@@ -23,11 +23,8 @@ Main functions available:
   approach and register it in the nameserver.
 * `ns_unregister` unregister an object identifier from the nameserver.
 * `ns_get_proxy` get a pyro proxy from a nameserver object identifier.
-
-:organization: Logilab
-
-
 """
+
 __docformat__ = "restructuredtext en"
 
 import logging
