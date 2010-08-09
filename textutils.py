@@ -18,10 +18,6 @@
 """Some text manipulation utility functions.
 
 
-
-
-
-
 :group text formatting: normalize_text, normalize_paragraph, pretty_match,\
 unquote, colorize_ansi
 :group text manipulation: searchall, splitstrip
@@ -211,6 +207,7 @@ def normalize_rest_paragraph(text, line_len=80, indent=''):
             lines.append(indent + line.strip())
     return linesep.join(lines)
 
+
 def splittext(text, line_len):
     """split the given text on space according to the given max line size
 
@@ -252,6 +249,36 @@ def splitstrip(string, sep=','):
     return [word.strip() for word in string.split(sep) if word.strip()]
 
 get_csv = deprecated()(splitstrip)
+
+
+def text_to_dict(text):
+    """parse multilines text containing simple 'key=value' lines and return a
+    dict of {'key': 'value'}. When the same key is encountered multiple time,
+    value is turned into a list containing all values.
+
+    >>> text_to_dict('''multiple=1
+    ... multiple= 2
+    ... single =3
+    ... ''')
+    {'single': '3', 'multiple': ['1', '2']}
+
+    """
+    res = {}
+    if not text:
+        return res
+    for line in text.splitlines():
+        line = line.strip()
+        if line:
+            key, value = [w.strip() for w in line.split('=', 1)]
+            if key in res:
+                try:
+                    res[key].append(value)
+                except AttributeError:
+                    res[key] = [res[key], value]
+            else:
+                res[key] = value
+    return res
+
 
 _BLANK_URE = r'(\s|,)+'
 _BLANK_RE = re.compile(_BLANK_URE)
@@ -313,6 +340,7 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
                                (unit, units.keys()))
         values.append(value)
     return final(sum(values))
+
 
 _LINE_RGX = re.compile('\r\n|\r+|\n')
 
