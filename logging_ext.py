@@ -72,7 +72,7 @@ class ColorFormatter(logging.Formatter):
         else:
             for cf in self.colorfilters:
                 color = cf(record)
-                if color: 
+                if color:
                     return colorize_ansi(msg, color)
         return msg
 
@@ -98,7 +98,7 @@ LOG_FORMAT = '%(asctime)s - (%(name)s) %(levelname)s: %(message)s'
 LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
-             logformat=LOG_FORMAT, logdateformat=LOG_DATE_FORMAT,
+             logformat=LOG_FORMAT, logdateformat=LOG_DATE_FORMAT, fmt=None,
              rotation_parameters=None):
     """init the log service"""
     if os.environ.get('APYCOT_ROOT'):
@@ -120,7 +120,7 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
                     handler = logging.FileHandler(logfile)
                 else:
                     from logging.handlers import TimedRotatingFileHandler
-                    handler = TimedRotatingFileHandler(logfile, 
+                    handler = TimedRotatingFileHandler(logfile,
                                                        **rotation_parameters)
             except IOError:
                 handler = logging.StreamHandler()
@@ -144,7 +144,7 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
             if 'kick' in record.message:
                 return 'red'
         fmt.colorfilters.append(col_fact)
-    else:
+    elif fmt is None:
         fmt = logging.Formatter(logformat, logdateformat)
     handler.setFormatter(fmt)
     return handler
