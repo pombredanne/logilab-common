@@ -30,11 +30,13 @@ LOW = 0
 MEDIUM = 10
 HIGH = 100
 
-REVERSE_PRIORITY = {
-    0: 'LOW',
-    10: 'MEDIUM',
-    100: 'HIGH'
+PRIORITY = {
+    'LOW': LOW,
+    'MEDIUM': MEDIUM,
+    'HIGH': HIGH,
     }
+REVERSE_PRIORITY = dict((values, key) for key, values in PRIORITY.iteritems())
+
 
 
 class PrioritizedTasksQueue(Queue):
