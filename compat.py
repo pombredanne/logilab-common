@@ -27,6 +27,7 @@ from __future__ import generators
 __docformat__ = "restructuredtext en"
 
 import os
+import sys
 from warnings import warn
 
 import __builtin__
@@ -325,4 +326,17 @@ except ImportError: # python < 2.6
             return curdir
         return join(*rel_list)
 
-
+if (2, 5) <= sys.version_info[:2]:
+    InheritableSet = set
+else:
+    class InheritableSet(set):
+        """hacked resolving inheritancy issue from old style class in 2.4"""
+        def __new__(cls, *args, **kwargs):
+            if args:
+                new_args = (args[0], )
+            else:
+                new_args = ()
+            obj = set.__new__(cls, *new_args)
+            obj.__init__(*args, **kwargs)
+            return obj
+    
