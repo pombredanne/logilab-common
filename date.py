@@ -24,6 +24,7 @@
 __docformat__ = "restructuredtext en"
 
 import math
+import re
 from locale import getpreferredencoding
 from datetime import date, time, datetime, timedelta
 from time import strptime as time_strptime
@@ -274,6 +275,22 @@ def ustrftime(somedate, fmt='%Y-%m-%d'):
 
     encoding is guessed by locale.getpreferredencoding()
     """
-    # date format may depend on the locale
     encoding = getpreferredencoding(do_setlocale=False) or 'UTF-8'
-    return unicode(somedate.strftime(str(fmt)), encoding)
+    try:
+        return unicode(somedate.strftime(str(fmt)), encoding)
+    except ValueError, exc:
+        if '1900' not in exc.args[0]:
+            raise
+        # datetime is not happy with dates before 1900
+        # we try to work around this, assuming a simple
+        # format string
+        fields = {'Y': somedate.year,
+                  'm': somedate.month,
+                  'd': somedate.day,
+                  }
+        if isinstance(somedate, datetime):
+            fields.update({'H': somedate.hour,
+                           'M': somedate.minute,
+                           'S': somedate.second})
+        fmt = re.sub('%([YmdHMS])', r'%(\1)02d', fmt)
+        return unicode(fmt) % fields

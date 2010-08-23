@@ -22,7 +22,7 @@ from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.date import date_range, endOfMonth
 from logilab.common.date import add_days_worked, nb_open_days, \
-         get_national_holidays
+         get_national_holidays, ustrftime
 
 from datetime import date, datetime, timedelta
 
@@ -126,6 +126,10 @@ class DateTC(TestCase):
 
     def test_open_days_afternoon(self):
         self.assertOpenDays(self.datetimecls(2008, 5, 6, 14), self.datetimecls(2008, 5, 7, 14), 1)
+
+    def test_ustrftime_before_1900(self):
+        date = self.datetimecls(1328, 3, 12, 6, 30)
+        self.assertEquals(ustrftime(date, '%Y-%m-%d %H:%M:%S'), u'1328-03-12 06:30:00')
 
 
 class MxDateTC(DateTC):
