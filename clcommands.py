@@ -27,27 +27,128 @@ __docformat__ = "restructuredtext en"
 # XXX : merge with optparser ?
 import sys
 from os.path import basename
+from logging import getLogger
 
 from logilab.common.configuration import Configuration
+from logilab.common.deprecation import deprecated
 
-
-DEFAULT_COPYRIGHT = '''\
-Copyright (c) 2004-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
-http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
-
-
-DEFAULT_DOC = '''\
-Type "%prog <command> --help" for more information about a specific
-command. Available commands are :\n'''
 
 class BadCommandUsage(Exception):
     """Raised when an unknown command is used or when a command is not
-    correctly used.
+    correctly used (bad options, too much / missing arguments...).
+
+    Trigger display of command usage.
+    """
+
+class CommandError(Exception):
+    """Raised when a command can't be processed and we want to display it and
+    exit, without traceback nor usage displayed.
     """
 
 
+# command line access point ####################################################
+
+class CommandLine(dict):
+    def __init__(self, pgm=None, doc=None, copyright=None, version=None,
+                 rcfile=None):
+        if pgm is None:
+            pgm = basename(sys.argv[0])
+        self.pgm = pgm
+        self.doc = doc
+        self.copyright = copyright
+        self.version = version
+        self.rcfile = rcfile
+        self.logger = None
+
+    def init_log(self):
+        from logilab.common import logging_ext
+        self.logger = getLogger(self.pgm)
+        logging_ext.init_log(debug=True,
+                             logformat='%(name)s %(levelname)s: %(message)s')
+
+    def register(self, cls):
+        self[cls.name] = cls
+        cls.logger = self.logger
+
+    def run(self, args):
+        self.init_log()
+        try:
+            arg = args.pop(0)
+        except IndexError:
+            self.usage_and_exit(1)
+        if arg in ('-h', '--help'):
+            self.usage_and_exit(0)
+        if self.version is not None and arg in ('--version'):
+            print self.version
+            sys.exit(0)
+        rcfile = self.rcfile
+        if rcfile is not None and arg in ('-C', '--rc-file'):
+            try:
+                rcfile = args.pop(0)
+            except IndexError:
+                self.usage_and_exit(1)
+        try:
+            command = self[arg]()
+        except KeyError:
+            print 'ERROR: no %s command' % arg
+            print
+            self.usage_and_exit(1)
+        sys.exit(command.main_run(args, rcfile))
+
+    def usage(self):
+        """display usage for the main program (i.e. when no command supplied)
+        and exit
+        """
+        print 'usage:', self.pgm,
+        if self.rcfile:
+            print '[--rc-file=<configuration file>]',
+        print '<command> [options] <command argument>...'
+        if self.doc:
+            print '\n%s\n' % self.doc
+        print  '''Type "%(pgm)s <command> --help" for more information about a specific
+    command. Available commands are :\n''' % self.__dict__
+        max_len = max([len(cmd) for cmd in self])
+        padding = ' ' * max_len
+        for cmdname, cmd in sorted(self.items()):
+            if not cmd.hidden:
+                print ' ', (cmdname + padding)[:max_len], cmd.short_description()
+        if self.rcfile:
+            print '''
+Use --rc-file=<configuration file> / -C <configuration file> before the command
+to specify a configuration file. Default to %s.
+''' % self.rcfile
+        print  '''%(pgm)s -h/--help
+      display this usage information and exit''' % self.__dict__
+        if self.version:
+            print  '''%(pgm)s -v/--version
+      display version configuration and exit''' % self.__dict__
+        if self.copyright:
+            print '\n', self.copyright
+
+    def usage_and_exit(self, status):
+        self.usage()
+        sys.exit(status)
+
+
+# base command classes #########################################################
+
 class Command(Configuration):
-    """Base class for command line commands."""
+    """Base class for command line commands.
+
+    Class attributes:
+
+    * `name`, the name of the command
+
+    * `min_args`, minimum number of arguments, None if unspecified
+
+    * `max_args`, maximum number of arguments, None if unspecified
+
+    * `arguments`, string describing arguments, used in command usage
+
+    * `hidden`, boolean flag telling if the command should be hidden, e.g. does
+      not appear in help's commands list
+    """
+
     arguments = ''
     name = ''
     # hidden from help ?
@@ -55,13 +156,19 @@ class Command(Configuration):
     # max/min args, None meaning unspecified
     min_args = None
     max_args = None
-    def __init__(self, __doc__=None, version=None):
-        if __doc__:
-            usage = __doc__ % (self.name, self.arguments,
-                               self.__doc__.replace('    ', ''))
-        else:
-            usage = self.__doc__.replace('    ', '')
-        Configuration.__init__(self, usage=usage, version=version)
+
+    @classmethod
+    def description(cls):
+        return cls.__doc__.replace('    ', '')
+
+    @classmethod
+    def short_description(cls):
+        return cls.description().split('.')[0]
+
+    def __init__(self):
+        usage = '%%prog %s %s\n\n%s' % (self.name, self.arguments,
+                                        self.description())
+        Configuration.__init__(self, usage=usage)
 
     def check_args(self, args):
         """check command's arguments are provided"""
@@ -70,90 +177,29 @@ class Command(Configuration):
         if self.max_args is not None and len(args) > self.max_args:
             raise BadCommandUsage('too many arguments')
 
+    def main_run(self, args, rcfile=None):
+        if rcfile:
+            print 'reading', rcfile, self.options
+            self.load_file_configuration(rcfile)
+        args = self.load_command_line_configuration(args)
+        self.check_args(args)
+        try:
+            self.run(args)
+        except KeyboardInterrupt:
+            print 'interrupted'
+        except CommandError, err:
+            print 'ERROR: ', err
+            return 2
+        except BadCommandUsage, err:
+            print 'ERROR: ', err
+            print
+            print self.help()
+            return 1
+        return 0
+
     def run(self, args):
         """run the command with its specific arguments"""
         raise NotImplementedError()
-
-
-def pop_arg(args_list, expected_size_after=0, msg="Missing argument"):
-    """helper function to get and check command line arguments"""
-    try:
-        value = args_list.pop(0)
-    except IndexError:
-        raise BadCommandUsage(msg)
-    if expected_size_after is not None and len(args_list) > expected_size_after:
-        raise BadCommandUsage('too many arguments')
-    return value
-
-
-_COMMANDS = {}
-
-def register_commands(commands):
-    """register existing commands"""
-    for command_klass in commands:
-        _COMMANDS[command_klass.name] = command_klass
-
-
-def main_usage(status=0, doc=DEFAULT_DOC, copyright=DEFAULT_COPYRIGHT):
-    """display usage for the main program (i.e. when no command supplied)
-    and exit
-    """
-    commands = _COMMANDS.keys()
-    commands.sort()
-    if doc != DEFAULT_DOC:
-        try:
-            doc = doc % ('<command>', '<command arguments>',
-                             '''\
-Type "%prog <command> --help" for more information about a specific
-command. Available commands are :\n''')
-        except TypeError:
-            print 'could not find the "command", "arguments" and "default" slots'
-    doc = doc.replace('%prog', basename(sys.argv[0]))
-    print 'usage:', doc
-    max_len = max([len(cmd) for cmd in commands]) # list comprehension for py 2.3 support
-    padding = ' '*max_len
-    for command in commands:
-        cmd = _COMMANDS[command]
-        if not cmd.hidden:
-            title = cmd.__doc__.split('.')[0]
-            print ' ', (command+padding)[:max_len], title
-    if copyright:
-        print '\n', copyright
-    sys.exit(status)
-
-
-def cmd_run(cmdname, *args):
-    try:
-        command = _COMMANDS[cmdname](__doc__='%%prog %s %s\n\n%s')
-    except KeyError:
-        raise BadCommandUsage('no %s command' % cmdname)
-    args = command.load_command_line_configuration(args)
-    command.check_args(args)
-    try:
-        command.run(args)
-    except KeyboardInterrupt:
-        print 'interrupted'
-    except BadCommandUsage, err:
-        print 'ERROR: ', err
-        print command.help()
-
-
-def main_run(args, doc=DEFAULT_DOC, copyright=DEFAULT_COPYRIGHT):
-    """command line tool
-
-    >>> main_run(sys.argv[1:])
-    """
-    try:
-        arg = args.pop(0)
-    except IndexError:
-        main_usage(status=1, doc=doc, copyright=copyright)
-    if arg in ('-h', '--help'):
-        main_usage(doc=doc, copyright=copyright)
-    try:
-        cmd_run(arg, *args)
-    except BadCommandUsage, err:
-        print 'ERROR: ', err
-        main_usage(1, doc=doc, copyright=copyright)
 
 
 class ListCommandsCommand(Command):
@@ -165,7 +211,7 @@ class ListCommandsCommand(Command):
     def run(self, args):
         """run the command with its specific arguments"""
         if args:
-            command = pop_arg(args)
+            command = args.pop()
             cmd = _COMMANDS[command]
             for optname, optdict in cmd.options:
                 print '--help'
@@ -178,4 +224,41 @@ class ListCommandsCommand(Command):
                 if not cmd.hidden:
                     print command
 
-register_commands([ListCommandsCommand])
+
+# deprecated stuff #############################################################
+
+_COMMANDS = CommandLine()
+
+DEFAULT_COPYRIGHT = '''\
+Copyright (c) 2004-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
+
+@deprecated('use cls.register(cli)')
+def register_commands(commands):
+    """register existing commands"""
+    for command_klass in commands:
+        _COMMANDS.register(command_klass)
+
+@deprecated('use args.pop(0)')
+def main_run(args, doc=None, copyright=None, version=None):
+    """command line tool: run command specified by argument list (without the
+    program name). Raise SystemExit with status 0 if everything went fine.
+
+    >>> main_run(sys.argv[1:])
+    """
+    _COMMANDS.doc = doc
+    _COMMANDS.copyright = copyright
+    _COMMANDS.version = version
+    _COMMANDS.run(args)
+
+@deprecated('use args.pop(0)')
+def pop_arg(args_list, expected_size_after=None, msg="Missing argument"):
+    """helper function to get and check command line arguments"""
+    try:
+        value = args_list.pop(0)
+    except IndexError:
+        raise BadCommandUsage(msg)
+    if expected_size_after is not None and len(args_list) > expected_size_after:
+        raise BadCommandUsage('too many arguments')
+    return value
+
