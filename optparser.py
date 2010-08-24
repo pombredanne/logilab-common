@@ -28,10 +28,6 @@ Example:
 >>> return run(options, args[1:])
 
 With mymod.build that defines two functions run and add_options
-
-
-
-
 """
 __docformat__ = "restructuredtext en"
 

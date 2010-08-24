@@ -97,11 +97,6 @@ Quick start: simplest usage
 
   number=3
   >>>
-
-
-
-
-
 """
 __docformat__ = "restructuredtext en"
 
