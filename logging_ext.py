@@ -125,7 +125,10 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
             except IOError:
                 handler = logging.StreamHandler()
         if logthreshold is None:
-            logthreshold = logging.ERROR
+            if debug:
+                logthreshold = logging.DEBUG
+            else:
+                logthreshold = logging.ERROR
         elif isinstance(logthreshold, basestring):
             logthreshold = getattr(logging, THRESHOLD_MAP.get(logthreshold,
                                                               logthreshold))
