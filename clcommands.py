@@ -179,7 +179,6 @@ class Command(Configuration):
 
     def main_run(self, args, rcfile=None):
         if rcfile:
-            print 'reading', rcfile, self.options
             self.load_file_configuration(rcfile)
         args = self.load_command_line_configuration(args)
         self.check_args(args)
