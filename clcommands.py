@@ -62,13 +62,13 @@ class CommandLine(dict):
 
     def init_log(self):
         from logilab.common import logging_ext
-        self.logger = getLogger(self.pgm)
-        logging_ext.init_log(debug=True,
-                             logformat='%(name)s %(levelname)s: %(message)s')
+        if self.logger is None:
+            self.logger = getLogger(self.pgm)
+            logging_ext.init_log(debug=True,
+                                 logformat='%(name)s %(levelname)s: %(message)s')
 
     def register(self, cls):
         self[cls.name] = cls
-        cls.logger = self.logger
 
     def run(self, args):
         self.init_log()
@@ -88,7 +88,7 @@ class CommandLine(dict):
             except IndexError:
                 self.usage_and_exit(1)
         try:
-            command = self[arg]()
+            command = self[arg](self.logger)
         except KeyError:
             print 'ERROR: no %s command' % arg
             print
@@ -165,10 +165,11 @@ class Command(Configuration):
     def short_description(cls):
         return cls.description().split('.')[0]
 
-    def __init__(self):
+    def __init__(self, logger):
         usage = '%%prog %s %s\n\n%s' % (self.name, self.arguments,
                                         self.description())
         Configuration.__init__(self, usage=usage)
+        self.logger = logger
 
     def check_args(self, args):
         """check command's arguments are provided"""
