@@ -49,6 +49,14 @@ class CommandError(Exception):
 # command line access point ####################################################
 
 class CommandLine(dict):
+    """Usage:
+
+    >>> LDI = cli.CommandLine('ldi', doc='Logilab debian installer',
+                              version=version, rcfile=RCFILE)
+    >>> LDI.register(MyCommandClass)
+    >>> LDI.register(MyCommandClass)
+    >>> LDI.run(sys.argv[1:])
+    """
     def __init__(self, pgm=None, doc=None, copyright=None, version=None,
                  rcfile=None):
         if pgm is None:
@@ -60,12 +68,11 @@ class CommandLine(dict):
         self.rcfile = rcfile
         self.logger = None
 
-    def init_log(self):
+    def init_log(self, **kwargs):
         from logilab.common import logging_ext
-        if self.logger is None:
-            self.logger = getLogger(self.pgm)
-            logging_ext.init_log(debug=True,
-                                 logformat='%(name)s %(levelname)s: %(message)s')
+        kwargs.setdefault('debug', True)
+        kwargs.setdefault('logformat', '%(name)s %(levelname)s: %(message)s')
+        logging_ext.init_log(**kwargs)
 
     def register(self, cls):
         self[cls.name] = cls
@@ -88,12 +95,17 @@ class CommandLine(dict):
             except IndexError:
                 self.usage_and_exit(1)
         try:
-            command = self[arg](self.logger)
+            sys.exit(self.run_command(arg, args, rcfile))
         except KeyError:
             print 'ERROR: no %s command' % arg
             print
             self.usage_and_exit(1)
-        sys.exit(command.main_run(args, rcfile))
+
+    def run_command(self, cmd, args, rcfile=None):
+        if self.logger is None:
+            self.logger = getLogger(self.pgm)
+        command = self[cmd](self.logger)
+        return command.main_run(args, rcfile)
 
     def usage(self):
         """display usage for the main program (i.e. when no command supplied)
@@ -147,6 +159,8 @@ class Command(Configuration):
 
     * `hidden`, boolean flag telling if the command should be hidden, e.g. does
       not appear in help's commands list
+
+    * `options`, options list, as allowed by :mod:configuration
     """
 
     arguments = ''
