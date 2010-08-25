@@ -45,6 +45,7 @@ __docformat__ = "restructuredtext en"
 
 import sys
 import re
+import os.path as osp
 from unicodedata import normalize as _uninormalize
 try:
     from os import linesep
@@ -249,6 +250,15 @@ def splitstrip(string, sep=','):
     return [word.strip() for word in string.split(sep) if word.strip()]
 
 get_csv = deprecated()(splitstrip)
+
+
+def split_url_or_path(url_or_path):
+    """return the latest component of a string containing either an url of the
+    form <scheme>://<path> or a local file system path
+    """
+    if '://' in url_or_path:
+        return url_or_path.rstrip('/').rsplit('/', 1)
+    return osp.split(url_or_path.rstrip(osp.sep))
 
 
 def text_to_dict(text):

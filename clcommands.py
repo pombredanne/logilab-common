@@ -196,8 +196,8 @@ class Command(Configuration):
         if rcfile:
             self.load_file_configuration(rcfile)
         args = self.load_command_line_configuration(args)
-        self.check_args(args)
         try:
+            self.check_args(args)
             self.run(args)
         except KeyboardInterrupt:
             print 'interrupted'
