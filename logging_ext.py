@@ -99,39 +99,40 @@ LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
              logformat=LOG_FORMAT, logdateformat=LOG_DATE_FORMAT, fmt=None,
-             rotation_parameters=None):
+             rotation_parameters=None, handler=None):
     """init the log service"""
     if os.environ.get('APYCOT_ROOT'):
         logthreshold = logging.CRITICAL
         # redirect logs to stdout to avoid apycot output parsing failure
-        handler = logging.StreamHandler(sys.stdout)
-    else:
-        if debug:
-            handler = logging.StreamHandler()
-        elif logfile is None:
-            if syslog:
-                from logging import handlers
-                handler = handlers.SysLogHandler()
-            else:
-                handler = logging.StreamHandler()
-        else:
-            try:
-                if rotation_parameters is None:
-                    handler = logging.FileHandler(logfile)
-                else:
-                    from logging.handlers import TimedRotatingFileHandler
-                    handler = TimedRotatingFileHandler(logfile,
-                                                       **rotation_parameters)
-            except IOError:
-                handler = logging.StreamHandler()
-        if logthreshold is None:
+        if handler is None:
+            handler = logging.StreamHandler(sys.stdout)
+    elif handler is None:
             if debug:
-                logthreshold = logging.DEBUG
+                    handler = logging.StreamHandler()
+            elif logfile is None:
+                if syslog:
+                    from logging import handlers
+                    handler = handlers.SysLogHandler()
+                else:
+                    handler = logging.StreamHandler()
             else:
-                logthreshold = logging.ERROR
-        elif isinstance(logthreshold, basestring):
-            logthreshold = getattr(logging, THRESHOLD_MAP.get(logthreshold,
-                                                              logthreshold))
+                try:
+                    if rotation_parameters is None:
+                        handler = logging.FileHandler(logfile)
+                    else:
+                        from logging.handlers import TimedRotatingFileHandler
+                        handler = TimedRotatingFileHandler(
+                            logfile, **rotation_parameters)
+                except IOError:
+                    handler = logging.StreamHandler()
+    if logthreshold is None:
+        if debug:
+            logthreshold = logging.DEBUG
+        else:
+            logthreshold = logging.ERROR
+    elif isinstance(logthreshold, basestring):
+        logthreshold = getattr(logging, THRESHOLD_MAP.get(logthreshold,
+                                                          logthreshold))
     # configure the root logger
     logger = logging.getLogger()
     logger.setLevel(logthreshold)
