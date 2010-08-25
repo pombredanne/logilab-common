@@ -36,6 +36,10 @@ __docformat__ = "restructuredtext en"
 import sys
 import optparse
 
+from warnings import warn
+warn('lgc.optparser module is deprecated, use lgc.clcommands instead', DeprecationWarning,
+     stacklevel=2)
+
 class OptionParser(optparse.OptionParser):
 
     def __init__(self, *args, **kwargs):
