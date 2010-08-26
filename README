@@ -4,25 +4,21 @@ Logilab's common library
 What's this ?
 -------------
 
-This package contains some modules used by differents Logilab's
-projects.
+This package contains some modules used by differents Logilab's projects.
 
 It is released under the GNU Public License.
 
-There is no documentation available yet but the source code should be
-clean and well documented.
+There is no documentation available yet but the source code should be clean and
+well documented.
 
 Designed to ease:
 
 * handling command line options and configuration files
 * writing interactive command line tools
-* manipulation files and character strings
-* interfacing to OmniORB
-* running unit tests
-* manipulating tree structures
+* manipulation of files and character strings
+* manipulation of common structures such as graph, tree, and pattern such as visitor
 * generating text and HTML reports
-* logging
-* parsing XML processing instructions
+* accessing some external libraries such as OmniORB_, Pyro_...
 * more...
 
 
@@ -59,7 +55,7 @@ Modules providing high-level features
 * `configuration`, some classes to handle unified configuration from both
   command line (using optparse) and configuration file (using ConfigParser).
 
-* `dbf`, read Visual Fox Pro DBF files
+* `dbf`, read Visual Fox Pro DBF files.
 
 * `proc`, interface to Linux /proc.
 
@@ -125,7 +121,7 @@ Modules extending some external modules
 
 * `corbautils`, useful functions for use with the OmniORB_ CORBA library.
 
-* `hg`, some mercurial_ utility functions.
+* `hg`, some Mercurial_ utility functions.
 
 * `pdf_ext`, pdf and fdf file manipulations, with pdftk.
 
@@ -145,7 +141,7 @@ versions:
 
 * `testlib`: use `unittest2`_ instead
 * `pytest`: use `discover`_ instead
-* `interface`: use `zope.interface` if you really want this
+* `interface`: use `zope.interface`_ if you really want this
 * `table`, `xmlutils`: is that used?
 * `sphinxutils`: we won't go that way imo (i == syt)
 
@@ -179,3 +175,13 @@ http://lists.logilab.org/mailman/listinfo/python-projects
 
 Archives are available at
 http://lists.logilab.org/pipermail/python-projects/
+
+
+.. _Pyro: http://pyro.sourceforge.net/
+.. _OmniORB: http://omniorb.sourceforge.net/
+.. _Mercurial: http://mercurial.selenic.com
+.. _Sphinx: http://sphinx.pocoo.org/
+.. _`logilab.database`: http://www.logilab.org/project/logilab-database/
+.. _`unittest2`: http://pypi.python.org/pypi/unittest2
+.. _`discover`: http://pypi.python.org/pypi/discover
+.. _`zope.interface`: http://pypi.python.org/pypi/zope.interface
