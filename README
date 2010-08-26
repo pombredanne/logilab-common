@@ -18,7 +18,6 @@ Designed to ease:
 * writing interactive command line tools
 * manipulation files and character strings
 * interfacing to OmniORB
-* generating SQL queries
 * running unit tests
 * manipulating tree structures
 * generating text and HTML reports
@@ -42,152 +41,129 @@ For installation options, see ::
 Provided modules
 ----------------
 
-Here is a brief description of the available modules :
+Here is a brief description of the available modules.
 
-* adbh.py:
-  helper functions for using database advanced. Supported RDBMS
-  include PostgreSQL, MySQL and sqlite. See also db.py.
+Modules providing high-level features
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* astutils:
-  Deprecated module. Use logilab.astng.
+* `cache`, a cache implementation with a least recently used algorithm.
 
-* bind.py :
-  Deprecated module.
-  Provides a way to optimize globals in certain functions by binding
-  their names to values provided in a dictionary.
+* `changelog`, a tiny library to manipulate our simplified ChangeLog file format.
 
-* cache.py :
-  A cache implementation with a least recently used algorithm.
+* `clcommands`, high-level classes to define command line programs handling
+  different subcommands. It is based on `configuration` to get easy command line
+  / configuration file handling.
 
-* clcommands.py:
-  helper functions for command line programs handling different
-  subcommands
+* `cli`, a base class for interactive programs using the command line.
 
-* cli.py :
-  Command line interface helper classes (for interactive programs
-  using the command line)
+* `configuration`, some classes to handle unified configuration from both
+  command line (using optparse) and configuration file (using ConfigParser).
 
-* compat.py:
-  Transparent compatibility layer between different python version
+* `dbf`, read Visual Fox Pro DBF files
 
-* configuration.py :
-  Two mix-in classes to handle configuration from both command line
-  (using optik/optparse) and configuration file.
+* `proc`, interface to Linux /proc.
 
-* corbautils.py:
-  Useful functions for use with the OmniORB CORBA library.
+* `umessage`, unicode email support.
 
-* daemon.py :
-  A daemon mix-in class.
+* `ureports`, micro-reports, a way to create simple reports using python objects
+  without care of the final formatting. ReST and html formatters are provided.
 
-* date.py:
-  date manipulation helper functions
 
-* db.py :
-  A generic method to get a database connection. See also adbh.py.
+Modules providing low-level functions and structures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* debugger.py:
-  pdb customization
+* `compat`, provides a transparent compatibility layer between different python
+  versions.
 
-* decorators.py:
-  useful decorators (cached, timed...)
+* `date`, a set of date manipulation functions.
 
-* deprecation.py:
-  mark functions / classes as deprecated or moved
+* `daemon`, a daemon function and mix-in class to properly start an Unix daemon
+  process.
 
-* fileutils.py :
-  Some file / file path manipulation utilities.
+* `decorators`, function decorators such as cached, timed...
 
-* graph.py:
-  graph manipulations, dot file generation
+* `deprecation`, decorator, metaclass & all to mark functions / classes as
+  deprecated or moved
 
-* html.py :
-  Deprecated module
-  Return an html formatted traceback from python exception infos.
+* `fileutils`, some file / file path manipulation utilities.
 
-* interface.py
-  Bases class for interfaces.
+* `graph`, graph manipulations functions such as cycle detection, bases for dot
+  file generation.
 
-* logger.py :
-  Deprecated module : use logging from stdlib.
-  Define a logger interface and two concrete loggers : one which prints
-  everything on stdout, the other using syslog.
+* `modutils`, python module manipulation functions.
 
-* logging_ext.py:
-  extensions to stdlib's logging module
+* `shellutils`, some powerful shell like functions to replace shell scripts with
+  python scripts.
 
-* logservice.py:
-  Deprecated module. Use logging from stdlib.
+* `tasksqueue`, a prioritized tasks queue implementation.
 
-* modutils.py :
-  Module manipulation utilities.
+* `textutils`, some text manipulation functions (ansi colorization, line wrapping,
+  rest support...).
 
-* monclient.py:
-  Deprecated module
-
-* monserver.py:
-  Deprecated module
-
-* optik_ext :
-  Add an abstraction level to transparently import optik classes from
-  optparse (python >= 2.3) or the optik package. It also defines two
-  new option types (regexp, csv, color, date...)
-
-* optparser.py:
-  extend optparse's OptionParser to support commands
-
-* patricia.py :
-  A Python implementation of PATRICIA trie (Practical Algorithm to
-  Retrieve Information Coded in Alphanumeric).
-
-* pdf_ext.py:
-  pdf and fdf file manipulations, with pdftk.
-
-* pytest.py:
-  unittest runner. See testlib
-
-* shellutils.py:
-  Some utilities to replace shell scripts with python scripts.
-
-* sqlgen.py :
-  Helper class to generate SQL strings to use with python's DB-API.
-
-* table.py:
-  manage tabular data (supports column and row names, sorting, grouping...
-
-* testlib.py :
-  Generic tests execution methods.
-
-* textutils.py:
-  Some text manipulation utilities (ansi colorization, line wrapping,
-  rest support...)
-
-* tree.py :
-  Base class to represent tree structure, and some others to make it
+* `tree`, base class to represent tree structure, and some others to make it
   works with the visitor implementation (see below).
 
-* umessage.py:
-  unicode email support
+* `visitor`, a generic visitor pattern implementation.
 
-* ureports:
-  Provides a way to create simple reports using python objects
-  without care of the final formatting. Some formatters text and html
-  are provided.
 
-* vcgutils.py :
-  utilities functions to generate file readable with Georg Sander's vcg
-  (Visualization of Compiler Graphs).
+Modules extending some standard modules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* visitor.py :
-  A generic visitor pattern implementation.
+* `debugger`,  `pdb` customization.
 
-* twisted_distutils.py
-  This module enables the installation of plugins.tml files using standard
-  distutils syntax. Note that you can use this to install files that
-  are not twisted plugins in any package directory of your application.
+* `logging_ext`, extensions to `logging` module such as a colorized formatter
+  and an easier initialization function.
 
-* xmlrpcutils.py:
-  Auth support for XML RPC
+* `optik_ext`, defines some new option types (regexp, csv, color, date, etc.)
+  for `optik` / `optparse`
+
+* `xmlrpcutils`, auth support for XML-RPC
+
+
+Modules extending some external modules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `corbautils`, useful functions for use with the OmniORB_ CORBA library.
+
+* `hg`, some mercurial_ utility functions.
+
+* `pdf_ext`, pdf and fdf file manipulations, with pdftk.
+
+* `pyro_ext`, some Pyro_ utility functions.
+
+* `sphinx_ext`, Sphinx_ plugin defining a `autodocstring` directive.
+
+* `vcgutils` , utilities functions to generate file readable with Georg Sander's
+  vcg tool (Visualization of Compiler Graphs).
+
+
+To be deprecated modules
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Those `logilab.common` modules will much probably be deprecated in future
+versions:
+
+* `testlib`: use `unittest2`_ instead
+* `pytest`: use `discover`_ instead
+* `interface`: use `zope.interface` if you really want this
+* `table`, `xmlutils`: is that used?
+* `sphinxutils`: we won't go that way imo (i == syt)
+
+
+Deprecated modules
+~~~~~~~~~~~~~~~~~~
+
+Those `logilab.common` modules are only there for backward compatibility. They
+can go away at anytime.
+
+* `optparser`: use `clcommands` instead
+
+* `adbh`, `db`, `sqlgen`: see `logilab.database`_ instead
+
+* `contexts`: content move to `shellutils`
+
+* `html`: deprecated without replacement
+
 
 Comments, support, bug reports
 ------------------------------
