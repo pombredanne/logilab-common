@@ -42,6 +42,31 @@ except ImportError:
         raise NoSuchProcess()
 
 
+class tempdir(object):
+
+    def __enter__(self):
+        self.path = tempfile.mkdtemp()
+        return self.path
+
+    def __exit__(self, exctype, value, traceback):
+        # rmtree in all cases
+        shutil.rmtree(self.path)
+        return traceback is None
+
+
+class pushd(object):
+    def __init__(self, directory):
+        self.directory = directory
+
+    def __enter__(self):
+        self.cwd = os.getcwd()
+        os.chdir(self.directory)
+        return self.directory
+
+    def __exit__(self, exctype, value, traceback):
+        os.chdir(self.cwd)
+
+
 def chown(path, login=None, group=None):
     """Same as `os.chown` function but accepting user login or group name as
     argument. If login or group is omitted, it's left unchanged.
