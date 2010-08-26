@@ -23,10 +23,6 @@
   _ Attribute objects
 
   This module requires at least python 2.2
-
-
-
-
 """
 __docformat__ = "restructuredtext en"
 

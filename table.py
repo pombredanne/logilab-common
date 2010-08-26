@@ -15,12 +15,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
-"""Table management module.
-
-
-
-
-"""
+"""Table management module."""
 __docformat__ = "restructuredtext en"
 
 from logilab.common.compat import enumerate, sum, set

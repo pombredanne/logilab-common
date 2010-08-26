@@ -15,13 +15,11 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
-"""render a tree in HTML.
-
-
-
-
-"""
+"""render a tree in HTML."""
 __docformat__ = "restructuredtext en"
+
+from warnings import warn
+warn('lgc.html module is deprecated', DeprecationWarning, stacklevel=2)
 
 
 def render_HTML_tree(tree, selected_node=None, render_node=None, caption=None):

@@ -31,14 +31,12 @@ With mymod.build that defines two functions run and add_options
 """
 __docformat__ = "restructuredtext en"
 
-# XXX merge with optik_ext ? merge with clcommands ?
-
-import sys
-import optparse
-
 from warnings import warn
 warn('lgc.optparser module is deprecated, use lgc.clcommands instead', DeprecationWarning,
      stacklevel=2)
+
+import sys
+import optparse
 
 class OptionParser(optparse.OptionParser):
 
