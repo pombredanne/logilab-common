@@ -20,24 +20,22 @@ __docformat__ = "restructuredtext en"
 
 distname = 'logilab-common'
 modname = 'common'
+subpackage_of = 'logilab'
+subpackage_master = True
 
-numversion = (0, 50, 3)
+numversion = (0, 51, 0)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'LGPL' # 2.1 or later
-
-author = "Logilab"
-author_email = "contact@logilab.fr"
-
 description = "collection of low-level Python packages and modules used by Logilab projects"
 web = "http://www.logilab.org/project/%s" % distname
 ftp = "ftp://ftp.logilab.org/pub/%s" % modname
 mailinglist = "mailto://python-projects@lists.logilab.org"
+author = "Logilab"
+author_email = "contact@logilab.fr"
 
-subpackage_of = 'logilab'
-subpackage_master = True
 
-scripts = ('bin/pytest',)
 from os.path import join
+scripts = [join('bin', 'pytest')]
 include_dirs = [join('test', 'data')]
 pyversions = ['2.4', '2.5', '2.6']

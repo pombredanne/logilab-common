@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
 
---
+2010-08-26  --  0.51.0
     * testlib: don't raise string exception (closes #35331)
 
     * hg: new module regrouping some mercurial utility functions
@@ -17,6 +17,8 @@ ChangeLog for logilab.common
       - threshold default to DEBUG if debug flag is true  and no threshold specified
 
     * date: new ustrftime implementation working around datetime limitaion on dates < 1900
+
+
 
 2010-06-04  --  0.50.3
     * logging: added new optional kw argument to init_log rotating_parameters
