@@ -19,6 +19,8 @@
 
 __docformat__ = "restructuredtext en"
 
+import os
+import sys
 import os.path as osp
 
 try:

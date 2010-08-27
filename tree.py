@@ -205,9 +205,6 @@ class Node(object):
         else:
             return [self]
 
-    def __iter__(self):
-        return iter(self.children)
-
     def flatten(self, _list=None):
         """
         return a list with all the nodes descendant from this node

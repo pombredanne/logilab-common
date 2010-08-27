@@ -1,4 +1,4 @@
-# pylint: disable-msg=E0601,W0622,W0611
+# pylint: disable=E0601,W0622,W0611
 # copyright 2003-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
@@ -18,12 +18,10 @@
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Wrappers around some builtins introduced in python 2.3, 2.4 and
 2.5, making them available in for earlier versions of python.
-
-
-
-
 """
+
 from __future__ import generators
+
 __docformat__ = "restructuredtext en"
 
 import os

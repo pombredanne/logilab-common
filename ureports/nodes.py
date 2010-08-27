@@ -116,7 +116,7 @@ class Image(BaseComponent):
     * title : the image's optional title
     """
     def __init__(self, filename, stream, title=None, **kwargs):
-        super(Link, self).__init__(**kwargs)
+        super(Image, self).__init__(**kwargs)
         assert filename
         assert stream
         self.filename = filename

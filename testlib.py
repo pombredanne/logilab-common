@@ -40,7 +40,7 @@ If no non-option arguments are present, prefixes used are 'test',
 __docformat__ = "restructuredtext en"
 # modified copy of some functions from test/regrtest.py from PyXml
 # disable camel case warning
-# pylint: disable-msg=C0103
+# pylint: disable=C0103
 
 import sys
 import os, os.path as osp
@@ -77,7 +77,7 @@ except ImportError:
             pass
     test_support = TestSupport()
 
-# pylint: disable-msg=W0622
+# pylint: disable=W0622
 from logilab.common.compat import set, enumerate, any, sorted, InheritableSet
 # pylint: enable-msg=W0622
 from logilab.common.modutils import load_module_from_name
@@ -1038,7 +1038,7 @@ class TestCase(unittest.TestCase):
 
     @classproperty
     @cached
-    def datadir(cls): # pylint: disable-msg=E0213
+    def datadir(cls): # pylint: disable=E0213
         """helper attribute holding the standard test's data directory
 
         NOTE: this is a logilab's standard
@@ -1473,10 +1473,10 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         except ExpatError, ex:
             if msg is None:
                 if hasattr(data, 'readlines'): #file like object
-                    stream.seek(0)
-                    lines = stream.readlines()
+                    data.seek(0)
+                    lines = data.readlines()
                 else:
-                    lines =data.splitlines(True)
+                    lines = data.splitlines(True)
                 nb_lines = len(lines)
                 context_lines = []
 
@@ -1808,7 +1808,7 @@ class DocTest(TestCase):
     """
     skipped = ()
     def __call__(self, result=None, runcondition=None, options=None):\
-            # pylint: disable-msg=W0613
+            # pylint: disable=W0613
         try:
             finder = DocTestFinder(skipped=self.skipped)
             if sys.version_info >= (2, 4):

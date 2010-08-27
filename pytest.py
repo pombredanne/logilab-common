@@ -502,7 +502,7 @@ class DjangoTester(PyTester):
         """walks through current working directory, finds something
         which can be considered as a testdir and runs every test there
         """
-        for dirname, dirs, _ in os.walk(os.getcwd()):
+        for dirname, dirs, files in os.walk(os.getcwd()):
             for skipped in ('CVS', '.svn', '.hg'):
                 if skipped in dirs:
                     dirs.remove(skipped)
