@@ -24,10 +24,9 @@ command'specific
 
 __docformat__ = "restructuredtext en"
 
-# XXX : merge with optparser ?
 import sys
+import logging
 from os.path import basename
-from logging import getLogger
 
 from logilab.common.configuration import Configuration
 from logilab.common.deprecation import deprecated
@@ -54,8 +53,26 @@ class CommandLine(dict):
     >>> LDI = cli.CommandLine('ldi', doc='Logilab debian installer',
                               version=version, rcfile=RCFILE)
     >>> LDI.register(MyCommandClass)
-    >>> LDI.register(MyCommandClass)
+    >>> LDI.register(MyOtherCommandClass)
     >>> LDI.run(sys.argv[1:])
+
+    Arguments:
+
+    * `pgm`, the program name, default to `basename(sys.argv[0])`
+
+    * `doc`, a short description of the command line tool
+
+    * `copyright`, additional doc string that will be appended to the generated
+      doc
+
+    * `version`, version number of string of the tool. If specified, global
+      --version option will be available.
+
+    * `rcfile`, path to a configuration file. If specified, global --C/--rc-file
+      option will be available?  self.rcfile = rcfile
+
+    * `logger`, logger to propagate to commands, default to
+      `logging.getLogger(self.pgm))`
     """
     def __init__(self, pgm=None, doc=None, copyright=None, version=None,
                  rcfile=None):
@@ -68,17 +85,22 @@ class CommandLine(dict):
         self.rcfile = rcfile
         self.logger = None
 
-    def init_log(self, **kwargs):
-        from logilab.common import logging_ext
-        kwargs.setdefault('debug', True)
-        kwargs.setdefault('logformat', '%(name)s %(levelname)s: %(message)s')
-        logging_ext.init_log(**kwargs)
-
     def register(self, cls):
+        """register the given :class:`Command` subclass"""
         self[cls.name] = cls
 
     def run(self, args):
-        self.init_log()
+        """main command line access point:
+        * init logging
+        * handle global options (-h/--help, --version, -C/--rc-file)
+        * check command
+        * run command
+
+        Terminate by :exc:`SystemExit`
+        """
+        from logilab.common import logging_ext
+        logging_ext.init_log(debug=True,
+                             logformat='%(levelname)s: %(message)s')
         try:
             arg = args.pop(0)
         except IndexError:
@@ -210,6 +232,14 @@ class Command(Configuration):
             raise BadCommandUsage('too many arguments')
 
     def main_run(self, args, rcfile=None):
+        """Run the command and return status 0 if everything went fine.
+
+        If :exc:`CommandError` is raised by the underlying command, simply log
+        the error and return status 2.
+
+        Any other exceptions, including :exc:`BadCommandUsage` will be
+        propagated.
+        """
         if rcfile:
             self.load_file_configuration(rcfile)
         args = self.load_command_line_configuration(args)
