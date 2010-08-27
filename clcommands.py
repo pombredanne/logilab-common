@@ -95,17 +95,34 @@ class CommandLine(dict):
             except IndexError:
                 self.usage_and_exit(1)
         try:
-            sys.exit(self.run_command(arg, args, rcfile))
+            command = self.get_command(cmd)
         except KeyError:
             print 'ERROR: no %s command' % arg
             print
             self.usage_and_exit(1)
+        try:
+            sys.exit(command.main_run(args, rcfile))
+        except KeyboardInterrupt:
+            print 'interrupted'
+            sys.exit(4)
+        except BadCommandUsage, err:
+            print 'ERROR:', err
+            print
+            print command.help()
+            sys.exit(1)
 
-    def run_command(self, cmd, args, rcfile=None):
-        if self.logger is None:
-            self.logger = getLogger(self.pgm)
-        command = self[cmd](self.logger)
-        return command.main_run(args, rcfile)
+    def create_logger(self, handler, threshold=logging.DEBUG):
+        logger = logging.Logger(self.pgm)
+        logger.handlers = [handler]
+        logger.setLevel(threshold)
+        return logger
+
+    def get_command(self, cmd, logger=None):
+        if logger is None:
+            logger = self.logger
+        if logger is None:
+            logger = self.logger = logging.getLogger(self.pgm)
+        return self[cmd](logger)
 
     def usage(self):
         """display usage for the main program (i.e. when no command supplied)
@@ -199,16 +216,9 @@ class Command(Configuration):
         try:
             self.check_args(args)
             self.run(args)
-        except KeyboardInterrupt:
-            print 'interrupted'
         except CommandError, err:
-            print 'ERROR: ', err
+            self.logger.error(err)
             return 2
-        except BadCommandUsage, err:
-            print 'ERROR: ', err
-            print
-            print self.help()
-            return 1
         return 0
 
     def run(self, args):
