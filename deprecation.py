@@ -76,7 +76,7 @@ def deprecated(reason=None, stacklevel=2):
     when the decorated function is called.
     """
     def deprecated_decorator(func):
-        message = reason or 'this function is deprecated, use %s instead'
+        message = reason or 'The function "%s" is deprecated'
         if '%s' in message:
             message = message % func.func_name
         def wrapped(*args, **kwargs):
