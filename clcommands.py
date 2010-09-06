@@ -117,7 +117,7 @@ class CommandLine(dict):
             except IndexError:
                 self.usage_and_exit(1)
         try:
-            command = self.get_command(cmd)
+            command = self.get_command(arg)
         except KeyError:
             print 'ERROR: no %s command' % arg
             print
