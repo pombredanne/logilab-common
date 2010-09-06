@@ -156,6 +156,8 @@ class CommandLine(dict):
         print '<command> [options] <command argument>...'
         if self.doc:
             print '\n%s\n' % self.doc
+        else:
+            print
         print  '''Type "%(pgm)s <command> --help" for more information about a specific
     command. Available commands are :\n''' % self.__dict__
         max_len = max([len(cmd) for cmd in self])
