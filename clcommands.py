@@ -75,7 +75,7 @@ class CommandLine(dict):
       `logging.getLogger(self.pgm))`
     """
     def __init__(self, pgm=None, doc=None, copyright=None, version=None,
-                 rcfile=None):
+                 rcfile=None, logthreshold=logging.ERROR):
         if pgm is None:
             pgm = basename(sys.argv[0])
         self.pgm = pgm
@@ -84,6 +84,7 @@ class CommandLine(dict):
         self.version = version
         self.rcfile = rcfile
         self.logger = None
+        self.logthreshold = logthreshold
 
     def register(self, cls):
         """register the given :class:`Command` subclass"""
@@ -99,7 +100,8 @@ class CommandLine(dict):
         Terminate by :exc:`SystemExit`
         """
         from logilab.common import logging_ext
-        logging_ext.init_log(debug=True,
+        logging_ext.init_log(debug=True, # so that we use StreamHandler
+                             logthreshold=self.logthreshold,
                              logformat='%(levelname)s: %(message)s')
         try:
             arg = args.pop(0)
@@ -133,10 +135,12 @@ class CommandLine(dict):
             print command.help()
             sys.exit(1)
 
-    def create_logger(self, handler, threshold=logging.DEBUG):
+    def create_logger(self, handler, logthreshold=None):
         logger = logging.Logger(self.pgm)
         logger.handlers = [handler]
-        logger.setLevel(threshold)
+        if logthreshold is None:
+            logthreshold = self.logthreshold
+        logger.setLevel(logthreshold)
         return logger
 
     def get_command(self, cmd, logger=None):
@@ -144,6 +148,7 @@ class CommandLine(dict):
             logger = self.logger
         if logger is None:
             logger = self.logger = logging.getLogger(self.pgm)
+            logger.setLevel(self.logthreshold)
         return self[cmd](logger)
 
     def usage(self):
