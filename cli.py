@@ -40,11 +40,8 @@ Example::
             print 'fuuuuuuuuuuuu rhhhhhrhrhrrh'
 
     cl = BookShell()
-
-
-
-
 """
+
 __docformat__ = "restructuredtext en"
 
 import __builtin__

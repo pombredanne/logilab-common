@@ -156,7 +156,7 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
     # only addHandler and removeHandler method while I would like a setHandler
     # method, so do it this way :$
     logger.handlers = [handler]
-    threshold = get_threshold(debug, logthreshold)
+    logthreshold = get_threshold(debug, logthreshold)
     logger.setLevel(logthreshold)
     if fmt is None:
         fmt = get_formatter(logformat=LOG_FORMAT, logdateformat=LOG_DATE_FORMAT)
