@@ -1,6 +1,16 @@
 ChangeLog for logilab.common
 ============================
 
+2010-09-10  --  0.51.1
+    * logging_ext: init_log function splitted into smaller chunk to ease reuse
+      in other contexts
+
+    * clcommands: enhanced/cleaned api, nicer usage display
+
+    * various pylint detected errors fixed
+
+
+
 2010-08-26  --  0.51.0
     * testlib: don't raise string exception (closes #35331)
 
