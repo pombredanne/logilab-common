@@ -31,6 +31,14 @@ from warnings import warn
 import __builtin__
 
 try:
+    callable = callable
+except NameError:# callable removed from py3k
+    import collections
+    def callable(something):
+        return isinstance(something, collections.Callable)
+    del collections
+
+try:
     set = set
     frozenset = frozenset
 except NameError:
