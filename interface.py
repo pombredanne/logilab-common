@@ -26,7 +26,6 @@
 """
 __docformat__ = "restructuredtext en"
 
-from types import ListType, TupleType
 
 class Interface(object):
     """Base class for interfaces."""
