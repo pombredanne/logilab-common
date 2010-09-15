@@ -17,7 +17,6 @@
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """unittest module for logilab.comon.testlib"""
 
-import unittest
 import os
 import sys
 from os.path import join, dirname, isdir, isfile, abspath, exists

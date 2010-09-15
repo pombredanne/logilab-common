@@ -127,7 +127,7 @@ class ProgressBarTC(TestCase):
         """Test the progress bar for nbops > size"""
         def half(total):
             for counter in range(1,total+1):
-                yield counter / 2
+                yield counter // 2
         self._update_test(40, half(40))
 
     def test_nbops_lt_size(self):

@@ -25,8 +25,8 @@ __docformat__ = "restructuredtext en"
 
 import email
 from encodings import search_function
-from email.Utils import parseaddr, parsedate
-from email.Header import decode_header
+from email.utils import parseaddr, parsedate
+from email.header import decode_header
 from datetime import datetime
 
 try:
