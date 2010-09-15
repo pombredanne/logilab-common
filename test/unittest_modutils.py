@@ -164,7 +164,12 @@ class is_standard_module_tc(TestCase):
     """
 
     def test_knownValues_is_standard_module_0(self):
-        self.assertEqual(modutils.is_standard_module('__builtin__'), True)
+        if sys.version_info < (3, 0):
+            self.assertEqual(modutils.is_standard_module('__builtin__'), True)
+            self.assertEqual(modutils.is_standard_module('builtins'), False)
+        else:
+            self.assertEqual(modutils.is_standard_module('__builtin__'), False)
+            self.assertEqual(modutils.is_standard_module('builtins'), True)
 
     def test_knownValues_is_standard_module_1(self):
         self.assertEqual(modutils.is_standard_module('sys'), True)
@@ -176,7 +181,14 @@ class is_standard_module_tc(TestCase):
         self.assertEqual(modutils.is_standard_module('unknown'), False)
 
     def test_knownValues_is_standard_module_4(self):
-        self.assertEqual(modutils.is_standard_module('StringIO'), True)
+        if sys.version_info < (3, 0):
+            self.assertEqual(modutils.is_standard_module('StringIO'), True)
+        else:
+            self.assertEqual(modutils.is_standard_module('StringIO'), False)
+        if sys.version_info < (2, 6):
+            self.assertEqual(modutils.is_standard_module('io'), False)
+        else:
+            self.assertEqual(modutils.is_standard_module('io'), True)
 
     def test_knownValues_is_standard_module_5(self):
         self.assertEqual(modutils.is_standard_module('data.module', (DATADIR,)), True)
