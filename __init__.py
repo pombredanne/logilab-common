@@ -138,3 +138,18 @@ def make_domains(lists):
                 i += 1
         domains.append(new_domain)
     return domains
+
+
+# private stuff ################################################################
+
+def _handle_blacklist(blacklist, dirnames, filenames):
+    """remove files/directories in the black list
+
+    dirnames/filenames are usually from os.walk
+    """
+    for norecurs in blacklist:
+        if norecurs in dirnames:
+            dirnames.remove(norecurs)
+        elif norecurs in filenames:
+            filenames.remove(norecurs)
+
