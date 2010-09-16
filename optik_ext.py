@@ -242,6 +242,7 @@ class Option(BaseOption):
         return self.take_action(
             self.action, self.dest, opt, value, values, parser)
 
+
 class OptionParser(BaseParser):
     """override optik.OptionParser to use our Option class
     """
@@ -260,7 +261,8 @@ class OptionParser(BaseParser):
             result.append(OptionContainer.format_option_help(self, formatter))
             result.append("\n")
         for group in self.option_groups:
-            if group.level <= outputlevel:
+            if group.level <= outputlevel and (
+                group.description or level_options(group, outputlevel)):
                 result.append(group.format_help(formatter))
                 result.append("\n")
         formatter.dedent()
@@ -270,15 +272,18 @@ class OptionParser(BaseParser):
 
 OptionGroup.level = 0
 
+def level_options(group, outputlevel):
+    return [option for option in group.option_list
+            if getattr(option, 'level', 0) <= outputlevel
+            and not option.help is SUPPRESS_HELP]
+
 def format_option_help(self, formatter):
     result = []
-    outputlevel = getattr(formatter, 'output_level', 0)
-    for option in self.option_list:
-        if getattr(option, 'level', 0) <= outputlevel and not option.help is SUPPRESS_HELP:
-            result.append(formatter.format_option(option))
+    for option in level_options(self, getattr(formatter, 'output_level', 0)):
+        result.append(formatter.format_option(option))
     return "".join(result)
 OptionContainer.format_option_help = format_option_help
-OptionContainer.format_option_help = format_option_help
+
 
 class ManHelpFormatter(HelpFormatter):
     """Format help using man pages ROFF format"""
