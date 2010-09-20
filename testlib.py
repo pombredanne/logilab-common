@@ -1025,7 +1025,7 @@ class TestCase(unittest.TestCase):
         super(TestCase, self).__init__(methodName)
         # internal API changed in python2.5
         if sys.version_info >= (2, 5):
-            self.__exc_info = self._exc_info
+            self.__exc_info = sys.exc_info
             self.__testMethodName = self._testMethodName
         else:
             # let's give easier access to _testMethodName to every subclasses
