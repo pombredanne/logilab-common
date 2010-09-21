@@ -44,11 +44,9 @@ Example::
 
 __docformat__ = "restructuredtext en"
 
-import __builtin__
-if not hasattr(__builtin__, '_'):
-    __builtin__._ = str
-
-from logilab.common.compat import raw_input
+from logilab.common.compat import raw_input, builtins
+if not hasattr(builtins, '_'):
+    builtins._ = str
 
 
 def init_readline(complete_method, histfile=None):

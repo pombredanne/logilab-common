@@ -20,7 +20,7 @@
 from logilab.common.testlib import TestCase, unittest_main
 import sys
 import types
-import __builtin__
+from logilab.common.compat import builtins
 import pprint
 
 class CompatTCMixIn:
@@ -39,8 +39,8 @@ class CompatTCMixIn:
         for modname in self.MODNAMES:
             del sys.modules[modname]
         for funcname, func in self.builtins_backup.items():
-            setattr(__builtin__, funcname, func)
-            # delattr(__builtin__, 'builtin_%s' % funcname)
+            setattr(builtins, funcname, func)
+            # delattr(builtins, 'builtin_%s' % funcname)
         for modname, mod in self.modules_backup.items():
             sys.modules[modname] = mod
         try:
@@ -50,18 +50,18 @@ class CompatTCMixIn:
 
     def remove_builtins(self):
         for builtin in self.BUILTINS:
-            func = getattr(__builtin__, builtin, None)
+            func = getattr(builtins, builtin, None)
             if func is not None:
                 self.builtins_backup[builtin] = func
-                delattr(__builtin__, builtin)
-                # setattr(__builtin__, 'builtin_%s' % builtin, func)
+                delattr(builtins, builtin)
+                # setattr(builtins, 'builtin_%s' % builtin, func)
     def alter_builtins(self):
         for builtin, func in self.ALTERED_BUILTINS.iteritems():
-            old_func = getattr(__builtin__, builtin, None)
+            old_func = getattr(builtins, builtin, None)
             if func is not None:
                 self.builtins_backup[builtin] = old_func
-                setattr(__builtin__, builtin, func)
-                # setattr(__builtin__, 'builtin_%s' % builtin, func)
+                setattr(builtins, builtin, func)
+                # setattr(builtins, 'builtin_%s' % builtin, func)
 
     def remove_modules(self):
         for modname in self.MODNAMES:

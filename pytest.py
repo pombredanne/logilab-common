@@ -123,8 +123,6 @@ import unittest
 
 import imp
 
-import __builtin__
-
 
 try:
     import django

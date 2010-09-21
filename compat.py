@@ -28,7 +28,7 @@ import os
 import sys
 from warnings import warn
 
-import __builtin__
+import __builtin__ as builtins # 2to3 will tranform '__builtin__' to 'builtins'
 
 try:
     callable = callable
@@ -214,7 +214,7 @@ except TypeError:
         key= kargs.pop("key", None)
         #default implementation
         if key is None:
-            return __builtin__.max(*args,**kargs)
+            return builtins.max(*args,**kargs)
 
         for karg in kargs:
             raise TypeError("unexpected keyword argument %s for function max") % karg
