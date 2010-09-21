@@ -91,6 +91,8 @@ class Py23CompatTC(CompatTCMixIn, TestCase):
         }
 
     def test_sum(self):
+        if sys.version_info >= (3, 0):
+            self.skip("don't test 2.3 compat 'sum' on >= 3.0")
         from logilab.common.compat import sum
         self.assertEquals(sum(range(5)), 10)
         self.assertRaises(TypeError, sum, 'abc')
@@ -143,6 +145,8 @@ class Py24CompatTC(CompatTCMixIn, TestCase):
     BUILTINS = ('reversed', 'sorted', 'set', 'frozenset',)
 
     def test_sorted(self):
+        if sys.version_info >= (3, 0):
+            self.skip("don't test 2.4 compat 'sorted' on >= 3.0")
         from logilab.common.compat import sorted
         l = [3, 1, 2, 5, 4]
         s = sorted(l)
@@ -164,6 +168,8 @@ class Py24CompatTC(CompatTCMixIn, TestCase):
         self.assertEquals(l, range(5))
 
     def test_set(self):
+        if sys.version_info >= (3, 0):
+            self.skip("don't test 2.4 compat 'set' on >= 3.0")
         from logilab.common.compat import set
         s1 = set(range(5))
         s2 = set(range(2, 6))
