@@ -36,6 +36,7 @@ from cStringIO import StringIO
 
 from logilab.common import STD_BLACKLIST as BASE_BLACKLIST, IGNORED_EXTENSIONS
 from logilab.common.shellutils import find
+from logilab.common.compat import FileIO
 
 def first_level_directory(path):
     """Return the first level directory of a path.
@@ -123,9 +124,10 @@ def ensure_fs_mode(filepath, desired_mode=S_IWRITE):
         chmod(filepath, mode | desired_mode)
 
 
-class ProtectedFile(file):
-    """A special file-object class that automatically that automatically
-    does a 'chmod +w' when needed.
+# XXX (syt) unused? kill?
+class ProtectedFile(FileIO):
+    """A special file-object class that automatically does a 'chmod +w' when
+    needed.
 
     XXX: for now, the way it is done allows 'normal file-objects' to be
     created during the ProtectedFile object lifetime.
@@ -150,7 +152,7 @@ class ProtectedFile(file):
             if not self.original_mode & S_IWRITE:
                 chmod(filepath, self.original_mode | S_IWRITE)
                 self.mode_changed = True
-        file.__init__(self, filepath, mode)
+        FileIO.__init__(self, filepath, mode)
 
     def _restore_mode(self):
         """restores the original mode if needed"""
@@ -162,7 +164,7 @@ class ProtectedFile(file):
     def close(self):
         """restore mode before closing"""
         self._restore_mode()
-        file.close(self)
+        FileIO.close(self)
 
     def __del__(self):
         if not self.closed:

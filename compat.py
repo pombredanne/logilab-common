@@ -43,6 +43,13 @@ if sys.version_info < (3, 0):
 else:
     raw_input = input
 
+if sys.version_info < (3, 0):
+    FileIO = file
+else:
+    import io
+    FileIO = io.FileIO
+    del io
+
 try:
     set = set
     frozenset = frozenset
