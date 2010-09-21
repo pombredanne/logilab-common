@@ -38,6 +38,11 @@ except NameError:# callable removed from py3k
         return isinstance(something, collections.Callable)
     del collections
 
+if sys.version_info < (3, 0):
+    raw_input = raw_input
+else:
+    raw_input = input
+
 try:
     set = set
     frozenset = frozenset

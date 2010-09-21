@@ -32,6 +32,8 @@ import errno
 from os.path import exists, isdir, islink, basename, join
 
 from logilab.common import STD_BLACKLIST, _handle_blacklist
+from logilab.common.compat import raw_input
+
 try:
     from logilab.common.proc import ProcInfo, NoSuchProcess
 except ImportError:

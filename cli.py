@@ -48,6 +48,8 @@ import __builtin__
 if not hasattr(__builtin__, '_'):
     __builtin__._ = str
 
+from logilab.common.compat import raw_input
+
 
 def init_readline(complete_method, histfile=None):
     """Init the readline library if available."""
