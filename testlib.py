@@ -57,7 +57,6 @@ import math
 from shutil import rmtree
 from operator import itemgetter
 import warnings
-from compiler.consts import CO_GENERATOR
 from ConfigParser import ConfigParser
 from itertools import dropwhile
 try:
@@ -95,6 +94,23 @@ DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
 ENABLE_DBC = False
 
 FILE_RESTART = ".pytest.restart"
+
+if sys.version_info >= (2, 6):
+    # FIXME : this does not work as expected / breaks tests on testlib
+    # however testlib does not work on py3k for many reasons ...
+    from inspect import CO_GENERATOR
+else:
+    from compiler.consts import CO_GENERATOR
+
+if sys.version_info >= (3, 0):
+    def is_generator(function):
+        flags = function.__code__.co_flags
+        return flags & CO_GENERATOR
+
+else:
+    def is_generator(function):
+        flags = function.func_code.co_flags
+        return flags & CO_GENERATOR
 
 # used by unittest to count the number of relevant levels in the traceback
 __unittest = 1
@@ -486,7 +502,6 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                 testname = '%s.%s' % (test.im_class.__name__, func.__name__)
             else:
                 return True # Not sure when this happens
-
             if is_generator(func) and skipgenerator:
                 return self.does_match_tags(func) # Let inner tests decide at run time
 
@@ -960,10 +975,6 @@ class TestSkipped(Exception):
 
 class InnerTestSkipped(TestSkipped):
     """raised when a test is skipped"""
-
-def is_generator(function):
-    flags = function.func_code.co_flags
-    return flags & CO_GENERATOR
 
 
 def parse_generative_args(params):
