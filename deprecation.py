@@ -87,10 +87,6 @@ def deprecated(reason=None, stacklevel=2):
         return wrapped
     return deprecated_decorator
 
-@deprecated('replace deprecated_function(f,m) with deprecated(m)(f)')
-def deprecated_function(func, message=None):
-    return deprecated(message)(func)
-
 def moved(modpath, objname):
     """use to tell that a callable has been moved to a new module.
 

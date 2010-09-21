@@ -717,18 +717,6 @@ class OptionsManagerMixIn(object):
         finally:
             self._unmonkeypatch_expand_default()
 
-    @property
-    def _optik_parser(self):
-        msg = '"_optik_parser" attribute has been renamed to "cmdline_parser"'
-        warn(msg, DeprecationWarning)
-        return self.cmdline_parser
-
-    @property
-    def _config_parser(self):
-        msg ='"_config_parser" attribute has been renamed to "cfgfile_parser"'
-        warn(msg, DeprecationWarning, stacklevel=2)
-        return self.cfgfile_parser
-
 
 class Method(object):
     """used to ease late binding of default method (so you can define options
