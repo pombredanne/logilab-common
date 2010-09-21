@@ -479,7 +479,7 @@ class OptionsManagerMixIn(object):
         args, optdict = self.optik_option(provider, opt, optdict)
         option = optikcontainer.add_option(*args, **optdict)
         self._all_options[opt] = provider
-        self._maxlevel = max(self._maxlevel, option.level)
+        self._maxlevel = max(self._maxlevel, option.level or 0)
 
     def optik_option(self, provider, opt, optdict):
         """get our personal option definition and return a suitable form for

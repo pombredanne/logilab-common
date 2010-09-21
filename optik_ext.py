@@ -272,9 +272,10 @@ OptionGroup.level = 0
 
 def format_option_help(self, formatter):
     result = []
-    outputlevel = getattr(formatter, 'output_level', 0)
+    outputlevel = getattr(formatter, 'output_level', 0) or 0
     for option in self.option_list:
-        if getattr(option, 'level', 0) <= outputlevel and not option.help is SUPPRESS_HELP:
+        if (getattr(option, 'level', 0) or 0) <= outputlevel \
+          and not option.help is SUPPRESS_HELP:
             result.append(formatter.format_option(option))
     return "".join(result)
 OptionContainer.format_option_help = format_option_help
