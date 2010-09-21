@@ -114,6 +114,7 @@ from ConfigParser import ConfigParser, NoOptionError, NoSectionError, \
 from warnings import warn
 
 from logilab.common.compat import set, reversed, callable, raw_input
+from logilab.common.compat import str_encode as _encode
 
 from logilab.common.textutils import normalize_text, unquote
 from logilab.common.deprecation import deprecated
@@ -133,11 +134,6 @@ def _get_encoding(encoding, stream):
         import locale
         encoding = locale.getpreferredencoding()
     return encoding
-
-def _encode(string, encoding):
-    if isinstance(string, unicode):
-        return string.encode(encoding)
-    return str(string)
 
 
 # validation functions ########################################################

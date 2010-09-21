@@ -33,6 +33,7 @@ from os.path import exists, isdir, islink, basename, join
 
 from logilab.common import STD_BLACKLIST, _handle_blacklist
 from logilab.common.compat import raw_input
+from logilab.common.compat import str_to_bytes
 
 try:
     from logilab.common.proc import ProcInfo, NoSuchProcess
@@ -247,7 +248,7 @@ def acquire_lock(lock_file, max_try=10, delay=10, max_delay=3600):
     while count:
         try:
             fd = os.open(lock_file, os.O_EXCL | os.O_RDWR | os.O_CREAT)
-            os.write(fd, str(os.getpid()))
+            os.write(fd, str_to_bytes(str(os.getpid())) )
             os.close(fd)
             return True
         except OSError, e:

@@ -20,15 +20,15 @@
 import sys, os, tempfile, shutil
 from os.path import join
 import datetime, time
+from StringIO import StringIO
 
 from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.shellutils import (globfind, find, ProgressBar,
                                        acquire_lock, release_lock,
                                        RawInput, confirm)
-
+from logilab.common.compat import str_to_bytes
 from logilab.common.proc import NoSuchProcess
-from StringIO import StringIO
 
 DATA_DIR = join('data','find_test')
 
@@ -165,14 +165,14 @@ class AcquireLockTC(TestCase):
 
     def test_wrong_process(self):
         fd = os.open(self.lock, os.O_EXCL | os.O_RDWR | os.O_CREAT)
-        os.write(fd, '1111111111')
+        os.write(fd, str_to_bytes('1111111111'))
         os.close(fd)
         self.assertTrue(os.path.exists(self.lock))
         self.assertRaises(Exception, acquire_lock, self.lock, 1, 1)
 
     def test_wrong_process_and_continue(self):
         fd = os.open(self.lock, os.O_EXCL | os.O_RDWR | os.O_CREAT)
-        os.write(fd, '1111111111')
+        os.write(fd, str_to_bytes('1111111111'))
         os.close(fd)
         self.assertTrue(os.path.exists(self.lock))
         self.assertTrue(acquire_lock(self.lock))
