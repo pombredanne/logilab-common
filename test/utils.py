@@ -30,7 +30,7 @@ class WriterTC:
         got = buffer.getvalue()
         expected = getattr(self, test_id)
         try:
-            self.assertLinesEquals(got, expected)
+            self.assertMultiLineEqual(got, expected)
         except:
             print '**** got for %s' % test_id
             print got

@@ -32,14 +32,17 @@ try:
 except NameError:
     __file__ = sys.argv[0]
 
-
-from unittest import TestSuite
+if sys.version_info < (3, 2):
+    from unittest2 import TestSuite
+else:
+    from unittest import TestSuite
 
 from logilab.common.testlib import TestCase, SkipAwareTextTestRunner, Tags
 from logilab.common.testlib import mock_object, NonStrictTestLoader, create_files
 from logilab.common.testlib import capture_stdout, unittest_main, InnerTest
 from logilab.common.testlib import with_tempdir, tag
 from logilab.common.testlib import require_version, require_module
+
 
 class MockTestCase(TestCase):
     def __init__(self):
@@ -53,8 +56,8 @@ class UtilTC(TestCase):
 
     def test_mockobject(self):
         obj = mock_object(foo='bar', baz='bam')
-        self.assertEquals(obj.foo, 'bar')
-        self.assertEquals(obj.baz, 'bam')
+        self.assertEqual(obj.foo, 'bar')
+        self.assertEqual(obj.baz, 'bam')
 
 
     def test_create_files(self):
@@ -62,21 +65,21 @@ class UtilTC(TestCase):
         path_to = lambda path: join(chroot, path)
         dircontent = lambda path: sorted(os.listdir(join(chroot, path)))
         try:
-            self.failIf(isdir(path_to('a/')))
+            self.assertFalse(isdir(path_to('a/')))
             create_files(['a/b/foo.py', 'a/b/c/', 'a/b/c/d/e.py'], chroot)
             # make sure directories exist
-            self.failUnless(isdir(path_to('a')))
-            self.failUnless(isdir(path_to('a/b')))
-            self.failUnless(isdir(path_to('a/b/c')))
-            self.failUnless(isdir(path_to('a/b/c/d')))
+            self.assertTrue(isdir(path_to('a')))
+            self.assertTrue(isdir(path_to('a/b')))
+            self.assertTrue(isdir(path_to('a/b/c')))
+            self.assertTrue(isdir(path_to('a/b/c/d')))
             # make sure files exist
-            self.failUnless(isfile(path_to('a/b/foo.py')))
-            self.failUnless(isfile(path_to('a/b/c/d/e.py')))
+            self.assertTrue(isfile(path_to('a/b/foo.py')))
+            self.assertTrue(isfile(path_to('a/b/c/d/e.py')))
             # make sure only asked files were created
-            self.assertEquals(dircontent('a'), ['b'])
-            self.assertEquals(dircontent('a/b'), ['c', 'foo.py'])
-            self.assertEquals(dircontent('a/b/c'), ['d'])
-            self.assertEquals(dircontent('a/b/c/d'), ['e.py'])
+            self.assertEqual(dircontent('a'), ['b'])
+            self.assertEqual(dircontent('a/b'), ['c', 'foo.py'])
+            self.assertEqual(dircontent('a/b/c'), ['d'])
+            self.assertEqual(dircontent('a/b/c/d'), ['e.py'])
         finally:
             shutil.rmtree(chroot)
 
@@ -109,14 +112,14 @@ class TestlibTC(TestCase):
         self.tc.assertDictEquals(d1, d1)
 
     def test_list_equals(self):
-        """tests TestCase.assertListEquals"""
+        """tests TestCase.assertListEqual"""
         l1 = range(10)
         l2 = range(5)
         l3 = range(10)
-        self.assertRaises(AssertionError, self.tc.assertListEquals, l1, l2)
-        self.tc.assertListEquals(l1, l1)
-        self.tc.assertListEquals(l1, l3)
-        self.tc.assertListEquals(l3, l1)
+        self.assertRaises(AssertionError, self.tc.assertListEqual, l1, l2)
+        self.tc.assertListEqual(l1, l1)
+        self.tc.assertListEqual(l1, l3)
+        self.tc.assertListEqual(l3, l1)
 
     def test_lines_equals(self):
         """tests assertLineEquals"""
@@ -129,9 +132,13 @@ class TestlibTC(TestCase):
         t3 = """some
         text"""
         self.assertRaises(AssertionError, self.tc.assertLinesEquals, t1, t2)
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, t1, t2)
         self.tc.assertLinesEquals(t1, t3)
+        self.tc.assertMultiLineEqual(t1, t3 + "\n")
         self.tc.assertLinesEquals(t3, t1)
+        self.tc.assertMultiLineEqual(t3 + "\n", t1)
         self.tc.assertLinesEquals(t1, t1)
+        self.tc.assertMultiLineEqual(t1, t1)
 
     def test_xml_valid(self):
         """tests xml is valid"""
@@ -145,18 +152,21 @@ class TestlibTC(TestCase):
         invalid = """<root><h2 </h2> </root>"""
         self.assertRaises(AssertionError, self.tc.assertXMLStringWellFormed, invalid)
 
-
     def test_unordered_equality_for_lists(self):
         l1 = [0, 1, 2]
         l2 = [1, 2, 3]
         self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, l1, l2)
+        self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
         self.tc.assertUnorderedIterableEquals(l1, l1)
+        self.tc.assertItemsEqual(l1, l1)
         self.tc.assertUnorderedIterableEquals([], [])
+        self.tc.assertItemsEqual([], [])
         l1 = [0, 1, 1]
         l2 = [0, 1]
         self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, l1, l2)
+        self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
         self.tc.assertUnorderedIterableEquals(l1, l1)
-
+        self.tc.assertItemsEqual(l1, l1)
 
     def test_unordered_equality_for_dicts(self):
         d1 = {'a' : 1, 'b' : 2}
@@ -165,17 +175,20 @@ class TestlibTC(TestCase):
         self.tc.assertUnorderedIterableEquals(d1, d1)
         self.tc.assertUnorderedIterableEquals({}, {})
 
-    def test_unordered_equality_for_iterables(self):
-        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, xrange(5), xrange(6))
-        self.tc.assertUnorderedIterableEquals(xrange(5), range(5))
-        self.tc.assertUnorderedIterableEquals([], ())
-
-    def test_unordered_equality_for_dicts(self):
+    def test_equality_for_sets(self):
         s1 = set('ab')
         s2 = set('a')
-        self.assertRaises(AssertionError, self.tc.assertSetEquals, s1, s2)
-        self.tc.assertSetEquals(s1, s1)
-        self.tc.assertSetEquals(set(), set())
+        self.assertRaises(AssertionError, self.tc.assertSetEqual, s1, s2)
+        self.tc.assertSetEqual(s1, s1)
+        self.tc.assertSetEqual(set(), set())
+
+    def test_unordered_equality_for_iterables(self):
+        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, xrange(5), xrange(6))
+        self.assertRaises(AssertionError, self.tc.assertItemsEqual, xrange(5), xrange(6))
+        self.tc.assertUnorderedIterableEquals(xrange(5), range(5))
+        self.tc.assertItemsEqual(xrange(5), range(5))
+        self.tc.assertUnorderedIterableEquals([], ())
+        self.tc.assertItemsEqual([], ())
 
     def test_file_equality(self):
         foo = join(dirname(__file__), 'data', 'foo.txt')
@@ -215,35 +228,41 @@ class TestlibTC(TestCase):
 
     def test_text_equality(self):
         self.assertRaises(AssertionError, self.tc.assertTextEqual, "toto", 12)
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, "toto", 12)
         self.assertRaises(AssertionError, self.tc.assertTextEqual, "toto", None)
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, "toto", None)
         self.assertRaises(AssertionError, self.tc.assertTextEqual, 3.12, u"toto")
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, 3.12, u"toto")
         self.assertRaises(AssertionError, self.tc.assertTextEqual, None, u"toto")
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, None, u"toto")
         self.tc.assertTextEqual('toto\ntiti', 'toto\ntiti')
+        self.tc.assertMultiLineEqual('toto\ntiti', 'toto\ntiti')
         self.tc.assertTextEqual('toto\ntiti', 'toto\n titi\n', striplines=True)
         self.assertRaises(AssertionError, self.tc.assertTextEqual, 'toto\ntiti', 'toto\n titi\n')
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, 'toto\ntiti', 'toto\n titi\n')
         foo = join(dirname(__file__), 'data', 'foo.txt')
         spam = join(dirname(__file__), 'data', 'spam.txt')
         text1 = file(foo).read()
         self.tc.assertTextEqual(text1, text1)
+        self.tc.assertMultiLineEqual(text1, text1)
         text2 = file(spam).read()
         self.assertRaises(AssertionError, self.tc.assertTextEqual, text1, text2)
-
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, text1, text2)
 
     def test_assert_raises(self):
         exc = self.tc.assertRaises(KeyError, {}.__getitem__, 'foo')
-        self.failUnless(isinstance(exc, KeyError))
-        self.assertEquals(exc.args, ('foo',))
-
+        self.assertTrue(isinstance(exc, KeyError))
+        self.assertEqual(exc.args, ('foo',))
 
     def test_default_datadir(self):
         expected_datadir = join(dirname(abspath(__file__)), 'data')
-        self.assertEquals(self.datadir, expected_datadir)
-        self.assertEquals(self.datapath('foo'), join(expected_datadir, 'foo'))
+        self.assertEqual(self.datadir, expected_datadir)
+        self.assertEqual(self.datapath('foo'), join(expected_datadir, 'foo'))
 
     def test_multiple_args_datadir(self):
         expected_datadir = join(dirname(abspath(__file__)), 'data')
-        self.assertEquals(self.datadir, expected_datadir)
-        self.assertEquals(self.datapath('foo', 'bar'), join(expected_datadir, 'foo', 'bar'))
+        self.assertEqual(self.datadir, expected_datadir)
+        self.assertEqual(self.datapath('foo', 'bar'), join(expected_datadir, 'foo', 'bar'))
 
     def test_custom_datadir(self):
         class MyTC(TestCase):
@@ -252,12 +271,11 @@ class TestlibTC(TestCase):
 
         # class' custom datadir
         tc = MyTC('test_1')
-        self.assertEquals(tc.datapath('bar'), join('foo', 'bar'))
+        self.assertEqual(tc.datapath('bar'), join('foo', 'bar'))
         # instance's custom datadir
-        self.skip('should this really works?')
+        self.skipTest('should this really works?')
         tc.datadir = 'spam'
-        self.assertEquals(tc.datapath('bar'), join('spam', 'bar'))
-
+        self.assertEqual(tc.datapath('bar'), join('spam', 'bar'))
 
     def test_cached_datadir(self):
         """test datadir is cached on the class"""
@@ -266,13 +284,13 @@ class TestlibTC(TestCase):
 
         expected_datadir = join(dirname(abspath(__file__)), 'data')
         tc = MyTC('test_1')
-        self.assertEquals(tc.datadir, expected_datadir)
+        self.assertEqual(tc.datadir, expected_datadir)
         # changing module should not change the datadir
         MyTC.__module__ = 'os'
-        self.assertEquals(tc.datadir, expected_datadir)
+        self.assertEqual(tc.datadir, expected_datadir)
         # even on new instances
         tc2 = MyTC('test_1')
-        self.assertEquals(tc2.datadir, expected_datadir)
+        self.assertEqual(tc2.datadir, expected_datadir)
 
     def test_is(self):
         obj_1 = []
@@ -290,7 +308,7 @@ class TestlibTC(TestCase):
         self.assertNone(None)
         self.assertRaises(AssertionError, self.assertNone, object())
 
-    def test_none(self):
+    def test_not_none(self):
         self.assertNotNone(object())
         self.assertRaises(AssertionError, self.assertNotNone, None)
 
@@ -314,22 +332,22 @@ class GenerativeTestsTC(TestCase):
         class FooTC(TestCase):
             def test_generative(self):
                 for i in xrange(10):
-                    yield self.assertEquals, i, i
+                    yield self.assertEqual, i, i
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 10)
-        self.assertEquals(len(result.failures), 0)
-        self.assertEquals(len(result.errors), 0)
+        self.assertEqual(result.testsRun, 10)
+        self.assertEqual(len(result.failures), 0)
+        self.assertEqual(len(result.errors), 0)
 
 
     def test_generative_half_bad(self):
         class FooTC(TestCase):
             def test_generative(self):
                 for i in xrange(10):
-                    yield self.assertEquals, i%2, 0
+                    yield self.assertEqual, i%2, 0
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 10)
-        self.assertEquals(len(result.failures), 5)
-        self.assertEquals(len(result.errors), 0)
+        self.assertEqual(result.testsRun, 10)
+        self.assertEqual(len(result.failures), 5)
+        self.assertEqual(len(result.errors), 0)
 
 
     def test_generative_error(self):
@@ -338,12 +356,12 @@ class GenerativeTestsTC(TestCase):
                 for i in xrange(10):
                     if i == 5:
                         raise ValueError('STOP !')
-                    yield self.assertEquals, i, i
+                    yield self.assertEqual, i, i
 
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 5)
-        self.assertEquals(len(result.failures), 0)
-        self.assertEquals(len(result.errors), 1)
+        self.assertEqual(result.testsRun, 5)
+        self.assertEqual(len(result.failures), 0)
+        self.assertEqual(len(result.errors), 1)
 
     def test_generative_error2(self):
         class FooTC(TestCase):
@@ -351,12 +369,12 @@ class GenerativeTestsTC(TestCase):
                 for i in xrange(10):
                     if i == 5:
                         yield self.ouch
-                    yield self.assertEquals, i, i
+                    yield self.assertEqual, i, i
             def ouch(self): raise ValueError('stop !')
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 6)
-        self.assertEquals(len(result.failures), 0)
-        self.assertEquals(len(result.errors), 1)
+        self.assertEqual(result.testsRun, 6)
+        self.assertEqual(len(result.failures), 0)
+        self.assertEqual(len(result.errors), 1)
 
 
     def test_generative_setup(self):
@@ -365,12 +383,12 @@ class GenerativeTestsTC(TestCase):
                 raise ValueError('STOP !')
             def test_generative(self):
                 for i in xrange(10):
-                    yield self.assertEquals, i, i
+                    yield self.assertEqual, i, i
 
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 1)
-        self.assertEquals(len(result.failures), 0)
-        self.assertEquals(len(result.errors), 1)
+        self.assertEqual(result.testsRun, 1)
+        self.assertEqual(len(result.failures), 0)
+        self.assertEqual(len(result.errors), 1)
 
     def test_generative_inner_skip(self):
         class FooTC(TestCase):
@@ -378,35 +396,35 @@ class GenerativeTestsTC(TestCase):
                 if val == 5:
                     self.innerSkip("no 5")
                 else:
-                    self.assertEquals(val, val)
+                    self.assertEqual(val, val)
 
             def test_generative(self):
                 for i in xrange(10):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 10)
-        self.assertEquals(len(result.failures), 0)
-        self.assertEquals(len(result.errors), 0)
-        self.assertEquals(len(result.skipped), 1)
+        self.assertEqual(result.testsRun, 10)
+        self.assertEqual(len(result.failures), 0)
+        self.assertEqual(len(result.errors), 0)
+        self.assertEqual(len(result.skipped), 1)
 
     def test_generative_skip(self):
         class FooTC(TestCase):
             def check(self, val):
                 if val == 5:
-                    self.skip("no 5")
+                    self.skipTest("no 5")
                 else:
-                    self.assertEquals(val, val)
+                    self.assertEqual(val, val)
 
             def test_generative(self):
                 for i in xrange(10):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 6)
-        self.assertEquals(len(result.failures), 0)
-        self.assertEquals(len(result.errors), 0)
-        self.assertEquals(len(result.skipped), 1)
+        self.assertEqual(result.testsRun, 6)
+        self.assertEqual(len(result.failures), 0)
+        self.assertEqual(len(result.errors), 0)
+        self.assertEqual(len(result.skipped), 1)
 
     def test_generative_inner_error(self):
         class FooTC(TestCase):
@@ -414,35 +432,35 @@ class GenerativeTestsTC(TestCase):
                 if val == 5:
                     raise ValueError("no 5")
                 else:
-                    self.assertEquals(val, val)
+                    self.assertEqual(val, val)
 
             def test_generative(self):
                 for i in xrange(10):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 6)
-        self.assertEquals(len(result.failures), 0)
-        self.assertEquals(len(result.errors), 1)
-        self.assertEquals(len(result.skipped), 0)
+        self.assertEqual(result.testsRun, 6)
+        self.assertEqual(len(result.failures), 0)
+        self.assertEqual(len(result.errors), 1)
+        self.assertEqual(len(result.skipped), 0)
 
     def test_generative_inner_failure(self):
         class FooTC(TestCase):
             def check(self, val):
                 if val == 5:
-                    self.assertEquals(val, val+1)
+                    self.assertEqual(val, val+1)
                 else:
-                    self.assertEquals(val, val)
+                    self.assertEqual(val, val)
 
             def test_generative(self):
                 for i in xrange(10):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 10)
-        self.assertEquals(len(result.failures), 1)
-        self.assertEquals(len(result.errors), 0)
-        self.assertEquals(len(result.skipped), 0)
+        self.assertEqual(result.testsRun, 10)
+        self.assertEqual(len(result.failures), 1)
+        self.assertEqual(len(result.errors), 0)
+        self.assertEqual(len(result.skipped), 0)
 
 
 class ExitFirstTC(TestCase):
@@ -457,9 +475,9 @@ class ExitFirstTC(TestCase):
             def test_3(self): pass
         tests = [FooTC('test_1'), FooTC('test_2')]
         result = self.runner.run(TestSuite(tests))
-        self.assertEquals(result.testsRun, 2)
-        self.assertEquals(len(result.failures), 1)
-        self.assertEquals(len(result.errors), 0)
+        self.assertEqual(result.testsRun, 2)
+        self.assertEqual(len(result.failures), 1)
+        self.assertEqual(len(result.errors), 0)
 
 
     def test_error_exit_first(self):
@@ -469,9 +487,9 @@ class ExitFirstTC(TestCase):
             def test_3(self): pass
         tests = [FooTC('test_1'), FooTC('test_2'), FooTC('test_3')]
         result = self.runner.run(TestSuite(tests))
-        self.assertEquals(result.testsRun, 2)
-        self.assertEquals(len(result.failures), 0)
-        self.assertEquals(len(result.errors), 1)
+        self.assertEqual(result.testsRun, 2)
+        self.assertEqual(len(result.failures), 0)
+        self.assertEqual(len(result.errors), 1)
 
     def test_generative_exit_first(self):
         class FooTC(TestCase):
@@ -479,9 +497,9 @@ class ExitFirstTC(TestCase):
                 for i in xrange(10):
                     yield self.assert_, False
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEquals(result.testsRun, 1)
-        self.assertEquals(len(result.failures), 1)
-        self.assertEquals(len(result.errors), 0)
+        self.assertEqual(result.testsRun, 1)
+        self.assertEqual(len(result.failures), 1)
+        self.assertEqual(len(result.errors), 0)
 
 
 class TestLoaderTC(TestCase):
@@ -511,16 +529,16 @@ class TestLoaderTC(TestCase):
         result = self.runner.run(suite)
         self.runner.test_pattern = None
         self.runner.skipped_patterns = ()
-        self.assertEquals(result.testsRun, expected_count)
+        self.assertEqual(result.testsRun, expected_count)
 
     def test_collect_everything(self):
         """make sure we don't change the default behaviour
         for loadTestsFromModule() and loadTestsFromTestCase
         """
         testsuite = self.loader.loadTestsFromModule(self.module)
-        self.assertEquals(len(testsuite._tests), 2)
+        self.assertEqual(len(testsuite._tests), 2)
         suite1, suite2 = testsuite._tests
-        self.assertEquals(len(suite1._tests) + len(suite2._tests), 4)
+        self.assertEqual(len(suite1._tests) + len(suite2._tests), 4)
 
     def test_collect_with_classname(self):
         self.assertRunCount('FooTC', self.module, 3)
@@ -697,10 +715,10 @@ class OutErrCaptureTC(TestCase):
     def test_capture_core(self):
         # output = capture_stdout()
         # bootstrap_print("hello", output=sys.stdout)
-        # self.assertEquals(output.restore(), "hello")
+        # self.assertEqual(output.restore(), "hello")
         output = capture_stdout()
         bootstrap_print("hello")
-        self.assertEquals(output.restore(), "hello")
+        self.assertEqual(output.restore(), "hello")
 
     def test_unicode_non_ascii_messages(self):
         class FooTC(TestCase):
@@ -727,7 +745,7 @@ class DecoratorTC(TestCase):
 
         tempdir = tempfile.gettempdir()
         # assert temp directory is empty
-        self.assertListEquals(list(os.walk(tempdir)),
+        self.assertListEqual(list(os.walk(tempdir)),
             [(tempdir,[],[])])
 
         witness = []
@@ -747,10 +765,10 @@ class DecoratorTC(TestCase):
         createfile(witness)
         self.assertTrue(witness)
 
-        self.assertEquals(tempfile.gettempdir(), tempdir)
+        self.assertEqual(tempfile.gettempdir(), tempdir)
 
         # assert temp directory is empty
-        self.assertListEquals(list(os.walk(tempdir)),
+        self.assertListEqual(list(os.walk(tempdir)),
             [(tempdir,[],[])])
 
     @with_tempdir
@@ -758,7 +776,7 @@ class DecoratorTC(TestCase):
 
         tempdir = tempfile.gettempdir()
         # assert temp directory is empty
-        self.assertListEquals(list(os.walk(tempfile.tempdir)),
+        self.assertListEqual(list(os.walk(tempfile.tempdir)),
             [(tempfile.tempdir,[],[])])
 
 
@@ -780,10 +798,10 @@ class DecoratorTC(TestCase):
 
 
         # assert tempdir didn't change
-        self.assertEquals(tempfile.gettempdir(), tempdir)
+        self.assertEqual(tempfile.gettempdir(), tempdir)
 
         # assert temp directory is empty
-        self.assertListEquals(list(os.walk(tempdir)),
+        self.assertListEqual(list(os.walk(tempdir)),
             [(tempdir,[],[])])
 
 
@@ -803,7 +821,7 @@ class DecoratorTC(TestCase):
         compare = ('2.4', '2.5', '2.5.4', '2.5.5')
         for version in compare:
             decorator = require_version(version)
-            self.assertEquals(func, decorator(func), '%s =< %s : function \
+            self.assertEqual(func, decorator(func), '%s =< %s : function \
                 return by the decorator should be the same.' % (version,
                 '.'.join([str(element) for element in current])))
 
@@ -817,7 +835,7 @@ class DecoratorTC(TestCase):
         compare = ('2.5.6', '2.6', '2.6.5')
         for version in compare:
             decorator = require_version(version)
-            self.assertNotEquals(func, decorator(func), '%s >= %s : function \
+            self.assertNotEqual(func, decorator(func), '%s >= %s : function \
                  return by the decorator should NOT be the same.'
                  % ('.'.join([str(element) for element in current]), version))
 
@@ -838,7 +856,7 @@ class DecoratorTC(TestCase):
             pass
         module = 'sys'
         decorator = require_module(module)
-        self.assertEquals(func, decorator(func), 'module %s exists : function \
+        self.assertEqual(func, decorator(func), 'module %s exists : function \
             return by the decorator should be the same.' % module)
 
     def test_require_module_bad(self):
@@ -853,7 +871,7 @@ class DecoratorTC(TestCase):
                 pass
             except ImportError:
                 decorator = require_module(module)
-                self.assertNotEquals(func, decorator(func), 'module %s does \
+                self.assertNotEqual(func, decorator(func), 'module %s does \
                     not exist : function return by the decorator should \
                     NOT be the same.' % module)
                 return
@@ -887,9 +905,9 @@ class TagTC(TestCase):
     def test_tag_decorator(self):
         bob = self.func
 
-        self.assertEquals(bob(2, 3, 7), 35)
+        self.assertEqual(bob(2, 3, 7), 35)
         self.assertTrue(hasattr(bob, 'tags'))
-        self.assertSetEquals(bob.tags, set(['testing','bob']))
+        self.assertSetEqual(bob.tags, set(['testing','bob']))
 
 
     def test_tags_class(self):

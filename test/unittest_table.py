@@ -45,24 +45,24 @@ class TableTC(TestCase):
         tab = Table()
         tab.create_columns(['col1'])
         tab.append_row([1])
-        self.assertEquals(tab, [[1]])
+        self.assertEqual(tab, [[1]])
         tab.append_row([2])
-        self.assertEquals(tab[0,0], 1)
-        self.assertEquals(tab[1,0], 2)
+        self.assertEqual(tab[0,0], 1)
+        self.assertEqual(tab[1,0], 2)
 
     def test_valeur_ligne(self):
         tab = Table()
         tab.create_columns(['col1','col2'])
         tab.append_row([1,2])
-        self.assertEquals(tab, [[1,2]])
+        self.assertEqual(tab, [[1,2]])
 
     def test_valeur_colonne(self):
         tab = Table()
         tab.create_columns(['col1'])
         tab.append_row([1])
         tab.append_row([2])
-        self.assertEquals(tab, [[1],[2]])
-        self.assertEquals(tab[:,0], [1,2])
+        self.assertEqual(tab, [[1],[2]])
+        self.assertEqual(tab[:,0], [1,2])
 
     def test_indexation(self):
         """we should be able to use [] to access rows"""
@@ -77,66 +77,66 @@ class TableTC(TestCase):
 
     def test_get_rows(self):
         """tests Table.get_rows()"""
-        self.assertEquals(self.table, [[0, 0], [0, 0], [0, 0]])
-        self.assertEquals(self.table[:], [[0, 0], [0, 0], [0, 0]])
+        self.assertEqual(self.table, [[0, 0], [0, 0], [0, 0]])
+        self.assertEqual(self.table[:], [[0, 0], [0, 0], [0, 0]])
         self.table.insert_column(1, range(3), 'supp')
-        self.assertEquals(self.table, [[0, 0, 0], [0, 1, 0], [0, 2, 0]])
-        self.assertEquals(self.table[:], [[0, 0, 0], [0, 1, 0], [0, 2, 0]])
+        self.assertEqual(self.table, [[0, 0, 0], [0, 1, 0], [0, 2, 0]])
+        self.assertEqual(self.table[:], [[0, 0, 0], [0, 1, 0], [0, 2, 0]])
 
     def test_get_cells(self):
         self.table.insert_column(1, range(3), 'supp')
-        self.assertEquals(self.table[0,1], 0)
-        self.assertEquals(self.table[1,1], 1)
-        self.assertEquals(self.table[2,1], 2)
-        self.assertEquals(self.table['row1', 'supp'], 0)
-        self.assertEquals(self.table['row2', 'supp'], 1)
-        self.assertEquals(self.table['row3', 'supp'], 2)
+        self.assertEqual(self.table[0,1], 0)
+        self.assertEqual(self.table[1,1], 1)
+        self.assertEqual(self.table[2,1], 2)
+        self.assertEqual(self.table['row1', 'supp'], 0)
+        self.assertEqual(self.table['row2', 'supp'], 1)
+        self.assertEqual(self.table['row3', 'supp'], 2)
         self.assertRaises(KeyError, self.table.__getitem__, ('row1', 'foo'))
         self.assertRaises(KeyError, self.table.__getitem__, ('foo', 'bar'))
 
     def test_shape(self):
         """tests table shape"""
-        self.assertEquals(self.table.shape, (3, 2))
+        self.assertEqual(self.table.shape, (3, 2))
         self.table.insert_column(1, range(3), 'supp')
-        self.assertEquals(self.table.shape, (3, 3))
+        self.assertEqual(self.table.shape, (3, 3))
 
     def test_set_column(self):
         """Tests that table.set_column() works fine.
         """
         self.table.set_column(0, range(3))
-        self.assertEquals(self.table[0,0], 0)
-        self.assertEquals(self.table[1,0], 1)
-        self.assertEquals(self.table[2,0], 2)
+        self.assertEqual(self.table[0,0], 0)
+        self.assertEqual(self.table[1,0], 1)
+        self.assertEqual(self.table[2,0], 2)
 
     def test_set_column_by_id(self):
         """Tests that table.set_column_by_id() works fine.
         """
         self.table.set_column_by_id('col1', range(3))
-        self.assertEquals(self.table[0,0], 0)
-        self.assertEquals(self.table[1,0], 1)
-        self.assertEquals(self.table[2,0], 2)
+        self.assertEqual(self.table[0,0], 0)
+        self.assertEqual(self.table[1,0], 1)
+        self.assertEqual(self.table[2,0], 2)
         self.assertRaises(KeyError, self.table.set_column_by_id, 'col123', range(3))
 
     def test_cells_ids(self):
         """tests that we can access cells by giving row/col ids"""
         self.assertRaises(KeyError, self.table.set_cell_by_ids, 'row12', 'col1', 12)
         self.assertRaises(KeyError, self.table.set_cell_by_ids, 'row1', 'col12', 12)
-        self.assertEquals(self.table[0,0], 0)
+        self.assertEqual(self.table[0,0], 0)
         self.table.set_cell_by_ids('row1', 'col1', 'DATA')
-        self.assertEquals(self.table[0,0], 'DATA')
+        self.assertEqual(self.table[0,0], 'DATA')
         self.assertRaises(KeyError, self.table.set_row_by_id, 'row12', [])
         self.table.set_row_by_id('row1', ['1.0', '1.1'])
-        self.assertEquals(self.table[0,0], '1.0')
+        self.assertEqual(self.table[0,0], '1.0')
 
     def test_insert_row(self):
         """tests a row insertion"""
         tmp_data = ['tmp1', 'tmp2']
         self.table.insert_row(1, tmp_data, 'tmprow')
-        self.assertEquals(self.table[1], tmp_data)
-        self.assertEquals(self.table['tmprow'], tmp_data)
+        self.assertEqual(self.table[1], tmp_data)
+        self.assertEqual(self.table['tmprow'], tmp_data)
         self.table.delete_row_by_id('tmprow')
         self.assertRaises(KeyError, self.table.delete_row_by_id, 'tmprow')
-        self.assertEquals(self.table[1], [0, 0])
+        self.assertEqual(self.table[1], [0, 0])
         self.assertRaises(KeyError, self.table.__getitem__, 'tmprow')
 
     def test_get_column(self):
@@ -144,42 +144,42 @@ class TableTC(TestCase):
         """
         self.table.set_cell(0, 1, 12)
         self.table.set_cell(2, 1, 13)
-        self.assertEquals(self.table[:,1], [12,0,13])
-        self.assertEquals(self.table[:,'col2'], [12,0,13])
+        self.assertEqual(self.table[:,1], [12,0,13])
+        self.assertEqual(self.table[:,'col2'], [12,0,13])
 
     def test_get_columns(self):
         """Tests if table.get_columns() works fine.
         """
         self.table.set_cell(0, 1, 12)
         self.table.set_cell(2, 1, 13)
-        self.assertEquals(self.table.get_columns(), [[0,0,0], [12,0,13]])
+        self.assertEqual(self.table.get_columns(), [[0,0,0], [12,0,13]])
 
     def test_insert_column(self):
         """Tests that table.insert_column() works fine.
         """
         self.table.insert_column(1, range(3), "inserted_column")
-        self.assertEquals(self.table[:,1], [0,1,2])
-        self.assertEquals(self.table.col_names,
+        self.assertEqual(self.table[:,1], [0,1,2])
+        self.assertEqual(self.table.col_names,
                           ['col1', 'inserted_column', 'col2'])
 
     def test_delete_column(self):
         """Tests that table.delete_column() works fine.
         """
         self.table.delete_column(1)
-        self.assertEquals(self.table.col_names, ['col1'])
-        self.assertEquals(self.table[:,0], [0,0,0])
+        self.assertEqual(self.table.col_names, ['col1'])
+        self.assertEqual(self.table[:,0], [0,0,0])
         self.assertRaises(KeyError, self.table.delete_column_by_id, 'col2')
         self.table.delete_column_by_id('col1')
-        self.assertEquals(self.table.col_names, [])
+        self.assertEqual(self.table.col_names, [])
 
     def test_transpose(self):
         """Tests that table.transpose() works fine.
         """
         self.table.append_column(range(5,8), 'col3')
         ttable = self.table.transpose()
-        self.assertEquals(ttable.row_names, ['col1', 'col2', 'col3'])
-        self.assertEquals(ttable.col_names, ['row1', 'row2', 'row3'])
-        self.assertEquals(ttable.data, [[0,0,0], [0,0,0], [5,6,7]])
+        self.assertEqual(ttable.row_names, ['col1', 'col2', 'col3'])
+        self.assertEqual(ttable.col_names, ['row1', 'row2', 'row3'])
+        self.assertEqual(ttable.data, [[0,0,0], [0,0,0], [5,6,7]])
 
     def test_sort_table(self):
         """Tests the table sort by column
@@ -187,11 +187,11 @@ class TableTC(TestCase):
         self.table.set_column(0, [3, 1, 2])
         self.table.set_column(1, [1, 2, 3])
         self.table.sort_by_column_index(0)
-        self.assertEquals(self.table.row_names, ['row2', 'row3', 'row1'])
-        self.assertEquals(self.table.data, [[1, 2], [2, 3], [3, 1]])
+        self.assertEqual(self.table.row_names, ['row2', 'row3', 'row1'])
+        self.assertEqual(self.table.data, [[1, 2], [2, 3], [3, 1]])
         self.table.sort_by_column_index(1, 'desc')
-        self.assertEquals(self.table.row_names, ['row3', 'row2', 'row1'])
-        self.assertEquals(self.table.data, [[2, 3], [1, 2], [3, 1]])
+        self.assertEqual(self.table.row_names, ['row3', 'row2', 'row1'])
+        self.assertEqual(self.table.data, [[2, 3], [1, 2], [3, 1]])
 
     def test_sort_by_id(self):
         """tests sort_by_column_id()"""
@@ -199,11 +199,11 @@ class TableTC(TestCase):
         self.table.set_column_by_id('col2', [1, 2, 3])
         self.table.sort_by_column_id('col1')
         self.assertRaises(KeyError, self.table.sort_by_column_id, 'col123')
-        self.assertEquals(self.table.row_names, ['row2', 'row3', 'row1'])
-        self.assertEquals(self.table.data, [[1, 2], [2, 3], [3, 1]])
+        self.assertEqual(self.table.row_names, ['row2', 'row3', 'row1'])
+        self.assertEqual(self.table.data, [[1, 2], [2, 3], [3, 1]])
         self.table.sort_by_column_id('col2', 'desc')
-        self.assertEquals(self.table.row_names, ['row3', 'row2', 'row1'])
-        self.assertEquals(self.table.data, [[2, 3], [1, 2], [3, 1]])
+        self.assertEqual(self.table.row_names, ['row3', 'row2', 'row1'])
+        self.assertEqual(self.table.data, [[2, 3], [1, 2], [3, 1]])
 
     def test_pprint(self):
         """only tests pprint doesn't raise an exception"""
@@ -227,17 +227,17 @@ class GroupByTC(TestCase):
     def test_single_groupby(self):
         """tests groupby() on several columns"""
         grouped = self.table.groupby('date')
-        self.assertEquals(len(grouped), 3)
-        self.assertEquals(len(grouped['date1']), 3)
-        self.assertEquals(len(grouped['date2']), 1)
-        self.assertEquals(len(grouped['date3']), 2)
-        self.assertEquals(grouped['date1'], [
+        self.assertEqual(len(grouped), 3)
+        self.assertEqual(len(grouped['date1']), 3)
+        self.assertEqual(len(grouped['date2']), 1)
+        self.assertEqual(len(grouped['date3']), 2)
+        self.assertEqual(grouped['date1'], [
             ('date1', 'ing1', 'task1', 0.3),
             ('date1', 'ing2', 'task2', 0.3),
             ('date1', 'ing1', 'task3', 0.3),
             ])
-        self.assertEquals(grouped['date2'], [('date2', 'ing3', 'task3', 0.3)])
-        self.assertEquals(grouped['date3'], [
+        self.assertEqual(grouped['date2'], [('date2', 'ing3', 'task3', 0.3)])
+        self.assertEqual(grouped['date3'], [
             ('date3', 'ing4', 'task2', 0.3),
             ('date3', 'ing1', 'task3', 0.3),
             ])
@@ -245,13 +245,13 @@ class GroupByTC(TestCase):
     def test_multiple_groupby(self):
         """tests groupby() on several columns"""
         grouped = self.table.groupby('date', 'task')
-        self.assertEquals(len(grouped), 3)
-        self.assertEquals(len(grouped['date1']), 3)
-        self.assertEquals(len(grouped['date2']), 1)
-        self.assertEquals(len(grouped['date3']), 2)
-        self.assertEquals(grouped['date1']['task1'], [('date1', 'ing1', 'task1', 0.3)])
-        self.assertEquals(grouped['date2']['task3'], [('date2', 'ing3', 'task3', 0.3)])
-        self.assertEquals(grouped['date3']['task2'], [('date3', 'ing4', 'task2', 0.3)])
+        self.assertEqual(len(grouped), 3)
+        self.assertEqual(len(grouped['date1']), 3)
+        self.assertEqual(len(grouped['date2']), 1)
+        self.assertEqual(len(grouped['date3']), 2)
+        self.assertEqual(grouped['date1']['task1'], [('date1', 'ing1', 'task1', 0.3)])
+        self.assertEqual(grouped['date2']['task3'], [('date2', 'ing3', 'task3', 0.3)])
+        self.assertEqual(grouped['date3']['task2'], [('date3', 'ing4', 'task2', 0.3)])
         date3 = grouped['date3']
         self.assertRaises(KeyError, date3.__getitem__, 'task1')
 
@@ -259,7 +259,7 @@ class GroupByTC(TestCase):
     def test_select(self):
         """tests Table.select() method"""
         rows = self.table.select('date', 'date1')
-        self.assertEquals(rows, [
+        self.assertEqual(rows, [
             ('date1', 'ing1', 'task1', 0.3),
             ('date1', 'ing2', 'task2', 0.3),
             ('date1', 'ing1', 'task3', 0.3),
@@ -289,18 +289,18 @@ class TableStyleSheetTC(TestCase):
         self.stylesheet.add_rule(rule)
         self.table.set_row(0, [3,4,0])
         self.table.apply_stylesheet(self.stylesheet)
-        self.assertEquals(self.table[0], [3,4,5])
-        self.assertEquals(len(self.stylesheet.rules), 1)
+        self.assertEqual(self.table[0], [3,4,5])
+        self.assertEqual(len(self.stylesheet.rules), 1)
         self.stylesheet.add_rule('some bad rule with bad syntax')
-        self.assertEquals(len(self.stylesheet.rules), 1, "Ill-formed rule mustn't be added")
-        self.assertEquals(len(self.stylesheet.instructions), 1, "Ill-formed rule mustn't be added")
+        self.assertEqual(len(self.stylesheet.rules), 1, "Ill-formed rule mustn't be added")
+        self.assertEqual(len(self.stylesheet.instructions), 1, "Ill-formed rule mustn't be added")
 
     def test_stylesheet_init(self):
         """tests Stylesheet.__init__"""
         rule = '0_2 = 1'
         sheet = TableStyleSheet([rule, 'bad rule'])
-        self.assertEquals(len(sheet.rules), 1, "Ill-formed rule mustn't be added")
-        self.assertEquals(len(sheet.instructions), 1, "Ill-formed rule mustn't be added")
+        self.assertEqual(len(sheet.rules), 1, "Ill-formed rule mustn't be added")
+        self.assertEqual(len(sheet.instructions), 1, "Ill-formed rule mustn't be added")
 
     def test_rowavg_rule(self):
         """Tests that add_rowavg_rule works as expected
@@ -364,9 +364,9 @@ class TableStyleTC(TestCase):
             getter = getattr(self.style, 'get_%s' % attrname)
             setter = getattr(self.style, 'set_%s' % attrname)
             self.assertRaises(KeyError, getter, 'badcol')
-            self.assertEquals(getter('col1'), default_value)
+            self.assertEqual(getter('col1'), default_value)
             setter('FOO', 'col1')
-            self.assertEquals(getter('col1'), 'FOO')
+            self.assertEqual(getter('col1'), 'FOO')
 
     def test_getset_index(self):
         """tests style's get and set by index methods"""
@@ -375,14 +375,14 @@ class TableStyleTC(TestCase):
             setter = getattr(self.style, 'set_%s' % attrname)
             igetter = getattr(self.style, 'get_%s_by_index' % attrname)
             isetter = getattr(self.style, 'set_%s_by_index' % attrname)
-            self.assertEquals(getter('__row_column__'), default_value)
+            self.assertEqual(getter('__row_column__'), default_value)
             isetter('FOO', 0)
-            self.assertEquals(getter('__row_column__'), 'FOO')
-            self.assertEquals(igetter(0), 'FOO')
-            self.assertEquals(getter('col1'), default_value)
+            self.assertEqual(getter('__row_column__'), 'FOO')
+            self.assertEqual(igetter(0), 'FOO')
+            self.assertEqual(getter('col1'), default_value)
             isetter('FOO', 1)
-            self.assertEquals(getter('col1'), 'FOO')
-            self.assertEquals(igetter(1), 'FOO')
+            self.assertEqual(getter('col1'), 'FOO')
+            self.assertEqual(igetter(1), 'FOO')
 
 
 class RendererTC(TestCase):
@@ -398,30 +398,30 @@ class RendererTC(TestCase):
     def test_cell_content(self):
         """test how alignment is rendered"""
         entry_xml = self.renderer._render_cell_content('data', self.style, 1)
-        self.assertEquals(entry_xml, "<entry align='right'>data</entry>\n")
+        self.assertEqual(entry_xml, "<entry align='right'>data</entry>\n")
         self.style.set_alignment_by_index('left', 1)
         entry_xml = self.renderer._render_cell_content('data', self.style, 1)
-        self.assertEquals(entry_xml, "<entry align='left'>data</entry>\n")
+        self.assertEqual(entry_xml, "<entry align='left'>data</entry>\n")
 
     def test_default_content_rendering(self):
         """tests that default rendering just prints the cell's content"""
         rendered_cell = self.base_renderer._render_cell_content('data', self.style, 1)
-        self.assertEquals(rendered_cell, "data")
+        self.assertEqual(rendered_cell, "data")
 
     def test_replacement_char(self):
         """tests that 0 is replaced when asked for"""
         cell_content = self.base_renderer._make_cell_content(0, self.style, 1)
-        self.assertEquals(cell_content, 0)
+        self.assertEqual(cell_content, 0)
         self.base_renderer.properties['skip_zero'] = '---'
         cell_content = self.base_renderer._make_cell_content(0, self.style, 1)
-        self.assertEquals(cell_content, '---')
+        self.assertEqual(cell_content, '---')
 
     def test_unit(self):
         """tests if units are added"""
         self.base_renderer.properties['units'] = True
         self.style.set_unit_by_index('EUR', 1)
         cell_content = self.base_renderer._make_cell_content(12, self.style, 1)
-        self.assertEquals(cell_content, '12 EUR')
+        self.assertEqual(cell_content, '12 EUR')
 
 
 class DocbookTableWriterTC(TestCase):

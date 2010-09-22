@@ -33,9 +33,9 @@ class CacheTestCase(TestCase):
         self.assertEqual(len(self.cache._usage), 1)
         self.assertEqual(self.cache._usage[-1], 1,
                          '1 is not the most recently used key')
-        self.assertUnorderedIterableEquals(self.cache._usage,
-                            self.cache.keys(),
-                            "usage list and data keys are different")
+        self.assertItemsEqual(self.cache._usage,
+                              self.cache.keys(),
+                              "usage list and data keys are different")
 
     def test_setitem2(self):
         """Checks that the setitem method works for multiple items"""
@@ -47,8 +47,8 @@ class CacheTestCase(TestCase):
                          "lenght of usage list is not 2")
         self.assertEqual(self.cache._usage[-1], 2,
                      '1 is not the most recently used key')
-        self.assertUnorderedIterableEquals(self.cache._usage,
-                            self.cache.keys())# usage list and data keys are different
+        self.assertItemsEqual(self.cache._usage,
+                              self.cache.keys())# usage list and data keys are different
 
     def test_setitem3(self):
         """Checks that the setitem method works when replacing an element in the cache"""
@@ -57,8 +57,8 @@ class CacheTestCase(TestCase):
         self.assertEqual(self.cache[1], 'bar', "1 : 'bar' is not in cache.data")
         self.assertEqual(len(self.cache._usage), 1, "lenght of usage list is not 1")
         self.assertEqual(self.cache._usage[-1], 1, '1 is not the most recently used key')
-        self.assertUnorderedIterableEquals(self.cache._usage,
-                            self.cache.keys())# usage list and data keys are different
+        self.assertItemsEqual(self.cache._usage,
+                              self.cache.keys())# usage list and data keys are different
 
     def test_recycling1(self):
         """Checks the removal of old elements"""
@@ -74,8 +74,8 @@ class CacheTestCase(TestCase):
                      'key 1 has not been suppressed from the cache LRU list')
         self.assertEqual(len(self.cache._usage), 5, "lenght of usage list is not 5")
         self.assertEqual(self.cache._usage[-1], 6, '6 is not the most recently used key')
-        self.assertUnorderedIterableEquals(self.cache._usage,
-                            self.cache.keys())# usage list and data keys are different
+        self.assertItemsEqual(self.cache._usage,
+                              self.cache.keys())# usage list and data keys are different
 
     def test_recycling2(self):
         """Checks that accessed elements get in the front of the list"""
@@ -86,8 +86,8 @@ class CacheTestCase(TestCase):
         a = self.cache[1]
         self.assertEqual(a, 'foo')
         self.assertEqual(self.cache._usage[-1], 1, '1 is not the most recently used key')
-        self.assertUnorderedIterableEquals(self.cache._usage,
-                            self.cache.keys())# usage list and data keys are different
+        self.assertItemsEqual(self.cache._usage,
+                              self.cache.keys())# usage list and data keys are different
 
     def test_delitem(self):
         """Checks that elements are removed from both element dict and element
@@ -97,8 +97,8 @@ class CacheTestCase(TestCase):
         del self.cache['foo']
         self.assert_('foo' not in self.cache.keys(),"Element 'foo' was not removed cache dictionnary")
         self.assert_('foo' not in self.cache._usage,"Element 'foo' was not removed usage list")
-        self.assertUnorderedIterableEquals(self.cache._usage,
-                            self.cache.keys())# usage list and data keys are different
+        self.assertItemsEqual(self.cache._usage,
+                              self.cache.keys())# usage list and data keys are different
 
 
     def test_nullsize(self):

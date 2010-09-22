@@ -52,26 +52,26 @@ class ExtendTC(TestCase):
 
     def test_base(self):
         extend(A, IFace2)
-        self.failUnlessEqual(A.__implements__, (IFace1, IFace2))
-        self.failUnlessEqual(B.__implements__, (IFace1, IFace2))
-        self.failUnless(B.__implements__ is A.__implements__)
-        self.failUnlessEqual(C1.__implements__, [IFace1, IFace3, IFace2])
-        self.failUnlessEqual(C2.__implements__, (IFace1, IFace2))
-        self.failUnless(C2.__implements__ is c2impl)
-        self.failUnlessEqual(D.__implements__, (IFace2,))
+        self.assertEqual(A.__implements__, (IFace1, IFace2))
+        self.assertEqual(B.__implements__, (IFace1, IFace2))
+        self.assertTrue(B.__implements__ is A.__implements__)
+        self.assertEqual(C1.__implements__, [IFace1, IFace3, IFace2])
+        self.assertEqual(C2.__implements__, (IFace1, IFace2))
+        self.assertTrue(C2.__implements__ is c2impl)
+        self.assertEqual(D.__implements__, (IFace2,))
 
     def test_already_impl(self):
         extend(A, IFace1)
-        self.failUnless(A.__implements__ is aimpl)
+        self.assertTrue(A.__implements__ is aimpl)
 
     def test_no_impl(self):
         extend(Z, IFace1)
-        self.failUnlessEqual(Z.__implements__, (IFace1,))
+        self.assertEqual(Z.__implements__, (IFace1,))
 
     def test_notimpl_explicit(self):
         extend(C1, IFace3)
-        self.failUnless(C1.__implements__ is c1impl)
-        self.failUnless(D.__implements__ is dimpl)
+        self.assertTrue(C1.__implements__ is c1impl)
+        self.assertTrue(D.__implements__ is dimpl)
 
 
     def test_nonregr_implements_baseinterface(self):
@@ -79,8 +79,8 @@ class ExtendTC(TestCase):
         class X(object):
             __implements__ = (SubIFace,)
 
-        self.failUnless(SubIFace.is_implemented_by(X))
-        self.failUnless(IFace1.is_implemented_by(X))
+        self.assertTrue(SubIFace.is_implemented_by(X))
+        self.assertTrue(IFace1.is_implemented_by(X))
 
 
 if __name__ == '__main__':

@@ -69,7 +69,7 @@ class UIlibHTMLGenerationTC(TestCase):
 
     def test_generated_html(self):
         s = html.render_HTML_tree(self.o, selected_node="child_2_2")
-        self.assertTextEqual(s, generated_html)
+        self.assertMultiLineEqual(s, generated_html)
 
 
 if __name__ == '__main__':

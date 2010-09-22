@@ -21,7 +21,6 @@ from logilab.common.testlib import TestCase, unittest_main
 import sys
 import types
 import __builtin__
-import pprint
 
 class CompatTCMixIn:
     MODNAMES = {}
@@ -92,37 +91,37 @@ class Py23CompatTC(CompatTCMixIn, TestCase):
 
     def test_sum(self):
         from logilab.common.compat import sum
-        self.assertEquals(sum(range(5)), 10)
+        self.assertEqual(sum(range(5)), 10)
         self.assertRaises(TypeError, sum, 'abc')
 
     def test_enumerate(self):
         from logilab.common.compat import enumerate
-        self.assertEquals(list(enumerate([])), [])
-        self.assertEquals(list(enumerate('abc')),
+        self.assertEqual(list(enumerate([])), [])
+        self.assertEqual(list(enumerate('abc')),
                           [(0, 'a'), (1, 'b'), (2, 'c')])
 
     def test_basic_set(self):
         from logilab.common.compat import set
         s = set('abc')
-        self.assertEquals(len(s), 3)
+        self.assertEqual(len(s), 3)
         s.remove('a')
-        self.assertEquals(len(s), 2)
+        self.assertEqual(len(s), 2)
         s.add('a')
-        self.assertEquals(len(s), 3)
+        self.assertEqual(len(s), 3)
         s.add('a')
-        self.assertEquals(len(s), 3)
+        self.assertEqual(len(s), 3)
         self.assertRaises(KeyError, s.remove, 'd')
 
     def test_basic_set(self):
         from logilab.common.compat import set
         s = set('abc')
-        self.assertEquals(len(s), 3)
+        self.assertEqual(len(s), 3)
         s.remove('a')
-        self.assertEquals(len(s), 2)
+        self.assertEqual(len(s), 2)
         s.add('a')
-        self.assertEquals(len(s), 3)
+        self.assertEqual(len(s), 3)
         s.add('a')
-        self.assertEquals(len(s), 3)
+        self.assertEqual(len(s), 3)
         self.assertRaises(KeyError, s.remove, 'd')
         self.assertRaises(TypeError, dict, [(s, 'foo')])
 
@@ -130,13 +129,13 @@ class Py23CompatTC(CompatTCMixIn, TestCase):
     def test_frozenset(self):
         from logilab.common.compat import frozenset
         s = frozenset('abc')
-        self.assertEquals(len(s), 3)
+        self.assertEqual(len(s), 3)
         self.assertRaises(AttributeError, getattr, s, 'remove')
         self.assertRaises(AttributeError, getattr, s, 'add')
         d = {s : 'foo'} # frozenset should be hashable
         d[s] = 'bar'
-        self.assertEquals(len(d), 1)
-        self.assertEquals(d[s], 'bar')
+        self.assertEqual(len(d), 1)
+        self.assertEqual(d[s], 'bar')
 
 
 class Py24CompatTC(CompatTCMixIn, TestCase):
@@ -146,30 +145,30 @@ class Py24CompatTC(CompatTCMixIn, TestCase):
         from logilab.common.compat import sorted
         l = [3, 1, 2, 5, 4]
         s = sorted(l)
-        self.assertEquals(s, [1, 2, 3, 4, 5])
-        self.assertEquals(l, [3, 1, 2, 5, 4])
-        self.assertEquals(sorted('FeCBaD'), list('BCDFae'))
-        self.assertEquals(sorted('FeCBaD', key=str.lower), list('aBCDeF'))
-        self.assertEquals(sorted('FeCBaD', key=str.lower, reverse=True), list('FeDCBa'))
+        self.assertEqual(s, [1, 2, 3, 4, 5])
+        self.assertEqual(l, [3, 1, 2, 5, 4])
+        self.assertEqual(sorted('FeCBaD'), list('BCDFae'))
+        self.assertEqual(sorted('FeCBaD', key=str.lower), list('aBCDeF'))
+        self.assertEqual(sorted('FeCBaD', key=str.lower, reverse=True), list('FeDCBa'))
         def strcmp(s1, s2):
             return cmp(s1.lower(), s2.lower())
-        self.assertEquals(sorted('FeCBaD', cmp=strcmp), list('aBCDeF'))
+        self.assertEqual(sorted('FeCBaD', cmp=strcmp), list('aBCDeF'))
 
 
     def test_reversed(self):
         from logilab.common.compat import reversed
         l = range(5)
         r = reversed(l)
-        self.assertEquals(r, [4, 3, 2, 1, 0])
-        self.assertEquals(l, range(5))
+        self.assertEqual(r, [4, 3, 2, 1, 0])
+        self.assertEqual(l, range(5))
 
     def test_set(self):
         from logilab.common.compat import set
         s1 = set(range(5))
         s2 = set(range(2, 6))
-        self.assertEquals(len(s1), 5)
-        self.assertEquals(s1 & s2, set([2, 3, 4]))
-        self.assertEquals(s1 | s2, set(range(6)))
+        self.assertEqual(len(s1), 5)
+        self.assertEqual(s1 & s2, set([2, 3, 4]))
+        self.assertEqual(s1 | s2, set(range(6)))
 
 
 
@@ -189,51 +188,52 @@ class Py25CompatTC(CompatTCMixIn, TestCase):
     def test_any(self):
         from logilab.common.compat import any
         testdata = ([], (), '', 'abc', xrange(0, 10), xrange(0, -10, -1))
-        self.assertEquals(any([]), False)
-        self.assertEquals(any(()), False)
-        self.assertEquals(any(''), False)
-        self.assertEquals(any('abc'), True)
-        self.assertEquals(any(xrange(10)), True)
-        self.assertEquals(any(xrange(0, -10, -1)), True)
+        self.assertEqual(any([]), False)
+        self.assertEqual(any(()), False)
+        self.assertEqual(any(''), False)
+        self.assertEqual(any('abc'), True)
+        self.assertEqual(any(xrange(10)), True)
+        self.assertEqual(any(xrange(0, -10, -1)), True)
         # python2.5's any consumes iterables
         irange = iter(range(10))
-        self.assertEquals(any(irange), True)
-        self.assertEquals(irange.next(), 2)
+        self.assertEqual(any(irange), True)
+        self.assertEqual(irange.next(), 2)
 
 
     def test_all(self):
         from logilab.common.compat import all
         testdata = ([], (), '', 'abc', xrange(0, 10), xrange(0, -10, -1))
-        self.assertEquals(all([]), True)
-        self.assertEquals(all(()), True)
-        self.assertEquals(all(''), True)
-        self.assertEquals(all('abc'), True)
-        self.assertEquals(all(xrange(10)), False)
-        self.assertEquals(all(xrange(0, -10, -1)), False)
+        self.assertEqual(all([]), True)
+        self.assertEqual(all(()), True)
+        self.assertEqual(all(''), True)
+        self.assertEqual(all('abc'), True)
+        self.assertEqual(all(xrange(10)), False)
+        self.assertEqual(all(xrange(0, -10, -1)), False)
         # python2.5's all consumes iterables
         irange = iter(range(10))
-        self.assertEquals(all(irange), False)
-        self.assertEquals(irange.next(), 1)
+        self.assertEqual(all(irange), False)
+        self.assertEqual(irange.next(), 1)
 
     def test_max(self):
         from logilab.common.compat import max
 
         # old apy
-        self.assertEquals(max("fdjkmhsgmdfhsg"),'s')
-        self.assertEquals(max(1,43,12,45,1337,34,2), 1337)
+        self.assertEqual(max("fdjkmhsgmdfhsg"),'s')
+        self.assertEqual(max(1,43,12,45,1337,34,2), 1337)
         self.assertRaises(TypeError,max)
         self.assertRaises(TypeError,max,1)
         self.assertRaises(ValueError,max,[])
         self.assertRaises(TypeError,max,bob=None)
 
         # new apy
-        self.assertEquals(max("shorter","longer",key=len),"shorter")
-        self.assertEquals(max(((1,1),(2,3,5),(8,13,21)),key=len),(2,3,5))
-        self.assertEquals(max(((1,1),(42,),(2,3,5),(8,13,21)),key=max),(42,))
+        self.assertEqual(max("shorter","longer",key=len),"shorter")
+        self.assertEqual(max(((1,1),(2,3,5),(8,13,21)),key=len),(2,3,5))
+        self.assertEqual(max(((1,1),(42,),(2,3,5),(8,13,21)),key=max),(42,))
         self.assertRaises(TypeError,max,key=None)
         self.assertRaises(TypeError,max,1,key=len)
         self.assertRaises(ValueError,max,[],key=max)
         self.assertRaises(TypeError,max,"shorter","longer",key=len,kathy=None)
+
 
 if __name__ == '__main__':
     unittest_main()

@@ -46,10 +46,8 @@ import sys
 import os, os.path as osp
 import re
 import time
-import getopt
 import traceback
 import inspect
-import unittest
 import difflib
 import types
 import tempfile
@@ -59,7 +57,16 @@ from operator import itemgetter
 import warnings
 from compiler.consts import CO_GENERATOR
 from ConfigParser import ConfigParser
+from logilab.common.deprecation import deprecated
 from itertools import dropwhile
+
+if sys.version_info < (3, 2):
+    import unittest2 as unittest
+    from unittest2 import SkipTest
+else:
+    import unittest
+    from unittest import SkipTest
+
 try:
     from functools import wraps
 except ImportError:
@@ -94,6 +101,8 @@ DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
 ENABLE_DBC = False
 
 FILE_RESTART = ".pytest.restart"
+
+UNITTEST2 = getattr(unittest, "__package__", "") == 'unittest2'
 
 # used by unittest to count the number of relevant levels in the traceback
 __unittest = 1
@@ -353,7 +362,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
     def addError(self, test, err):
         """err ==  (exc_type, exc, tcbk)"""
         exc_type, exc, _ = err #
-        if exc_type == TestSkipped:
+        if exc_type == SkipTest:
             self.addSkipped(test, exc)
         else:
             if self.exitfirst:
@@ -378,6 +387,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def printErrors(self):
         super(SkipAwareTestResult, self).printErrors()
+        # FIXME format of skipped results not compatible with unittest2
         self.printSkippedList()
 
     def printSkippedList(self):
@@ -439,11 +449,6 @@ unittest.TestSuite.run = run
 
 # backward compatibility: TestSuite might be imported from lgc.testlib
 TestSuite = unittest.TestSuite
-
-# python2.3 compat
-def __call__(self, *args, **kwds):
-    return self.run(*args, **kwds)
-unittest.TestSuite.__call__ = __call__
 
 
 class SkipAwareTextTestRunner(unittest.TextTestRunner):
@@ -853,9 +858,10 @@ Examples:
             except Exception, exc:
                 print 'teardown_module error:', exc
                 sys.exit(1)
-        if result.debuggers and self.pdbmode:
+        if getattr(result, "debuggers", None) and \
+           getattr(self, "pdbmode", None):
             start_interactive_mode(result)
-        if not self.batchmode:
+        if not getattr(self, "batchmode", None):
             sys.exit(not result.wasSuccessful())
         self.result = result
 
@@ -954,11 +960,9 @@ def unittest_main(module='__main__', defaultTest=None,
     return SkipAwareTestProgram(module, defaultTest, batchmode,
                                 cvg, options, outstream)
 
-class TestSkipped(Exception):
+class InnerTestSkipped(SkipTest):
     """raised when a test is skipped"""
-
-class InnerTestSkipped(TestSkipped):
-    """raised when a test is skipped"""
+    pass
 
 def is_generator(function):
     flags = function.func_code.co_flags
@@ -1013,12 +1017,22 @@ class Tags(InheritableSet): # 2.4 compat
     def match(self, exp):
         return eval(exp, {}, self)
 
+
 class TestCase(unittest.TestCase):
     """A unittest.TestCase extension with some additional methods."""
 
     capture = False
     pdbclass = Debugger
     tags = Tags()
+
+    # duplicate definition from unittest2 of the _deprecate decorator
+    def _deprecate(original_func):
+        def deprecated_func(*args, **kwargs):
+            warnings.warn(
+                ('Please use %s instead.' % original_func.__name__),
+                PendingDeprecationWarning, 2)
+            return original_func(*args, **kwargs)
+        return deprecated_func
 
     def __init__(self, methodName='runTest'):
         super(TestCase, self).__init__(methodName)
@@ -1028,7 +1042,8 @@ class TestCase(unittest.TestCase):
             self.__testMethodName = self._testMethodName
         else:
             # let's give easier access to _testMethodName to every subclasses
-            self._testMethodName = self.__testMethodName
+            if hasattr(self, "__testMethodName"):
+                self._testMethodName = self.__testMethodName
         self._captured_stdout = ""
         self._captured_stderr = ""
         self._out = []
@@ -1062,7 +1077,7 @@ class TestCase(unittest.TestCase):
 
     # override default's unittest.py feature
     def shortDescription(self):
-        """override default unitest shortDescription to handle correctly
+        """override default unittest shortDescription to handle correctly
         generative tests
         """
         if self._current_test_descr is not None:
@@ -1128,8 +1143,7 @@ class TestCase(unittest.TestCase):
 
     def _get_test_method(self):
         """return the test method"""
-        return getattr(self, self.__testMethodName)
-
+        return getattr(self, self._testMethodName)
 
     def optval(self, option, default=None):
         """return the option value or default if the option is not define"""
@@ -1188,8 +1202,6 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             # if result.cvg:
             #     result.cvg.stop()
             result.stopTest(self)
-
-
 
     def _proceed_generative(self, result, testfunc, runcondition=None):
         # cancel startTest()'s increment
@@ -1259,34 +1271,18 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         """return a new instance of the defaultTestResult"""
         return SkipAwareTestResult()
 
-    def skip(self, msg=None):
-        """mark a test as skipped for the <msg> reason"""
-        msg = msg or 'test was skipped'
-        raise TestSkipped(msg)
+    skip = _deprecate(unittest.TestCase.skipTest)
+    assertEquals = _deprecate(unittest.TestCase.assertEqual)
+    assertNotEquals = _deprecate(unittest.TestCase.assertNotEqual)
+    assertAlmostEquals = _deprecate(unittest.TestCase.assertAlmostEqual)
+    assertNotAlmostEquals = _deprecate(unittest.TestCase.assertNotAlmostEqual)
 
     def innerSkip(self, msg=None):
         """mark a generative test as skipped for the <msg> reason"""
         msg = msg or 'test was skipped'
         raise InnerTestSkipped(msg)
 
-    def assertIn(self, object, set, msg=None):
-        """assert <object> is in <set>
-
-        :param object: a Python Object
-        :param set: a Python Container
-        :param msg: custom message (String) in case of failure
-        """
-        self.assert_(object in set, msg or "%s not in %s" % (object, set))
-
-    def assertNotIn(self, object, set, msg=None):
-        """assert <object> is not in <set>
-
-        :param object: a Python Object
-        :param set: the Python container to contain <object>
-        :param msg: custom message (String) in case of failure
-        """
-        self.assert_(object not in set, msg or "%s in %s" % (object, set))
-
+    @deprecated('Please use assertDictEqual instead.')
     def assertDictEquals(self, dict1, dict2, msg=None):
         """compares two dicts
 
@@ -1312,8 +1308,8 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             self.failureException(msg)
         elif msgs:
             self.fail('\n'.join(msgs))
-    assertDictEqual = assertDictEquals
 
+    @deprecated('Please use assertItemsEqual instead.')
     def assertUnorderedIterableEquals(self, got, expected, msg=None):
         """compares two iterable and shows difference between both
 
@@ -1334,7 +1330,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                 for element in expected:
                     expected_count[element] = expected_count.get(element,0) + 1
                 # we know that got_count.key() == expected_count.key()
-                # because of assertSetEquals
+                # because of assertSetEqual
                 for element, count in got_count.iteritems():
                     other_count = expected_count[element]
                     if other_count != count:
@@ -1345,6 +1341,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
     assertUnorderedIterableEqual = assertUnorderedIterableEquals
     assertUnordIterEquals = assertUnordIterEqual = assertUnorderedIterableEqual
 
+    @deprecated('Please use assertSetEqual instead.')
     def assertSetEquals(self,got,expected, msg=None):
         """compares two sets and shows difference between both
 
@@ -1370,9 +1367,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                     for key, values in items.iteritems() if values)
             self.fail(msg)
 
-
-    assertSetEqual = assertSetEquals
-
+    @deprecated('Please use assertListEqual instead.')
     def assertListEquals(self, list_1, list_2, msg=None):
         """compares two lists
 
@@ -1401,8 +1396,8 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             if msg is None:
                 msg = 'list_2 is lacking %r' % _l1
             self.fail(msg)
-    assertListEqual = assertListEquals
 
+    @deprecated('Non-standard. Please use assertMultiLineEqual instead.')
     def assertLinesEquals(self, string1, string2, msg=None, striplines=False):
         """compare two strings and assert that the text lines of the strings
         are equal.
@@ -1417,9 +1412,10 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         if striplines:
             lines1 = [l.strip() for l in lines1]
             lines2 = [l.strip() for l in lines2]
-        self.assertListEquals(lines1, lines2, msg)
+        self.assertListEqual(lines1, lines2, msg)
     assertLineEqual = assertLinesEquals
 
+    @deprecated('Non-standard')
     def assertXMLWellFormed(self, stream, msg=None, context=2):
         """asserts the XML stream is well-formed (no DTD conformance check)
 
@@ -1444,6 +1440,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                     msg = 'XML stream not well formed: %s\n%s%s' % (ex, line, pointer)
                 self.fail(msg)
 
+    @deprecated('Non-standard')
     def assertXMLStringWellFormed(self, xml_string, msg=None, context=2):
         """asserts the XML string is well-formed (no DTD conformance check)
 
@@ -1500,7 +1497,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                 msg = 'XML stream not well formed: %s\n%s' % (ex, rich_context)
             self.fail(msg)
 
-
+    @deprecated('Non-standard')
     def assertXMLEqualsTuple(self, element, tup):
         """compare an ElementTree Element to a tuple formatted as follow:
         (tagname, [attrib[, children[, text[, tail]]]])"""
@@ -1511,7 +1508,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             if len(tup)<=1:
                 self.fail( "tuple %s has no attributes (%s expected)"%(tup,
                     dict(element.attrib)))
-            self.assertDictEquals(element.attrib, tup[1])
+            self.assertDictEqual(element.attrib, tup[1])
         # check children
         if len(element) or len(tup)>2:
             if len(tup)<=2:
@@ -1547,6 +1544,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             if not line.startswith(' '):
                 self.fail('\n'.join(['%s\n'%msg_prefix]+read + list(result)))
 
+    @deprecated('Non-standard. Please use assertMultiLineEqual instead.')
     def assertTextEquals(self, text1, text2, junk=None,
             msg_prefix='Text differ', striplines=False):
         """compare two multiline strings (using difflib and splitlines())
@@ -1572,6 +1570,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         self._difftext(lines1, lines2, junk,  msg_prefix)
     assertTextEqual = assertTextEquals
 
+    @deprecated('Non-standard')
     def assertStreamEquals(self, stream1, stream2, junk=None,
             msg_prefix='Stream differ'):
         """compare two streams (using difflib and readlines())"""
@@ -1587,13 +1586,16 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
              msg_prefix)
 
     assertStreamEqual = assertStreamEquals
+
+    @deprecated('Non-standard')
     def assertFileEquals(self, fname1, fname2, junk=(' ', '\t')):
         """compares two files using difflib"""
         self.assertStreamEqual(file(fname1), file(fname2), junk,
             msg_prefix='Files differs\n-:%s\n+:%s\n'%(fname1, fname2))
+
     assertFileEqual = assertFileEquals
 
-
+    @deprecated('Non-standard')
     def assertDirEquals(self, path_a, path_b):
         """compares two files using difflib"""
         assert osp.exists(path_a), "%s doesn't exists" % path_a
@@ -1655,9 +1657,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             except StopIteration:
                 break
 
-
     assertDirEqual = assertDirEquals
-
 
     def assertIsInstance(self, obj, klass, msg=None, strict=False):
         """check if an object is an instance of a class
@@ -1668,6 +1668,9 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         :param strict: if True, check that the class of <obj> is <klass>;
                        else check with 'isinstance'
         """
+        if strict:
+            warnings.warn('[API] Non-standard. Strict parameter has vanished',
+                          DeprecationWarning, stacklevel=2)
         if msg is None:
             if strict:
                 msg = '%r is not of class %s but of %s'
@@ -1679,24 +1682,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         else:
             self.assert_(isinstance(obj, klass), msg)
 
-    def assertIs(self, obj, other, msg=None):
-        """compares identity of two reference
-
-        :param obj: a Python Object
-        :param other: another Python Object
-        :param msg: a String for a custom message
-        """
-        if msg is None:
-            msg = "%r is not %r"%(obj, other)
-        self.assert_(obj is other, msg)
-
-
-    def assertIsNot(self, obj, other, msg=None):
-        """compares identity of two reference"""
-        if msg is None:
-            msg = "%r is %r"%(obj, other)
-        self.assert_(obj is not other, msg )
-
+    @deprecated('Please use assertIsNone instead.')
     def assertNone(self, obj, msg=None):
         """assert obj is None
 
@@ -1706,12 +1692,14 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             msg = "reference to %r when None expected"%(obj,)
         self.assert_( obj is None, msg )
 
+    @deprecated('Please use assertIsNotNone instead.')
     def assertNotNone(self, obj, msg=None):
         """assert obj is not None"""
         if msg is None:
             msg = "unexpected reference to None"
         self.assert_( obj is not None, msg )
 
+    @deprecated('Non-standard. Please use assertAlmostEqual instead.')
     def assertFloatAlmostEquals(self, obj, other, prec=1e-5, msg=None):
         """compares if two floats have a distance smaller than expected
         precision.
@@ -1725,8 +1713,9 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             msg = "%r != %r" % (obj, other)
         self.assert_(math.fabs(obj - other) < prec, msg)
 
+    #@deprecated('[API] Non-standard. Please consider using a context here')
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
-        """override default failUnlessRaise method to return the raised
+        """override default failUnlessRaises method to return the raised
         exception instance.
 
         Fail unless an exception of class excClass is thrown
@@ -1735,6 +1724,11 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
         thrown, it will not be caught, and the test case will be
         deemed to have suffered an error, exactly as for an
         unexpected exception.
+
+        CAUTION! There are subtle differences between Logilab and unittest2
+        - exc is not returned in standard version
+        - context capabilities in standard version
+        - try/except/else construction (minor)
 
         :param excClass: the Exception to be raised
         :param callableObj: a callable Object which should raise <excClass>
@@ -1753,6 +1747,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             raise self.failureException("%s not raised" % excName)
 
     assertRaises = failUnlessRaises
+
 
 import doctest
 
@@ -1985,7 +1980,7 @@ def require_version(version):
         if current < compare:
             #print 'version too old'
             def new_f(self, *args, **kwargs):
-                self.skip('Need at least %s version of python. Current version is %s.' % (version, '.'.join([str(element) for element in current])))
+                self.skipTest('Need at least %s version of python. Current version is %s.' % (version, '.'.join([str(element) for element in current])))
             new_f.__name__ = f.__name__
             return new_f
         else:
@@ -2004,7 +1999,7 @@ def require_module(module):
         except ImportError:
             #print module, 'can not be imported'
             def new_f(self, *args, **kwargs):
-                self.skip('%s can not be imported.' % module)
+                self.skipTest('%s can not be imported.' % module)
             new_f.__name__ = f.__name__
             return new_f
     return check_require_module

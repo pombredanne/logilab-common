@@ -40,7 +40,7 @@ else:
 class NormalizeTextTC(TestCase):
 
     def test_known_values(self):
-        self.assertEquals(ulines(tu.normalize_text('''some really malformated
+        self.assertEqual(ulines(tu.normalize_text('''some really malformated
         text.
 With some times some veeeeeeeeeeeeeeerrrrryyyyyyyyyyyyyyyyyyy loooooooooooooooooooooong linnnnnnnnnnnes
 
@@ -51,7 +51,7 @@ veeeeeeeeeeeeeeerrrrryyyyyyyyyyyyyyyyyyy loooooooooooooooooooooong
 linnnnnnnnnnnes
 
 and empty lines!''')
-        self.assertTextEquals(ulines(tu.normalize_text('''\
+        self.assertMultiLineEqual(ulines(tu.normalize_text('''\
 some ReST formated text
 =======================
 With some times some veeeeeeeeeeeeeeerrrrryyyyyyyyyyyyyyyyyyy loooooooooooooooooooooong linnnnnnnnnnnes
@@ -69,7 +69,7 @@ and normal lines!
 another paragraph''')
 
     def test_nonregr_unsplitable_word(self):
-        self.assertEquals(ulines(tu.normalize_text('''petit complement :
+        self.assertEqual(ulines(tu.normalize_text('''petit complement :
 
 http://www.plonefr.net/blog/archive/2005/10/30/tester-la-future-infrastructure-i18n
 ''', 80)),
@@ -79,16 +79,16 @@ http://www.plonefr.net/blog/archive/2005/10/30/tester-la-future-infrastructure-i
 
 
     def test_nonregr_rest_normalize(self):
-        self.assertEquals(ulines(tu.normalize_text("""... Il est donc evident que tout le monde doit lire le compte-rendu de RSH et aller discuter avec les autres si c'est utile ou necessaire.
+        self.assertEqual(ulines(tu.normalize_text("""... Il est donc evident que tout le monde doit lire le compte-rendu de RSH et aller discuter avec les autres si c'est utile ou necessaire.
         """, rest=True)), """... Il est donc evident que tout le monde doit lire le compte-rendu de RSH et
 aller discuter avec les autres si c'est utile ou necessaire.""")
 
     def test_normalize_rest_paragraph(self):
-        self.assertEquals(ulines(tu.normalize_rest_paragraph("""**nico**: toto""")),
+        self.assertEqual(ulines(tu.normalize_rest_paragraph("""**nico**: toto""")),
                           """**nico**: toto""")
 
     def test_normalize_rest_paragraph2(self):
-        self.assertEquals(ulines(tu.normalize_rest_paragraph(""".. _tdm: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
+        self.assertEqual(ulines(tu.normalize_rest_paragraph(""".. _tdm: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
 .. _extrait: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Extrait-du-livre/.20_d6eed0be-0d36-4384-be59-2dd09e081012_0_0.pdf""", indent='> ')),
                           """> .. _tdm:
 > http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
@@ -96,7 +96,7 @@ aller discuter avec les autres si c'est utile ou necessaire.""")
 > http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Extrait-du-livre/.20_d6eed0be-0d36-4384-be59-2dd09e081012_0_0.pdf""")
 
     def test_normalize_paragraph2(self):
-        self.assertEquals(ulines(tu.normalize_paragraph(""".. _tdm: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
+        self.assertEqual(ulines(tu.normalize_paragraph(""".. _tdm: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
 .. _extrait: http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Extrait-du-livre/.20_d6eed0be-0d36-4384-be59-2dd09e081012_0_0.pdf""", indent='> ')),
                           """> .. _tdm:
 > http://www.editions-eni.fr/Livres/Python-Les-fondamentaux-du-langage---La-programmation-pour-les-scientifiques-Table-des-matieres/.20_adaa41fb-c125-4919-aece-049601e81c8e_0_0.pdf
@@ -106,7 +106,7 @@ aller discuter avec les autres si c'est utile ou necessaire.""")
 class NormalizeParagraphTC(TestCase):
 
     def test_known_values(self):
-        self.assertEquals(ulines(tu.normalize_text("""This package contains test files shared by the logilab-common package. It isn't
+        self.assertEqual(ulines(tu.normalize_text("""This package contains test files shared by the logilab-common package. It isn't
 necessary to install this package unless you want to execute or look at
 the tests.""", indent=' ', line_len=70)),
                          """\
@@ -118,7 +118,7 @@ the tests.""", indent=' ', line_len=70)),
 class GetCsvTC(TestCase):
 
     def test_known(self):
-        self.assertEquals(tu.splitstrip('a, b,c '), ['a', 'b', 'c'])
+        self.assertEqual(tu.splitstrip('a, b,c '), ['a', 'b', 'c'])
 
 class UnitsTC(TestCase):
 
@@ -130,13 +130,13 @@ class UnitsTC(TestCase):
             }
 
     def test_empty_base(self):
-        self.assertEquals(tu.apply_units('17', {}), 17)
+        self.assertEqual(tu.apply_units('17', {}), 17)
 
     def test_empty_inter(self):
         def inter(value):
             return int(float(value)) * 2
         result = tu.apply_units('12.4', {}, inter=inter)
-        self.assertEquals(result, 12 * 2)
+        self.assertEqual(result, 12 * 2)
         self.assertIsInstance(result, float)
 
     def test_empty_final(self):
@@ -145,57 +145,57 @@ class UnitsTC(TestCase):
 
     def test_empty_inter_final(self):
         result = tu.apply_units('12.4', {}, inter=float,final=int)
-        self.assertEquals(result, 12)
+        self.assertEqual(result, 12)
         self.assertIsInstance(result, int)
 
     def test_blank_base(self):
         result = tu.apply_units(' 42  ', {}, final=int)
-        self.assertEquals(result, 42)
+        self.assertEqual(result, 42)
 
     def test_blank_space(self):
         result = tu.apply_units(' 1 337 ', {}, final=int)
-        self.assertEquals(result, 1337)
+        self.assertEqual(result, 1337)
 
     def test_blank_coma(self):
         result = tu.apply_units(' 4,298.42 ', {})
-        self.assertEquals(result, 4298.42)
+        self.assertEqual(result, 4298.42)
 
     def test_blank_mixed(self):
         result = tu.apply_units('45, 317, 337', {},final=int)
-        self.assertEquals(result, 45317337)
+        self.assertEqual(result, 45317337)
 
     def test_unit_singleunit_singleletter(self):
         result = tu.apply_units('15m', self.units)
-        self.assertEquals(result, 15 * self.units['m'] )
+        self.assertEqual(result, 15 * self.units['m'] )
 
     def test_unit_singleunit_multipleletter(self):
         result = tu.apply_units('47KB', self.units)
-        self.assertEquals(result, 47 * self.units['kb'] )
+        self.assertEqual(result, 47 * self.units['kb'] )
 
     def test_unit_singleunit_caseinsensitive(self):
         result = tu.apply_units('47kb', self.units)
-        self.assertEquals(result, 47 * self.units['kb'] )
+        self.assertEqual(result, 47 * self.units['kb'] )
 
     def test_unit_multipleunit(self):
         result = tu.apply_units('47KB 1.5MB', self.units)
-        self.assertEquals(result, 47 * self.units['kb'] + 1.5 * self.units['mb'])
+        self.assertEqual(result, 47 * self.units['kb'] + 1.5 * self.units['mb'])
 
     def test_unit_with_blank(self):
         result = tu.apply_units('1 000 KB', self.units)
-        self.assertEquals(result, 1000 * self.units['kb'])
+        self.assertEqual(result, 1000 * self.units['kb'])
 
 RGX = re.compile('abcd')
 class PrettyMatchTC(TestCase):
 
     def test_known(self):
         string = 'hiuherabcdef'
-        self.assertEquals(ulines(tu.pretty_match(RGX.search(string), string)),
+        self.assertEqual(ulines(tu.pretty_match(RGX.search(string), string)),
                          'hiuherabcdef\n      ^^^^')
     def test_known_values_1(self):
         rgx = re.compile('(to*)')
         string = 'toto'
         match = rgx.search(string)
-        self.assertEquals(ulines(tu.pretty_match(match, string)), '''toto
+        self.assertEqual(ulines(tu.pretty_match(match, string)), '''toto
 ^^''')
 
     def test_known_values_2(self):
@@ -203,7 +203,7 @@ class PrettyMatchTC(TestCase):
         string = ''' ... ... to to
  ... ... '''
         match = rgx.search(string)
-        self.assertEquals(ulines(tu.pretty_match(match, string)), ''' ... ... to to
+        self.assertEqual(ulines(tu.pretty_match(match, string)), ''' ... ... to to
          ^^
  ... ...''')
 
@@ -211,17 +211,17 @@ class PrettyMatchTC(TestCase):
 
 class UnquoteTC(TestCase):
     def test(self):
-        self.assertEquals(tu.unquote('"toto"'), 'toto')
-        self.assertEquals(tu.unquote("'l'inenarrable toto'"), "l'inenarrable toto")
-        self.assertEquals(tu.unquote("no quote"), "no quote")
+        self.assertEqual(tu.unquote('"toto"'), 'toto')
+        self.assertEqual(tu.unquote("'l'inenarrable toto'"), "l'inenarrable toto")
+        self.assertEqual(tu.unquote("no quote"), "no quote")
 
 
 class ColorizeAnsiTC(TestCase):
     def test_known(self):
-        self.assertEquals(tu.colorize_ansi('hello', 'blue', 'strike'), '\x1b[9;34mhello\x1b[0m')
-        self.assertEquals(tu.colorize_ansi('hello', style='strike, inverse'), '\x1b[9;7mhello\x1b[0m')
-        self.assertEquals(tu.colorize_ansi('hello', None, None), 'hello')
-        self.assertEquals(tu.colorize_ansi('hello', '', ''), 'hello')
+        self.assertEqual(tu.colorize_ansi('hello', 'blue', 'strike'), '\x1b[9;34mhello\x1b[0m')
+        self.assertEqual(tu.colorize_ansi('hello', style='strike, inverse'), '\x1b[9;7mhello\x1b[0m')
+        self.assertEqual(tu.colorize_ansi('hello', None, None), 'hello')
+        self.assertEqual(tu.colorize_ansi('hello', '', ''), 'hello')
     def test_raise(self):
         self.assertRaises(KeyError, tu.colorize_ansi, 'hello', 'bleu', None)
         self.assertRaises(KeyError, tu.colorize_ansi, 'hello', None, 'italique')

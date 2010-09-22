@@ -52,13 +52,13 @@ class TestCase(TLTestCase):
 class _module_file_tc(TestCase):
     def test_find_zipped_module(self):
         mtype, mfile = _module_file('mypypa', [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.zip')])
-        self.assertEquals(mtype, modutils.ZIPFILE)
-        self.assertEquals(mfile, '')
+        self.assertEqual(mtype, modutils.ZIPFILE)
+        self.assertEqual(mfile, '')
 
     def test_find_egg_module(self):
         mtype, mfile = _module_file('mypypa', [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.egg')])
-        self.assertEquals(mtype, modutils.ZIPFILE)
-        self.assertEquals(mfile, '')
+        self.assertEqual(mtype, modutils.ZIPFILE)
+        self.assertEqual(mfile, '')
 
 
 
@@ -206,7 +206,7 @@ class get_modules_tc(TestCase):
         mod_path = ("data", 'find_test')
         modules = modutils.get_modules(path.join(*mod_path), data.__path__[0])
         modules.sort()
-        self.assertSetEquals(set(modules),
+        self.assertSetEqual(set(modules),
             set([ '.'.join(mod_path + (mod, )) for mod in 'module', 'module2',
             'noendingnewline', 'nonregr']))
 

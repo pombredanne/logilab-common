@@ -436,7 +436,7 @@ succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
             except SystemExit, exc:
                 self.errcode = exc.code
                 raise
-            except testlib.TestSkipped:
+            except testlib.SkipTest:
                 print "Module skipped:", filename
                 self.report.skip_module(filename)
                 return None
