@@ -233,9 +233,15 @@ class UnormalizeTC(TestCase):
                 (u'\u0152nologie', u'OEnologie'),
                 (u'l\xf8to', u'loto'),
                 (u'été', u'ete'),
-                ]
+                (u'àèùéïîôêç', u'aeueiioec'),
+                (u'ÀÈÙÉÏÎÔÊÇ', u'AEUEIIOEC'),
+                (u'\xa0', u' '), # NO-BREAK SPACE managed by NFKD decomposition
+               ]
         for input, output in data:
-            yield self.assertEquals, tu.unormalize(input), output
+            yield self.assertEqual, tu.unormalize(input), output
+        self.assertRaises(ValueError, tu.unormalize, u"non ascii char is \u0154",
+                          ignorenonascii=False)
+
 
 class ModuleDocTest(DocTest):
     """test doc test in this module"""
