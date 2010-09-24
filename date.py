@@ -15,12 +15,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
-"""Date manipulation helper functions.
+"""Date manipulation helper functions."""
 
-
-
-
-"""
 __docformat__ = "restructuredtext en"
 
 import math
@@ -33,8 +29,6 @@ from calendar import monthrange, timegm
 try:
     from mx.DateTime import RelativeDateTime, Date, DateTimeType
 except ImportError:
-    from warnings import warn
-    warn("mxDateTime not found, endOfMonth won't be available")
     endOfMonth = None
     DateTimeType = datetime
 else:
