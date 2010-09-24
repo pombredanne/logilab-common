@@ -257,7 +257,7 @@ def splitstrip(string, sep=','):
     """
     return [word.strip() for word in string.split(sep) if word.strip()]
 
-get_csv = deprecated()(splitstrip)
+get_csv = deprecated('get_csv is deprecated, use splitstrip')(splitstrip)
 
 
 def split_url_or_path(url_or_path):
