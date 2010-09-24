@@ -102,8 +102,6 @@ ENABLE_DBC = False
 
 FILE_RESTART = ".pytest.restart"
 
-UNITTEST2 = getattr(unittest, "__package__", "") == 'unittest2'
-
 # used by unittest to count the number of relevant levels in the traceback
 __unittest = 1
 
@@ -203,7 +201,6 @@ def find_tests(testdir,
                         tests.append(name)
     tests.sort()
     return tests
-
 
 def run_test(test, verbose, runner=None, capture=0):
     """
@@ -312,7 +309,6 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.descrs_for(flavour).append( (len(self.debuggers), test_descr) )
         if self.pdbmode:
             self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
-
 
     def _iter_valid_frames(self, frames):
         """only consider non-testlib frames when formatting  traceback"""
@@ -789,7 +785,6 @@ Examples:
         except getopt.error, msg:
             self.usageExit(msg)
 
-
     def runTests(self):
         if self.profile_name:
             import cProfile
@@ -960,6 +955,7 @@ def unittest_main(module='__main__', defaultTest=None,
     return SkipAwareTestProgram(module, defaultTest, batchmode,
                                 cvg, options, outstream)
 
+
 class InnerTestSkipped(SkipTest):
     """raised when a test is skipped"""
     pass
@@ -967,7 +963,6 @@ class InnerTestSkipped(SkipTest):
 def is_generator(function):
     flags = function.func_code.co_flags
     return flags & CO_GENERATOR
-
 
 def parse_generative_args(params):
     args = []
@@ -992,6 +987,7 @@ def parse_generative_args(params):
             args.append(param)
 
     return args, kwargs
+
 
 class InnerTest(tuple):
     def __new__(cls, name, *data):
