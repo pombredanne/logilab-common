@@ -71,7 +71,8 @@ class ProcInfo(Node):
             return 0
 
     def lineage_memory_usage(self):
-        return self.memory_usage() + sum(child.lineage_memory_usage() for child in self.children)
+        return self.memory_usage() + sum([child.lineage_memory_usage()
+                                          for child in self.children])
 
     def time(self, children=0):
         """return the number of jiffies that this process has been scheduled

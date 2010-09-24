@@ -115,12 +115,9 @@ from warnings import warn
 
 from logilab.common.compat import set, reversed
 from logilab.common.textutils import normalize_text, unquote
-from logilab.common.deprecation import deprecated
 from logilab.common import optik_ext as optparse
 
 REQUIRED = []
-
-check_csv = deprecated('use lgc.optik_ext.check_csv')(optparse.check_csv)
 
 class UnsupportedAction(Exception):
     """raised by set_option when it doesn't know what to do for an action"""

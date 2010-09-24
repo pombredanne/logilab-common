@@ -28,6 +28,7 @@ import os.path as osp
 import os
 import sys
 import tempfile
+from logilab.common.compat import sorted, reversed
 
 def escape(value):
     """Make <value> usable in a dot file."""
@@ -183,7 +184,7 @@ def ordered_nodes(graph):
     """
     cycles = get_cycles(graph)
     if cycles:
-        cycles = '\n'.join(' -> '.join(cycle) for cycle in cycles)
+        cycles = '\n'.join([' -> '.join(cycle) for cycle in cycles])
         raise UnorderableGraph(cycles)
     ordered = []
     while graph:

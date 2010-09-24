@@ -25,7 +25,7 @@ from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.shellutils import (globfind, find, ProgressBar,
                                        acquire_lock, release_lock,
-                                       RawInput, confirm)
+                                       RawInput)
 
 from logilab.common.proc import NoSuchProcess
 from StringIO import StringIO

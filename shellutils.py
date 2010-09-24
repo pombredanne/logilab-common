@@ -339,13 +339,6 @@ class ProgressBar(object):
             self._last_text_write_size = len(text.rstrip())
         self._stream.flush()
 
-from logilab.common.deprecation import deprecated
-
-@deprecated('confirm() is deprecated, use RawInput.confirm() instead')
-def confirm(question, default_is_yes=True):
-    """ask for confirmation and return true on positive answer"""
-    return RawInput().confirm(question, default_is_yes)
-
 
 class RawInput(object):
 
@@ -365,7 +358,7 @@ class RawInput(object):
                 label += '(%s)' % option[1:].lower()
             choices.append((option, label))
         prompt = "%s [%s]: " % (question,
-                                '/'.join(opt[1] for opt in choices))
+                                '/'.join([opt[1] for opt in choices]))
         tries = 3
         while tries > 0:
             answer = self._input(prompt).strip().lower()

@@ -82,7 +82,10 @@ def deprecated(reason=None, stacklevel=2):
         def wrapped(*args, **kwargs):
             warn(message, DeprecationWarning, stacklevel=stacklevel)
             return func(*args, **kwargs)
-        wrapped.__name__ = func.__name__
+        try:
+            wrapped.__name__ = func.__name__
+        except TypeError: # readonly attribute in 2.3 
+            pass
         wrapped.__doc__ = func.__doc__
         return wrapped
     return deprecated_decorator
@@ -106,5 +109,4 @@ def moved(modpath, objname):
         return getattr(m, objname)(*args, **kwargs)
     return callnew
 
-obsolete = deprecated('obsolete is deprecated, use deprecated instead')(deprecated)
 
