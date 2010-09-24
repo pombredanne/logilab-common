@@ -28,7 +28,7 @@ class ProcessingInstructionDataParsingTest(TestCase):
         """
         pi_data = u" \t \n "
         data = parse_pi_data(pi_data)
-        self.assertEquals(data, {})
+        self.assertEqual(data, {})
 
     def test_simple_pi_with_double_quotes(self):
         """
@@ -37,7 +37,7 @@ class ProcessingInstructionDataParsingTest(TestCase):
         """
         pi_data = u""" \t att="value"\n """
         data = parse_pi_data(pi_data)
-        self.assertEquals(data, {u"att": u"value"})
+        self.assertEqual(data, {u"att": u"value"})
 
     def test_simple_pi_with_simple_quotes(self):
         """
@@ -46,7 +46,7 @@ class ProcessingInstructionDataParsingTest(TestCase):
         """
         pi_data = u""" \t att='value'\n """
         data = parse_pi_data(pi_data)
-        self.assertEquals(data, {u"att": u"value"})
+        self.assertEqual(data, {u"att": u"value"})
 
     def test_complex_pi_with_different_quotes(self):
         """
@@ -55,7 +55,7 @@ class ProcessingInstructionDataParsingTest(TestCase):
         """
         pi_data = u""" \t att='value'\n att2="value2" att3='value3'"""
         data = parse_pi_data(pi_data)
-        self.assertEquals(data, {u"att": u"value", u"att2": u"value2",
+        self.assertEqual(data, {u"att": u"value", u"att2": u"value2",
                                  u"att3": u"value3"})
 
     def test_pi_with_non_attribute_data(self):
@@ -65,7 +65,7 @@ class ProcessingInstructionDataParsingTest(TestCase):
         """
         pi_data = u""" \t keyword att1="value1" """
         data = parse_pi_data(pi_data)
-        self.assertEquals(data, {u"keyword": None, u"att1": u"value1"})
+        self.assertEqual(data, {u"keyword": None, u"att1": u"value1"})
 
 
 # definitions for automatic unit testing

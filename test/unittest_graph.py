@@ -35,16 +35,16 @@ class getCyclesTC(TestCase):
 class hasPathTC(TestCase):
 
     def test_direct_connection(self):
-        self.assertEquals(has_path({'A': ['B'], 'B': ['A']}, 'A', 'B'), ['B'])
+        self.assertEqual(has_path({'A': ['B'], 'B': ['A']}, 'A', 'B'), ['B'])
 
     def test_indirect_connection(self):
-        self.assertEquals(has_path({'A': ['B'], 'B': ['A', 'C'], 'C': ['B']}, 'A', 'C'), ['B', 'C'])
+        self.assertEqual(has_path({'A': ['B'], 'B': ['A', 'C'], 'C': ['B']}, 'A', 'C'), ['B', 'C'])
 
     def test_no_connection(self):
-        self.assertEquals(has_path({'A': ['B'], 'B': ['A']}, 'A', 'C'), None)
+        self.assertEqual(has_path({'A': ['B'], 'B': ['A']}, 'A', 'C'), None)
 
     def test_cycle(self):
-        self.assertEquals(has_path({'A': ['A']}, 'A', 'B'), None)
+        self.assertEqual(has_path({'A': ['A']}, 'A', 'B'), None)
 
 if __name__ == "__main__":
     unittest_main()

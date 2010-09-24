@@ -26,9 +26,9 @@ __metaclass__ = type
 
 import os.path as osp
 import os
-import subprocess
 import sys
 import tempfile
+from logilab.common.compat import sorted, reversed
 
 def escape(value):
     """Make <value> usable in a dot file."""
@@ -85,6 +85,7 @@ class DotBackend:
         :rtype: str
         :return: a path to the generated file
         """
+        import subprocess # introduced in py 2.4
         name = self.graphname
         if not dotfile:
             # if 'outputfile' is a dot file use it as 'dotfile'
@@ -183,7 +184,7 @@ def ordered_nodes(graph):
     """
     cycles = get_cycles(graph)
     if cycles:
-        cycles = '\n'.join(' -> '.join(cycle) for cycle in cycles)
+        cycles = '\n'.join([' -> '.join(cycle) for cycle in cycles])
         raise UnorderableGraph(cycles)
     ordered = []
     while graph:

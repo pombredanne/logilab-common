@@ -159,7 +159,10 @@ def init_log(debug=False, syslog=False, logthreshold=None, logfile=None,
     logthreshold = get_threshold(debug, logthreshold)
     logger.setLevel(logthreshold)
     if fmt is None:
-        fmt = get_formatter(logformat=LOG_FORMAT, logdateformat=LOG_DATE_FORMAT)
+        if debug:
+            fmt = get_formatter(logformat=logformat, logdateformat=logdateformat)
+        else:
+            fmt = logging.Formatter(logformat, logdateformat)
     handler.setFormatter(fmt)
     return handler
 

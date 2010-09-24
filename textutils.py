@@ -73,6 +73,14 @@ MANUAL_UNICODE_MAP = {
 
 def unormalize(ustring, ignorenonascii=False):
     """replace diacritical characters with their corresponding ascii characters
+    
+    Convert the unicode string to its long normalized form (unicode character
+    will be transform into several characters) and keep the first one only.
+    The normal form KD (NFKD) will apply the compatibility decomposition, i.e.
+    replace all compatibility characters with their equivalents.
+    
+    :see: Another project about ASCII transliterations of Unicode text
+          http://pypi.python.org/pypi/Unidecode
     """
     res = []
     for letter in ustring[:]:
@@ -83,7 +91,7 @@ def unormalize(ustring, ignorenonascii=False):
                 if ignorenonascii:
                     continue
                 raise ValueError("can't deal with non-ascii based characters")
-            replacement = _uninormalize('NFD', letter)[0]
+            replacement = _uninormalize('NFKD', letter)[0]
         res.append(replacement)
     return u''.join(res)
 
@@ -249,7 +257,7 @@ def splitstrip(string, sep=','):
     """
     return [word.strip() for word in string.split(sep) if word.strip()]
 
-get_csv = deprecated()(splitstrip)
+get_csv = deprecated('get_csv is deprecated, use splitstrip')(splitstrip)
 
 
 def split_url_or_path(url_or_path):

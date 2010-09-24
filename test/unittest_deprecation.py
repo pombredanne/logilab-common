@@ -49,11 +49,6 @@ class RawInputTC(TestCase):
         any_func()
 
     def test_deprecated_decorator(self):
-        @deprecation.deprecated_function
-        def any_func():
-            pass
-        any_func()
-
         @deprecation.deprecated()
         def any_func():
             pass

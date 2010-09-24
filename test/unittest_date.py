@@ -42,32 +42,32 @@ class DateTC(TestCase):
         """enumerate days"""
         r = list(date_range(self.datecls(2000,1,1), self.datecls(2000,1,4)))
         expected = [self.datecls(2000,1,1), self.datecls(2000,1,2), self.datecls(2000,1,3)]
-        self.assertListEquals(r, expected)
+        self.assertListEqual(r, expected)
         r = list(date_range(self.datecls(2000,1,31), self.datecls(2000,2,3)))
         expected = [self.datecls(2000,1,31), self.datecls(2000,2,1), self.datecls(2000,2,2)]
-        self.assertListEquals(r, expected)
+        self.assertListEqual(r, expected)
         r = list(date_range(self.datecls(2000,1,1), self.datecls(2000,1,6), 2))
         expected = [self.datecls(2000,1,1), self.datecls(2000,1,3), self.datecls(2000,1,5)]
-        self.assertListEquals(r, expected)
+        self.assertListEqual(r, expected)
 
     def test_add_days_worked(self):
         add = add_days_worked
         # normal
-        self.assertEquals(add(self.datecls(2008, 1, 3), 1), self.datecls(2008, 1, 4))
+        self.assertEqual(add(self.datecls(2008, 1, 3), 1), self.datecls(2008, 1, 4))
         # skip week-end
-        self.assertEquals(add(self.datecls(2008, 1, 3), 2), self.datecls(2008, 1, 7))
+        self.assertEqual(add(self.datecls(2008, 1, 3), 2), self.datecls(2008, 1, 7))
         # skip 2 week-ends
-        self.assertEquals(add(self.datecls(2008, 1, 3), 8), self.datecls(2008, 1, 15))
+        self.assertEqual(add(self.datecls(2008, 1, 3), 8), self.datecls(2008, 1, 15))
         # skip holiday + week-end
-        self.assertEquals(add(self.datecls(2008, 4, 30), 2), self.datecls(2008, 5, 5))
+        self.assertEqual(add(self.datecls(2008, 4, 30), 2), self.datecls(2008, 5, 5))
 
     def test_get_national_holidays(self):
         holidays = get_national_holidays
-        yield self.assertEquals, holidays(self.datecls(2008, 4, 29), self.datecls(2008, 5, 2)), \
+        yield self.assertEqual, holidays(self.datecls(2008, 4, 29), self.datecls(2008, 5, 2)), \
               [self.datecls(2008, 5, 1)]
-        yield self.assertEquals, holidays(self.datecls(2008, 5, 7), self.datecls(2008, 5, 8)), []
+        yield self.assertEqual, holidays(self.datecls(2008, 5, 7), self.datecls(2008, 5, 8)), []
         x = self.datetimecls(2008, 5, 7, 12, 12, 12)
-        yield self.assertEquals, holidays(x, x + self.timedeltacls(days=1)), []
+        yield self.assertEqual, holidays(x, x + self.timedeltacls(days=1)), []
 
     def test_open_days_now_and_before(self):
         nb = nb_open_days
@@ -77,7 +77,7 @@ class DateTC(TestCase):
 
     def assertOpenDays(self, start, stop, expected):
         got = nb_open_days(start, stop)
-        self.assertEquals(got, expected)
+        self.assertEqual(got, expected)
 
     def test_open_days_tuesday_friday(self):
         self.assertOpenDays(self.datecls(2008, 3, 4), self.datecls(2008, 3, 7), 3)
@@ -129,7 +129,7 @@ class DateTC(TestCase):
 
     def test_ustrftime_before_1900(self):
         date = self.datetimecls(1328, 3, 12, 6, 30)
-        self.assertEquals(ustrftime(date, '%Y-%m-%d %H:%M:%S'), u'1328-03-12 06:30:00')
+        self.assertEqual(ustrftime(date, '%Y-%m-%d %H:%M:%S'), u'1328-03-12 06:30:00')
 
 
 class MxDateTC(DateTC):
@@ -149,10 +149,10 @@ class MxDateTC(DateTC):
         """enumerate months"""
         r = list(date_range(self.datecls(2000,1,2), self.datecls(2000,4,4), endOfMonth))
         expected = [self.datecls(2000,1,2), self.datecls(2000,2,29), self.datecls(2000,3,31)]
-        self.assertListEquals(r, expected)
+        self.assertListEqual(r, expected)
         r = list(date_range(self.datecls(2000,11,30), self.datecls(2001,2,3), endOfMonth))
         expected = [self.datecls(2000,11,30), self.datecls(2000,12,31), self.datecls(2001,1,31)]
-        self.assertListEquals(r, expected)
+        self.assertListEqual(r, expected)
 
 if __name__ == '__main__':
     unittest_main()

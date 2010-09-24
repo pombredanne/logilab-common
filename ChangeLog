@@ -1,6 +1,15 @@
 ChangeLog for logilab.common
 ============================
 
+	--
+    * restored python 2.3 compat in some modules, so one get a change to run
+      pylint at least
+
+    * textutils: use NFKD decomposition in unormalize()
+
+    * logging_ext: don't try to use ansi colorized formatter when not in debug
+      mode
+
 2010-09-10  --  0.51.1
     * logging_ext: init_log function splitted into smaller chunk to ease reuse
       in other contexts

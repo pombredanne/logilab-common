@@ -32,23 +32,23 @@ class UMessageTC(TestCase):
 
     def test_get_subject(self):
         subj = self.umessage2.get('Subject')
-        self.assertEquals(type(subj), unicode)
-        self.assertEquals(subj, u'À LA MER')
+        self.assertEqual(type(subj), unicode)
+        self.assertEqual(subj, u'À LA MER')
 
     def test_get_all(self):
         to = self.umessage2.get_all('To')
-        self.assertEquals(type(to[0]), unicode)
-        self.assertEquals(to, [u'élément à accents <alf@logilab.fr>'])
+        self.assertEqual(type(to[0]), unicode)
+        self.assertEqual(to, [u'élément à accents <alf@logilab.fr>'])
 
     def test_get_payload_no_multi(self):
         payload = self.umessage1.get_payload()
-        self.assertEquals(type(payload), unicode)
+        self.assertEqual(type(payload), unicode)
 
     def test_decode_QP(self):
         test_line =  '=??b?UmFwaGHrbA==?= DUPONT<raphael.dupont@societe.fr>'
         test = decode_QP(test_line)
-        self.assertEquals(type(test), unicode)
-        self.assertEquals(test, u'Raphaël DUPONT<raphael.dupont@societe.fr>')
+        self.assertEqual(type(test), unicode)
+        self.assertEqual(test, u'Raphaël DUPONT<raphael.dupont@societe.fr>')
 
 
 if __name__ == '__main__':

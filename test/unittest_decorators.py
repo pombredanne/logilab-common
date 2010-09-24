@@ -28,20 +28,20 @@ class DecoratorsTC(TestCase):
         @monkeypatch(MyClass)
         def meth1(self):
             return 12
-        self.assertEquals([attr for attr in dir(MyClass) if attr[:2] != '__'],
+        self.assertEqual([attr for attr in dir(MyClass) if attr[:2] != '__'],
                           ['meth1'])
         inst = MyClass()
-        self.assertEquals(inst.meth1(), 12)
+        self.assertEqual(inst.meth1(), 12)
 
     def test_monkeypatch_with_custom_name(self):
         class MyClass: pass
         @monkeypatch(MyClass, 'foo')
         def meth2(self, param):
             return param + 12
-        self.assertEquals([attr for attr in dir(MyClass) if attr[:2] != '__'],
+        self.assertEqual([attr for attr in dir(MyClass) if attr[:2] != '__'],
                           ['foo'])
         inst = MyClass()
-        self.assertEquals(inst.foo(4), 16)
+        self.assertEqual(inst.foo(4), 16)
 
     def test_cached_preserves_docstrings(self):
         class Foo(object):
@@ -54,9 +54,9 @@ class DecoratorsTC(TestCase):
             @cached
             def quux(self, zogzog):
                 """ what's up doc ? """
-        self.assertEquals(Foo.foo.__doc__, """ what's up doc ? """)
-        self.assertEquals(Foo.bar.__doc__, """ what's up doc ? """)
-        self.assertEquals(Foo.quux.__doc__, """ what's up doc ? """)
+        self.assertEqual(Foo.foo.__doc__, """ what's up doc ? """)
+        self.assertEqual(Foo.bar.__doc__, """ what's up doc ? """)
+        self.assertEqual(Foo.quux.__doc__, """ what's up doc ? """)
 
 if __name__ == '__main__':
     unittest_main()

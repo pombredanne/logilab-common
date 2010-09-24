@@ -117,12 +117,9 @@ from logilab.common.compat import set, reversed, callable, raw_input
 from logilab.common.compat import str_encode as _encode
 
 from logilab.common.textutils import normalize_text, unquote
-from logilab.common.deprecation import deprecated
 from logilab.common import optik_ext as optparse
 
 REQUIRED = []
-
-check_csv = deprecated('use lgc.optik_ext.check_csv')(optparse.check_csv)
 
 class UnsupportedAction(Exception):
     """raised by set_option when it doesn't know what to do for an action"""
@@ -713,18 +710,6 @@ class OptionsManagerMixIn(object):
             return self.cmdline_parser.format_help()
         finally:
             self._unmonkeypatch_expand_default()
-
-    @property
-    def _optik_parser(self):
-        msg = '"_optik_parser" attribute has been renamed to "cmdline_parser"'
-        warn(msg, DeprecationWarning)
-        return self.cmdline_parser
-
-    @property
-    def _config_parser(self):
-        msg ='"_config_parser" attribute has been renamed to "cfgfile_parser"'
-        warn(msg, DeprecationWarning, stacklevel=2)
-        return self.cfgfile_parser
 
 
 class Method(object):
