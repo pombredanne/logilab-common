@@ -489,7 +489,6 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
             if is_generator(func) and skipgenerator:
                 return self.does_match_tags(func) # Let inner tests decide at run time
-
         # print 'testname', testname, self.test_pattern
         if self._this_is_skipped(testname):
             return False # this was explicitly skipped
@@ -1014,21 +1013,21 @@ class Tags(InheritableSet): # 2.4 compat
         return eval(exp, {}, self)
 
 
+# duplicate definition from unittest2 of the _deprecate decorator
+def _deprecate(original_func):
+    def deprecated_func(*args, **kwargs):
+        warnings.warn(
+            ('Please use %s instead.' % original_func.__name__),
+            DeprecationWarning, 2)
+        return original_func(*args, **kwargs)
+    return deprecated_func
+
 class TestCase(unittest.TestCase):
     """A unittest.TestCase extension with some additional methods."""
 
     capture = False
     pdbclass = Debugger
     tags = Tags()
-
-    # duplicate definition from unittest2 of the _deprecate decorator
-    def _deprecate(original_func):
-        def deprecated_func(*args, **kwargs):
-            warnings.warn(
-                ('Please use %s instead.' % original_func.__name__),
-                PendingDeprecationWarning, 2)
-            return original_func(*args, **kwargs)
-        return deprecated_func
 
     def __init__(self, methodName='runTest'):
         super(TestCase, self).__init__(methodName)
