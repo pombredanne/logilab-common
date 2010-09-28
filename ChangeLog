@@ -1,7 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
-	--
+2010-09-28  --  0.52.0
+    * testlib is now based on unittest2, to prepare its own extinction.
+      Warning are printed so you can easily migration step by step.
+
     * restored python 2.3 compat in some modules, so one get a change to run
       pylint at least
 
@@ -9,6 +12,8 @@ ChangeLog for logilab.common
 
     * logging_ext: don't try to use ansi colorized formatter when not in debug
       mode
+
+
 
 2010-09-10  --  0.51.1
     * logging_ext: init_log function splitted into smaller chunk to ease reuse
