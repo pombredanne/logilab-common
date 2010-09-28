@@ -397,3 +397,9 @@ try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
+
+# may not be there if cubicweb-web not installed
+if sys.version_info < (2, 6):
+    import simplejson as json
+else:
+    import json
