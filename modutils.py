@@ -33,6 +33,7 @@ import sys
 import os
 from os.path import splitext, join, abspath, isdir, dirname, exists, basename
 from imp import find_module, load_module, C_BUILTIN, PY_COMPILED, PKG_DIRECTORY
+from distutils.sysconfig import get_config_var, get_python_lib, get_python_version
 
 try:
     import zipimport
@@ -43,14 +44,21 @@ ZIPFILE = object()
 
 from logilab.common import STD_BLACKLIST, _handle_blacklist
 
+# Notes about STD_LIB_DIR
+# Consider arch-specific installation for STD_LIB_DIR definition
+# :mod:`distutils.sysconfig` contains to much hardcoded values to rely on
+#
+# :see: `Problems with /usr/lib64 builds <http://bugs.python.org/issue1294959>`_
+# :see: `FHS <http://www.pathname.com/fhs/pub/fhs-2.3.html#LIBLTQUALGTALTERNATEFORMATESSENTIAL>`_
 if sys.platform.startswith('win'):
     PY_SOURCE_EXTS = ('py', 'pyw')
     PY_COMPILED_EXTS = ('dll', 'pyd')
-    STD_LIB_DIR = join(sys.prefix, 'lib')
+    STD_LIB_DIR = get_python_lib(standard_lib=1)
 else:
     PY_SOURCE_EXTS = ('py',)
     PY_COMPILED_EXTS = ('so',)
-    STD_LIB_DIR = join(sys.prefix, 'lib', 'python%s' % sys.version[:3])
+    # extend lib dir with some arch-dependant paths
+    STD_LIB_DIR = join(get_config_var("LIBDIR"), "python%s" % get_python_version())
 
 BUILTIN_MODULES = dict(zip(sys.builtin_module_names,
                            [1]*len(sys.builtin_module_names)))
