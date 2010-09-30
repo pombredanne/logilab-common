@@ -31,15 +31,10 @@ try:
 except NameError:
     __file__ = sys.argv[0]
 
-if sys.version_info < (3, 2):
-    from unittest2 import TestSuite
-else:
-    from unittest import TestSuite
-
+from logilab.common.testlib import unittest, TestSuite, unittest_main
 from logilab.common.testlib import TestCase, SkipAwareTextTestRunner, Tags
 from logilab.common.testlib import mock_object, NonStrictTestLoader, create_files
-from logilab.common.testlib import capture_stdout, unittest_main, InnerTest
-from logilab.common.testlib import with_tempdir, tag
+from logilab.common.testlib import capture_stdout, InnerTest, with_tempdir, tag
 from logilab.common.testlib import require_version, require_module
 
 
@@ -661,6 +656,7 @@ class OutErrCaptureTC(TestCase):
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
 
+    @unittest.skipIf(not sys.stdout.isatty(), "need stdout")
     def test_stdout_capture(self):
         class FooTC(TestCase):
             def test_stdout(self):
@@ -672,6 +668,7 @@ class OutErrCaptureTC(TestCase):
         self.assertEqual(captured_out.strip(), "foo")
         self.assertEqual(captured_err.strip(), "")
 
+    @unittest.skipIf(not sys.stderr.isatty(), "need stderr")
     def test_stderr_capture(self):
         class FooTC(TestCase):
             def test_stderr(self):
@@ -683,7 +680,8 @@ class OutErrCaptureTC(TestCase):
         self.assertEqual(captured_out.strip(), "")
         self.assertEqual(captured_err.strip(), "foo")
 
-
+    @unittest.skipIf(not sys.stderr.isatty(), "need stderr")
+    @unittest.skipIf(not sys.stdout.isatty(), "need stdout")
     def test_both_capture(self):
         class FooTC(TestCase):
             def test_stderr(self):
@@ -696,6 +694,8 @@ class OutErrCaptureTC(TestCase):
         self.assertEqual(captured_out.strip(), "bar")
         self.assertEqual(captured_err.strip(), "foo")
 
+    @unittest.skipIf(not sys.stderr.isatty(), "need stderr")
+    @unittest.skipIf(not sys.stdout.isatty(), "need stdout")
     def test_no_capture(self):
         class FooTC(TestCase):
             def test_stderr(self):
@@ -710,7 +710,7 @@ class OutErrCaptureTC(TestCase):
         self.assertEqual(captured_out.strip(), "")
         self.assertEqual(captured_err.strip(), "")
 
-
+    @unittest.skipIf(not sys.stdout.isatty(), "need stdout")
     def test_capture_core(self):
         # output = capture_stdout()
         # bootstrap_print("hello", output=sys.stdout)
@@ -739,9 +739,7 @@ class OutErrCaptureTC(TestCase):
 class DecoratorTC(TestCase):
 
     @with_tempdir
-    def test_tmp_dir_normal(self):
-
-
+    def test_tmp_dir_normal_1(self):
         tempdir = tempfile.gettempdir()
         # assert temp directory is empty
         self.assertListEqual(list(os.walk(tempdir)),
@@ -771,7 +769,7 @@ class DecoratorTC(TestCase):
             [(tempdir,[],[])])
 
     @with_tempdir
-    def test_tmp_dir_normal(self):
+    def test_tmp_dir_normal_2(self):
 
         tempdir = tempfile.gettempdir()
         # assert temp directory is empty
@@ -795,14 +793,12 @@ class DecoratorTC(TestCase):
 
         self.assertRaises(WitnessException, createfile)
 
-
         # assert tempdir didn't change
         self.assertEqual(tempfile.gettempdir(), tempdir)
 
         # assert temp directory is empty
         self.assertListEqual(list(os.walk(tempdir)),
             [(tempdir,[],[])])
-
 
     def setUp(self):
         self.pyversion = sys.version_info
