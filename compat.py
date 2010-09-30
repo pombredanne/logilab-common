@@ -23,7 +23,7 @@ See another compatibility snippets from other projects:
     
     :mod:`lib2to3.fixes`
     :mod:`coverage.backward`
-    :mod:``unittest2.compatibility
+    :mod:`unittest2.compatibility`
 """
 
 from __future__ import generators
