@@ -138,7 +138,7 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
     prevmodule = None
     for part in parts:
         modpath.append(part)
-        curname = ".".join(modpath)
+        curname = '.'.join(modpath)
         module = None
         if len(modpath) != len(parts):
             # even with use_sys=False, should try to get outer packages from sys.modules
@@ -148,9 +148,9 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
             module = load_module(curname, mp_file, mp_filename, mp_desc)
         if prevmodule:
             setattr(prevmodule, part, module)
-        _file = getattr(module, "__file__", "")
+        _file = getattr(module, '__file__', '')
         if not _file and len(modpath) != len(parts):
-            raise ImportError("no module in %s" % ".".join(parts[len(modpath):]) )
+            raise ImportError('no module in %s' % '.'.join(parts[len(modpath):]) )
         path = [dirname( _file )]
         prevmodule = module
     return module

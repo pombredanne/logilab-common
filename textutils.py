@@ -73,12 +73,12 @@ MANUAL_UNICODE_MAP = {
 
 def unormalize(ustring, ignorenonascii=False):
     """replace diacritical characters with their corresponding ascii characters
-    
+
     Convert the unicode string to its long normalized form (unicode character
     will be transform into several characters) and keep the first one only.
     The normal form KD (NFKD) will apply the compatibility decomposition, i.e.
     replace all compatibility characters with their equivalents.
-    
+
     :see: Another project about ASCII transliterations of Unicode text
           http://pypi.python.org/pypi/Unidecode
     """
