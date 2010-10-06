@@ -36,7 +36,7 @@ from cStringIO import StringIO
 
 from logilab.common import STD_BLACKLIST as BASE_BLACKLIST, IGNORED_EXTENSIONS
 from logilab.common.shellutils import find
-from logilab.common.compat import FileIO
+from logilab.common.compat import FileIO, any
 
 def first_level_directory(path):
     """Return the first level directory of a path.
@@ -377,7 +377,8 @@ def export(from_dir, to_dir,
                     mkdir(dest)
         for filename in filenames:
             # don't include binary files
-            if filename.endswith(ignore_ext):
+            # endswith does not accept tuple in 2.4
+            if any(filename.endswith(ext) for ext in ignore_ext):
                 continue
             src = join(directory, filename)
             dest = to_dir + src[len(from_dir):]
