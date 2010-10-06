@@ -267,7 +267,7 @@ class TestlibTC(TestCase):
         tc = MyTC('test_1')
         self.assertEqual(tc.datapath('bar'), join('foo', 'bar'))
         # instance's custom datadir
-        self.skipTest('should this really works?')
+        self.skipTest('should this really work?')
         tc.datadir = 'spam'
         self.assertEqual(tc.datapath('bar'), join('spam', 'bar'))
 
