@@ -25,7 +25,7 @@ from logilab.common.testlib import TestCase, unittest_main, unittest
 
 from logilab.common.fileutils import *
 
-DATA_DIR = 'data'
+DATA_DIR = join(os.path.abspath(os.path.dirname(__file__)), 'data')
 NEWLINES_TXT = join(DATA_DIR,'newlines.txt')
 
 
@@ -72,7 +72,7 @@ class ExportTC(TestCase):
         os.mkdir(self.tempdir)
 
     def test(self):
-        export('data', self.tempdir, verbose=0)
+        export(DATA_DIR, self.tempdir, verbose=0)
         self.assert_(exists(join(self.tempdir, '__init__.py')))
         self.assert_(exists(join(self.tempdir, 'sub')))
         self.assert_(not exists(join(self.tempdir, '__init__.pyc')))
@@ -83,8 +83,8 @@ class ExportTC(TestCase):
 
 class ProtectedFileTC(TestCase):
     def setUp(self):
-        self.rpath = 'data/write_protected_file.txt'
-        self.rwpath = 'data/normal_file.txt'
+        self.rpath = join(DATA_DIR, 'write_protected_file.txt')
+        self.rwpath = join(DATA_DIR, 'normal_file.txt')
         # Make sure rpath is not writable !
         os.chmod(self.rpath, 33060)
         # Make sure rwpath is writable !
