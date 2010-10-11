@@ -1,12 +1,17 @@
 ChangeLog for logilab.common
 ============================
---
+
+2010-10-11  --  0.52.1
     * configuration: fix pb with option names as unicode string w/
       python 2.5. Makes OptionError available through the module
 
     * testutils: text_to_dict skip comments (# lines)
+
     * compat: dropped some 2.2 compat
+
     * modutils: Consider arch-specific installation for STD_LIB_DIR definition
+
+
 
 2010-09-28  --  0.52.0
     * testlib is now based on unittest2, to prepare its own extinction.
