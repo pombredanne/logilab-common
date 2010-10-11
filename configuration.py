@@ -497,7 +497,7 @@ class OptionsManagerMixIn(object):
                 not optdict['action'] in ('store_true', 'store_false')):
                 optdict['help'] += ' [current: %default]'
             del optdict['default']
-        args = ['--' + opt]
+        args = ['--' + str(opt)]
         if 'short' in optdict:
             self._short_options[optdict['short']] = opt
             args.append('-' + optdict['short'])
