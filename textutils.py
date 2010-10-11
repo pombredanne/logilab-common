@@ -286,7 +286,7 @@ def text_to_dict(text):
         return res
     for line in text.splitlines():
         line = line.strip()
-        if line:
+        if line and not line.startswith('#'):
             key, value = [w.strip() for w in line.split('=', 1)]
             if key in res:
                 try:

@@ -83,24 +83,9 @@ class CompatTCMixIn:
 
 
 class Py23CompatTC(CompatTCMixIn, TestCase):
-    BUILTINS = ('enumerate', 'sum')
     MODNAMES = {
         'sets' : ('Set', 'ImmutableSet'),
-        'itertools' : ('izip', 'chain'),
         }
-
-    def test_sum(self):
-        if sys.version_info >= (3, 0):
-            self.skip("don't test 2.3 compat 'sum' on >= 3.0")
-        from logilab.common.compat import sum
-        self.assertEqual(sum(range(5)), 10)
-        self.assertRaises(TypeError, sum, 'abc')
-
-    def test_enumerate(self):
-        from logilab.common.compat import enumerate
-        self.assertEqual(list(enumerate([])), [])
-        self.assertEqual(list(enumerate('abc')),
-                          [(0, 'a'), (1, 'b'), (2, 'c')])
 
     def test_basic_set(self):
         from logilab.common.compat import set

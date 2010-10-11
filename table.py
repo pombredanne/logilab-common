@@ -18,7 +18,7 @@
 """Table management module."""
 __docformat__ = "restructuredtext en"
 
-from logilab.common.compat import enumerate, sum, set
+from logilab.common.compat import set
 
 class Table(object):
     """Table defines a data table with column and row names.

@@ -119,6 +119,8 @@ from logilab.common.compat import str_encode as _encode
 from logilab.common.textutils import normalize_text, unquote
 from logilab.common import optik_ext as optparse
 
+OptionError = optparse.OptionError
+
 REQUIRED = []
 
 class UnsupportedAction(Exception):
@@ -359,6 +361,10 @@ def ini_format_section(stream, section, options, encoding=None, doc=None):
     if doc:
         print >> stream, _encode(comment(doc), encoding)
     print >> stream, '[%s]' % section
+    ini_format(stream, options, encoding)
+
+def ini_format(stream, options, encoding):
+    """format options using the INI format"""
     for optname, optdict, value in options:
         value = format_option_value(optdict, value)
         help = optdict.get('help')
@@ -852,7 +858,8 @@ class OptionsProviderMixIn(object):
         for option in self.options:
             if option[0] == opt:
                 return option[1]
-        raise optparse.OptionError('no such option in section %r' % self.name, opt)
+        raise OptionError('no such option %s in section %r'
+                          % (self.name, opt), opt)
 
 
     def all_options(self):
@@ -937,7 +944,7 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
     def get(self, key, default=None):
         try:
             return getattr(self.config, self.option_name(key))
-        except (optparse.OptionError, AttributeError):
+        except (OptionError, AttributeError):
             return default
 
 
