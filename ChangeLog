@@ -5,7 +5,7 @@ ChangeLog for logilab.common
     * configuration: fix pb with option names as unicode string w/
       python 2.5. Makes OptionError available through the module
 
-    * testutils: text_to_dict skip comments (# lines)
+    * textutils: text_to_dict skip comments (# lines)
 
     * compat: dropped some 2.2 compat
 

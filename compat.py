@@ -91,8 +91,8 @@ izip = deprecated('izip exists in itertools since py2.3')(izip)
 imap = deprecated('imap exists in itertools since py2.3')(imap)
 chain = deprecated('chain exists in itertools since py2.3')(chain)
 
-sum = deprecated('sum exists in __builtins since py2.3')(sum)
-enumerate = deprecated('enumerate exists in __builtins since py2.3')(enumerate)
+sum = deprecated('sum exists in builtins since py2.3')(sum)
+enumerate = deprecated('enumerate exists in builtins since py2.3')(enumerate)
 
 try:
     sorted = sorted
