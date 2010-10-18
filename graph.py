@@ -189,7 +189,7 @@ def ordered_nodes(graph):
     ordered = []
     while graph:
         # sorted to get predictable results
-        for node, deps in sorted(graph.items()):
+        for node, deps in sorted(graph.items(), key=id):
             if not deps:
                 ordered.append(node)
                 del graph[node]
