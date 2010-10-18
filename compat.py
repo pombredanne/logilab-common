@@ -87,8 +87,9 @@ except NameError:# Python 2.3 doesn't have `set`
 from logilab.common.deprecation import deprecated
 
 from itertools import izip, chain, imap
-izip = deprecated('izip exists in itertools since py2.3')(izip)
-imap = deprecated('imap exists in itertools since py2.3')(imap)
+if sys.version_info < (3, 0):# 2to3 will remove the imports
+    izip = deprecated('izip exists in itertools since py2.3')(izip)
+    imap = deprecated('imap exists in itertools since py2.3')(imap)
 chain = deprecated('chain exists in itertools since py2.3')(chain)
 
 sum = deprecated('sum exists in builtins since py2.3')(sum)
