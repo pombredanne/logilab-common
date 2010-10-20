@@ -60,6 +60,22 @@ class nullobject(object):
     def __nonzero__(self):
         return False
 
+class tempattr(object):
+    def __init__(self, obj, attr, value):
+        self.obj = obj
+        self.attr = attr
+        self.value = value
+
+    def __enter__(self):
+        self.oldvalue = getattr(self.obj, self.attr)
+        setattr(self.obj, self.attr, self.value)
+        return self.obj
+
+    def __exit__(self, exctype, value, traceback):
+        setattr(self.obj, self.attr, self.oldvalue)
+
+
+
 # flatten -----
 # XXX move in a specific module and use yield instead
 # do not mix flatten and translate
