@@ -1935,7 +1935,7 @@ def create_files(paths, chroot):
         if not osp.isdir(dirpath):
             os.makedirs(dirpath)
     for filepath in files:
-        file(filepath, 'w').close()
+        open(filepath, 'w').close()
 
 def enable_dbc(*args):
     """

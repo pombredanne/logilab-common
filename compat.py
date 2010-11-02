@@ -69,8 +69,10 @@ if sys.version_info < (3, 0):
     from cStringIO import StringIO
     FileIO = file
     BytesIO = StringIO
+    reload = reload
 else:
     from io import FileIO, BytesIO, StringIO
+    from imp import reload
 
 # Where do pickles come from?
 try:
