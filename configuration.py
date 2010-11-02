@@ -859,7 +859,7 @@ class OptionsProviderMixIn(object):
             if option[0] == opt:
                 return option[1]
         raise OptionError('no such option %s in section %r'
-                          % (self.name, opt), opt)
+                          % (opt, self.name), opt)
 
 
     def all_options(self):
