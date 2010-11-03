@@ -29,6 +29,7 @@ import logging
 from os.path import basename
 
 from logilab.common.configuration import Configuration
+from logilab.common.logging_ext import init_log, get_threshold
 from logilab.common.deprecation import deprecated
 
 
@@ -99,10 +100,9 @@ class CommandLine(dict):
 
         Terminate by :exc:`SystemExit`
         """
-        from logilab.common import logging_ext
-        logging_ext.init_log(debug=True, # so that we use StreamHandler
-                             logthreshold=self.logthreshold,
-                             logformat='%(levelname)s: %(message)s')
+        init_log(debug=True, # so that we use StreamHandler
+                 logthreshold=self.logthreshold,
+                 logformat='%(levelname)s: %(message)s')
         try:
             arg = args.pop(0)
         except IndexError:
@@ -139,7 +139,7 @@ class CommandLine(dict):
         logger = logging.Logger(self.pgm)
         logger.handlers = [handler]
         if logthreshold is None:
-            logthreshold = self.logthreshold
+            logthreshold = get_threshold(self.logthreshold)
         logger.setLevel(logthreshold)
         return logger
 
@@ -148,7 +148,7 @@ class CommandLine(dict):
             logger = self.logger
         if logger is None:
             logger = self.logger = logging.getLogger(self.pgm)
-            logger.setLevel(self.logthreshold)
+            logger.setLevel(get_threshold(self.logthreshold))
         return self[cmd](logger)
 
     def usage(self):

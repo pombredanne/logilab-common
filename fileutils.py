@@ -378,7 +378,7 @@ def export(from_dir, to_dir,
         for filename in filenames:
             # don't include binary files
             # endswith does not accept tuple in 2.4
-            if any(filename.endswith(ext) for ext in ignore_ext):
+            if any([filename.endswith(ext) for ext in ignore_ext]):
                 continue
             src = join(directory, filename)
             dest = to_dir + src[len(from_dir):]

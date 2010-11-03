@@ -52,9 +52,9 @@ import difflib
 import types
 import tempfile
 import math
+import warnings
 from shutil import rmtree
 from operator import itemgetter
-import warnings
 from ConfigParser import ConfigParser
 from logilab.common.deprecation import deprecated
 from itertools import dropwhile
@@ -1935,7 +1935,7 @@ def create_files(paths, chroot):
         if not osp.isdir(dirpath):
             os.makedirs(dirpath)
     for filepath in files:
-        file(filepath, 'w').close()
+        open(filepath, 'w').close()
 
 def enable_dbc(*args):
     """
