@@ -52,9 +52,9 @@ import difflib
 import types
 import tempfile
 import math
+import warnings
 from shutil import rmtree
 from operator import itemgetter
-import warnings
 from ConfigParser import ConfigParser
 from logilab.common.deprecation import deprecated
 from itertools import dropwhile
