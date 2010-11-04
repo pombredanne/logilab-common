@@ -17,6 +17,8 @@
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 import tempfile
 import os
+from os.path import join, dirname, abspath
+
 from cStringIO import StringIO
 from sys import version_info
 
@@ -24,6 +26,8 @@ from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.optik_ext import OptionValueError
 from logilab.common.configuration import Configuration, \
      OptionsManagerMixIn, OptionsProviderMixIn, Method, read_old_config
+
+DATA = join(dirname(abspath(__file__)), 'data')
 
 options = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar': '<y or n>'}),
            ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
@@ -278,7 +282,7 @@ options:
         changes = [('renamed', 'renamed', 'choice'),
                    ('moved', 'named', 'old', 'test'),
                    ]
-        read_old_config(self.cfg, changes, 'data/test.ini')
+        read_old_config(self.cfg, changes, join(DATA, 'test.ini'))
         stream = StringIO()
         self.cfg.generate_config(stream)
         self.assertMultiLineEqual(stream.getvalue().strip(), """[TEST]
