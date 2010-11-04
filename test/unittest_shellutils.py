@@ -18,7 +18,7 @@
 """unit tests for logilab.common.shellutils"""
 
 import sys, os, tempfile, shutil
-from os.path import join
+from os.path import join, dirname, abspath
 import datetime, time
 from StringIO import StringIO
 
@@ -30,7 +30,7 @@ from logilab.common.shellutils import (globfind, find, ProgressBar,
 from logilab.common.compat import str_to_bytes
 from logilab.common.proc import NoSuchProcess
 
-DATA_DIR = join('data','find_test')
+DATA_DIR = join(dirname(abspath(__file__)), 'data', 'find_test')
 
 class FindTC(TestCase):
     def test_include(self):

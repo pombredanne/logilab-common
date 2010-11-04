@@ -16,18 +16,20 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
+import email
+from os.path import join, dirname, abspath
 
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.umessage import UMessage, decode_QP
 
-import email
+DATA = join(dirname(abspath(__file__)), 'data')
 
 class UMessageTC(TestCase):
 
     def setUp(self):
-        msg1 = email.message_from_file(open('data/test1.msg'))
+        msg1 = email.message_from_file(open(join(DATA, 'test1.msg')))
         self.umessage1 = UMessage(msg1)
-        msg2 = email.message_from_file(open('data/test2.msg'))
+        msg2 = email.message_from_file(open(join(DATA, 'test2.msg')))
         self.umessage2 = UMessage(msg2)
 
     def test_get_subject(self):
