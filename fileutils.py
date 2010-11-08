@@ -243,11 +243,6 @@ def relative_path(from_file, to_file):
     return sep.join(result)
 
 
-from logilab.common.textutils import _LINE_RGX
-from sys import version_info
-_HAS_UNIV_OPEN = version_info[:2] >= (2, 3)
-del version_info
-
 def norm_read(path):
     """Return the content of the file with normalized line feeds.
 
@@ -257,9 +252,7 @@ def norm_read(path):
     :rtype: str
     :return: the content of the file with normalized line feeds
     """
-    if _HAS_UNIV_OPEN:
-        return open(path, 'U').read()
-    return _LINE_RGX.sub('\n', open(path).read())
+    return open(path, 'U').read()
 
 
 def norm_open(path):
@@ -271,9 +264,7 @@ def norm_open(path):
     :rtype: file or StringIO
     :return: the opened file with normalized line feeds
     """
-    if _HAS_UNIV_OPEN:
-        return open(path, 'U')
-    return StringIO(_LINE_RGX.sub('\n', open(path).read()))
+    return open(path, 'U')
 
 
 def lines(path, comments=None):
