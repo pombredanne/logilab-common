@@ -65,6 +65,8 @@ install: build
 
 	# remove test directory
 	rm -rf debian/$(PACKAGE)/usr/lib/python*/*-packages/logilab/common/test
+	# dont install pytest for python3k
+	rm -rf debian/$(PACKAGE)/usr/bin/pytest
 
 
 # Build architecture-independent files here.
