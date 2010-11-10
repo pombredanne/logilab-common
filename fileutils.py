@@ -36,6 +36,7 @@ from cStringIO import StringIO
 
 from logilab.common import STD_BLACKLIST as BASE_BLACKLIST, IGNORED_EXTENSIONS
 from logilab.common.shellutils import find
+from logilab.common.deprecation import deprecated
 from logilab.common.compat import FileIO, any
 
 def first_level_directory(path):
@@ -253,7 +254,7 @@ def norm_read(path):
     :return: the content of the file with normalized line feeds
     """
     return open(path, 'U').read()
-
+norm_read = deprecated("use \"open(path, 'U').read()\"")(norm_read)
 
 def norm_open(path):
     """Return a stream for a file with content with normalized line feeds.
@@ -265,7 +266,7 @@ def norm_open(path):
     :return: the opened file with normalized line feeds
     """
     return open(path, 'U')
-
+norm_open = deprecated("use \"open(path, 'U')\"")(norm_open)
 
 def lines(path, comments=None):
     """Return a list of non empty lines in the file located at `path`.
@@ -285,7 +286,7 @@ def lines(path, comments=None):
 
     :warning: at some point this function will probably return an iterator
     """
-    stream = norm_open(path)
+    stream = open(path, 'U')
     result = stream_lines(stream, comments)
     stream.close()
     return result
