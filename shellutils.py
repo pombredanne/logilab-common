@@ -332,6 +332,46 @@ class ProgressBar(object):
             self._last_text_write_size = len(text.rstrip())
         self._stream.flush()
 
+    def finish(self):
+        self._stream.write('\n')
+        self._stream.flush()
+
+
+class DummyProgressBar(object):
+    __slot__ = ('text',)
+
+    def refresh(self):
+        pass
+    def update(self):
+        pass
+    def finish(self):
+        pass
+
+
+_MARKER = object()
+class progress(object):
+
+    def __init__(self, nbops=_MARKER, size=_MARKER, stream=_MARKER, title=_MARKER, enabled=True):
+        self.nbops = nbops
+        self.size = size
+        self.stream = stream
+        self.title = title
+        self.enabled = enabled
+
+    def __enter__(self):
+        if self.enabled:
+            kwargs = {}
+            for attr in ('nbops', 'size', 'stream', 'title'):
+                value = getattr(self, attr)
+                if value is not _MARKER:
+                    kwargs[attr] = value
+            self.pb = ProgressBar(**kwargs)
+        else:
+            self.pb =  DummyProgressBar()
+        return self.pb
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.pb.finish()
 
 class RawInput(object):
 
