@@ -38,7 +38,6 @@ author_email = "contact@logilab.fr"
 from os.path import join
 scripts = [join('bin', 'pytest')]
 include_dirs = [join('test', 'data')]
-pyversions = ['2.4', '2.5', '2.6']
 
 install_requires = ['unittest2 >= 0.5.1']
 

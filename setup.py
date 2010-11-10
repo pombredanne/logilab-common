@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # pylint: disable=W0404,W0622,W0704,W0613
 # copyright 2003-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
@@ -24,7 +25,7 @@ __docformat__ = "restructuredtext en"
 import os
 import sys
 import shutil
-from os.path import isdir, exists, join, walk
+from os.path import isdir, exists, join
 
 try:
     if os.environ.get('NO_SETUPTOOLS'):
@@ -58,7 +59,7 @@ STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 IGNORED_EXTENSIONS = ('.pyc', '.pyo', '.elc', '~')
 
 if exists('README'):
-    long_description = file('README').read()
+    long_description = open('README').read()
 else:
     long_description = ''
 
@@ -88,48 +89,7 @@ def get_packages(directory, prefix):
                 result += get_packages(absfile, result[-1])
     return result
 
-def export(from_dir, to_dir,
-           blacklist=STD_BLACKLIST,
-           ignore_ext=IGNORED_EXTENSIONS,
-           verbose=True):
-    """make a mirror of from_dir in to_dir, omitting directories and files
-    listed in the black list
-    """
-    def make_mirror(arg, directory, fnames):
-        """walk handler"""
-        for norecurs in blacklist:
-            try:
-                fnames.remove(norecurs)
-            except ValueError:
-                pass
-        for filename in fnames:
-            # don't include binary files
-            if filename[-4:] in ignore_ext:
-                continue
-            if filename[-1] == '~':
-                continue
-            src = join(directory, filename)
-            dest = to_dir + src[len(from_dir):]
-            if verbose:
-                print >> sys.stderr, src, '->', dest
-            if os.path.isdir(src):
-                if not exists(dest):
-                    os.mkdir(dest)
-            else:
-                if exists(dest):
-                    os.remove(dest)
-                shutil.copy2(src, dest)
-    try:
-        os.mkdir(to_dir)
-    except OSError, ex:
-        # file exists ?
-        import errno
-        if ex.errno != errno.EEXIST:
-            raise
-    walk(from_dir, make_mirror, None)
-
-
-EMPTY_FILE = '''"""generated file, don\'t modify or your data will be lost"""
+EMPTY_FILE = '''"""generated file, don't modify or your data will be lost"""
 try:
     __import__('pkg_resources').declare_namespace(__name__)
 except ImportError:
@@ -159,7 +119,8 @@ class MyInstallLib(install_lib.install_lib):
                 base = modname
             for directory in include_dirs:
                 dest = join(self.install_dir, base, directory)
-                export(directory, dest, verbose=False)
+                shutil.rmtree(dest, ignore_errors=True)
+                shutil.copytree(directory, dest)
 
 def install(**kwargs):
     """setup entry point"""
