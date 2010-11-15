@@ -29,7 +29,7 @@ from logilab.common.testlib import TestCase as TLTestCase, unittest_main
 from logilab.common import modutils
 from logilab.common.compat import set
 
-from os import path, getcwd
+from os import path, getcwd, sep
 from logilab import common
 from logilab.common import tree
 
@@ -49,17 +49,19 @@ class TestCase(TLTestCase):
             sys.path.insert(0, common.__path__[0])
         super(TestCase, self).tearDown()
 
-class _module_file_tc(TestCase):
+
+class ModuleFileTC(TestCase):
+    package = "mypypa"
+
     def test_find_zipped_module(self):
-        mtype, mfile = _module_file('mypypa', [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.zip')])
+        mtype, mfile = modutils._module_file([self.package], [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.zip')])
         self.assertEqual(mtype, modutils.ZIPFILE)
-        self.assertEqual(mfile, '')
+        self.assertEqual(mfile.split(sep)[-4:], ["test", "data", "MyPyPa-0.1.0-py2.5.zip", self.package])
 
     def test_find_egg_module(self):
-        mtype, mfile = _module_file('mypypa', [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.egg')])
+        mtype, mfile = modutils._module_file([self.package], [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.egg')])
         self.assertEqual(mtype, modutils.ZIPFILE)
-        self.assertEqual(mfile, '')
-
+        self.assertEqual(mfile.split(sep)[-4:], ["test", "data", "MyPyPa-0.1.0-py2.5.egg", self.package])
 
 
 class load_module_from_name_tc(TestCase):
