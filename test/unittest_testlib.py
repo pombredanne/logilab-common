@@ -82,7 +82,7 @@ class TestlibTC(TestCase):
 
     capture = True
 
-    def mkdir(self,path):
+    def mkdir(self, path):
         if not exists(path):
             self._dirs.add(path)
             os.mkdir(path)
@@ -199,7 +199,7 @@ class TestlibTC(TestCase):
         ed1 = join(dirname(__file__), 'data', 'empty_dir_1')
         ed2 = join(dirname(__file__), 'data', 'empty_dir_2')
 
-        for path in (ed1, ed2, join(subdir_differ,'unexpected')):
+        for path in (ed1, ed2, join(subdir_differ, 'unexpected')):
             self.mkdir(path)
 
         self.assertDirEquals(ed1, ed2)
@@ -289,13 +289,13 @@ class TestlibTC(TestCase):
     def test_is(self):
         obj_1 = []
         obj_2 = []
-        self.assertIs(obj_1,obj_1)
+        self.assertIs(obj_1, obj_1)
         self.assertRaises(AssertionError, self.assertIs, obj_1, obj_2)
 
     def test_isnot(self):
         obj_1 = []
         obj_2 = []
-        self.assertIsNot(obj_1,obj_2)
+        self.assertIsNot(obj_1, obj_2)
         self.assertRaises(AssertionError, self.assertIsNot, obj_1, obj_1)
 
     def test_none(self):
@@ -743,7 +743,7 @@ class DecoratorTC(TestCase):
         tempdir = tempfile.gettempdir()
         # assert temp directory is empty
         self.assertListEqual(list(os.walk(tempdir)),
-            [(tempdir,[],[])])
+            [(tempdir, [], [])])
 
         witness = []
 
@@ -766,7 +766,7 @@ class DecoratorTC(TestCase):
 
         # assert temp directory is empty
         self.assertListEqual(list(os.walk(tempdir)),
-            [(tempdir,[],[])])
+            [(tempdir, [], [])])
 
     @with_tempdir
     def test_tmp_dir_normal_2(self):
@@ -774,7 +774,7 @@ class DecoratorTC(TestCase):
         tempdir = tempfile.gettempdir()
         # assert temp directory is empty
         self.assertListEqual(list(os.walk(tempfile.tempdir)),
-            [(tempfile.tempdir,[],[])])
+            [(tempfile.tempdir, [], [])])
 
 
         class WitnessException(Exception):
@@ -798,7 +798,7 @@ class DecoratorTC(TestCase):
 
         # assert temp directory is empty
         self.assertListEqual(list(os.walk(tempdir)),
-            [(tempdir,[],[])])
+            [(tempdir, [], [])])
 
     def setUp(self):
         self.pyversion = sys.version_info
@@ -902,7 +902,7 @@ class TagTC(TestCase):
 
         self.assertEqual(bob(2, 3, 7), 35)
         self.assertTrue(hasattr(bob, 'tags'))
-        self.assertSetEqual(bob.tags, set(['testing','bob']))
+        self.assertSetEqual(bob.tags, set(['testing', 'bob']))
 
 
     def test_tags_class(self):

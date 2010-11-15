@@ -26,7 +26,7 @@ from logilab.common.testlib import TestCase, unittest_main, unittest
 from logilab.common.fileutils import *
 
 DATA_DIR = join(os.path.abspath(os.path.dirname(__file__)), 'data')
-NEWLINES_TXT = join(DATA_DIR,'newlines.txt')
+NEWLINES_TXT = join(DATA_DIR, 'newlines.txt')
 
 
 class FirstleveldirectoryTC(TestCase):

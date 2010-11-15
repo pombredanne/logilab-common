@@ -390,7 +390,7 @@ class PyTester(object):
                         restartfile.close()
                     except Exception, e:
                         print >> sys.__stderr__, "Error while overwriting \
-succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
+succeeded test file :", osp.join(os.getcwd(), testlib.FILE_RESTART)
                         raise e
                 # run test and collect information
                 prog = self.testfile(filename, batchmode=True)
@@ -417,7 +417,7 @@ succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
                 restartfile.close()
             except Exception, e:
                 print >> sys.__stderr__, "Error while overwriting \
-succeeded test file :", osp.join(os.getcwd(),testlib.FILE_RESTART)
+succeeded test file :", osp.join(os.getcwd(), testlib.FILE_RESTART)
                 raise e
         modname = osp.basename(filename)[:-3]
         try:

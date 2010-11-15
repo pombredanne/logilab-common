@@ -153,7 +153,7 @@ class Debugger(Pdb):
         expr, attr = m.group(1, 3)
         object = eval(expr, namespace)
         words = dir(object)
-        if hasattr(object,'__class__'):
+        if hasattr(object, '__class__'):
             words.append('__class__')
             words = words + self.get_class_members(object.__class__)
         matches = []
@@ -166,7 +166,7 @@ class Debugger(Pdb):
     def get_class_members(self, klass):
         """implementation coming from rlcompleter.get_class_members"""
         ret = dir(klass)
-        if hasattr(klass,'__bases__'):
+        if hasattr(klass, '__bases__'):
             for base in klass.__bases__:
                 ret = ret + self.get_class_members(base)
         return ret

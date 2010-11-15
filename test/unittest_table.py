@@ -47,22 +47,22 @@ class TableTC(TestCase):
         tab.append_row([1])
         self.assertEqual(tab, [[1]])
         tab.append_row([2])
-        self.assertEqual(tab[0,0], 1)
-        self.assertEqual(tab[1,0], 2)
+        self.assertEqual(tab[0, 0], 1)
+        self.assertEqual(tab[1, 0], 2)
 
     def test_valeur_ligne(self):
         tab = Table()
-        tab.create_columns(['col1','col2'])
-        tab.append_row([1,2])
-        self.assertEqual(tab, [[1,2]])
+        tab.create_columns(['col1', 'col2'])
+        tab.append_row([1, 2])
+        self.assertEqual(tab, [[1, 2]])
 
     def test_valeur_colonne(self):
         tab = Table()
         tab.create_columns(['col1'])
         tab.append_row([1])
         tab.append_row([2])
-        self.assertEqual(tab, [[1],[2]])
-        self.assertEqual(tab[:,0], [1,2])
+        self.assertEqual(tab, [[1], [2]])
+        self.assertEqual(tab[:, 0], [1, 2])
 
     def test_indexation(self):
         """we should be able to use [] to access rows"""
@@ -85,9 +85,9 @@ class TableTC(TestCase):
 
     def test_get_cells(self):
         self.table.insert_column(1, range(3), 'supp')
-        self.assertEqual(self.table[0,1], 0)
-        self.assertEqual(self.table[1,1], 1)
-        self.assertEqual(self.table[2,1], 2)
+        self.assertEqual(self.table[0, 1], 0)
+        self.assertEqual(self.table[1, 1], 1)
+        self.assertEqual(self.table[2, 1], 2)
         self.assertEqual(self.table['row1', 'supp'], 0)
         self.assertEqual(self.table['row2', 'supp'], 1)
         self.assertEqual(self.table['row3', 'supp'], 2)
@@ -104,29 +104,29 @@ class TableTC(TestCase):
         """Tests that table.set_column() works fine.
         """
         self.table.set_column(0, range(3))
-        self.assertEqual(self.table[0,0], 0)
-        self.assertEqual(self.table[1,0], 1)
-        self.assertEqual(self.table[2,0], 2)
+        self.assertEqual(self.table[0, 0], 0)
+        self.assertEqual(self.table[1, 0], 1)
+        self.assertEqual(self.table[2, 0], 2)
 
     def test_set_column_by_id(self):
         """Tests that table.set_column_by_id() works fine.
         """
         self.table.set_column_by_id('col1', range(3))
-        self.assertEqual(self.table[0,0], 0)
-        self.assertEqual(self.table[1,0], 1)
-        self.assertEqual(self.table[2,0], 2)
+        self.assertEqual(self.table[0, 0], 0)
+        self.assertEqual(self.table[1, 0], 1)
+        self.assertEqual(self.table[2, 0], 2)
         self.assertRaises(KeyError, self.table.set_column_by_id, 'col123', range(3))
 
     def test_cells_ids(self):
         """tests that we can access cells by giving row/col ids"""
         self.assertRaises(KeyError, self.table.set_cell_by_ids, 'row12', 'col1', 12)
         self.assertRaises(KeyError, self.table.set_cell_by_ids, 'row1', 'col12', 12)
-        self.assertEqual(self.table[0,0], 0)
+        self.assertEqual(self.table[0, 0], 0)
         self.table.set_cell_by_ids('row1', 'col1', 'DATA')
-        self.assertEqual(self.table[0,0], 'DATA')
+        self.assertEqual(self.table[0, 0], 'DATA')
         self.assertRaises(KeyError, self.table.set_row_by_id, 'row12', [])
         self.table.set_row_by_id('row1', ['1.0', '1.1'])
-        self.assertEqual(self.table[0,0], '1.0')
+        self.assertEqual(self.table[0, 0], '1.0')
 
     def test_insert_row(self):
         """tests a row insertion"""
@@ -144,21 +144,21 @@ class TableTC(TestCase):
         """
         self.table.set_cell(0, 1, 12)
         self.table.set_cell(2, 1, 13)
-        self.assertEqual(self.table[:,1], [12,0,13])
-        self.assertEqual(self.table[:,'col2'], [12,0,13])
+        self.assertEqual(self.table[:, 1], [12, 0, 13])
+        self.assertEqual(self.table[:, 'col2'], [12, 0, 13])
 
     def test_get_columns(self):
         """Tests if table.get_columns() works fine.
         """
         self.table.set_cell(0, 1, 12)
         self.table.set_cell(2, 1, 13)
-        self.assertEqual(self.table.get_columns(), [[0,0,0], [12,0,13]])
+        self.assertEqual(self.table.get_columns(), [[0, 0, 0], [12, 0, 13]])
 
     def test_insert_column(self):
         """Tests that table.insert_column() works fine.
         """
         self.table.insert_column(1, range(3), "inserted_column")
-        self.assertEqual(self.table[:,1], [0,1,2])
+        self.assertEqual(self.table[:, 1], [0, 1, 2])
         self.assertEqual(self.table.col_names,
                           ['col1', 'inserted_column', 'col2'])
 
@@ -167,7 +167,7 @@ class TableTC(TestCase):
         """
         self.table.delete_column(1)
         self.assertEqual(self.table.col_names, ['col1'])
-        self.assertEqual(self.table[:,0], [0,0,0])
+        self.assertEqual(self.table[:, 0], [0, 0, 0])
         self.assertRaises(KeyError, self.table.delete_column_by_id, 'col2')
         self.table.delete_column_by_id('col1')
         self.assertEqual(self.table.col_names, [])
@@ -175,11 +175,11 @@ class TableTC(TestCase):
     def test_transpose(self):
         """Tests that table.transpose() works fine.
         """
-        self.table.append_column(range(5,8), 'col3')
+        self.table.append_column(range(5, 8), 'col3')
         ttable = self.table.transpose()
         self.assertEqual(ttable.row_names, ['col1', 'col2', 'col3'])
         self.assertEqual(ttable.col_names, ['row1', 'row2', 'row3'])
-        self.assertEqual(ttable.data, [[0,0,0], [0,0,0], [5,6,7]])
+        self.assertEqual(ttable.data, [[0, 0, 0], [0, 0, 0], [5, 6, 7]])
 
     def test_sort_table(self):
         """Tests the table sort by column
@@ -273,7 +273,7 @@ class TableStyleSheetTC(TestCase):
         """
         self.table = Table()
         self.table.create_row('row1')
-        self.table.create_columns(['a','b','c'])
+        self.table.create_columns(['a', 'b', 'c'])
         self.stylesheet = TableStyleSheet()
         # We don't want anything to be printed
         self.stdout_backup = sys.stdout
@@ -287,9 +287,9 @@ class TableStyleSheetTC(TestCase):
         """
         rule = '0_2 = sqrt(0_0**2 + 0_1**2)'
         self.stylesheet.add_rule(rule)
-        self.table.set_row(0, [3,4,0])
+        self.table.set_row(0, [3, 4, 0])
         self.table.apply_stylesheet(self.stylesheet)
-        self.assertEqual(self.table[0], [3,4,5])
+        self.assertEqual(self.table[0], [3, 4, 5])
         self.assertEqual(len(self.stylesheet.rules), 1)
         self.stylesheet.add_rule('some bad rule with bad syntax')
         self.assertEqual(len(self.stylesheet.rules), 1, "Ill-formed rule mustn't be added")
@@ -305,44 +305,44 @@ class TableStyleSheetTC(TestCase):
     def test_rowavg_rule(self):
         """Tests that add_rowavg_rule works as expected
         """
-        self.table.set_row(0, [10,20,0])
-        self.stylesheet.add_rowavg_rule((0,2), 0, 0, 1)
+        self.table.set_row(0, [10, 20, 0])
+        self.stylesheet.add_rowavg_rule((0, 2), 0, 0, 1)
         self.table.apply_stylesheet(self.stylesheet)
-        val = self.table[0,2]
+        val = self.table[0, 2]
         self.assert_(int(val) == 15)
 
 
     def test_rowsum_rule(self):
         """Tests that add_rowsum_rule works as expected
         """
-        self.table.set_row(0, [10,20,0])
-        self.stylesheet.add_rowsum_rule((0,2), 0, 0, 1)
+        self.table.set_row(0, [10, 20, 0])
+        self.stylesheet.add_rowsum_rule((0, 2), 0, 0, 1)
         self.table.apply_stylesheet(self.stylesheet)
-        val = self.table[0,2]
+        val = self.table[0, 2]
         self.assert_(val == 30)
 
 
     def test_colavg_rule(self):
         """Tests that add_colavg_rule works as expected
         """
-        self.table.set_row(0, [10,20,0])
-        self.table.append_row([12,8,3], 'row2')
+        self.table.set_row(0, [10, 20, 0])
+        self.table.append_row([12, 8, 3], 'row2')
         self.table.create_row('row3')
-        self.stylesheet.add_colavg_rule((2,0), 0, 0, 1)
+        self.stylesheet.add_colavg_rule((2, 0), 0, 0, 1)
         self.table.apply_stylesheet(self.stylesheet)
-        val = self.table[2,0]
+        val = self.table[2, 0]
         self.assert_(int(val) == 11)
 
 
     def test_colsum_rule(self):
         """Tests that add_colsum_rule works as expected
         """
-        self.table.set_row(0, [10,20,0])
-        self.table.append_row([12,8,3], 'row2')
+        self.table.set_row(0, [10, 20, 0])
+        self.table.append_row([12, 8, 3], 'row2')
         self.table.create_row('row3')
-        self.stylesheet.add_colsum_rule((2,0), 0, 0, 1)
+        self.stylesheet.add_colsum_rule((2, 0), 0, 0, 1)
         self.table.apply_stylesheet(self.stylesheet)
-        val = self.table[2,0]
+        val = self.table[2, 0]
         self.assert_(val == 22)
 
 

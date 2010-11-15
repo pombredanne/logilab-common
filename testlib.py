@@ -564,7 +564,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
             det_results = []
             for name, value in (("failures", result.failures),
-                                ("errors",result.errors),
+                                ("errors", result.errors),
                                 ("skipped", result.skipped)):
                 if value:
                     det_results.append("%s=%i" % (name, len(value)))
@@ -1201,7 +1201,7 @@ class TestCase(unittest.TestCase):
                             restartfile.close()
                     except Exception, ex:
                         print >> sys.__stderr__, "Error while saving \
-succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
+succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
                         raise ex
                 result.addSuccess(self)
         finally:
@@ -1332,9 +1332,9 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                 got_count = {}
                 expected_count = {}
                 for element in got:
-                    got_count[element] = got_count.get(element,0) + 1
+                    got_count[element] = got_count.get(element, 0) + 1
                 for element in expected:
-                    expected_count[element] = expected_count.get(element,0) + 1
+                    expected_count[element] = expected_count.get(element, 0) + 1
                 # we know that got_count.key() == expected_count.key()
                 # because of assertSetEqual
                 for element, count in got_count.iteritems():
@@ -1362,14 +1362,14 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
             warnings.warn("the assertSetEquals function if now intended for set only."\
                           "use assertUnorderedIterableEquals instead.",
                 DeprecationWarning, 2)
-            return self.assertUnorderedIterableEquals(got,expected, msg)
+            return self.assertUnorderedIterableEquals(got, expected, msg)
 
         items={}
         items['missing'] = expected - got
         items['unexpected'] = got - expected
         if any(items.itervalues()):
             if msg is None:
-                msg = '\n'.join('%s:\n\t%s' % (key,"\n\t".join(str(value) for value in values))
+                msg = '\n'.join('%s:\n\t%s' % (key, "\n\t".join(str(value) for value in values))
                     for key, values in items.iteritems() if values)
             self.fail(msg)
 
@@ -1647,7 +1647,7 @@ succeeded test into", osp.join(os.getcwd(),FILE_RESTART)
                     for name, items in errors.iteritems() if items]
 
                 if msgs:
-                    msgs.insert(0,"%s and %s differ :" % (
+                    msgs.insert(0, "%s and %s differ :" % (
                         osp.join(path_a, ipath_a),
                         osp.join(path_b, ipath_b),
                         ))
@@ -1854,7 +1854,7 @@ class MockConfigParser(ConfigParser):
         for section, pairs in options.iteritems():
             self.add_section(section)
             for key, value in pairs.iteritems():
-                self.set(section,key,value)
+                self.set(section, key, value)
     def write(self, _):
         raise NotImplementedError()
 

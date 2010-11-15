@@ -95,8 +95,8 @@ class CacheTestCase(TestCase):
         """
         self.cache['foo'] = 'bar'
         del self.cache['foo']
-        self.assert_('foo' not in self.cache.keys(),"Element 'foo' was not removed cache dictionnary")
-        self.assert_('foo' not in self.cache._usage,"Element 'foo' was not removed usage list")
+        self.assert_('foo' not in self.cache.keys(), "Element 'foo' was not removed cache dictionnary")
+        self.assert_('foo' not in self.cache._usage, "Element 'foo' was not removed usage list")
         self.assertItemsEqual(self.cache._usage,
                               self.cache.keys())# usage list and data keys are different
 

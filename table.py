@@ -322,25 +322,25 @@ class Table(object):
         else:
             rows = indices
         # define row slice
-        if isinstance(rows,str):
+        if isinstance(rows, str):
             try:
                 rows = self.row_names.index(rows)
             except ValueError:
                 raise KeyError("Row (%s) not found in table" % (rows))
-        if isinstance(rows,int):
-            rows = slice(rows,rows+1)
+        if isinstance(rows, int):
+            rows = slice(rows, rows+1)
             multirows = False
         else:
             rows = slice(None)
             multirows = True
         # define col slice
-        if isinstance(cols,str):
+        if isinstance(cols, str):
             try:
                 cols = self.col_names.index(cols)
             except ValueError:
                 raise KeyError("Column (%s) not found in table" % (cols))
-        if isinstance(cols,int):
-            cols = slice(cols,cols+1)
+        if isinstance(cols, int):
+            cols = slice(cols, cols+1)
             multicols = False
         else:
             cols = slice(None)
@@ -350,7 +350,7 @@ class Table(object):
         tab.default_value = self.default_value
         tab.create_rows(self.row_names[rows])
         tab.create_columns(self.col_names[cols])
-        for idx,row in enumerate(self.data[rows]):
+        for idx, row in enumerate(self.data[rows]):
             tab.set_row(idx, row[cols])
         if multirows :
             if multicols:
@@ -398,7 +398,7 @@ class Table(object):
     def get_columns(self):
         """Returns all the columns in the table
         """
-        return [self[:,index] for index in range(len(self.col_names))]
+        return [self[:, index] for index in range(len(self.col_names))]
 
     def get_column(self, col_index, distinct=False):
         """get a column by index"""
@@ -488,17 +488,17 @@ class TableStyle:
     def __init__(self, table):
 
         self._table = table
-        self.size = dict([(col_name,'1*') for col_name in table.col_names])
+        self.size = dict([(col_name, '1*') for col_name in table.col_names])
         # __row_column__ is a special key to define the first column which
         # actually has no name (<=> left most column <=> row names column)
         self.size['__row_column__'] = '1*'
-        self.alignment = dict([(col_name,'right')
+        self.alignment = dict([(col_name, 'right')
                                for col_name in table.col_names])
         self.alignment['__row_column__'] = 'right'
 
         # We shouldn't have to create an entry for
         # the 1st col (the row_column one)
-        self.units = dict([(col_name,'') for col_name in table.col_names])
+        self.units = dict([(col_name, '') for col_name in table.col_names])
         self.units['__row_column__'] = ''
 
     # XXX FIXME : params order should be reversed for all set() methods

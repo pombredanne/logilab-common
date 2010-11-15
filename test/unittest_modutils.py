@@ -39,7 +39,7 @@ DATADIR = path.join(path.dirname(__file__), 'data')
 
 class TestCase(TLTestCase):
     def setUp(self):
-        super(TestCase,self).setUp()
+        super(TestCase, self).setUp()
         self.__common_in_path = common.__path__[0] in sys.path
         if self.__common_in_path:
             sys.path.remove(common.__path__[0])
@@ -47,7 +47,7 @@ class TestCase(TLTestCase):
     def tearDown(self):
         if self.__common_in_path:
             sys.path.insert(0, common.__path__[0])
-        super(TestCase,self).tearDown()
+        super(TestCase, self).tearDown()
 
 class _module_file_tc(TestCase):
     def test_find_zipped_module(self):
@@ -155,7 +155,7 @@ class get_source_file_tc(TestCase):
                          path.__file__.replace('.pyc', '.py'))
 
     def test_raise(self):
-        self.assertRaises(modutils.NoSourceFile, modutils.get_source_file,'whatever')
+        self.assertRaises(modutils.NoSourceFile, modutils.get_source_file, 'whatever')
 
 class is_standard_module_tc(TestCase):
     """
@@ -230,7 +230,7 @@ class get_modules_files_tc(TestCase):
         in subdirectories
         """
         import data
-        modules = modutils.get_module_files(path.join(DATADIR,'find_test'), data.__path__[0])
+        modules = modutils.get_module_files(path.join(DATADIR, 'find_test'), data.__path__[0])
         modules.sort()
         self.assertEqual(modules,
                          [path.join(DATADIR, 'find_test', x) for x in ['__init__.py', 'module.py', 'module2.py', 'noendingnewline.py', 'nonregr.py']])
@@ -240,7 +240,7 @@ class get_modules_files_tc(TestCase):
         import logilab
         del logilab.common.fileutils
         del sys.modules['logilab.common.fileutils']
-        m = modutils.load_module_from_modpath(['logilab','common', 'fileutils'])
+        m = modutils.load_module_from_modpath(['logilab', 'common', 'fileutils'])
         self.assert_( hasattr(logilab, 'common') )
         self.assert_( hasattr(logilab.common, 'fileutils') )
         self.assert_( m is logilab.common.fileutils )

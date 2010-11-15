@@ -196,8 +196,8 @@ def bytes_validator(optdict, name, value):
     return optparse.check_bytes(None, name, value)
 
 
-VALIDATORS = {'string' : unquote,
-              'int' : int,
+VALIDATORS = {'string': unquote,
+              'int': int,
               'float': float,
               'file': file_validator,
               'font': unquote,
@@ -341,7 +341,7 @@ def format_option_value(optdict, value):
     if isinstance(value, (list, tuple)):
         value = ','.join(value)
     elif isinstance(value, dict):
-        value = ','.join(['%s:%s' % (k,v) for k,v in value.items()])
+        value = ','.join(['%s:%s' % (k, v) for k, v in value.items()])
     elif hasattr(value, 'match'): # optdict.get('type') == 'regexp'
         # compiled regexp
         value = value.pattern
@@ -400,7 +400,7 @@ def rest_format_section(stream, section, options, encoding=None, doc=None):
         if value:
             value = _encode(format_option_value(optdict, value), encoding)
             print >> stream, ''
-            print >> stream, '  Default: ``%s``' % value.replace("`` ","```` ``")
+            print >> stream, '  Default: ``%s``' % value.replace("`` ", "```` ``")
 
 
 class OptionsManagerMixIn(object):

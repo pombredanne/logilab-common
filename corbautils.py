@@ -50,7 +50,7 @@ def get_root_context():
     orb = get_orb()
     nss = orb.resolve_initial_references("NameService")
     rootContext = nss._narrow(CosNaming.NamingContext)
-    assert rootContext is not None,"Failed to narrow root naming context"
+    assert rootContext is not None, "Failed to narrow root naming context"
     return rootContext
 
 def register_object_name(object, namepath):
@@ -77,7 +77,7 @@ def register_object_name(object, namepath):
             assert context is not None, \
                    'test context exists but is not a NamingContext'
 
-    id,kind = namepath[-1]
+    id, kind = namepath[-1]
     name = [CosNaming.NameComponent(id, kind)]
     try:
         context.bind(name, object._this())

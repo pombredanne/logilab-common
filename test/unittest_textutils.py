@@ -124,9 +124,9 @@ class UnitsTC(TestCase):
 
     def setUp(self):
         self.units = {
-            'm':60,
-            'kb':1024,
-            'mb':1024*1024,
+            'm': 60,
+            'kb': 1024,
+            'mb': 1024*1024,
             }
 
     def test_empty_base(self):
@@ -141,10 +141,10 @@ class UnitsTC(TestCase):
 
     def test_empty_final(self):
         # int('12.4') raise value error
-        self.assertRaises(ValueError, tu.apply_units,'12.4', {}, final=int)
+        self.assertRaises(ValueError, tu.apply_units, '12.4', {}, final=int)
 
     def test_empty_inter_final(self):
-        result = tu.apply_units('12.4', {}, inter=float,final=int)
+        result = tu.apply_units('12.4', {}, inter=float, final=int)
         self.assertEqual(result, 12)
         self.assertIsInstance(result, int)
 
@@ -161,7 +161,7 @@ class UnitsTC(TestCase):
         self.assertEqual(result, 4298.42)
 
     def test_blank_mixed(self):
-        result = tu.apply_units('45, 317, 337', {},final=int)
+        result = tu.apply_units('45, 317, 337', {}, final=int)
         self.assertEqual(result, 45317337)
 
     def test_unit_singleunit_singleletter(self):

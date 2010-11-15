@@ -232,8 +232,8 @@ class Execute:
         errfile = tempfile.mktemp()
         self.status = os.system("( %s ) >%s 2>%s" %
                                 (command, outfile, errfile)) >> 8
-        self.out = open(outfile,"r").read()
-        self.err = open(errfile,"r").read()
+        self.out = open(outfile, "r").read()
+        self.err = open(errfile, "r").read()
         os.remove(outfile)
         os.remove(errfile)
 
@@ -415,7 +415,7 @@ class RawInput(object):
 
     def confirm(self, question, default_is_yes=True):
         default = default_is_yes and 'y' or 'n'
-        answer = self.ask(question, ('y','n'), default)
+        answer = self.ask(question, ('y', 'n'), default)
         return answer == 'y'
 
 ASK = RawInput()

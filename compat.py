@@ -122,7 +122,7 @@ except NameError: # py2.3
 
 try:
     max = max
-    max(("ab","cde"),key=len) # does not work in py2.3
+    max(("ab", "cde"), key=len) # does not work in py2.3
 except TypeError:
     def max( *args, **kargs):
         if len(args) == 0:

@@ -84,7 +84,7 @@ class CompatTCMixIn:
 
 class Py23CompatTC(CompatTCMixIn, TestCase):
     MODNAMES = {
-        'sets' : ('Set', 'ImmutableSet'),
+        'sets': ('Set', 'ImmutableSet'),
         }
 
     def test_basic_set(self):
@@ -209,21 +209,21 @@ class Py25CompatTC(CompatTCMixIn, TestCase):
         from logilab.common.compat import max
 
         # old apy
-        self.assertEqual(max("fdjkmhsgmdfhsg"),'s')
-        self.assertEqual(max(1,43,12,45,1337,34,2), 1337)
-        self.assertRaises(TypeError,max)
-        self.assertRaises(TypeError,max,1)
-        self.assertRaises(ValueError,max,[])
-        self.assertRaises(TypeError,max,bob=None)
+        self.assertEqual(max("fdjkmhsgmdfhsg"), 's')
+        self.assertEqual(max(1, 43, 12, 45, 1337, 34, 2), 1337)
+        self.assertRaises(TypeError, max)
+        self.assertRaises(TypeError, max, 1)
+        self.assertRaises(ValueError, max, [])
+        self.assertRaises(TypeError, max, bob=None)
 
         # new apy
-        self.assertEqual(max("shorter","longer",key=len),"shorter")
-        self.assertEqual(max(((1,1),(2,3,5),(8,13,21)),key=len),(2,3,5))
-        self.assertEqual(max(((1,1),(42,),(2,3,5),(8,13,21)),key=max),(42,))
-        self.assertRaises(TypeError,max,key=None)
-        self.assertRaises(TypeError,max,1,key=len)
-        self.assertRaises(ValueError,max,[],key=max)
-        self.assertRaises(TypeError,max,"shorter","longer",key=len,kathy=None)
+        self.assertEqual(max("shorter", "longer", key=len), "shorter")
+        self.assertEqual(max(((1, 1), (2, 3, 5), (8, 13, 21)), key=len), (2, 3, 5))
+        self.assertEqual(max(((1, 1), (42,), (2, 3, 5), (8, 13, 21)), key=max), (42,))
+        self.assertRaises(TypeError, max, key=None)
+        self.assertRaises(TypeError, max, 1, key=len)
+        self.assertRaises(ValueError, max, [], key=max)
+        self.assertRaises(TypeError, max, "shorter", "longer", key=len, kathy=None)
 
 
 if __name__ == '__main__':

@@ -302,7 +302,7 @@ _BLANK_URE = r'(\s|,)+'
 _BLANK_RE = re.compile(_BLANK_URE)
 __VALUE_URE = r'-?(([0-9]+\.[0-9]*)|((0x?)?[0-9]+))'
 __UNITS_URE = r'[a-zA-Z]+'
-_VALUE_RE = re.compile(r'(?P<value>%s)(?P<unit>%s)?'%(__VALUE_URE,__UNITS_URE))
+_VALUE_RE = re.compile(r'(?P<value>%s)(?P<unit>%s)?'%(__VALUE_URE, __UNITS_URE))
 
 BYTE_UNITS = {
     "b": 1,
@@ -342,7 +342,7 @@ def apply_units( string, units, inter=None, final=float, blank_reg=_BLANK_RE,
     """
     if inter is None:
         inter = final
-    string = _BLANK_RE.sub('',string)
+    string = _BLANK_RE.sub('', string)
     values = []
     for match in value_reg.finditer(string):
         dic = match.groupdict()
@@ -421,24 +421,24 @@ ANSI_PREFIX = '\033['
 ANSI_END = 'm'
 ANSI_RESET = '\033[0m'
 ANSI_STYLES = {
-    'reset'     : "0",
-    'bold'      : "1",
-    'italic'    : "3",
-    'underline' : "4",
-    'blink'     : "5",
-    'inverse'   : "7",
-    'strike'    : "9",
+    'reset': "0",
+    'bold': "1",
+    'italic': "3",
+    'underline': "4",
+    'blink': "5",
+    'inverse': "7",
+    'strike': "9",
 }
 ANSI_COLORS = {
-    'reset'   : "0",
-    'black'   : "30",
-    'red'     : "31",
-    'green'   : "32",
-    'yellow'  : "33",
-    'blue'    : "34",
-    'magenta' : "35",
-    'cyan'    : "36",
-    'white'   : "37",
+    'reset': "0",
+    'black': "30",
+    'red': "31",
+    'green': "32",
+    'yellow': "33",
+    'blue': "34",
+    'magenta': "35",
+    'cyan': "36",
+    'white': "37",
 }
 
 def _get_ansi_code(color=None, style=None):
@@ -466,7 +466,7 @@ def _get_ansi_code(color=None, style=None):
             ansi_code.append(ANSI_STYLES[effect])
     if color:
         if color.isdigit():
-            ansi_code.extend(['38','5'])
+            ansi_code.extend(['38', '5'])
             ansi_code.append(color)
         else:
             ansi_code.append(ANSI_COLORS[color])

@@ -74,7 +74,7 @@ class WriterTC:
 
     def test_advanced_table(self):
         table = Table(cols=2, klass='whatever', id='mytable', rheaders=1)
-        for field, value in (('field', 'value') ,('f1', 'v1'), ('f22', 'v22'), ('f333', 'v333')):
+        for field, value in (('field', 'value'), ('f1', 'v1'), ('f22', 'v22'), ('f333', 'v333')):
             table.append(Text(field))
             table.append(Text(value))
         table.append(Link('http://www.perdu.com', 'toi perdu ?'))

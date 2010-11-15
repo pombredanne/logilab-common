@@ -72,7 +72,7 @@ class Version(tuple):
             try:
                 parsed = [int(i) for i in versionstr.split('.')]
             except ValueError, ex:
-                raise ValueError("invalid literal for version '%s' (%s)"%(versionstr,ex))
+                raise ValueError("invalid literal for version '%s' (%s)"%(versionstr, ex))
         else:
             parsed = versionstr
         return tuple.__new__(klass, parsed)
@@ -99,7 +99,7 @@ class ChangeLogEntry(object):
 
     def add_message(self, msg):
         """add a new message"""
-        self.messages.append(([msg],[]))
+        self.messages.append(([msg], []))
 
     def complete_latest_message(self, msg_suite):
         """complete the latest added message

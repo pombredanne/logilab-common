@@ -34,11 +34,11 @@ import string
 
 ATTRS_VAL = {
     'algos':       ('dfs', 'tree', 'minbackward',
-                    'left_to_right','right_to_left',
-                    'top_to_bottom','bottom_to_top',
+                    'left_to_right', 'right_to_left',
+                    'top_to_bottom', 'bottom_to_top',
                     'maxdepth', 'maxdepthslow', 'mindepth', 'mindepthslow',
                     'mindegree', 'minindegree', 'minoutdegree',
-                    'maxdegree','maxindegree', 'maxoutdegree'),
+                    'maxdegree', 'maxindegree', 'maxoutdegree'),
     'booleans':    ('yes', 'no'),
     'colors':      ('black', 'white', 'blue', 'red', 'green', 'yellow',
                     'magenta', 'lightgrey',
@@ -59,8 +59,8 @@ ATTRS_VAL = {
 #   1    -> int
 #   list -> value in list
 GRAPH_ATTRS = {
-    'title' :              0,
-    'label' :              0,
+    'title':              0,
+    'label':              0,
     'color':               ATTRS_VAL['colors'],
     'textcolor':           ATTRS_VAL['colors'],
     'bordercolor':         ATTRS_VAL['colors'],
@@ -76,10 +76,10 @@ GRAPH_ATTRS = {
     'horizontal_order':    1,
     'xspace':              1,
     'yspace':              1,
-    'layoutalgorithm' :    ATTRS_VAL['algos'],
-    'late_edge_labels' :   ATTRS_VAL['booleans'],
+    'layoutalgorithm':    ATTRS_VAL['algos'],
+    'late_edge_labels':   ATTRS_VAL['booleans'],
     'display_edge_labels': ATTRS_VAL['booleans'],
-    'dirty_edge_labels' :  ATTRS_VAL['booleans'],
+    'dirty_edge_labels':  ATTRS_VAL['booleans'],
     'finetuning':          ATTRS_VAL['booleans'],
     'manhattan_edges':     ATTRS_VAL['booleans'],
     'smanhattan_edges':    ATTRS_VAL['booleans'],
@@ -89,8 +89,8 @@ GRAPH_ATTRS = {
     'splines':             ATTRS_VAL['booleans'],
     }
 NODE_ATTRS = {
-    'title' :              0,
-    'label' :              0,
+    'title':              0,
+    'label':              0,
     'color':               ATTRS_VAL['colors'],
     'textcolor':           ATTRS_VAL['colors'],
     'bordercolor':         ATTRS_VAL['colors'],
@@ -105,12 +105,12 @@ NODE_ATTRS = {
     'horizontal_order':    1,
     }
 EDGE_ATTRS = {
-    'sourcename' :         0,
-    'targetname' :         0,
-    'label' :              0,
-    'linestyle' :          ATTRS_VAL['linestyles'],
-    'class' :              1,
-    'thickness' :          0,
+    'sourcename':         0,
+    'targetname':         0,
+    'label':              0,
+    'linestyle':          ATTRS_VAL['linestyles'],
+    'class':              1,
+    'thickness':          0,
     'color':               ATTRS_VAL['colors'],
     'textcolor':           ATTRS_VAL['colors'],
     'arrowcolor':          ATTRS_VAL['colors'],

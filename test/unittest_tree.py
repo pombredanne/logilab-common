@@ -114,21 +114,21 @@ class Node_ClassTest(TestCase):
         return depth of this node in the tree
         """
         self.assertEqual(self.o.depth_down(), 4)
-        self.assertEqual(self.o.get_child_by_id('child_2_1',True).depth_down(), 1)
+        self.assertEqual(self.o.get_child_by_id('child_2_1', True).depth_down(), 1)
 
     def test_known_values_depth(self):
         """
         return depth of this node in the tree
         """
         self.assertEqual(self.o.depth(), 0)
-        self.assertEqual(self.o.get_child_by_id('child_2_1',True).depth(), 2)
+        self.assertEqual(self.o.get_child_by_id('child_2_1', True).depth(), 2)
 
     def test_known_values_width(self):
         """
         return depth of this node in the tree
         """
         self.assertEqual(self.o.width(), 3)
-        self.assertEqual(self.o.get_child_by_id('child_2_1',True).width(), 1)
+        self.assertEqual(self.o.get_child_by_id('child_2_1', True).width(), 1)
 
     def test_known_values_root(self):
         """
@@ -140,15 +140,15 @@ class Node_ClassTest(TestCase):
         """
         return a list with all the leaf nodes descendant from this task
         """
-        self.assertEqual(self.o.leaves(), [self.o.get_child_by_id('child_2_1',True),
-                                          self.o.get_child_by_id('child_3_1',True),
-                                          self.o.get_child_by_id('child_2_3',True)])
+        self.assertEqual(self.o.leaves(), [self.o.get_child_by_id('child_2_1', True),
+                                          self.o.get_child_by_id('child_3_1', True),
+                                          self.o.get_child_by_id('child_2_3', True)])
 
     def test_known_values_lineage(self):
-        c31 = self.o.get_child_by_id('child_3_1',True)
-        self.assertEqual(c31.lineage(), [self.o.get_child_by_id('child_3_1',True),
-                                         self.o.get_child_by_id('child_2_2',True),
-                                         self.o.get_child_by_id('child_1_1',True),
+        c31 = self.o.get_child_by_id('child_3_1', True)
+        self.assertEqual(c31.lineage(), [self.o.get_child_by_id('child_3_1', True),
+                                         self.o.get_child_by_id('child_2_2', True),
+                                         self.o.get_child_by_id('child_1_1', True),
                                          self.o])
 
 

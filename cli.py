@@ -92,8 +92,8 @@ class CLIHelper:
     and provide an help system.
     """
 
-    CMD_MAP = {'help' : _("Others"),
-               'quit' : _("Others"),
+    CMD_MAP = {'help': _("Others"),
+               'quit': _("Others"),
                }
     CMD_PREFIX = ''
 
