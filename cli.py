@@ -105,7 +105,7 @@ class CLIHelper:
 
     def run(self):
         """loop on user input, exit on EOF"""
-        while 1:
+        while True:
             try:
                 line = raw_input('>>> ')
             except EOFError:
@@ -171,8 +171,7 @@ class CLIHelper:
         elif command is None or command not in self._topics:
             print _("Use help <topic> or help <command>.")
             print _("Available topics are:")
-            topics = self._topics.keys()
-            topics.sort()
+            topics = sorted(self._topics.keys())
             for topic in topics:
                 print '\t', topic
             print

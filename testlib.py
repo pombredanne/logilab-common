@@ -177,7 +177,7 @@ def run_tests(tests, quiet, verbose, runner=None, capture=0):
             print '-'*80
             print "Executing", test
         result = run_test(test, verbose, runner, capture)
-        if type(result) is type(''):
+        if isinstance(result, str):
             # an unexpected error occurred
             skipped.append( (test, result))
         else:

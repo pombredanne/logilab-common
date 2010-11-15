@@ -216,11 +216,11 @@ class get_modules_tc(TestCase):
         """
         import data.find_test as data
         mod_path = ("data", 'find_test')
-        modules = modutils.get_modules(path.join(*mod_path), data.__path__[0])
-        modules.sort()
+        modules = sorted(modutils.get_modules(path.join(*mod_path),
+                                              data.__path__[0]))
         self.assertSetEqual(set(modules),
-            set([ '.'.join(mod_path + (mod, )) for mod in 'module', 'module2',
-            'noendingnewline', 'nonregr']))
+            set([ '.'.join(mod_path + (mod, )) for mod in ('module', 'module2',
+            'noendingnewline', 'nonregr')]))
 
 
 class get_modules_files_tc(TestCase):
@@ -230,8 +230,8 @@ class get_modules_files_tc(TestCase):
         in subdirectories
         """
         import data
-        modules = modutils.get_module_files(path.join(DATADIR, 'find_test'), data.__path__[0])
-        modules.sort()
+        modules = sorted(modutils.get_module_files(path.join(DATADIR, 'find_test'),
+                                                   data.__path__[0]))
         self.assertEqual(modules,
                          [path.join(DATADIR, 'find_test', x) for x in ['__init__.py', 'module.py', 'module2.py', 'noendingnewline.py', 'nonregr.py']])
 

@@ -111,7 +111,7 @@ If it i not the case, remove the file %s''' % (self.name, self._pid_file))
         if self.delay < 0:
             self.delay = -self.delay
             time.sleep(self.delay)
-        while 1:
+        while True:
             try:
                 self._run()
             except Exception, ex:

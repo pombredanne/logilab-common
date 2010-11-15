@@ -100,10 +100,9 @@ class Table(object):
 
         method should be in ('asc', 'desc')
         """
-        sort_list = [(row[col_index], row, row_name)
-                     for row, row_name in zip(self.data, self.row_names)]
+        sort_list = sorted([(row[col_index], row, row_name)
+                     for row, row_name in zip(self.data, self.row_names)])
         # Sorting sort_list will sort according to col_index
-        sort_list.sort()
         # If we want reverse sort, then reverse list
         if method.lower() == 'desc':
             sort_list.reverse()

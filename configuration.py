@@ -815,13 +815,13 @@ class OptionsProviderMixIn(object):
             opt = self.option_name(opt, optdict)
             _list = getattr(self.config, opt, None)
             if _list is None:
-                if type(value) in (type(()), type([])):
+                if isinstance(value, (list, tuple)):
                     _list = value
                 elif value is not None:
                     _list = []
                     _list.append(value)
                 setattr(self.config, opt, _list)
-            elif type(_list) is type(()):
+            elif isinstance(_list, tuple):
                 setattr(self.config, opt, _list + (value,))
             else:
                 _list.append(value)

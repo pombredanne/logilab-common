@@ -277,8 +277,7 @@ class ListCommandsCommand(Command):
                 print '--help'
                 print '--' + optname
         else:
-            commands = _COMMANDS.keys()
-            commands.sort()
+            commands = sorted(_COMMANDS.keys())
             for command in commands:
                 cmd = _COMMANDS[command]
                 if not cmd.hidden:
