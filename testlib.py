@@ -57,7 +57,8 @@ from ConfigParser import ConfigParser
 from logilab.common.deprecation import deprecated
 from itertools import dropwhile
 
-if sys.version_info < (3, 2):
+import unittest as unittest_legacy
+if not getattr(unittest_legacy, "__package__", None):
     try:
         import unittest2 as unittest
         from unittest2 import SkipTest
@@ -969,7 +970,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         from xml.parsers.expat import ExpatError
         try:
             parse(data)
-        except ExpatError, ex:
+        except (ExpatError, ParseError), ex:
             if msg is None:
                 if hasattr(data, 'readlines'): #file like object
                     data.seek(0)

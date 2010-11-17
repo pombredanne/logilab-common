@@ -118,11 +118,12 @@ import types
 
 from logilab.common.fileutils import abspath_listdir
 from logilab.common import testlib, STD_BLACKLIST
+# use the same unittest module as testlib
 from logilab.common.testlib import unittest
 import doctest
 
-# use the same unittest module as testlib
-if sys.version_info < (3, 2):
+import unittest as unittest_legacy
+if not getattr(unittest_legacy, "__package__", None):
     try:
         import unittest2.suite as unittest_suite
     except ImportError:
