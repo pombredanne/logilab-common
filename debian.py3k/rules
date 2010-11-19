@@ -22,7 +22,6 @@ include /usr/share/python3/python.mk
 
 override_dh_auto_build:
 	# python module build
-	2to3-$(PYDEF) -wnv -x import setup.py
 	NO_SETUPTOOLS=1 python3 setup.py -q build --build-purelib $(CURDIR)/build/lib
 	# build doc
 	$(MAKE) -C doc
