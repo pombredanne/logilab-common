@@ -304,7 +304,7 @@ class ProgressBar(object):
         return self._current_text
 
     def _set_text(self, text=None):
-        if text != self._current_text):
+        if text != self._current_text:
             self._current_text = text
             self.refresh()
 
