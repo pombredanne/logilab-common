@@ -80,12 +80,6 @@ try:
 except ImportError:
     import pickle
 
-try:
-    set = set
-    frozenset = frozenset
-except NameError:# Python 2.3 doesn't have `set`
-    from sets import Set as set, ImmutableSet as frozenset
-
 from logilab.common.deprecation import deprecated
 
 from itertools import izip, chain, imap
@@ -94,65 +88,14 @@ if sys.version_info < (3, 0):# 2to3 will remove the imports
     imap = deprecated('imap exists in itertools since py2.3')(imap)
 chain = deprecated('chain exists in itertools since py2.3')(chain)
 
+set = deprecated('set exists in builtins since py2.4')(set)
+frozenset = deprecated('frozenset exists in builtins since py2.4')(frozenset)
 sum = deprecated('sum exists in builtins since py2.3')(sum)
 enumerate = deprecated('enumerate exists in builtins since py2.3')(enumerate)
-
-try:
-    sorted = sorted
-    reversed = reversed
-except NameError: # py2.3
-
-    def sorted(iterable, cmp=None, key=None, reverse=False):
-        original = list(iterable)
-        if key:
-            l2 = [(key(elt), index) for index, elt in builtins.enumerate(original)]
-        else:
-            l2 = original
-        l2.sort(cmp)
-        if reverse:
-            l2.reverse()
-        if key:
-            return [original[index] for elt, index in l2]
-        return l2
-
-    def reversed(l):
-        l2 = list(l)
-        l2.reverse()
-        return l2
-
-try:
-    max = max
-    max(("ab", "cde"), key=len) # does not work in py2.3
-except TypeError:
-    def max( *args, **kargs):
-        if len(args) == 0:
-            raise TypeError("max expected at least 1 arguments, got 0")
-        key= kargs.pop("key", None)
-        #default implementation
-        if key is None:
-            return builtins.max(*args,**kargs)
-
-        for karg in kargs:
-            raise TypeError("unexpected keyword argument %s for function max") % karg
-
-        if len(args) == 1:
-            items = iter(args[0])
-        else:
-            items = iter(args)
-
-        try:
-            best_item = items.next()
-            best_value = key(best_item)
-        except StopIteration:
-            raise ValueError("max() arg is an empty sequence")
-
-        for item in items:
-            value = key(item)
-            if value > best_value:
-                best_item = item
-                best_value = value
-
-        return best_item
+set = deprecated('set exists in builtins since py2.4')(set)
+reversed = deprecated('reversed exists in builtins since py2.4')(reversed)
+sorted = deprecated('sorted exists in builtins since py2.4')(sorted)
+max = deprecated('max exists in builtins since py2.4')(max)
 
 
 # Python2.5 builtins
