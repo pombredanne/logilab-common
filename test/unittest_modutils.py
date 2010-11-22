@@ -89,8 +89,8 @@ class get_module_part_tc(TestCase):
                          'logilab.common.modutils')
 
     def test_knownValues_get_module_part_3(self):
-        self.assertEqual(modutils.get_module_part('db.get_connexion', modutils.__file__),
-                         'db')
+        self.assertRaises(ImportError, modutils.get_module_part, 'db.get_connexion',
+                          modutils.__file__)
 
     def test_knownValues_get_compiled_module_part(self):
         self.assertEqual(modutils.get_module_part('math.log10'), 'math')
