@@ -28,7 +28,7 @@ import os.path as osp
 import os
 import sys
 import tempfile
-from logilab.common.compat import sorted, reversed, str_encode
+from logilab.common.compat import str_encode
 
 def escape(value):
     """Make <value> usable in a dot file."""

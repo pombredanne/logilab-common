@@ -24,8 +24,6 @@ from cStringIO import StringIO
 import tempfile
 import shutil
 
-from logilab.common.compat import sorted
-
 try:
     __file__
 except NameError:

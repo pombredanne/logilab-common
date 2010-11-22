@@ -113,8 +113,7 @@ from ConfigParser import ConfigParser, NoOptionError, NoSectionError, \
      DuplicateSectionError
 from warnings import warn
 
-from logilab.common.compat import set, reversed, callable, raw_input
-from logilab.common.compat import str_encode as _encode
+from logilab.common.compat import callable, raw_input, str_encode as _encode
 
 from logilab.common.textutils import normalize_text, unquote
 from logilab.common import optik_ext as optparse

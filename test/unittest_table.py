@@ -28,7 +28,6 @@ from cStringIO import StringIO
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.table import Table, TableStyleSheet, DocbookTableWriter, \
      DocbookRenderer, TableStyle, TableWriter, TableCellRenderer
-from logilab.common.compat import set
 
 class TableTC(TestCase):
     """Table TestCase class"""
