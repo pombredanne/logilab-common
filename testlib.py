@@ -86,7 +86,7 @@ except ImportError:
     test_support = TestSupport()
 
 # pylint: disable=W0622
-from logilab.common.compat import set, any, sorted, InheritableSet, callable
+from logilab.common.compat import any, InheritableSet, callable
 # pylint: enable=W0622
 from logilab.common.debugger import Debugger, colorize_source
 from logilab.common.decorators import cached, classproperty

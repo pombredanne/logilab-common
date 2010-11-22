@@ -27,7 +27,6 @@ except NameError:
 
 from logilab.common.testlib import TestCase as TLTestCase, unittest_main
 from logilab.common import modutils
-from logilab.common.compat import set
 
 from os import path, getcwd, sep
 from logilab import common

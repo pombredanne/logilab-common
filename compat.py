@@ -88,11 +88,9 @@ if sys.version_info < (3, 0):# 2to3 will remove the imports
     imap = deprecated('imap exists in itertools since py2.3')(imap)
 chain = deprecated('chain exists in itertools since py2.3')(chain)
 
-set = deprecated('set exists in builtins since py2.4')(set)
-frozenset = deprecated('frozenset exists in builtins since py2.4')(frozenset)
 sum = deprecated('sum exists in builtins since py2.3')(sum)
 enumerate = deprecated('enumerate exists in builtins since py2.3')(enumerate)
-set = deprecated('set exists in builtins since py2.4')(set)
+frozenset = deprecated('frozenset exists in builtins since py2.4')(frozenset)
 reversed = deprecated('reversed exists in builtins since py2.4')(reversed)
 sorted = deprecated('sorted exists in builtins since py2.4')(sorted)
 max = deprecated('max exists in builtins since py2.4')(max)
@@ -196,17 +194,20 @@ except ImportError: # python < 2.6
             return curdir
         return join(*rel_list)
 
+
+# XXX don't know why tests don't pass if I don't do that :
+_real_set, set = set, deprecated('set exists in builtins since py2.4')(set)
 if (2, 5) <= sys.version_info[:2]:
-    InheritableSet = set
+    InheritableSet = _real_set
 else:
-    class InheritableSet(set):
+    class InheritableSet(_real_set):
         """hacked resolving inheritancy issue from old style class in 2.4"""
         def __new__(cls, *args, **kwargs):
             if args:
                 new_args = (args[0], )
             else:
                 new_args = ()
-            obj = set.__new__(cls, *new_args)
+            obj = _real_set.__new__(cls, *new_args)
             obj.__init__(*args, **kwargs)
             return obj
 

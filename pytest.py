@@ -120,6 +120,7 @@ from logilab.common.fileutils import abspath_listdir
 from logilab.common import testlib, STD_BLACKLIST
 # use the same unittest module as testlib
 from logilab.common.testlib import unittest
+from logilab.common.compat import any
 import doctest
 
 import unittest as unittest_legacy
