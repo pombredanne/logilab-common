@@ -969,6 +969,11 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         """
         from xml.parsers.expat import ExpatError
         try:
+            from xml.etree.ElementTree import ParseError
+        except ImportError:
+            # compatibility for <python2.7
+            ParseError = ExpatError
+        try:
             parse(data)
         except (ExpatError, ParseError), ex:
             if msg is None:
@@ -980,21 +985,23 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
                 nb_lines = len(lines)
                 context_lines = []
 
-                if  context < 0:
-                    start = 1
-                    end   = nb_lines
-                else:
-                    start = max(ex.lineno-context, 1)
-                    end   = min(ex.lineno+context, nb_lines)
-                line_number_length = len('%i' % end)
-                line_pattern = " %%%ii: %%s" % line_number_length
+                # catch when ParseError doesn't set valid lineno
+                if ex.lineno is not None:
+                    if context < 0:
+                        start = 1
+                        end   = nb_lines
+                    else:
+                        start = max(ex.lineno-context, 1)
+                        end   = min(ex.lineno+context, nb_lines)
+                    line_number_length = len('%i' % end)
+                    line_pattern = " %%%ii: %%s" % line_number_length
 
-                for line_no in xrange(start, ex.lineno):
-                    context_lines.append(line_pattern % (line_no, lines[line_no-1]))
-                context_lines.append(line_pattern % (ex.lineno, lines[ex.lineno-1]))
-                context_lines.append('%s^\n' % (' ' * (1 + line_number_length + 2 +ex.offset)))
-                for line_no in xrange(ex.lineno+1, end+1):
-                    context_lines.append(line_pattern % (line_no, lines[line_no-1]))
+                    for line_no in xrange(start, ex.lineno):
+                        context_lines.append(line_pattern % (line_no, lines[line_no-1]))
+                    context_lines.append(line_pattern % (ex.lineno, lines[ex.lineno-1]))
+                    context_lines.append('%s^\n' % (' ' * (1 + line_number_length + 2 +ex.offset)))
+                    for line_no in xrange(ex.lineno+1, end+1):
+                        context_lines.append(line_pattern % (line_no, lines[line_no-1]))
 
                 rich_context = ''.join(context_lines)
                 msg = 'XML stream not well formed: %s\n%s' % (ex, rich_context)
