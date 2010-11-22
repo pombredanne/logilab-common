@@ -786,7 +786,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         raise InnerTestSkipped(msg)
 
     @deprecated('Please use assertDictEqual instead.')
-    def assertDictEquals(self, dict1, dict2, msg=None):
+    def assertDictEquals(self, dict1, dict2, msg=None, context=None):
         """compares two dicts
 
         If the two dict differ, the first difference is shown in the error
@@ -810,7 +810,11 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         if msg:
             self.failureException(msg)
         elif msgs:
-            self.fail('\n'.join(msgs))
+            if context is not None:
+                base = '%s\n' % context
+            else:
+                base = ''
+            self.fail(base + '\n'.join(msgs))
 
     @deprecated('Please use assertItemsEqual instead.')
     def assertUnorderedIterableEquals(self, got, expected, msg=None):
