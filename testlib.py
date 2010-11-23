@@ -294,10 +294,11 @@ class SkipAwareTestResult(unittest._TextTestResult):
         return '\n'.join(output)
 
     def addError(self, test, err):
-        """err ==  (exc_type, exc, tcbk)"""
-        exc_type, exc, _ = err #
-        if exc_type == SkipTest:
-            self.addSkipped(test, exc)
+        """err ->  (exc_type, exc, tcbk)"""
+        exc_type, exc, _ = err
+        if isinstance(exc, SkipTest):
+            assert exc_type == SkipTest
+            self.addSkip(test, exc)
         else:
             if self.exitfirst:
                 self.shouldStop = True
@@ -312,8 +313,8 @@ class SkipAwareTestResult(unittest._TextTestResult):
         super(SkipAwareTestResult, self).addFailure(test, err)
         self._create_pdb(descr, 'fail')
 
-    def addSkipped(self, test, reason):
-        self.skipped.append((test, self.getDescription(test), reason))
+    def addSkip(self, test, reason):
+        self.skipped.append((test, reason))
         if self.showAll:
             self.stream.writeln("SKIPPED")
         elif self.dots:
@@ -321,11 +322,12 @@ class SkipAwareTestResult(unittest._TextTestResult):
 
     def printErrors(self):
         super(SkipAwareTestResult, self).printErrors()
-        # FIXME format of skipped results not compatible with unittest2
         self.printSkippedList()
 
     def printSkippedList(self):
-        for _, descr, err in self.skipped: # test, descr, err
+        # format (test, err) compatible with unittest2
+        for test, err in self.skipped:
+            descr = self.getDescription(test)
             self.stream.writeln(self.separator1)
             self.stream.writeln("%s: %s" % ('SKIPPED', descr))
             self.stream.writeln("\t%s" % err)
@@ -762,7 +764,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
             self._stop_capture()
             raise
         except InnerTestSkipped, e:
-            result.addSkipped(self, e)
+            result.addSkip(self, e)
             return 1
         except:
             self._stop_capture()
