@@ -89,8 +89,9 @@ class get_module_part_tc(TestCase):
                          'logilab.common.modutils')
 
     def test_knownValues_get_module_part_3(self):
-        self.assertRaises(ImportError, modutils.get_module_part, 'db.get_connexion',
-                          modutils.__file__)
+        """relative import from given file"""
+        self.assertEqual(modutils.get_module_part('interface.Interface',
+                                                  modutils.__file__), 'interface')
 
     def test_knownValues_get_compiled_module_part(self):
         self.assertEqual(modutils.get_module_part('math.log10'), 'math')
@@ -99,6 +100,10 @@ class get_module_part_tc(TestCase):
     def test_knownValues_get_builtin_module_part(self):
         self.assertEqual(modutils.get_module_part('sys.path'), 'sys')
         self.assertEqual(modutils.get_module_part('sys.path', '__file__'), 'sys')
+
+    def test_get_module_part_exception(self):
+        self.assertRaises(ImportError, modutils.get_module_part, 'unknown.module',
+                          modutils.__file__)
 
 
 class modpath_from_file_tc(TestCase):
