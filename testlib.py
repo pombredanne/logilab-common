@@ -98,9 +98,6 @@ __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
                     'func', 'validation')
 
-ENABLE_DBC = False
-
-FILE_RESTART = ".pytest.restart"
 
 if sys.version_info >= (2, 6):
     # FIXME : this does not work as expected / breaks tests on testlib
@@ -659,6 +656,7 @@ class TestCase(unittest.TestCase):
         This is mostly a copy/paste from unittest.py (i.e same
         variable names, same logic, except for the generative tests part)
         """
+        from logilab.common.pytest import FILE_RESTART
         if result is None:
             result = self.defaultTestResult()
         result.pdbclass = self.pdbclass
@@ -1319,7 +1317,7 @@ class DocTest(TestCase):
     """
     skipped = ()
     def __call__(self, result=None, runcondition=None, options=None):\
-            # pylint: disable=W0613
+        # pylint: disable=W0613
         try:
             finder = DocTestFinder(skipped=self.skipped)
             if sys.version_info >= (2, 4):
@@ -1446,27 +1444,6 @@ def create_files(paths, chroot):
             os.makedirs(dirpath)
     for filepath in files:
         open(filepath, 'w').close()
-
-def enable_dbc(*args):
-    """
-    Without arguments, return True if contracts can be enabled and should be
-    enabled (see option -d), return False otherwise.
-
-    With arguments, return False if contracts can't or shouldn't be enabled,
-    otherwise weave ContractAspect with items passed as arguments.
-    """
-    if not ENABLE_DBC:
-        return False
-    try:
-        from logilab.aspects.weaver import weaver
-        from logilab.aspects.lib.contracts import ContractAspect
-    except ImportError:
-        sys.stderr.write(
-            'Warning: logilab.aspects is not available. Contracts disabled.')
-        return False
-    for arg in args:
-        weaver.weave_module(arg, ContractAspect)
-    return True
 
 
 class AttrObject: # XXX cf mock_object

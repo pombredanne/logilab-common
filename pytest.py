@@ -110,6 +110,9 @@ pytest --coverage test_foo.py
   (only if logilab.devtools is available)
 """
 
+ENABLE_DBC = False
+FILE_RESTART = ".pytest.restart"
+
 import os, sys, re
 import os.path as osp
 from time import time, clock
@@ -117,9 +120,10 @@ import warnings
 import types
 
 from logilab.common.fileutils import abspath_listdir
+from logilab.common import textutils
 from logilab.common import testlib, STD_BLACKLIST
 # use the same unittest module as testlib
-from logilab.common.testlib import unittest
+from logilab.common.testlib import unittest, start_interactive_mode
 from logilab.common.compat import any
 import doctest
 
@@ -184,9 +188,6 @@ def nocoverage(func):
 
 
 ## end of coverage hacks
-
-
-
 
 
 TESTFILE_RE = re.compile("^((unit)?test.*|smoketest)\.py$")
@@ -382,11 +383,11 @@ class PyTester(object):
                 if self.options.exitfirst and not self.options.restart:
                     # overwrite restart file
                     try:
-                        restartfile = open(testlib.FILE_RESTART, "w")
+                        restartfile = open(FILE_RESTART, "w")
                         restartfile.close()
                     except Exception, e:
                         print >> sys.__stderr__, "Error while overwriting \
-succeeded test file :", osp.join(os.getcwd(), testlib.FILE_RESTART)
+succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
                         raise e
                 # run test and collect information
                 prog = self.testfile(filename, batchmode=True)
@@ -409,11 +410,11 @@ succeeded test file :", osp.join(os.getcwd(), testlib.FILE_RESTART)
         # overwrite restart file if it has not been done already
         if self.options.exitfirst and not self.options.restart and self.firstwrite:
             try:
-                restartfile = open(testlib.FILE_RESTART, "w")
+                restartfile = open(FILE_RESTART, "w")
                 restartfile.close()
             except Exception, e:
                 print >> sys.__stderr__, "Error while overwriting \
-succeeded test file :", osp.join(os.getcwd(), testlib.FILE_RESTART)
+succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
                 raise e
         modname = osp.basename(filename)[:-3]
         try:
@@ -873,13 +874,13 @@ Examples:
             """ Recursive function that removes succTests from
             a TestSuite or TestCase
             """
-            if isinstance(obj, TestSuite):
+            if isinstance(obj, unittest.TestSuite):
                 removeSucceededTests(obj._tests, succTests)
             if isinstance(obj, list):
                 for el in obj[:]:
-                    if isinstance(el, TestSuite):
+                    if isinstance(el, unittest.TestSuite):
                         removeSucceededTests(el, succTests)
-                    elif isinstance(el, TestCase):
+                    elif isinstance(el, unittest.TestCase):
                         descr = '.'.join((el.__class__.__module__,
                                 el.__class__.__name__,
                                 el._testMethodName))
@@ -1176,6 +1177,26 @@ def _ts_wrapped_run(self, result, debug=False, runcondition=None, options=None):
             test.debug()
 
 
+def enable_dbc(*args):
+    """
+    Without arguments, return True if contracts can be enabled and should be
+    enabled (see option -d), return False otherwise.
+
+    With arguments, return False if contracts can't or shouldn't be enabled,
+    otherwise weave ContractAspect with items passed as arguments.
+    """
+    if not ENABLE_DBC:
+        return False
+    try:
+        from logilab.aspects.weaver import weaver
+        from logilab.aspects.lib.contracts import ContractAspect
+    except ImportError:
+        sys.stderr.write(
+            'Warning: logilab.aspects is not available. Contracts disabled.')
+        return False
+    for arg in args:
+        weaver.weave_module(arg, ContractAspect)
+    return True
 
 
 # monkeypatch unittest and doctest (ouch !)
@@ -1183,8 +1204,12 @@ unittest._TextTestResult = testlib.SkipAwareTestResult
 unittest.TextTestRunner = SkipAwareTextTestRunner
 unittest.TestLoader = NonStrictTestLoader
 unittest.TestProgram = SkipAwareTestProgram
+
 if sys.version_info >= (2, 4):
     doctest.DocTestCase.__bases__ = (testlib.TestCase,)
+    # XXX check python2.6 compatibility
+    #doctest.DocTestCase._cleanups = []
+    #doctest.DocTestCase._out = []
 else:
     unittest.FunctionTestCase.__bases__ = (testlib.TestCase,)
 unittest.TestSuite.run = _ts_run
