@@ -126,8 +126,11 @@ class CommandLine(dict):
             self.usage_and_exit(1)
         try:
             sys.exit(command.main_run(args, rcfile))
-        except KeyboardInterrupt:
-            print 'interrupted'
+        except KeyboardInterrupt, exc:
+            print 'Interrupted',
+            if str(exc):
+                print ': %s' % exc,
+            print
             sys.exit(4)
         except BadCommandUsage, err:
             print 'ERROR:', err
