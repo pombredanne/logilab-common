@@ -88,6 +88,9 @@ class Task(object):
     def __cmp__(self, other):
         return cmp(self.priority, other.priority)
 
+    def __lt__(self, other):
+        return self.priority < other.priority
+
     def __eq__(self, other):
         return self.id == other.id
 
