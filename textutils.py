@@ -366,7 +366,7 @@ def pretty_match(match, string, underline_char='^'):
     """return a string with the match location underlined:
 
     >>> import re
-    >>> print pretty_match(re.search('mange', 'il mange du bacon'), 'il mange du bacon')
+    >>> print(pretty_match(re.search('mange', 'il mange du bacon'), 'il mange du bacon'))
     il mange du bacon
        ^^^^^
     >>>
