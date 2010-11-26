@@ -15,12 +15,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
-"""A few useful function/method decorators.
-
-
-
-
-"""
+""" A few useful function/method decorators. """
 __docformat__ = "restructuredtext en"
 
 from types import MethodType
@@ -43,7 +38,11 @@ def cached(callableobj, keyarg=None):
                 value = callableobj(self, *args)
                 setattr(self, cache, value)
                 return value
-        cache_wrapper1.__doc__ = callableobj.__doc__
+        try:
+            cache_wrapper1.__doc__ = callableobj.__doc__
+            cache_wrapper1.func_name = callableobj.func_name
+        except:
+            pass
         return cache_wrapper1
 
     elif keyarg:
@@ -64,7 +63,11 @@ def cached(callableobj, keyarg=None):
                 #print 'miss', self, cache, key
                 _cache[key] = callableobj(self, *args, **kwargs)
             return _cache[key]
-        cache_wrapper2.__doc__ = callableobj.__doc__
+        try:
+            cache_wrapper2.__doc__ = callableobj.__doc__
+            cache_wrapper2.func_name = callableobj.func_name
+        except:
+            pass
         return cache_wrapper2
 
     def cache_wrapper3(self, *args):
@@ -82,7 +85,11 @@ def cached(callableobj, keyarg=None):
             #print 'miss'
             _cache[args] = callableobj(self, *args)
         return _cache[args]
-    cache_wrapper3.__doc__ = callableobj.__doc__
+    try:
+        cache_wrapper3.__doc__ = callableobj.__doc__
+        cache_wrapper3.func_name = callableobj.func_name
+    except:
+        pass
     return cache_wrapper3
 
 def clear_cache(obj, funcname):

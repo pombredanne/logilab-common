@@ -43,7 +43,7 @@ class DecoratorsTC(TestCase):
         inst = MyClass()
         self.assertEqual(inst.foo(4), 16)
 
-    def test_cached_preserves_docstrings(self):
+    def test_cached_preserves_docstrings_and_name(self):
         class Foo(object):
             @cached
             def foo(self):
@@ -55,8 +55,11 @@ class DecoratorsTC(TestCase):
             def quux(self, zogzog):
                 """ what's up doc ? """
         self.assertEqual(Foo.foo.__doc__, """ what's up doc ? """)
+        self.assertEqual(Foo.foo.func_name, 'foo')
         self.assertEqual(Foo.bar.__doc__, """ what's up doc ? """)
+        self.assertEqual(Foo.bar.func_name, 'bar')
         self.assertEqual(Foo.quux.__doc__, """ what's up doc ? """)
+        self.assertEqual(Foo.quux.func_name, 'quux')
 
 if __name__ == '__main__':
     unittest_main()
