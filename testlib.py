@@ -557,8 +557,9 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
                     success = True
                 else:
                     success = False
-                    if status == 2:
-                        result.shouldStop = True
+                    # XXX Don't stop anymore if an error occured
+                    #if status == 2:
+                    #    result.shouldStop = True
                 if result.shouldStop: # either on error or on exitfirst + error
                     break
         except:

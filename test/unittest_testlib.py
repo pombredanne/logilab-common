@@ -338,7 +338,7 @@ class GenerativeTestsTC(TestCase):
                     yield self.assertEqual, i, i
             def ouch(self): raise ValueError('stop !')
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEqual(result.testsRun, 6)
+        self.assertEqual(result.testsRun, 11)
         self.assertEqual(len(result.failures), 0)
         self.assertEqual(len(result.errors), 1)
 
@@ -404,7 +404,7 @@ class GenerativeTestsTC(TestCase):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEqual(result.testsRun, 6)
+        self.assertEqual(result.testsRun, 10)
         self.assertEqual(len(result.failures), 0)
         self.assertEqual(len(result.errors), 1)
         self.assertEqual(len(result.skipped), 0)
