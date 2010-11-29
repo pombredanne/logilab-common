@@ -586,6 +586,9 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         except InnerTestSkipped, e:
             result.addSkip(self, e)
             return 1
+        except SkipTest, e:
+            result.addSkip(self, e)
+            return 0
         except:
             result.addError(self, self.__exc_info())
             return 2

@@ -386,7 +386,7 @@ class GenerativeTestsTC(TestCase):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
-        self.assertEqual(result.testsRun, 6)
+        self.assertEqual(result.testsRun, 10)
         self.assertEqual(len(result.failures), 0)
         self.assertEqual(len(result.errors), 0)
         self.assertEqual(len(result.skipped), 1)
