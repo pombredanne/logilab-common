@@ -43,6 +43,11 @@ class DecoratorsTC(TestCase):
         inst = MyClass()
         self.assertEqual(inst.foo(4), 16)
 
+    def test_cannot_cache_generator(self):
+        def foo():
+            yield 42
+        self.assertRaises(AssertionError, cached, foo)
+
     def test_cached_preserves_docstrings_and_name(self):
         class Foo(object):
             @cached
