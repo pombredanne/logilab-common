@@ -53,7 +53,7 @@ class GetModeTC(TestCase):
 
 class NormReadTC(TestCase):
     def test_known_values_norm_read(self):
-        data = norm_read(NEWLINES_TXT)
+        data = open(NEWLINES_TXT, 'U').read()
         self.assertEqual(data.strip(), '\n'.join(['# mixed new lines', '1', '2', '3']))
 
 
