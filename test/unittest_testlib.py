@@ -29,11 +29,9 @@ try:
 except NameError:
     __file__ = sys.argv[0]
 
-from logilab.common.testlib import unittest, TestSuite, unittest_main
-from logilab.common.testlib import TestCase, Tags
-from logilab.common.testlib import mock_object, create_files
-from logilab.common.testlib import capture_stdout, InnerTest, with_tempdir, tag
-from logilab.common.testlib import require_version, require_module
+from logilab.common.testlib import (unittest, TestSuite, unittest_main, Tags,
+    TestCase, mock_object, create_files, InnerTest, with_tempdir, tag,
+    require_version, require_module)
 from logilab.common.pytest  import SkipAwareTextTestRunner, NonStrictTestLoader
 
 
@@ -629,11 +627,6 @@ class TestLoaderTC(TestCase):
         self.assertRunCount(None, MyMod, 2)
 
 
-def bootstrap_print(msg, output=sys.stdout):
-    """sys.stdout will be evaluated at function parsing time"""
-    # print msg
-    output.write(msg)
-
 class OutErrCaptureTC(TestCase):
 
     def setUp(self):
@@ -644,68 +637,6 @@ class OutErrCaptureTC(TestCase):
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
 
-    @unittest.skipIf(not sys.stdout.isatty(), "need stdout")
-    def test_stdout_capture(self):
-        class FooTC(TestCase):
-            def test_stdout(self):
-                print "foo"
-                self.assert_(False)
-        test = FooTC('test_stdout')
-        result = self.runner.run(test)
-        captured_out, captured_err = test.captured_output()
-        self.assertEqual(captured_out.strip(), "foo")
-        self.assertEqual(captured_err.strip(), "")
-
-    @unittest.skipIf(not sys.stderr.isatty(), "need stderr")
-    def test_stderr_capture(self):
-        class FooTC(TestCase):
-            def test_stderr(self):
-                print >> sys.stderr, "foo"
-                self.assert_(False)
-        test = FooTC('test_stderr')
-        result = self.runner.run(test)
-        captured_out, captured_err = test.captured_output()
-        self.assertEqual(captured_out.strip(), "")
-        self.assertEqual(captured_err.strip(), "foo")
-
-    @unittest.skipIf(not sys.stderr.isatty(), "need stderr")
-    @unittest.skipIf(not sys.stdout.isatty(), "need stdout")
-    def test_both_capture(self):
-        class FooTC(TestCase):
-            def test_stderr(self):
-                print >> sys.stderr, "foo"
-                print "bar"
-                self.assert_(False)
-        test = FooTC('test_stderr')
-        result = self.runner.run(test)
-        captured_out, captured_err = test.captured_output()
-        self.assertEqual(captured_out.strip(), "bar")
-        self.assertEqual(captured_err.strip(), "foo")
-
-    @unittest.skipIf(not sys.stderr.isatty(), "need stderr")
-    @unittest.skipIf(not sys.stdout.isatty(), "need stdout")
-    def test_no_capture(self):
-        class FooTC(TestCase):
-            def test_stderr(self):
-                print >> sys.stderr, "foo"
-                print "bar"
-                self.assert_(False)
-        test = FooTC('test_stderr')
-        # this runner should not capture stdout / stderr
-        runner = SkipAwareTextTestRunner(stream=StringIO(), exitfirst=True)
-        result = runner.run(test)
-        captured_out, captured_err = test.captured_output()
-        self.assertEqual(captured_out.strip(), "")
-        self.assertEqual(captured_err.strip(), "")
-
-    @unittest.skipIf(not sys.stdout.isatty(), "need stdout")
-    def test_capture_core(self):
-        # output = capture_stdout()
-        # bootstrap_print("hello", output=sys.stdout)
-        # self.assertEqual(output.restore(), "hello")
-        output = capture_stdout()
-        bootstrap_print("hello")
-        self.assertEqual(output.restore(), "hello")
 
     def test_unicode_non_ascii_messages(self):
         class FooTC(TestCase):
