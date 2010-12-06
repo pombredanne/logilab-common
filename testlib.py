@@ -886,7 +886,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
     @deprecated('Non-standard: please copy test method to your TestCase class')
     def assertFileEquals(self, fname1, fname2, junk=(' ', '\t')):
         """compares two files using difflib"""
-        self.assertStreamEqual(file(fname1), file(fname2), junk,
+        self.assertStreamEqual(open(fname1), open(fname2), junk,
             msg_prefix='Files differs\n-:%s\n+:%s\n'%(fname1, fname2))
 
     assertFileEqual = assertFileEquals

@@ -189,10 +189,10 @@ class TestlibTC(TestCase):
     def test_stream_equality(self):
         foo = join(dirname(__file__), 'data', 'foo.txt')
         spam = join(dirname(__file__), 'data', 'spam.txt')
-        stream1 = file(foo)
+        stream1 = open(foo)
         self.tc.assertStreamEqual(stream1, stream1)
-        stream1 = file(foo)
-        stream2 = file(spam)
+        stream1 = open(foo)
+        stream2 = open(spam)
         self.assertRaises(AssertionError, self.tc.assertStreamEqual, stream1, stream2)
 
     def test_text_equality(self):
@@ -210,10 +210,10 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, 'toto\ntiti', 'toto\n titi\n')
         foo = join(dirname(__file__), 'data', 'foo.txt')
         spam = join(dirname(__file__), 'data', 'spam.txt')
-        text1 = file(foo).read()
+        text1 = open(foo).read()
         self.tc.assertMultiLineEqual(text1, text1)
         self.tc.assertMultiLineEqual(text1, text1)
-        text2 = file(spam).read()
+        text2 = open(spam).read()
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, text1, text2)
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, text1, text2)
 
