@@ -332,37 +332,11 @@ class SkipAwareTestResult(unittest._TextTestResult):
     def printErrorList(self, flavour, errors):
         for (_, descr), (test, err) in zip(self.descrs_for(flavour), errors):
             self.stream.writeln(self.separator1)
-            if self.colorize:
-                self.stream.writeln("%s: %s" % (
-                    textutils.colorize_ansi(flavour, color='red'), descr))
-            else:
-                self.stream.writeln("%s: %s" % (flavour, descr))
-
+            self.stream.writeln("%s: %s" % (flavour, descr))
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
-            try:
-                output, errput = test.captured_output()
-            except AttributeError:
-                pass # original unittest
-            else:
-                if output:
-                    self.stream.writeln(self.separator2)
-                    self.stream.writeln("captured stdout".center(
-                        len(self.separator2)))
-                    self.stream.writeln(self.separator2)
-                    self.stream.writeln(output)
-                else:
-                    self.stream.writeln('no stdout'.center(
-                        len(self.separator2)))
-                if errput:
-                    self.stream.writeln(self.separator2)
-                    self.stream.writeln("captured stderr".center(
-                        len(self.separator2)))
-                    self.stream.writeln(self.separator2)
-                    self.stream.writeln(errput)
-                else:
-                    self.stream.writeln('no stderr'.center(
-                        len(self.separator2)))
+            self.stream.writeln('no stdout'.center(len(self.separator2)))
+            self.stream.writeln('no stderr'.center(len(self.separator2)))
 
 
 # backward compatibility: TestSuite might be imported from lgc.testlib
@@ -460,8 +434,6 @@ class TestCase(unittest.TestCase):
             # let's give easier access to _testMethodName to every subclasses
             if hasattr(self, "__testMethodName"):
                 self._testMethodName = self.__testMethodName
-        self._captured_stdout = ""
-        self._captured_stderr = ""
         self._current_test_descr = None
         self._options_ = None
 
@@ -497,11 +469,6 @@ class TestCase(unittest.TestCase):
         if self._current_test_descr is not None:
             return self._current_test_descr
         return super(TestCase, self).shortDescription()
-
-
-    def captured_output(self):
-        """return a two tuple with standard output and error stripped"""
-        return self._captured_stdout.strip(), self._captured_stderr.strip()
 
     def quiet_run(self, result, func, *args, **kwargs):
         try:
@@ -784,7 +751,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         self.assertListEqual(lines1, lines2, msg)
     assertLineEqual = assertLinesEquals
 
-    @deprecated('Non-standard')
+    @deprecated('Non-standard: please copy test method to your TestCase class')
     def assertXMLWellFormed(self, stream, msg=None, context=2):
         """asserts the XML stream is well-formed (no DTD conformance check)
 
@@ -809,7 +776,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
                     msg = 'XML stream not well formed: %s\n%s%s' % (ex, line, pointer)
                 self.fail(msg)
 
-    @deprecated('Non-standard')
+    @deprecated('Non-standard: please copy test method to your TestCase class')
     def assertXMLStringWellFormed(self, xml_string, msg=None, context=2):
         """asserts the XML string is well-formed (no DTD conformance check)
 
@@ -873,7 +840,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
                 msg = 'XML stream not well formed: %s\n%s' % (ex, rich_context)
             self.fail(msg)
 
-    @deprecated('Non-standard')
+    @deprecated('Non-standard: please copy test method to your TestCase class')
     def assertXMLEqualsTuple(self, element, tup):
         """compare an ElementTree Element to a tuple formatted as follow:
         (tagname, [attrib[, children[, text[, tail]]]])"""
@@ -946,7 +913,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         self._difftext(lines1, lines2, junk,  msg_prefix)
     assertTextEqual = assertTextEquals
 
-    @deprecated('Non-standard')
+    @deprecated('Non-standard: please copy test method to your TestCase class')
     def assertStreamEquals(self, stream1, stream2, junk=None,
             msg_prefix='Stream differ'):
         """compare two streams (using difflib and readlines())"""
@@ -963,7 +930,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
 
     assertStreamEqual = assertStreamEquals
 
-    @deprecated('Non-standard')
+    @deprecated('Non-standard: please copy test method to your TestCase class')
     def assertFileEquals(self, fname1, fname2, junk=(' ', '\t')):
         """compares two files using difflib"""
         self.assertStreamEqual(file(fname1), file(fname2), junk,
@@ -971,7 +938,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
 
     assertFileEqual = assertFileEquals
 
-    @deprecated('Non-standard')
+    @deprecated('Non-standard: please copy test method to your TestCase class')
     def assertDirEquals(self, path_a, path_b):
         """compares two files using difflib"""
         assert osp.exists(path_a), "%s doesn't exists" % path_a

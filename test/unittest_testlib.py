@@ -76,8 +76,6 @@ class UtilTC(TestCase):
 
 class TestlibTC(TestCase):
 
-    capture = True
-
     def mkdir(self, path):
         if not exists(path):
             self._dirs.add(path)
@@ -605,34 +603,6 @@ class TestLoaderTC(TestCase):
             class MyTestCase(_Base):
                 def test_2(self): pass
         self.assertRunCount(None, MyMod, 2)
-
-
-class OutErrCaptureTC(TestCase):
-
-    def setUp(self):
-        sys.stdout = sys.stderr = StringIO()
-        self.runner = SkipAwareTextTestRunner(stream=StringIO(), exitfirst=True, capture=True)
-
-    def tearDown(self):
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
-
-
-    def test_unicode_non_ascii_messages(self):
-        class FooTC(TestCase):
-            def test_xxx(self):
-                raise Exception(u'\xe9')
-        test = FooTC('test_xxx')
-        # run the test and make sure testlib doesn't raise an exception
-        result = self.runner.run(test)
-
-    def test_encoded_non_ascii_messages(self):
-        class FooTC(TestCase):
-            def test_xxx(self):
-                raise Exception('\xe9')
-        test = FooTC('test_xxx')
-        # run the test and make sure testlib doesn't raise an exception
-        result = self.runner.run(test)
 
 
 class DecoratorTC(TestCase):
