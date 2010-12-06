@@ -25,6 +25,7 @@ additional facilities.
 Command line options:
 
  -v  verbose -- run tests in verbose mode with output to stdout
+ -q  quiet   -- don't print anything except if a test fails
  -t  testdir -- directory where the tests will be found
  -x  exclude -- add a test to exclude
  -p  profile -- profiled execution
@@ -217,8 +218,8 @@ def start_interactive_mode(result):
 
 class SkipAwareTestResult(unittest._TextTestResult):
 
-    def __init__(self, stream, descriptions, verbosity, exitfirst=False,
-                 pdbmode=False, cvg=None):
+    def __init__(self, stream, descriptions, verbosity,
+                 exitfirst=False, pdbmode=False, cvg=None, colorize=False):
         super(SkipAwareTestResult, self).__init__(stream,
                                                   descriptions, verbosity)
         self.skipped = []
@@ -228,6 +229,7 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.exitfirst = exitfirst
         self.pdbmode = pdbmode
         self.cvg = cvg
+        self.colorize = colorize
         self.pdbclass = Debugger
         self.verbose = verbosity > 1
 
@@ -246,6 +248,43 @@ class SkipAwareTestResult(unittest._TextTestResult):
         invalid = lambda fi: osp.abspath(fi[1]) in (lgc_testlib, std_testlib)
         for frameinfo in dropwhile(invalid, frames):
             yield frameinfo
+
+    def _exc_info_to_string(self, err, test):
+        """Converts a sys.exc_info()-style tuple of values into a string.
+
+        This method is overridden here because we want to colorize
+        lines if --color is passed, and display local variables if
+        --verbose is passed
+        """
+        exctype, exc, tb = err
+        output = ['Traceback (most recent call last)']
+        frames = inspect.getinnerframes(tb)
+        colorize = self.colorize
+        frames = enumerate(self._iter_valid_frames(frames))
+        for index, (frame, filename, lineno, funcname, ctx, ctxindex) in frames:
+            filename = osp.abspath(filename)
+            if ctx is None: # pyc files or C extensions for instance
+                source = '<no source available>'
+            else:
+                source = ''.join(ctx)
+            if colorize:
+                filename = textutils.colorize_ansi(filename, 'magenta')
+                source = colorize_source(source)
+            output.append('  File "%s", line %s, in %s' % (filename, lineno, funcname))
+            output.append('    %s' % source.strip())
+            if self.verbose:
+                output.append('%r == %r' % (dir(frame), test.__module__))
+                output.append('')
+                output.append('    ' + ' local variables '.center(66, '-'))
+                for varname, value in sorted(frame.f_locals.items()):
+                    output.append('    %s: %r' % (varname, value))
+                    if varname == 'self': # special handy processing for self
+                        for varname, value in sorted(vars(value).items()):
+                            output.append('      self.%s: %r' % (varname, value))
+                output.append('    ' + '-' * 66)
+                output.append('')
+        output.append(''.join(traceback.format_exception_only(exctype, exc)))
+        return '\n'.join(output)
 
     def addError(self, test, err):
         """err ->  (exc_type, exc, tcbk)"""

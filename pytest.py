@@ -614,6 +614,9 @@ def make_parser():
                       action="callback",
                       help="Restart tests from where it failed (implies exitfirst) "
                         "(only make sense if tests previously ran with exitfirst only)")
+    parser.add_option('--color', callback=rebuild_cmdline,
+                      action="callback",
+                      help="colorize tracebacks")
     parser.add_option('-s', '--skip',
                       # XXX: I wish I could use the callback action but it
                       #      doesn't seem to be able to get the value
@@ -736,6 +739,7 @@ Options:
   -x, --exitfirst  Exit on first failure
   -s, --skip       skip test matching this pattern (no regexp for now)
   -q, --quiet      Minimal output
+  --color          colorize tracebacks
 
   -m, --match      Run only test whose tag match this pattern
 
@@ -765,13 +769,14 @@ Examples:
         self.skipped_patterns = []
         self.test_pattern = None
         self.tags_pattern = None
+        self.colorize = False
         self.profile_name = None
         import getopt
         try:
             options, args = getopt.getopt(argv[1:], 'hHvixrqcp:s:m:P:',
                                           ['help', 'verbose', 'quiet', 'pdb',
                                            'exitfirst', 'restart',
-                                           'skip=', 'match=', 'profile='])
+                                           'skip=', 'color', 'match=', 'profile='])
             for opt, value in options:
                 if opt in ('-h', '-H', '--help'):
                     self.usageExit()
@@ -789,6 +794,8 @@ Examples:
                 if opt in ('-s', '--skip'):
                     self.skipped_patterns = [pat.strip() for pat in
                                              value.split(', ')]
+                if opt == '--color':
+                    self.colorize = True
                 if opt in ('-m', '--match'):
                     #self.tags_pattern = value
                     self.options["tag_pattern"] = value
@@ -833,6 +840,7 @@ Examples:
                                                   cvg=self.cvg,
                                                   test_pattern=self.test_pattern,
                                                   skipped_patterns=self.skipped_patterns,
+                                                  colorize=self.colorize,
                                                   batchmode=self.batchmode,
                                                   options=self.options)
 
@@ -887,9 +895,10 @@ Examples:
 
 class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
-    def __init__(self, stream=sys.stderr, verbosity=1, exitfirst=False,
-                 pdbmode=False, cvg=None, test_pattern=None,
-                 skipped_patterns=(), batchmode=False, options=None):
+    def __init__(self, stream=sys.stderr, verbosity=1,
+                 exitfirst=False, pdbmode=False, cvg=None, test_pattern=None,
+                 skipped_patterns=(), colorize=False, batchmode=False,
+                 options=None):
         super(SkipAwareTextTestRunner, self).__init__(stream=stream,
                                                       verbosity=verbosity)
         self.exitfirst = exitfirst
@@ -897,6 +906,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         self.cvg = cvg
         self.test_pattern = test_pattern
         self.skipped_patterns = skipped_patterns
+        self.colorize = colorize
         self.batchmode = batchmode
         self.options = options
 
@@ -948,7 +958,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
     def _makeResult(self):
         return testlib.SkipAwareTestResult(self.stream, self.descriptions,
                                    self.verbosity, self.exitfirst,
-                                   self.pdbmode, self.cvg)
+                                   self.pdbmode, self.cvg, self.colorize)
 
     def run(self, test):
         "Run the given test case or test suite."
@@ -965,9 +975,15 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                                 (run, run != 1 and "s" or "", timeTaken))
             self.stream.writeln()
             if not result.wasSuccessful():
-                self.stream.write("FAILED")
+                if self.colorize:
+                    self.stream.write(textutils.colorize_ansi("FAILED", color='red'))
+                else:
+                    self.stream.write("FAILED")
             else:
-                self.stream.write("OK")
+                if self.colorize:
+                    self.stream.write(textutils.colorize_ansi("OK", color='green'))
+                else:
+                    self.stream.write("OK")
             failed, errored, skipped = map(len, (result.failures,
                                                  result.errors,
                                                  result.skipped))
