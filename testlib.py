@@ -25,7 +25,6 @@ additional facilities.
 Command line options:
 
  -v  verbose -- run tests in verbose mode with output to stdout
- -q  quiet   -- don't print anything except if a test fails
  -t  testdir -- directory where the tests will be found
  -x  exclude -- add a test to exclude
  -p  profile -- profiled execution
