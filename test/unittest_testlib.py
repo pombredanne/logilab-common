@@ -92,14 +92,14 @@ class TestlibTC(TestCase):
             shutil.rmtree(self._dirs.pop(), ignore_errors=True)
 
     def test_dict_equals(self):
-        """tests TestCase.assertDictEquals"""
+        """tests TestCase.assertDictEqual"""
         d1 = {'a' : 1, 'b' : 2}
         d2 = {'a' : 1, 'b' : 3}
         d3 = dict(d1)
-        self.assertRaises(AssertionError, self.tc.assertDictEquals, d1, d2)
-        self.tc.assertDictEquals(d1, d3)
-        self.tc.assertDictEquals(d3, d1)
-        self.tc.assertDictEquals(d1, d1)
+        self.assertRaises(AssertionError, self.tc.assertDictEqual, d1, d2)
+        self.tc.assertDictEqual(d1, d3)
+        self.tc.assertDictEqual(d3, d1)
+        self.tc.assertDictEqual(d1, d1)
 
     def test_list_equals(self):
         """tests TestCase.assertListEqual"""
@@ -110,25 +110,6 @@ class TestlibTC(TestCase):
         self.tc.assertListEqual(l1, l1)
         self.tc.assertListEqual(l1, l3)
         self.tc.assertListEqual(l3, l1)
-
-    def test_lines_equals(self):
-        """tests assertLineEquals"""
-        t1 = """some
-        text
-"""
-        t2 = """some
-
-        text"""
-        t3 = """some
-        text"""
-        self.assertRaises(AssertionError, self.tc.assertLinesEquals, t1, t2)
-        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, t1, t2)
-        self.tc.assertLinesEquals(t1, t3)
-        self.tc.assertMultiLineEqual(t1, t3 + "\n")
-        self.tc.assertLinesEquals(t3, t1)
-        self.tc.assertMultiLineEqual(t3 + "\n", t1)
-        self.tc.assertLinesEquals(t1, t1)
-        self.tc.assertMultiLineEqual(t1, t1)
 
     def test_xml_valid(self):
         """tests xml is valid"""
@@ -145,25 +126,25 @@ class TestlibTC(TestCase):
     def test_unordered_equality_for_lists(self):
         l1 = [0, 1, 2]
         l2 = [1, 2, 3]
-        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, l1, l2)
         self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
-        self.tc.assertUnorderedIterableEquals(l1, l1)
+        self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
         self.tc.assertItemsEqual(l1, l1)
-        self.tc.assertUnorderedIterableEquals([], [])
+        self.tc.assertItemsEqual(l1, l1)
+        self.tc.assertItemsEqual([], [])
         self.tc.assertItemsEqual([], [])
         l1 = [0, 1, 1]
         l2 = [0, 1]
-        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, l1, l2)
         self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
-        self.tc.assertUnorderedIterableEquals(l1, l1)
+        self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
+        self.tc.assertItemsEqual(l1, l1)
         self.tc.assertItemsEqual(l1, l1)
 
     def test_unordered_equality_for_dicts(self):
         d1 = {'a' : 1, 'b' : 2}
         d2 = {'a' : 1}
-        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, d1, d2)
-        self.tc.assertUnorderedIterableEquals(d1, d1)
-        self.tc.assertUnorderedIterableEquals({}, {})
+        self.assertRaises(AssertionError, self.tc.assertItemsEqual, d1, d2)
+        self.tc.assertItemsEqual(d1, d1)
+        self.tc.assertItemsEqual({}, {})
 
     def test_equality_for_sets(self):
         s1 = set('ab')
@@ -173,11 +154,11 @@ class TestlibTC(TestCase):
         self.tc.assertSetEqual(set(), set())
 
     def test_unordered_equality_for_iterables(self):
-        self.assertRaises(AssertionError, self.tc.assertUnorderedIterableEquals, xrange(5), xrange(6))
         self.assertRaises(AssertionError, self.tc.assertItemsEqual, xrange(5), xrange(6))
-        self.tc.assertUnorderedIterableEquals(xrange(5), range(5))
+        self.assertRaises(AssertionError, self.tc.assertItemsEqual, xrange(5), xrange(6))
         self.tc.assertItemsEqual(xrange(5), range(5))
-        self.tc.assertUnorderedIterableEquals([], ())
+        self.tc.assertItemsEqual(xrange(5), range(5))
+        self.tc.assertItemsEqual([], ())
         self.tc.assertItemsEqual([], ())
 
     def test_file_equality(self):
@@ -198,14 +179,14 @@ class TestlibTC(TestCase):
         for path in (ed1, ed2, join(subdir_differ, 'unexpected')):
             self.mkdir(path)
 
-        self.assertDirEquals(ed1, ed2)
-        self.assertDirEquals(ref, ref)
-        self.assertDirEquals( ref, same)
-        self.assertRaises(AssertionError, self.assertDirEquals, ed1, ref)
-        self.assertRaises(AssertionError, self.assertDirEquals, ref, ed2)
-        self.assertRaises(AssertionError, self.assertDirEquals, subdir_differ, ref)
-        self.assertRaises(AssertionError, self.assertDirEquals, file_differ, ref)
-        self.assertRaises(AssertionError, self.assertDirEquals, ref, content_differ)
+        self.assertDirEqual(ed1, ed2)
+        self.assertDirEqual(ref, ref)
+        self.assertDirEqual( ref, same)
+        self.assertRaises(AssertionError, self.assertDirEqual, ed1, ref)
+        self.assertRaises(AssertionError, self.assertDirEqual, ref, ed2)
+        self.assertRaises(AssertionError, self.assertDirEqual, subdir_differ, ref)
+        self.assertRaises(AssertionError, self.assertDirEqual, file_differ, ref)
+        self.assertRaises(AssertionError, self.assertDirEqual, ref, content_differ)
 
     def test_stream_equality(self):
         foo = join(dirname(__file__), 'data', 'foo.txt')
@@ -217,26 +198,25 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.tc.assertStreamEqual, stream1, stream2)
 
     def test_text_equality(self):
-        self.assertRaises(AssertionError, self.tc.assertTextEqual, "toto", 12)
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, "toto", 12)
-        self.assertRaises(AssertionError, self.tc.assertTextEqual, "toto", None)
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, "toto", 12)
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, "toto", None)
-        self.assertRaises(AssertionError, self.tc.assertTextEqual, 3.12, u"toto")
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, "toto", None)
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, 3.12, u"toto")
-        self.assertRaises(AssertionError, self.tc.assertTextEqual, None, u"toto")
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, 3.12, u"toto")
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, None, u"toto")
-        self.tc.assertTextEqual('toto\ntiti', 'toto\ntiti')
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, None, u"toto")
         self.tc.assertMultiLineEqual('toto\ntiti', 'toto\ntiti')
-        self.tc.assertTextEqual('toto\ntiti', 'toto\n titi\n', striplines=True)
-        self.assertRaises(AssertionError, self.tc.assertTextEqual, 'toto\ntiti', 'toto\n titi\n')
+        self.tc.assertMultiLineEqual('toto\ntiti', 'toto\ntiti')
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, 'toto\ntiti', 'toto\n titi\n')
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, 'toto\ntiti', 'toto\n titi\n')
         foo = join(dirname(__file__), 'data', 'foo.txt')
         spam = join(dirname(__file__), 'data', 'spam.txt')
         text1 = file(foo).read()
-        self.tc.assertTextEqual(text1, text1)
+        self.tc.assertMultiLineEqual(text1, text1)
         self.tc.assertMultiLineEqual(text1, text1)
         text2 = file(spam).read()
-        self.assertRaises(AssertionError, self.tc.assertTextEqual, text1, text2)
+        self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, text1, text2)
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, text1, text2)
 
     def test_assert_raises(self):
@@ -295,12 +275,12 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.assertIsNot, obj_1, obj_1)
 
     def test_none(self):
-        self.assertNone(None)
-        self.assertRaises(AssertionError, self.assertNone, object())
+        self.assertIsNone(None)
+        self.assertRaises(AssertionError, self.assertIsNone, object())
 
     def test_not_none(self):
-        self.assertNotNone(object())
-        self.assertRaises(AssertionError, self.assertNotNone, None)
+        self.assertIsNotNone(object())
+        self.assertRaises(AssertionError, self.assertIsNotNone, None)
 
     def test_in(self):
         self.assertIn("a", "dsqgaqg")
