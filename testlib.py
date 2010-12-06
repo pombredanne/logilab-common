@@ -29,7 +29,6 @@ Command line options:
  -t  testdir -- directory where the tests will be found
  -x  exclude -- add a test to exclude
  -p  profile -- profiled execution
- -c  capture -- capture standard out/err during tests
  -d  dbc     -- enable design-by-contract
  -m  match   -- only run test matching the tag pattern which follow
 
@@ -219,9 +218,8 @@ def start_interactive_mode(result):
 
 class SkipAwareTestResult(unittest._TextTestResult):
 
-    def __init__(self, stream, descriptions, verbosity,
-                 exitfirst=False, capture=0, printonly=None,
-                 pdbmode=False, cvg=None, colorize=False):
+    def __init__(self, stream, descriptions, verbosity, exitfirst=False,
+                 pdbmode=False, cvg=None):
         super(SkipAwareTestResult, self).__init__(stream,
                                                   descriptions, verbosity)
         self.skipped = []
@@ -229,11 +227,8 @@ class SkipAwareTestResult(unittest._TextTestResult):
         self.fail_descrs = []
         self.error_descrs = []
         self.exitfirst = exitfirst
-        self.capture = capture
-        self.printonly = printonly
         self.pdbmode = pdbmode
         self.cvg = cvg
-        self.colorize = colorize
         self.pdbclass = Debugger
         self.verbose = verbosity > 1
 
@@ -252,43 +247,6 @@ class SkipAwareTestResult(unittest._TextTestResult):
         invalid = lambda fi: osp.abspath(fi[1]) in (lgc_testlib, std_testlib)
         for frameinfo in dropwhile(invalid, frames):
             yield frameinfo
-
-    def _exc_info_to_string(self, err, test):
-        """Converts a sys.exc_info()-style tuple of values into a string.
-
-        This method is overridden here because we want to colorize
-        lines if --color is passed, and display local variables if
-        --verbose is passed
-        """
-        exctype, exc, tb = err
-        output = ['Traceback (most recent call last)']
-        frames = inspect.getinnerframes(tb)
-        colorize = self.colorize
-        frames = enumerate(self._iter_valid_frames(frames))
-        for index, (frame, filename, lineno, funcname, ctx, ctxindex) in frames:
-            filename = osp.abspath(filename)
-            if ctx is None: # pyc files or C extensions for instance
-                source = '<no source available>'
-            else:
-                source = ''.join(ctx)
-            if colorize:
-                filename = textutils.colorize_ansi(filename, 'magenta')
-                source = colorize_source(source)
-            output.append('  File "%s", line %s, in %s' % (filename, lineno, funcname))
-            output.append('    %s' % source.strip())
-            if self.verbose:
-                output.append('%r == %r' % (dir(frame), test.__module__))
-                output.append('')
-                output.append('    ' + ' local variables '.center(66, '-'))
-                for varname, value in sorted(frame.f_locals.items()):
-                    output.append('    %s: %r' % (varname, value))
-                    if varname == 'self': # special handy processing for self
-                        for varname, value in sorted(vars(value).items()):
-                            output.append('      self.%s: %r' % (varname, value))
-                output.append('    ' + '-' * 66)
-                output.append('')
-        output.append(''.join(traceback.format_exception_only(exctype, exc)))
-        return '\n'.join(output)
 
     def addError(self, test, err):
         """err ->  (exc_type, exc, tcbk)"""
@@ -420,7 +378,6 @@ def _deprecate(original_func):
 class TestCase(unittest.TestCase):
     """A unittest.TestCase extension with some additional methods."""
     maxDiff = None
-    capture = False
     pdbclass = Debugger
     tags = Tags()
 
@@ -497,9 +454,6 @@ class TestCase(unittest.TestCase):
         if result is None:
             result = self.defaultTestResult()
         result.pdbclass = self.pdbclass
-        # if self.capture is True here, it means it was explicitly specified
-        # in the user's TestCase class. If not, do what was asked on cmd line
-        self.capture = self.capture or getattr(result, 'capture', False)
         self._options_ = options
         # if result.cvg:
         #     result.cvg.start()

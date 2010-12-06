@@ -614,20 +614,6 @@ def make_parser():
                       action="callback",
                       help="Restart tests from where it failed (implies exitfirst) "
                         "(only make sense if tests previously ran with exitfirst only)")
-    parser.add_option('-c', '--capture', callback=capture_and_rebuild,
-                      action="callback",
-                      help="Captures and prints standard out/err only on errors "
-                      "(only make sense when pytest run one test file)")
-    parser.add_option('--color', callback=rebuild_cmdline,
-                      action="callback",
-                      help="colorize tracebacks")
-    parser.add_option('-p', '--printonly',
-                      # XXX: I wish I could use the callback action but it
-                      #      doesn't seem to be able to get the value
-                      #      associated to the option
-                      action="store", dest="printonly", default=None,
-                      help="Only prints lines matching specified pattern (implies capture) "
-                      "(only make sense when pytest run one test file)")
     parser.add_option('-s', '--skip',
                       # XXX: I wish I could use the callback action but it
                       #      doesn't seem to be able to get the value
@@ -676,8 +662,6 @@ def parseargs(parser):
     # someone wants DBC
     testlib.ENABLE_DBC = options.dbc
     newargs = parser.newargs
-    if options.printonly:
-        newargs.extend(['--printonly', options.printonly])
     if options.skipped:
         newargs.extend(['--skip', options.skipped])
     # restart implies exitfirst
@@ -750,12 +734,8 @@ Options:
   -v, --verbose    Verbose output
   -i, --pdb        Enable test failure inspection
   -x, --exitfirst  Exit on first failure
-  -c, --capture    Captures and prints standard out/err only on errors
-  -p, --printonly  Only prints lines matching specified pattern
-                   (implies capture)
   -s, --skip       skip test matching this pattern (no regexp for now)
   -q, --quiet      Minimal output
-  --color          colorize tracebacks
 
   -m, --match      Run only test whose tag match this pattern
 
@@ -782,19 +762,16 @@ Examples:
     def parseArgs(self, argv):
         self.pdbmode = False
         self.exitfirst = False
-        self.capture = 0
-        self.printonly = None
         self.skipped_patterns = []
         self.test_pattern = None
         self.tags_pattern = None
-        self.colorize = False
         self.profile_name = None
         import getopt
         try:
             options, args = getopt.getopt(argv[1:], 'hHvixrqcp:s:m:P:',
                                           ['help', 'verbose', 'quiet', 'pdb',
-                                           'exitfirst', 'restart', 'capture', 'printonly=',
-                                           'skip=', 'color', 'match=', 'profile='])
+                                           'exitfirst', 'restart',
+                                           'skip=', 'match=', 'profile='])
             for opt, value in options:
                 if opt in ('-h', '-H', '--help'):
                     self.usageExit()
@@ -809,23 +786,15 @@ Examples:
                     self.verbosity = 0
                 if opt in ('-v', '--verbose'):
                     self.verbosity = 2
-                if opt in ('-c', '--capture'):
-                    self.capture += 1
-                if opt in ('-p', '--printonly'):
-                    self.printonly = re.compile(value)
                 if opt in ('-s', '--skip'):
                     self.skipped_patterns = [pat.strip() for pat in
                                              value.split(', ')]
-                if opt == '--color':
-                    self.colorize = True
                 if opt in ('-m', '--match'):
                     #self.tags_pattern = value
                     self.options["tag_pattern"] = value
                 if opt in ('-P', '--profile'):
                     self.profile_name = value
             self.testLoader.skipped_patterns = self.skipped_patterns
-            if self.printonly is not None:
-                self.capture += 1
             if len(args) == 0 and self.defaultTest is None:
                 suitefunc = getattr(self.module, 'suite', None)
                 if isinstance(suitefunc, (types.FunctionType,
@@ -860,13 +829,10 @@ Examples:
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
                                                   stream=self.outstream,
                                                   exitfirst=self.exitfirst,
-                                                  capture=self.capture,
-                                                  printonly=self.printonly,
                                                   pdbmode=self.pdbmode,
                                                   cvg=self.cvg,
                                                   test_pattern=self.test_pattern,
                                                   skipped_patterns=self.skipped_patterns,
-                                                  colorize=self.colorize,
                                                   batchmode=self.batchmode,
                                                   options=self.options)
 
@@ -921,21 +887,16 @@ Examples:
 
 class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
-    def __init__(self, stream=sys.stderr, verbosity=1,
-                 exitfirst=False, capture=False, printonly=None,
+    def __init__(self, stream=sys.stderr, verbosity=1, exitfirst=False,
                  pdbmode=False, cvg=None, test_pattern=None,
-                 skipped_patterns=(), colorize=False, batchmode=False,
-                 options=None):
+                 skipped_patterns=(), batchmode=False, options=None):
         super(SkipAwareTextTestRunner, self).__init__(stream=stream,
                                                       verbosity=verbosity)
         self.exitfirst = exitfirst
-        self.capture = capture
-        self.printonly = printonly
         self.pdbmode = pdbmode
         self.cvg = cvg
         self.test_pattern = test_pattern
         self.skipped_patterns = skipped_patterns
-        self.colorize = colorize
         self.batchmode = batchmode
         self.options = options
 
@@ -986,9 +947,8 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
 
     def _makeResult(self):
         return testlib.SkipAwareTestResult(self.stream, self.descriptions,
-                                   self.verbosity, self.exitfirst, self.capture,
-                                   self.printonly, self.pdbmode, self.cvg,
-                                   self.colorize)
+                                   self.verbosity, self.exitfirst,
+                                   self.pdbmode, self.cvg)
 
     def run(self, test):
         "Run the given test case or test suite."
@@ -1005,15 +965,9 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                                 (run, run != 1 and "s" or "", timeTaken))
             self.stream.writeln()
             if not result.wasSuccessful():
-                if self.colorize:
-                    self.stream.write(textutils.colorize_ansi("FAILED", color='red'))
-                else:
-                    self.stream.write("FAILED")
+                self.stream.write("FAILED")
             else:
-                if self.colorize:
-                    self.stream.write(textutils.colorize_ansi("OK", color='green'))
-                else:
-                    self.stream.write("OK")
+                self.stream.write("OK")
             failed, errored, skipped = map(len, (result.failures,
                                                  result.errors,
                                                  result.skipped))
