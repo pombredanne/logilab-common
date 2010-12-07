@@ -11,27 +11,24 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-PACKAGE:=$(shell grep Package debian/control | cut -d ' ' -f2)
-PYDEF:=$(shell py3versions -dv)
-
 include /usr/share/python3/python.mk
 
+PACKAGE:=$(shell grep Package debian/control | cut -d ' ' -f2)
+#PACKAGE:=$(call py_pkgname,$(shell grep Package debian/control | cut -d ' ' -f2), python3.)
 
 %:
 	dh --with python3 --without python2 $@
 
 override_dh_auto_build:
-	# python module build
-	NO_SETUPTOOLS=1 python3 setup.py -q build --build-purelib $(CURDIR)/build/lib
+ifeq (,$(findstring nodoc,$(DEB_BUILD_OPTIONS)))
 	# build doc
 	$(MAKE) -C doc
+endif
 
 override_dh_install:
 	NO_SETUPTOOLS=1 python3 setup.py -q install --no-compile \
 		--root=$(CURDIR)/debian/$(PACKAGE)/ \
 		${py_setup_install_args}
-	# transform python2 sources to python3
-	find $(CURDIR)/debian/$(PACKAGE)/usr/lib/python*/*-packages/ ! -path "*/test/*py" -name "*py" -exec 2to3-$(PYDEF) -wn {} \;
 	# remove test directory
 	rm -rf debian/$(PACKAGE)/usr/lib/python*/*-packages/logilab/common/test
 	# rename pytest for python3k
@@ -41,8 +38,7 @@ override_dh_install:
 	rm -rf debian/$(PACKAGE)/usr/lib/python2.?
 
 override_dh_pysupport:
-	dh_pysupport
-	dh_python3 -V "$(PYDEF)-" --suggests=python3
+	dh_python3 --suggests=python3
 
 override_dh_installdocs:
 	dh_installdocs -i README* doc/apidoc/
@@ -50,11 +46,14 @@ override_dh_installdocs:
 
 override_dh_auto_test:
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
+	# IMPORTANT: Install command was overriden by Logilab to install data test files.
+	NO_SETUPTOOLS=1 python3 setup.py -q install --no-compile \
+	                  --root=$(CURDIR)/testing/ ${py_setup_install_args}
 	# since "logilab.common" is a namespace package, we need to "simulate" it
-	touch $(CURDIR)/build/lib/logilab/__init__.py
+	touch $(CURDIR)/testing/usr/lib/python3/dist-packages/logilab/__init__.py
 	# use the default python version to select the script dir to run the tests
-	-PYTHONPATH=$(CURDIR)/build/lib/ python3 $(shell unit2) -v -s $(CURDIR)/build/lib/logilab/common/test -p '*test*.py'
-	rm -f $(CURDIR)/build/lib/logilab/__init__.py
+	PYTHONPATH=$(CURDIR)/testing/usr/lib/python3/dist-packages/ python3 $(CURDIR)/testing/usr/bin/pytest -t $(CURDIR)/testing/usr/lib/python3/dist-packages/logilab/common/test
+	rm -f $(CURDIR)/testing/usr/lib/python3/dist-packages/logilab/__init__.py
 endif
 
 override_dh_compress:
