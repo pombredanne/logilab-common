@@ -1119,8 +1119,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
             prec = prec*math.fabs(obj)
         self.assert_(math.fabs(obj - other) < prec, msg)
 
-    #@deprecated('[API] Non-standard. Please consider using a context here')
-    def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
+    def failUnlessRaises(self, excClass, callableObj=None, *args, **kwargs):
         """override default failUnlessRaises method to return the raised
         exception instance.
 
@@ -1141,10 +1140,29 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         :param args: a List of arguments for <callableObj>
         :param kwargs: a List of keyword arguments  for <callableObj>
         """
+        # XXX cube vcslib : test_branches_from_app
+        if callableObj is None:
+            _assert = super(TestCase, self).assertRaises
+            return _assert(self, excClass, callableObj, *args, **kwargs)
         try:
             callableObj(*args, **kwargs)
         except excClass, exc:
-            return exc
+            class ProxyException(exc.__class__):
+                def __init__(self, obj):
+                    super(ProxyException, self).__setattr__("_obj", obj)
+                def __getattr__(self, attr):
+                    warn_msg = ("This exception was retrieved with the old testlib way "
+                                "`exc = self.assertRaises(Exc, callable)`, please use "
+                                "the context manager instead'")
+                    warnings.warn(warn_msg, DeprecationWarning, 2)
+                    return self._obj.__getattribute__(attr)
+                def __setattr__(self, attr, value):
+                    warn_msg = ("This exception was retrieved with the old testlib way "
+                                "`exc = self.assertRaises(Exc, callable)`, please use "
+                                "the context manager instead'")
+                    warnings.warn(warn_msg, DeprecationWarning, 2)
+                    return self._obj.__setattr__(attr, value)
+            return ProxyException(exc)
         else:
             if hasattr(excClass, '__name__'):
                 excName = excClass.__name__
