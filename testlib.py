@@ -1040,19 +1040,21 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
 
     @deprecated('Non-standard. Please use assertAlmostEqual instead.')
     def assertFloatAlmostEquals(self, obj, other, prec=1e-5,
-                                relative_prec=1e-5, msg=None):
+                                relative=False, msg=None):
         """compares if two floats have a distance smaller than expected
         precision.
 
         :param obj: a Float
         :param other: another Float to be comparted to <obj>
         :param prec: a Float describing the precision
-        :param relative_prec: a Float describing the relative precision
+        :param relative: boolean switching to relative/absolute precision
         :param msg: a String for a custom message
         """
         if msg is None:
             msg = "%r != %r" % (obj, other)
-        self.assert_(math.fabs(obj - other) < prec+relative_prec*math.fabs(obj), msg)
+        if relative:
+            prec = prec*math.fabs(obj)
+        self.assert_(math.fabs(obj - other) < prec, msg)
 
     #@deprecated('[API] Non-standard. Please consider using a context here')
     def failUnlessRaises(self, excClass, callableObj, *args, **kwargs):
