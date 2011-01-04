@@ -334,10 +334,73 @@ class SkipAwareTestResult(unittest._TextTestResult):
             self.stream.writeln('no stdout'.center(len(self.separator2)))
             self.stream.writeln('no stderr'.center(len(self.separator2)))
 
+# Add deprecation warnings about new api used by module level fixtures in unittest2
+# http://www.voidspace.org.uk/python/articles/unittest2.shtml#setupmodule-and-teardownmodule
+class _DebugResult(object): # simplify import statement among unittest flavors..
+    "Used by the TestSuite to hold previous class when running in debug."
+    _previousTestClass = None
+    _moduleSetUpFailed = False
+    shouldStop = False
+
+from logilab.common.decorators import monkeypatch
+@monkeypatch(unittest.TestSuite)
+def _handleModuleTearDown(self, result):
+    previousModule = self._get_previous_module(result)
+    if previousModule is None:
+        return
+    if result._moduleSetUpFailed:
+        return
+    try:
+        module = sys.modules[previousModule]
+    except KeyError:
+        return
+    # add testlib specific deprecation warning and switch to new api
+    if hasattr(module, 'teardown_module'):
+        warnings.warn('Please rename teardown_module() to tearDownModule() instead.',
+                      DeprecationWarning)
+        setattr(module, 'tearDownModule', module.teardown_module)
+    # end of monkey-patching
+    tearDownModule = getattr(module, 'tearDownModule', None)
+    if tearDownModule is not None:
+        try:
+            tearDownModule()
+        except Exception, e:
+            if isinstance(result, _DebugResult):
+                raise
+            errorName = 'tearDownModule (%s)' % previousModule
+            self._addClassOrModuleLevelException(result, e, errorName)
+
+@monkeypatch(unittest.TestSuite)
+def _handleModuleFixture(self, test, result):
+    previousModule = self._get_previous_module(result)
+    currentModule = test.__class__.__module__
+    if currentModule == previousModule:
+        return
+    self._handleModuleTearDown(result)
+    result._moduleSetUpFailed = False
+    try:
+        module = sys.modules[currentModule]
+    except KeyError:
+        return
+    # add testlib specific deprecation warning and switch to new api
+    if hasattr(module, 'setup_module'):
+        warnings.warn('Please rename setup_module() to setUpModule() instead.',
+                      DeprecationWarning)
+        setattr(module, 'setUpModule', module.setup_module)
+    # end of monkey-patching
+    setUpModule = getattr(module, 'setUpModule', None)
+    if setUpModule is not None:
+        try:
+            setUpModule()
+        except Exception, e:
+            if isinstance(result, _DebugResult):
+                raise
+            result._moduleSetUpFailed = True
+            errorName = 'setUpModule (%s)' % currentModule
+            self._addClassOrModuleLevelException(result, e, errorName)
 
 # backward compatibility: TestSuite might be imported from lgc.testlib
 TestSuite = unittest.TestSuite
-
 
 class keywords(dict):
     """Keyword args (**kwargs) support for generative tests."""

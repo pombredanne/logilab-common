@@ -827,12 +827,6 @@ Examples:
             return self._runTests()
 
     def _runTests(self):
-        if hasattr(self.module, 'setup_module'):
-            try:
-                self.module.setup_module(self.options)
-            except Exception, exc:
-                print 'setup_module error:', exc
-                sys.exit(1)
         self.testRunner = SkipAwareTextTestRunner(verbosity=self.verbosity,
                                                   stream=self.outstream,
                                                   exitfirst=self.exitfirst,
@@ -879,12 +873,6 @@ Examples:
         # help garbage collection: we want TestSuite, which hold refs to every
         # executed TestCase, to be gc'ed
         del self.test
-        if hasattr(self.module, 'teardown_module'):
-            try:
-                self.module.teardown_module(self.options, result)
-            except Exception, exc:
-                print 'teardown_module error:', exc
-                sys.exit(1)
         if getattr(result, "debuggers", None) and \
            getattr(self, "pdbmode", None):
             start_interactive_mode(result)
