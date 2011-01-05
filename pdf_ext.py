@@ -86,7 +86,7 @@ def write_field(out, key, value):
 
 def write_fields(out, fields):
     out.write(HEAD)
-    for (key,value,comment) in fields:
+    for (key, value, comment) in fields:
         write_field(out, key, value)
         write_field(out, key+"a", value) # pour copie-carbone sur autres pages
     out.write(TAIL)

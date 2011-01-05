@@ -78,7 +78,7 @@ class ProgressBarTC(TestCase):
     def test_refresh(self):
         pgb_stream = StringIO()
         expected_stream = StringIO()
-        pgb = ProgressBar(20,stream=pgb_stream)
+        pgb = ProgressBar(20, stream=pgb_stream)
         self.assertEqual(pgb_stream.getvalue(), expected_stream.getvalue()) # nothing print before refresh
         pgb.refresh()
         expected_stream.write("\r["+' '*20+"]")
@@ -87,7 +87,7 @@ class ProgressBarTC(TestCase):
     def test_refresh_g_size(self):
         pgb_stream = StringIO()
         expected_stream = StringIO()
-        pgb = ProgressBar(20,35,stream=pgb_stream)
+        pgb = ProgressBar(20, 35, stream=pgb_stream)
         pgb.refresh()
         expected_stream.write("\r["+' '*35+"]")
         self.assertEqual(pgb_stream.getvalue(), expected_stream.getvalue())
@@ -95,7 +95,7 @@ class ProgressBarTC(TestCase):
     def test_refresh_l_size(self):
         pgb_stream = StringIO()
         expected_stream = StringIO()
-        pgb = ProgressBar(20,3,stream=pgb_stream)
+        pgb = ProgressBar(20, 3, stream=pgb_stream)
         pgb.refresh()
         expected_stream.write("\r["+' '*3+"]")
         self.assertEqual(pgb_stream.getvalue(), expected_stream.getvalue())
@@ -121,25 +121,25 @@ class ProgressBarTC(TestCase):
             self.assertEqual(pgb_stream.getvalue(), expected_stream.getvalue())
 
     def test_default(self):
-        self._update_test(20, xrange(1,21))
+        self._update_test(20, xrange(1, 21))
 
     def test_nbops_gt_size(self):
         """Test the progress bar for nbops > size"""
         def half(total):
-            for counter in range(1,total+1):
+            for counter in range(1, total+1):
                 yield counter // 2
         self._update_test(40, half(40))
 
     def test_nbops_lt_size(self):
         """Test the progress bar for nbops < size"""
         def double(total):
-            for counter in range(1,total+1):
+            for counter in range(1, total+1):
                 yield counter * 2
         self._update_test(10, double(10))
 
     def test_nbops_nomul_size(self):
         """Test the progress bar for size % nbops !=0 (non int number of dots per update)"""
-        self._update_test(3, (6,13,20))
+        self._update_test(3, (6, 13, 20))
 
     def test_overflow(self):
         self._update_test(5, (8, 16, 25, 33, 42, (42, True)), size=42)
@@ -195,43 +195,43 @@ class RawInputTC(TestCase):
 
     def test_ask_default(self):
         self.input_answer = ''
-        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        answer = self.qa.ask('text', ('yes', 'no'), 'yes')
         self.assertEqual(answer, 'yes')
         self.input_answer = '  '
-        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        answer = self.qa.ask('text', ('yes', 'no'), 'yes')
         self.assertEqual(answer, 'yes')
 
     def test_ask_case(self):
         self.input_answer = 'no'
-        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        answer = self.qa.ask('text', ('yes', 'no'), 'yes')
         self.assertEqual(answer, 'no')
         self.input_answer = 'No'
-        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        answer = self.qa.ask('text', ('yes', 'no'), 'yes')
         self.assertEqual(answer, 'no')
         self.input_answer = 'NO'
-        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        answer = self.qa.ask('text', ('yes', 'no'), 'yes')
         self.assertEqual(answer, 'no')
         self.input_answer = 'nO'
-        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        answer = self.qa.ask('text', ('yes', 'no'), 'yes')
         self.assertEqual(answer, 'no')
         self.input_answer = 'YES'
-        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        answer = self.qa.ask('text', ('yes', 'no'), 'yes')
         self.assertEqual(answer, 'yes')
 
     def test_ask_prompt(self):
         self.input_answer = ''
-        answer = self.qa.ask('text', ('yes','no'), 'yes')
+        answer = self.qa.ask('text', ('yes', 'no'), 'yes')
         self.assertEqual(self.input_args[0], 'text [Y(es)/n(o)]: ')
-        answer = self.qa.ask('text', ('y','n'), 'y')
+        answer = self.qa.ask('text', ('y', 'n'), 'y')
         self.assertEqual(self.input_args[0], 'text [Y/n]: ')
-        answer = self.qa.ask('text', ('n','y'), 'y')
+        answer = self.qa.ask('text', ('n', 'y'), 'y')
         self.assertEqual(self.input_args[0], 'text [n/Y]: ')
-        answer = self.qa.ask('text', ('yes','no','maybe','1'), 'yes')
+        answer = self.qa.ask('text', ('yes', 'no', 'maybe', '1'), 'yes')
         self.assertEqual(self.input_args[0], 'text [Y(es)/n(o)/m(aybe)/1]: ')
 
     def test_ask_ambiguous(self):
         self.input_answer = 'y'
-        self.assertRaises(Exception, self.qa.ask, 'text', ('yes','yep'), 'yes')
+        self.assertRaises(Exception, self.qa.ask, 'text', ('yes', 'yep'), 'yes')
 
     def test_confirm(self):
         self.input_answer = 'y'

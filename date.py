@@ -38,52 +38,52 @@ else:
 #       as we have in lgc.db ?
 
 FRENCH_FIXED_HOLIDAYS = {
-    'jour_an'        : '%s-01-01',
-    'fete_travail'   : '%s-05-01',
-    'armistice1945'  : '%s-05-08',
-    'fete_nat'       : '%s-07-14',
-    'assomption'     : '%s-08-15',
-    'toussaint'      : '%s-11-01',
-    'armistice1918'  : '%s-11-11',
-    'noel'           : '%s-12-25',
+    'jour_an': '%s-01-01',
+    'fete_travail': '%s-05-01',
+    'armistice1945': '%s-05-08',
+    'fete_nat': '%s-07-14',
+    'assomption': '%s-08-15',
+    'toussaint': '%s-11-01',
+    'armistice1918': '%s-11-11',
+    'noel': '%s-12-25',
     }
 
 FRENCH_MOBILE_HOLIDAYS = {
-    'paques2004'    : '2004-04-12',
-    'ascension2004' : '2004-05-20',
-    'pentecote2004' : '2004-05-31',
+    'paques2004': '2004-04-12',
+    'ascension2004': '2004-05-20',
+    'pentecote2004': '2004-05-31',
 
-    'paques2005'    : '2005-03-28',
-    'ascension2005' : '2005-05-05',
-    'pentecote2005' : '2005-05-16',
+    'paques2005': '2005-03-28',
+    'ascension2005': '2005-05-05',
+    'pentecote2005': '2005-05-16',
 
-    'paques2006'    : '2006-04-17',
-    'ascension2006' : '2006-05-25',
-    'pentecote2006' : '2006-06-05',
+    'paques2006': '2006-04-17',
+    'ascension2006': '2006-05-25',
+    'pentecote2006': '2006-06-05',
 
-    'paques2007'    : '2007-04-09',
-    'ascension2007' : '2007-05-17',
-    'pentecote2007' : '2007-05-28',
+    'paques2007': '2007-04-09',
+    'ascension2007': '2007-05-17',
+    'pentecote2007': '2007-05-28',
 
-    'paques2008'    : '2008-03-24',
-    'ascension2008' : '2008-05-01',
-    'pentecote2008' : '2008-05-12',
+    'paques2008': '2008-03-24',
+    'ascension2008': '2008-05-01',
+    'pentecote2008': '2008-05-12',
 
-    'paques2009'    : '2009-04-13',
-    'ascension2009' : '2009-05-21',
-    'pentecote2009' : '2009-06-01',
+    'paques2009': '2009-04-13',
+    'ascension2009': '2009-05-21',
+    'pentecote2009': '2009-06-01',
 
-    'paques2010'    : '2010-04-05',
-    'ascension2010' : '2010-05-13',
-    'pentecote2010' : '2010-05-24',
+    'paques2010': '2010-04-05',
+    'ascension2010': '2010-05-13',
+    'pentecote2010': '2010-05-24',
 
-    'paques2011'    : '2011-04-25',
-    'ascension2011' : '2011-06-02',
-    'pentecote2011' : '2011-06-13',
+    'paques2011': '2011-04-25',
+    'ascension2011': '2011-06-02',
+    'pentecote2011': '2011-06-13',
 
-    'paques2012'    : '2012-04-09',
-    'ascension2012' : '2012-05-17',
-    'pentecote2012' : '2012-05-28',
+    'paques2012': '2012-04-09',
+    'ascension2012': '2012-05-17',
+    'pentecote2012': '2012-05-28',
     }
 
 # XXX this implementation cries for multimethod dispatching

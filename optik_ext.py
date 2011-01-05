@@ -318,14 +318,18 @@ class ManHelpFormatter(HelpFormatter):
 ''' % (optstring, help)
 
     def format_head(self, optparser, pkginfo, section=1):
+        long_desc = ""
         try:
             pgm = optparser._get_prog_name()
         except AttributeError:
             # py >= 2.4.X (dunno which X exactly, at least 2)
             pgm = optparser.get_prog_name()
         short_desc = self.format_short_description(pgm, pkginfo.description)
-        return '%s\n%s\n%s' % (self.format_title(pgm, section), short_desc,
-                               self.format_synopsis(pgm))
+        if hasattr(pkginfo, "long_desc"):
+            long_desc = self.format_long_description(pgm, pkginfo.long_desc)
+        return '%s\n%s\n%s\n%s' % (self.format_title(pgm, section),
+                                   short_desc, self.format_synopsis(pgm),
+                                   long_desc)
 
     def format_title(self, pgm, section):
         date = '-'.join([str(num) for num in time.localtime()[:3]])

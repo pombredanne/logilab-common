@@ -1,6 +1,13 @@
 ChangeLog for logilab.common
 ============================
 
+2010-11-15  --  0.53.0
+    * python3.x: first python3.x release
+
+    * __init__: tempattr context manager
+   
+    * shellutils: progress context manager
+
 2010-10-11  --  0.52.1
     * configuration: fix pb with option names as unicode string w/
       python 2.5. Makes OptionError available through the module

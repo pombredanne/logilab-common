@@ -113,8 +113,7 @@ from ConfigParser import ConfigParser, NoOptionError, NoSectionError, \
      DuplicateSectionError
 from warnings import warn
 
-from logilab.common.compat import set, reversed, callable, raw_input
-from logilab.common.compat import str_encode as _encode
+from logilab.common.compat import callable, raw_input, str_encode as _encode
 
 from logilab.common.textutils import normalize_text, unquote
 from logilab.common import optik_ext as optparse
@@ -196,8 +195,8 @@ def bytes_validator(optdict, name, value):
     return optparse.check_bytes(None, name, value)
 
 
-VALIDATORS = {'string' : unquote,
-              'int' : int,
+VALIDATORS = {'string': unquote,
+              'int': int,
               'float': float,
               'file': file_validator,
               'font': unquote,
@@ -341,7 +340,7 @@ def format_option_value(optdict, value):
     if isinstance(value, (list, tuple)):
         value = ','.join(value)
     elif isinstance(value, dict):
-        value = ','.join(['%s:%s' % (k,v) for k,v in value.items()])
+        value = ','.join(['%s:%s' % (k, v) for k, v in value.items()])
     elif hasattr(value, 'match'): # optdict.get('type') == 'regexp'
         # compiled regexp
         value = value.pattern
@@ -400,7 +399,7 @@ def rest_format_section(stream, section, options, encoding=None, doc=None):
         if value:
             value = _encode(format_option_value(optdict, value), encoding)
             print >> stream, ''
-            print >> stream, '  Default: ``%s``' % value.replace("`` ","```` ``")
+            print >> stream, '  Default: ``%s``' % value.replace("`` ", "```` ``")
 
 
 class OptionsManagerMixIn(object):
@@ -815,13 +814,13 @@ class OptionsProviderMixIn(object):
             opt = self.option_name(opt, optdict)
             _list = getattr(self.config, opt, None)
             if _list is None:
-                if type(value) in (type(()), type([])):
+                if isinstance(value, (list, tuple)):
                     _list = value
                 elif value is not None:
                     _list = []
                     _list.append(value)
                 setattr(self.config, opt, _list)
-            elif type(_list) is type(()):
+            elif isinstance(_list, tuple):
                 setattr(self.config, opt, _list + (value,))
             else:
                 _list.append(value)

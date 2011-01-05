@@ -31,7 +31,7 @@ DATA = join(dirname(abspath(__file__)), 'data')
 
 options = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar': '<y or n>'}),
            ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
-           ('multiple', {'type': 'csv', 'default': ('yop','yep'),
+           ('multiple', {'type': 'csv', 'default': ('yop', 'yep'),
                          'metavar': '<comma separated values>',
                          'help': 'you can also document the option'}),
            ('number', {'type': 'int', 'default':2, 'metavar':'<int>', 'help': 'boom'}),
@@ -62,7 +62,7 @@ class ConfigurationTC(TestCase):
         cfg = self.cfg
         self.assertEqual(cfg['dothis'], True)
         self.assertEqual(cfg['value'], None)
-        self.assertEqual(cfg['multiple'], ('yop','yep'))
+        self.assertEqual(cfg['multiple'], ('yop', 'yep'))
         self.assertEqual(cfg['number'], 2)
         self.assertEqual(cfg['choice'], 'yo')
         self.assertEqual(cfg['multiple-choice'], ('yo', 'ye'))
@@ -142,7 +142,7 @@ diffgroup=zou
             self.cfg.load_file_configuration(file)
             self.assertEqual(self.cfg['dothis'], False)
             self.assertEqual(self.cfg['value'], None)
-            self.assertEqual(self.cfg['multiple'], ['yop','yepii'])
+            self.assertEqual(self.cfg['multiple'], ['yop', 'yepii'])
             self.assertEqual(self.cfg['diffgroup'], 'zou')
         finally:
             os.remove(file)

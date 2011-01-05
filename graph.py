@@ -28,7 +28,7 @@ import os.path as osp
 import os
 import sys
 import tempfile
-from logilab.common.compat import sorted, reversed, str_encode
+from logilab.common.compat import str_encode
 
 def escape(value):
     """Make <value> usable in a dot file."""
@@ -106,7 +106,7 @@ class DotBackend:
             ppng, outputfile = tempfile.mkstemp(".png", name)
             os.close(pdot)
             os.close(ppng)
-        pdot = open(dot_sourcepath,'w')
+        pdot = open(dot_sourcepath, 'w')
         pdot.write(str_encode(self.source, 'utf8'))
         pdot.close()
         if target != 'dot':

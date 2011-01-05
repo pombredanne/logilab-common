@@ -27,9 +27,8 @@ except NameError:
 
 from logilab.common.testlib import TestCase as TLTestCase, unittest_main
 from logilab.common import modutils
-from logilab.common.compat import set
 
-from os import path, getcwd
+from os import path, getcwd, sep
 from logilab import common
 from logilab.common import tree
 
@@ -39,7 +38,7 @@ DATADIR = path.join(path.dirname(__file__), 'data')
 
 class TestCase(TLTestCase):
     def setUp(self):
-        super(TestCase,self).setUp()
+        super(TestCase, self).setUp()
         self.__common_in_path = common.__path__[0] in sys.path
         if self.__common_in_path:
             sys.path.remove(common.__path__[0])
@@ -47,19 +46,21 @@ class TestCase(TLTestCase):
     def tearDown(self):
         if self.__common_in_path:
             sys.path.insert(0, common.__path__[0])
-        super(TestCase,self).tearDown()
+        super(TestCase, self).tearDown()
 
-class _module_file_tc(TestCase):
+
+class ModuleFileTC(TestCase):
+    package = "mypypa"
+
     def test_find_zipped_module(self):
-        mtype, mfile = _module_file('mypypa', [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.zip')])
+        mtype, mfile = modutils._module_file([self.package], [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.zip')])
         self.assertEqual(mtype, modutils.ZIPFILE)
-        self.assertEqual(mfile, '')
+        self.assertEqual(mfile.split(sep)[-4:], ["test", "data", "MyPyPa-0.1.0-py2.5.zip", self.package])
 
     def test_find_egg_module(self):
-        mtype, mfile = _module_file('mypypa', [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.egg')])
+        mtype, mfile = modutils._module_file([self.package], [path.join(DATADIR, 'MyPyPa-0.1.0-py2.5.egg')])
         self.assertEqual(mtype, modutils.ZIPFILE)
-        self.assertEqual(mfile, '')
-
+        self.assertEqual(mfile.split(sep)[-4:], ["test", "data", "MyPyPa-0.1.0-py2.5.egg", self.package])
 
 
 class load_module_from_name_tc(TestCase):
@@ -88,8 +89,9 @@ class get_module_part_tc(TestCase):
                          'logilab.common.modutils')
 
     def test_knownValues_get_module_part_3(self):
-        self.assertEqual(modutils.get_module_part('db.get_connexion', modutils.__file__),
-                         'db')
+        """relative import from given file"""
+        self.assertEqual(modutils.get_module_part('interface.Interface',
+                                                  modutils.__file__), 'interface')
 
     def test_knownValues_get_compiled_module_part(self):
         self.assertEqual(modutils.get_module_part('math.log10'), 'math')
@@ -98,6 +100,10 @@ class get_module_part_tc(TestCase):
     def test_knownValues_get_builtin_module_part(self):
         self.assertEqual(modutils.get_module_part('sys.path'), 'sys')
         self.assertEqual(modutils.get_module_part('sys.path', '__file__'), 'sys')
+
+    def test_get_module_part_exception(self):
+        self.assertRaises(ImportError, modutils.get_module_part, 'unknown.module',
+                          modutils.__file__)
 
 
 class modpath_from_file_tc(TestCase):
@@ -155,7 +161,7 @@ class get_source_file_tc(TestCase):
                          path.__file__.replace('.pyc', '.py'))
 
     def test_raise(self):
-        self.assertRaises(modutils.NoSourceFile, modutils.get_source_file,'whatever')
+        self.assertRaises(modutils.NoSourceFile, modutils.get_source_file, 'whatever')
 
 class is_standard_module_tc(TestCase):
     """
@@ -216,11 +222,11 @@ class get_modules_tc(TestCase):
         """
         import data.find_test as data
         mod_path = ("data", 'find_test')
-        modules = modutils.get_modules(path.join(*mod_path), data.__path__[0])
-        modules.sort()
+        modules = sorted(modutils.get_modules(path.join(*mod_path),
+                                              data.__path__[0]))
         self.assertSetEqual(set(modules),
-            set([ '.'.join(mod_path + (mod, )) for mod in 'module', 'module2',
-            'noendingnewline', 'nonregr']))
+            set([ '.'.join(mod_path + (mod, )) for mod in ('module', 'module2',
+            'noendingnewline', 'nonregr')]))
 
 
 class get_modules_files_tc(TestCase):
@@ -230,8 +236,8 @@ class get_modules_files_tc(TestCase):
         in subdirectories
         """
         import data
-        modules = modutils.get_module_files(path.join(DATADIR,'find_test'), data.__path__[0])
-        modules.sort()
+        modules = sorted(modutils.get_module_files(path.join(DATADIR, 'find_test'),
+                                                   data.__path__[0]))
         self.assertEqual(modules,
                          [path.join(DATADIR, 'find_test', x) for x in ['__init__.py', 'module.py', 'module2.py', 'noendingnewline.py', 'nonregr.py']])
 
@@ -240,7 +246,7 @@ class get_modules_files_tc(TestCase):
         import logilab
         del logilab.common.fileutils
         del sys.modules['logilab.common.fileutils']
-        m = modutils.load_module_from_modpath(['logilab','common', 'fileutils'])
+        m = modutils.load_module_from_modpath(['logilab', 'common', 'fileutils'])
         self.assert_( hasattr(logilab, 'common') )
         self.assert_( hasattr(logilab.common, 'fileutils') )
         self.assert_( m is logilab.common.fileutils )

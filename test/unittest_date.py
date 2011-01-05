@@ -40,14 +40,14 @@ class DateTC(TestCase):
 
     def test_day(self):
         """enumerate days"""
-        r = list(date_range(self.datecls(2000,1,1), self.datecls(2000,1,4)))
-        expected = [self.datecls(2000,1,1), self.datecls(2000,1,2), self.datecls(2000,1,3)]
+        r = list(date_range(self.datecls(2000, 1, 1), self.datecls(2000, 1, 4)))
+        expected = [self.datecls(2000, 1, 1), self.datecls(2000, 1, 2), self.datecls(2000, 1, 3)]
         self.assertListEqual(r, expected)
-        r = list(date_range(self.datecls(2000,1,31), self.datecls(2000,2,3)))
-        expected = [self.datecls(2000,1,31), self.datecls(2000,2,1), self.datecls(2000,2,2)]
+        r = list(date_range(self.datecls(2000, 1, 31), self.datecls(2000, 2, 3)))
+        expected = [self.datecls(2000, 1, 31), self.datecls(2000, 2, 1), self.datecls(2000, 2, 2)]
         self.assertListEqual(r, expected)
-        r = list(date_range(self.datecls(2000,1,1), self.datecls(2000,1,6), 2))
-        expected = [self.datecls(2000,1,1), self.datecls(2000,1,3), self.datecls(2000,1,5)]
+        r = list(date_range(self.datecls(2000, 1, 1), self.datecls(2000, 1, 6), 2))
+        expected = [self.datecls(2000, 1, 1), self.datecls(2000, 1, 3), self.datecls(2000, 1, 5)]
         self.assertListEqual(r, expected)
 
     def test_add_days_worked(self):
@@ -147,11 +147,11 @@ class MxDateTC(DateTC):
 
     def test_month(self):
         """enumerate months"""
-        r = list(date_range(self.datecls(2000,1,2), self.datecls(2000,4,4), endOfMonth))
-        expected = [self.datecls(2000,1,2), self.datecls(2000,2,29), self.datecls(2000,3,31)]
+        r = list(date_range(self.datecls(2000, 1, 2), self.datecls(2000, 4, 4), endOfMonth))
+        expected = [self.datecls(2000, 1, 2), self.datecls(2000, 2, 29), self.datecls(2000, 3, 31)]
         self.assertListEqual(r, expected)
-        r = list(date_range(self.datecls(2000,11,30), self.datecls(2001,2,3), endOfMonth))
-        expected = [self.datecls(2000,11,30), self.datecls(2000,12,31), self.datecls(2001,1,31)]
+        r = list(date_range(self.datecls(2000, 11, 30), self.datecls(2001, 2, 3), endOfMonth))
+        expected = [self.datecls(2000, 11, 30), self.datecls(2000, 12, 31), self.datecls(2001, 1, 31)]
         self.assertListEqual(r, expected)
 
 if __name__ == '__main__':

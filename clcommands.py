@@ -126,8 +126,11 @@ class CommandLine(dict):
             self.usage_and_exit(1)
         try:
             sys.exit(command.main_run(args, rcfile))
-        except KeyboardInterrupt:
-            print 'interrupted'
+        except KeyboardInterrupt, exc:
+            print 'Interrupted',
+            if str(exc):
+                print ': %s' % exc,
+            print
             sys.exit(4)
         except BadCommandUsage, err:
             print 'ERROR:', err
@@ -277,8 +280,7 @@ class ListCommandsCommand(Command):
                 print '--help'
                 print '--' + optname
         else:
-            commands = _COMMANDS.keys()
-            commands.sort()
+            commands = sorted(_COMMANDS.keys())
             for command in commands:
                 cmd = _COMMANDS[command]
                 if not cmd.hidden:

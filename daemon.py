@@ -111,7 +111,7 @@ If it i not the case, remove the file %s''' % (self.name, self._pid_file))
         if self.delay < 0:
             self.delay = -self.delay
             time.sleep(self.delay)
-        while 1:
+        while True:
             try:
                 self._run()
             except Exception, ex:
@@ -168,10 +168,10 @@ def print_help(modconfig):
     Defaults to %s""" % (modconfig.LOG_TRESHOLD, modconfig.DELAY)
 
 def handle_option(modconfig, opt_name, opt_value, help_meth):
-    if opt_name in ('-h','--help'):
+    if opt_name in ('-h', '--help'):
         help_meth()
         sys.exit(0)
-    elif opt_name in ('-l','--log'):
+    elif opt_name in ('-l', '--log'):
         modconfig.LOG_TRESHOLD = int(opt_value)
     elif opt_name in ('-d', '--delay'):
         modconfig.DELAY = int(opt_value)
