@@ -27,7 +27,12 @@ import time
 import warnings
 
 
-def daemonize(pidfile=None, uid=None):
+def daemonize(pidfile=None, uid=None, umask=077):
+    """daemonize a Unix process. Set paranoid umask by default.
+
+    Return 1 in the original process, 2 in the first fork, and None for the
+    second fork (eg daemon process).
+    """
     # See http://www.erlenstar.demon.co.uk/unix/faq_toc.html#TOC16
     # XXX unix specific
     #
@@ -40,11 +45,12 @@ def daemonize(pidfile=None, uid=None):
     # as a non-session group leader, we can never regain a controlling
     # terminal.
     if os.fork():   # launch child again.
-        return 1
+        return 2
     # move to the root to avoit mount pb
     os.chdir('/')
-    # set paranoid umask
-    os.umask(077)
+    # set umask if specified
+    if umask is not None:
+        os.umask(umask)
     # redirect standard descriptors
     null = os.open('/dev/null', os.O_RDWR)
     for i in range(3):
