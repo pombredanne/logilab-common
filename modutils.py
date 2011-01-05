@@ -295,7 +295,6 @@ def get_module_part(dotted_name, context_file=None):
     >>> get_module_part('logilab.common.modutils.get_module_part')
     'logilab.common.modutils'
 
-
     :type dotted_name: str
     :param dotted_name: full name of the identifier we are interested in
 
