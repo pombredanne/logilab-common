@@ -217,11 +217,6 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, text1, text2)
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, text1, text2)
 
-    def test_assert_raises(self):
-        exc = self.tc.assertRaises(KeyError, {}.__getitem__, 'foo')
-        self.assertTrue(isinstance(exc, KeyError))
-        self.assertEqual(exc.args, ('foo',))
-
     def test_default_datadir(self):
         expected_datadir = join(dirname(abspath(__file__)), 'data')
         self.assertEqual(self.datadir, expected_datadir)
