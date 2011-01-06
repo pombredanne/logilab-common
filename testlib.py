@@ -1143,25 +1143,19 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         # XXX cube vcslib : test_branches_from_app
         if callableObj is None:
             _assert = super(TestCase, self).assertRaises
-            return _assert(self, excClass, callableObj, *args, **kwargs)
+            return _assert(excClass, callableObj, *args, **kwargs)
         try:
             callableObj(*args, **kwargs)
         except excClass, exc:
-            class ProxyException(exc.__class__):
+            class ProxyException:
                 def __init__(self, obj):
-                    super(ProxyException, self).__setattr__("_obj", obj)
+                    self._obj = obj
                 def __getattr__(self, attr):
                     warn_msg = ("This exception was retrieved with the old testlib way "
                                 "`exc = self.assertRaises(Exc, callable)`, please use "
                                 "the context manager instead'")
                     warnings.warn(warn_msg, DeprecationWarning, 2)
                     return self._obj.__getattribute__(attr)
-                def __setattr__(self, attr, value):
-                    warn_msg = ("This exception was retrieved with the old testlib way "
-                                "`exc = self.assertRaises(Exc, callable)`, please use "
-                                "the context manager instead'")
-                    warnings.warn(warn_msg, DeprecationWarning, 2)
-                    return self._obj.__setattr__(attr, value)
             return ProxyException(exc)
         else:
             if hasattr(excClass, '__name__'):
