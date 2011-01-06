@@ -1125,7 +1125,10 @@ def _ts_wrapped_run(self, result, debug=False, runcondition=None, options=None):
                 continue
 
         if hasattr(test, '_wrapped_run'):
-            test._wrapped_run(result, debug)
+            try:
+                test._wrapped_run(result, debug, runcondition=runcondition, options=options)
+            except TypeError:
+                test._wrapped_run(result, debug)
         elif not debug:
             try:
                 test(result, runcondition, options)
