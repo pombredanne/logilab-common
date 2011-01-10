@@ -107,7 +107,7 @@ def incoming(wdrepo, masterrepo):
         revs, checkout = hg.addbranchrevs(wdrepo, masterrepo, ('', []), None)
         common, incoming, rheads = discovery.findcommonincoming(
             wdrepo, masterrepo, heads=revs)
-        if masterrepo.local():
+        if not masterrepo.local():
             from mercurial import bundlerepo
             if revs is None and masterrepo.capable('changegroupsubset'):
                 revs = rheads
