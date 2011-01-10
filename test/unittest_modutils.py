@@ -25,7 +25,7 @@ try:
 except NameError:
     __file__ = sys.argv[0]
 
-from logilab.common.testlib import TestCase as TLTestCase, unittest_main
+from logilab.common.testlib import TestCase, unittest_main
 from logilab.common import modutils
 
 from os import path, getcwd, sep
@@ -36,9 +36,9 @@ sys.path.insert(0, path.dirname(__file__))
 DATADIR = path.join(path.dirname(__file__), 'data')
 
 
-class TestCase(TLTestCase):
+class ModutilsTestCase(TestCase):
     def setUp(self):
-        super(TestCase, self).setUp()
+        super(ModutilsTestCase, self).setUp()
         self.__common_in_path = common.__path__[0] in sys.path
         if self.__common_in_path:
             sys.path.remove(common.__path__[0])
@@ -46,11 +46,17 @@ class TestCase(TLTestCase):
     def tearDown(self):
         if self.__common_in_path:
             sys.path.insert(0, common.__path__[0])
-        super(TestCase, self).tearDown()
+        super(ModutilsTestCase, self).tearDown()
 
 
-class ModuleFileTC(TestCase):
+class ModuleFileTC(ModutilsTestCase):
     package = "mypypa"
+
+    def setUp(self):
+        super(ModuleFileTC, self).setUp()
+        for k in sys.path_importer_cache.keys():
+            if 'MyPyPa' in k:
+                del sys.path_importer_cache[k]
 
     def test_find_zipped_module(self):
         mtype, mfile = modutils._module_file([self.package], [path.join(DATADIR, 'MyPyPa-0.1.0.zip')])
@@ -63,7 +69,7 @@ class ModuleFileTC(TestCase):
         self.assertEqual(mfile.split(sep)[-4:], ["test", "data", "MyPyPa-0.1.0-py2.5.egg", self.package])
 
 
-class load_module_from_name_tc(TestCase):
+class load_module_from_name_tc(ModutilsTestCase):
     """ load a python module from it's name """
 
     def test_knownValues_load_module_from_name_1(self):
@@ -77,7 +83,7 @@ class load_module_from_name_tc(TestCase):
                           modutils.load_module_from_name, 'os.path', use_sys=0)
 
 
-class get_module_part_tc(TestCase):
+class get_module_part_tc(ModutilsTestCase):
     """given a dotted name return the module part of the name"""
 
     def test_knownValues_get_module_part_1(self):
@@ -106,7 +112,7 @@ class get_module_part_tc(TestCase):
                           modutils.__file__)
 
 
-class modpath_from_file_tc(TestCase):
+class modpath_from_file_tc(ModutilsTestCase):
     """ given an absolute file path return the python module's path as a list """
 
     def test_knownValues_modpath_from_file_1(self):
@@ -122,7 +128,7 @@ class modpath_from_file_tc(TestCase):
         self.assertRaises(Exception, modutils.modpath_from_file, '/turlututu')
 
 
-class file_from_modpath_tc(TestCase):
+class file_from_modpath_tc(ModutilsTestCase):
     """given a mod path (i.e. splited module / package name), return the
     corresponding file, giving priority to source file over precompiled file
     if it exists"""
@@ -153,7 +159,7 @@ class file_from_modpath_tc(TestCase):
     def test_raise_file_from_modpath_Exception(self):
         self.assertRaises(ImportError, modutils.file_from_modpath, ['turlututu'])
 
-class get_source_file_tc(TestCase):
+class get_source_file_tc(ModutilsTestCase):
 
     def test(self):
         from os import path
@@ -163,7 +169,7 @@ class get_source_file_tc(TestCase):
     def test_raise(self):
         self.assertRaises(modutils.NoSourceFile, modutils.get_source_file, 'whatever')
 
-class is_standard_module_tc(TestCase):
+class is_standard_module_tc(ModutilsTestCase):
     """
     return true if the module may be considered as a module from the standard
     library
@@ -201,7 +207,7 @@ class is_standard_module_tc(TestCase):
         self.assertEqual(modutils.is_standard_module('data.module', (path.abspath(DATADIR),)), True)
 
 
-class is_relative_tc(TestCase):
+class is_relative_tc(ModutilsTestCase):
 
 
     def test_knownValues_is_relative_1(self):
@@ -214,7 +220,7 @@ class is_relative_tc(TestCase):
         self.assertEqual(modutils.is_relative('logilab.common.modutils',
                                               common.__path__[0]), False)
 
-class get_modules_tc(TestCase):
+class get_modules_tc(ModutilsTestCase):
 
     def test_knownValues_get_modules_1(self): #  XXXFIXME: TOWRITE
         """given a directory return a list of all available python modules, even
@@ -229,7 +235,7 @@ class get_modules_tc(TestCase):
             'noendingnewline', 'nonregr')]))
 
 
-class get_modules_files_tc(TestCase):
+class get_modules_files_tc(ModutilsTestCase):
 
     def test_knownValues_get_module_files_1(self): #  XXXFIXME: TOWRITE
         """given a directory return a list of all available python module's files, even
