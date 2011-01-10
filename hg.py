@@ -117,7 +117,7 @@ def incoming(wdrepo, masterrepo):
                 cg = masterrepo.changegroupsubset(incoming, revs, 'incoming')
             fname = changegroup.writebundle(cg, None, "HG10UN")
             # use the created uncompressed bundlerepo
-            masterrepo = bundlerepo.bundlerepository(ui, repo.root, fname)
+            masterrepo = bundlerepo.bundlerepository(wdrepo.ui, wdrepo.root, fname)
         return masterrepo.changelog.nodesbetween(incoming, revs)[0]
 
 def outgoing(wdrepo, masterrepo):
