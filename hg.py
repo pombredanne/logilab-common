@@ -108,7 +108,7 @@ def incoming(wdrepo, masterrepo):
         common, incoming, rheads = discovery.findcommonincoming(
             wdrepo, masterrepo, heads=revs)
         if not masterrepo.local():
-            from mercurial import bundlerepo
+            from mercurial import bundlerepo, changegroup
             if revs is None and masterrepo.capable('changegroupsubset'):
                 revs = rheads
             if revs is None:
