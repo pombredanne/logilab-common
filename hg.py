@@ -98,3 +98,22 @@ def get_repository(path):
     if repopath is None:
         raise RuntimeError('no repository found in %s' % osp.abspath(path))
     return Repository(Ui(), path=repopath)
+
+def incoming(wdrepo, masterrepo):
+    try:
+        return wdrepo.findincoming(masterrepo)
+    except AttributeError:
+        from mercurial import hg, discovery
+        revs, checkout = hg.addbranchrevs(wdrepo, masterrepo, ('', []), None)
+        common, incoming, rheads = discovery.findcommonincoming(
+            wdrepo, masterrepo, heads=revs)
+        return masterrepo.changelog.nodesbetween(incoming, revs)[0]
+
+def outgoing(wdrepo, masterrepo):
+    try:
+        return wdrepo.findoutgoing(masterrepo)
+    except AttributeError:
+        from mercurial import hg, discovery
+        revs, checkout = hg.addbranchrevs(wdrepo, wdrepo, ('', []), None)
+        o = discovery.findoutgoing(wdrepo, masterrepo)
+        return wdrepo.changelog.nodesbetween(o, revs)[0]
