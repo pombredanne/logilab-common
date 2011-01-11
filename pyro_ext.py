@@ -62,6 +62,7 @@ def host_and_port(hoststr):
     return hoststr, port
 
 _DAEMONS = {}
+_PYRO_OBJS = {}
 def _get_daemon(daemonhost, start=True):
     if not daemonhost in _DAEMONS:
         if not start:
@@ -98,7 +99,9 @@ def register_object(object, nsid, defaultnsgroup=_MARKER,
     # use Delegation approach
     impl = core.ObjBase()
     impl.delegateTo(object)
-    daemon.connect(impl, '%s.%s' % (nsgroup, nsid))
+    qnsid = '%s.%s' % (nsgroup, nsid)
+    uri = daemon.connect(impl, qnsid)
+    _PYRO_OBJS[qnsid] = uri
     _LOGGER.info('registered %s a pyro object using group %s and id %s',
                  object, nsgroup, nsid)
     return daemon
@@ -119,6 +122,26 @@ def ns_unregister(nsid, defaultnsgroup=_MARKER, nshost=None):
         except errors.NamingError:
             _LOGGER.warning('%s not registered in pyro name server', nsid)
 
+def ns_reregister(nsid, defaultnsgroup=_MARKER, nshost=None):
+    """reregister a pyro object into the name server. You only have to specify
+    the name-server id of the object (though you MUST have gone through
+    `register_object` for the given object previously).
+
+    This is especially useful for long running server while the name server may
+    have been restarted, and its records lost.
+    """
+    nsgroup, nsid = ns_group_and_id(nsid, defaultnsgroup)
+    qnsid = '%s.%s' % (nsgroup, nsid)
+    nsd = locate_ns(nshost)
+    try:
+        nsd.unregister(qnsid)
+    except errors.NamingError:
+        # make sure our namespace group exists
+        try:
+            nsd.createGroup(nsgroup)
+        except errors.NamingError:
+            pass
+    nsd.register(qnsid, _PYRO_OBJS[qnsid])
 
 def ns_get_proxy(nsid, defaultnsgroup=_MARKER, nshost=None):
     nsgroup, nsid = ns_group_and_id(nsid, defaultnsgroup)
