@@ -1,28 +1,30 @@
 ChangeLog for logilab.common
 ============================
 
---
-   * dropped python 2.3 support
+2011-01-12  --  0.54.0
+    * dropped python 2.3 support
 
-   * daemon: we can now specify umask to daemonize function, and it return
+    * daemon: we can now specify umask to daemonize function, and it return
      different exit code according to the process
 
-   * pyro_ext: new ns_reregister function to ensure a name is still properly
+    * pyro_ext: new ns_reregister function to ensure a name is still properly
      registered in the pyro name server
 
-   * hg: new incoming/outgoing functions backward compatible with regards to
+    * hg: new incoming/outgoing functions backward compatible with regards to
      mercurial version (eg hg 1.6 and earlier)
 
-   * testlib/pytest: more deprecation and removed code. Still on the way to
+    * testlib/pytest: more deprecation and removed code. Still on the way to
      unittest2
+
 
 
 2010-11-15  --  0.53.0
     * first python3.x compatible release
 
     * __init__: tempattr context manager
-   
+
     * shellutils: progress context manager
+
 
 
 2010-10-11  --  0.52.1
@@ -34,6 +36,7 @@ ChangeLog for logilab.common
     * compat: dropped some 2.2 compat
 
     * modutils: Consider arch-specific installation for STD_LIB_DIR definition
+
 
 
 2010-09-28  --  0.52.0
