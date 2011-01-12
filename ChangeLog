@@ -2,8 +2,19 @@ ChangeLog for logilab.common
 ============================
 
 --
+   * dropped python 2.3 support
+
    * daemon: we can now specify umask to daemonize function, and it return
      different exit code according to the process
+
+   * pyro_ext: new ns_reregister function to ensure a name is still properly
+     registered in the pyro name server
+
+   * hg: new incoming/outgoing functions backward compatible with regards to
+     mercurial version (eg hg 1.6 and earlier)
+
+   * testlib/pytest: more deprecation and removed code. Still on the way to
+     unittest2
 
 
 2010-11-15  --  0.53.0
