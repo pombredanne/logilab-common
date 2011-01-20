@@ -917,8 +917,8 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                 testname = '%s.%s' % (test.im_class.__name__, func.__name__)
             else:
                 return True # Not sure when this happens
-            if testlib.is_generator(func) and skipgenerator:
-                return self.does_match_tags(func) # Let inner tests decide at run time
+            if testlib.is_generator(test) and skipgenerator:
+                return self.does_match_tags(test) # Let inner tests decide at run time
         if self._this_is_skipped(testname):
             return False # this was explicitly skipped
         if self.test_pattern is not None:
