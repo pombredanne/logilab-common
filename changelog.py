@@ -42,11 +42,8 @@ Each entry contains a set of messages corresponding to changes done in this
 release.
 All the non empty lines before the first entry are considered as the change
 log title.
-
-
-
-
 """
+
 __docformat__ = "restructuredtext en"
 
 import sys
@@ -66,16 +63,21 @@ class Version(tuple):
     """simple class to handle soft version number has a tuple while
     correctly printing it as X.Y.Z
     """
-    def __new__(klass, versionstr):
+    def __new__(cls, versionstr):
         if isinstance(versionstr, basestring):
-            versionstr = versionstr.strip(' :')
-            try:
-                parsed = [int(i) for i in versionstr.split('.')]
-            except ValueError, ex:
-                raise ValueError("invalid literal for version '%s' (%s)"%(versionstr, ex))
+            versionstr = versionstr.strip(' :') # XXX (syt) duh?
+            parsed = cls.parse(versionstr)
         else:
             parsed = versionstr
-        return tuple.__new__(klass, parsed)
+        return tuple.__new__(cls, parsed)
+
+    @classmethod
+    def parse(cls, versionstr):
+        versionstr = versionstr.strip(' :')
+        try:
+            return [int(i) for i in versionstr.split('.')]
+        except ValueError, ex:
+            raise ValueError("invalid literal for version '%s' (%s)"%(versionstr, ex))
 
     def __str__(self):
         return '.'.join([str(i) for i in self])
