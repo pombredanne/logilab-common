@@ -76,7 +76,8 @@ class CommandLine(dict):
       `logging.getLogger(self.pgm))`
     """
     def __init__(self, pgm=None, doc=None, copyright=None, version=None,
-                 rcfile=None, logthreshold=logging.ERROR):
+                 rcfile=None, logthreshold=logging.ERROR,
+                 check_duplicated_command=True):
         if pgm is None:
             pgm = basename(sys.argv[0])
         self.pgm = pgm
@@ -86,9 +87,12 @@ class CommandLine(dict):
         self.rcfile = rcfile
         self.logger = None
         self.logthreshold = logthreshold
+        self.check_duplicated_command = check_duplicated_command
 
-    def register(self, cls):
+    def register(self, cls, force=False):
         """register the given :class:`Command` subclass"""
+        assert not self.check_duplicated_command or force or not cls.name in self, \
+               'a command %s is already defined' % cls.name
         self[cls.name] = cls
 
     def run(self, args):
