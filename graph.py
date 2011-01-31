@@ -165,11 +165,7 @@ class GraphGenerator:
 
 
 class UnorderableGraph(Exception):
-    def __init__(self, cycles):
-        self.cycles = cycles
-
-    def __str__(self):
-        return 'cycles in graph: %s' % self.cycles
+    pass
 
 def ordered_nodes(graph):
     """takes a dependency graph dict as arguments and return an ordered tuple of
@@ -179,24 +175,38 @@ def ordered_nodes(graph):
 
     Also the given graph dict will be emptied.
     """
+    # check graph consistency
     cycles = get_cycles(graph)
     if cycles:
         cycles = '\n'.join([' -> '.join(cycle) for cycle in cycles])
-        raise UnorderableGraph(cycles)
-    ordered = []
+        raise UnorderableGraph('cycles in graph: %s' % cycles)
+    vertices = set(graph)
+    to_vertices = set()
+    for edges in graph.values():
+        to_vertices |= set(edges)
+    missing_vertices = to_vertices - vertices
+    if missing_vertices:
+        raise UnorderableGraph('missing vertices: %s' % ', '.join(missing_vertices))
+    # order vertices
+    order = []
+    order_set = set()
+    old_len = None
     while graph:
-        # sorted to get predictable results
-        for node, deps in sorted(graph.items(), key=id):
-            if not deps:
-                ordered.append(node)
-                del graph[node]
-                for deps in graph.itervalues():
-                    try:
-                        deps.remove(node)
-                    except KeyError:
-                        continue
-    return tuple(reversed(ordered))
-
+        if old_len == len(graph):
+            raise UnorderableGraph('unknown problem with %s' % graph)
+        old_len = len(graph)
+        deps_ok = []
+        for node, node_deps in graph.items():
+            for dep in node_deps:
+                if dep not in order_set:
+                    break
+            else:
+                deps_ok.append(node)
+        order.extend(sorted(deps_ok))
+        order_set |= set(deps_ok)
+        for node in deps_ok:
+            del graph[node]
+    return tuple(order)
 
 
 def get_cycles(graph_dict, vertices=None):

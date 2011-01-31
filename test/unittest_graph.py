@@ -18,7 +18,7 @@
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 
 from logilab.common.testlib import TestCase, unittest_main
-from logilab.common.graph import get_cycles, has_path
+from logilab.common.graph import get_cycles, has_path, ordered_nodes, UnorderableGraph
 
 class getCyclesTC(TestCase):
 
@@ -45,6 +45,42 @@ class hasPathTC(TestCase):
 
     def test_cycle(self):
         self.assertEqual(has_path({'A': ['A']}, 'A', 'B'), None)
+
+class ordered_nodesTC(TestCase):
+
+    def test_one_item(self):
+        graph = {'a':[]}
+        ordered = ordered_nodes(graph)
+        self.assertEqual(ordered, ('a',))
+
+    def test_single_dependency(self):
+        graph = {'a':[], 'b':['a']}
+        ordered = ordered_nodes(graph)
+        self.assertEqual(ordered, ('a','b'))
+
+    def test_two_items_no_dependency(self):
+        graph = {'a':[], 'b':[]}
+        ordered = ordered_nodes(graph)
+        self.assertEqual(ordered, ('a','b'))
+
+    def test_three_items_no_dependency(self):
+        graph = {'a':[], 'b':[], 'c':[]}
+        ordered = ordered_nodes(graph)
+        self.assertEqual(ordered, ('a', 'b', 'c'))
+
+    def test_three_items_one_dependency(self):
+        graph = {'a': ['b'], 'b': [], 'c':[]}
+        ordered = ordered_nodes(graph)
+        self.assertEqual(ordered, ('b', 'c', 'a'))
+
+    def test_three_items_two_dependencies(self):
+        graph = {'a': ['b'], 'b': ['c'], 'c':[]}
+        ordered = ordered_nodes(graph)
+        self.assertEqual(ordered, ('c', 'b', 'a'))
+
+    def test_bad_graph(self):
+        graph = {'a':['b']}
+        self.assertRaises(UnorderableGraph, ordered_nodes, graph)
 
 if __name__ == "__main__":
     unittest_main()
