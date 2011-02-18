@@ -23,7 +23,7 @@ modname = 'common'
 subpackage_of = 'logilab'
 subpackage_master = True
 
-numversion = (0, 54, 1)
+numversion = (0, 55, 0)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'LGPL' # 2.1 or later
@@ -40,4 +40,3 @@ scripts = [join('bin', 'pytest')]
 include_dirs = [join('test', 'data')]
 
 install_requires = ['unittest2 >= 0.5.1']
-
