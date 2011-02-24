@@ -111,13 +111,12 @@ class DotBackend:
         pdot.close()
         if target != 'dot':
             if mapfile:
-                print '%s -Tcmapx -o%s -T%s %s -o%s' % (self.renderer, mapfile,
-                                                        target, dot_sourcepath, outputfile)
-                subprocess.call('%s -Tcmapx -o%s -T%s %s -o%s' % (self.renderer, mapfile,
-                           target, dot_sourcepath, outputfile), shell=True)
+                subprocess.call([self.renderer,  '-Tcmapx', '-o', mapfile, '-T', target, dot_sourcepath, '-o', outputfile],
+                                shell=True)
             else:
-                subprocess.call('%s -T%s %s -o%s' % (self.renderer, target,
-                            dot_sourcepath, outputfile), shell=True)
+                subprocess.call([self.renderer, '-T',  target,
+                                 dot_sourcepath, '-o',  outputfile],
+                                shell=True)
             os.unlink(dot_sourcepath)
         return outputfile
 
