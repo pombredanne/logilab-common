@@ -46,6 +46,7 @@ __docformat__ = "restructuredtext en"
 import sys
 import re
 import os.path as osp
+from warnings import warn
 from unicodedata import normalize as _uninormalize
 try:
     from os import linesep
@@ -71,7 +72,7 @@ MANUAL_UNICODE_MAP = {
     u'\xdf': u'ss',   # LATIN SMALL LETTER SHARP S
     }
 
-def unormalize(ustring, ignorenonascii=False):
+def unormalize(ustring, ignorenonascii=None, substitute=None):
     """replace diacritical characters with their corresponding ascii characters
 
     Convert the unicode string to its long normalized form (unicode character
@@ -79,19 +80,28 @@ def unormalize(ustring, ignorenonascii=False):
     The normal form KD (NFKD) will apply the compatibility decomposition, i.e.
     replace all compatibility characters with their equivalents.
 
+    :type substitute: str
+    :param substitute: replacement character to use if decomposition fails
+
     :see: Another project about ASCII transliterations of Unicode text
           http://pypi.python.org/pypi/Unidecode
     """
+    # backward compatibility, ignorenonascii was a boolean
+    if ignorenonascii is not None:
+        warn("ignorenonascii is deprecated, use substitute named parameter instead",
+             DeprecationWarning, stacklevel=2)
+        if ignorenonascii:
+            substitute = ''
     res = []
     for letter in ustring[:]:
         try:
             replacement = MANUAL_UNICODE_MAP[letter]
         except KeyError:
-            if ord(letter) >= 2**8:
-                if ignorenonascii:
-                    continue
-                raise ValueError("can't deal with non-ascii based characters")
             replacement = _uninormalize('NFKD', letter)[0]
+            if ord(replacement) >= 2 ** 7:
+                if substitute is None:
+                    raise ValueError("can't deal with non-ascii based characters")
+                replacement = substitute
         res.append(replacement)
     return u''.join(res)
 

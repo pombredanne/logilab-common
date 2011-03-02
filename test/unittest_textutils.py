@@ -228,7 +228,7 @@ class ColorizeAnsiTC(TestCase):
 
 
 class UnormalizeTC(TestCase):
-    def test_unormalize(self):
+    def test_unormalize_no_substitute(self):
         data = [(u'\u0153nologie', u'oenologie'),
                 (u'\u0152nologie', u'OEnologie'),
                 (u'l\xf8to', u'loto'),
@@ -236,11 +236,19 @@ class UnormalizeTC(TestCase):
                 (u'àèùéïîôêç', u'aeueiioec'),
                 (u'ÀÈÙÉÏÎÔÊÇ', u'AEUEIIOEC'),
                 (u'\xa0', u' '), # NO-BREAK SPACE managed by NFKD decomposition
+                (u'\u0154', u'R'),
                ]
         for input, output in data:
             yield self.assertEqual, tu.unormalize(input), output
-        self.assertRaises(ValueError, tu.unormalize, u"non ascii char is \u0154",
+
+    def test_unormalize_substitute(self):
+        self.assertEqual(tu.unormalize(u'ab \u8000 cd', substitute='_'),
+                         'ab _ cd')
+
+    def test_unormalize_backward_compat(self):
+        self.assertRaises(ValueError, tu.unormalize, u"\u8000",
                           ignorenonascii=False)
+        self.assertEqual(tu.unormalize(u"\u8000", ignorenonascii=True), u'')
 
 
 class ModuleDocTest(DocTest):
