@@ -110,13 +110,17 @@ class DotBackend:
         pdot.write(str_encode(self.source, 'utf8'))
         pdot.close()
         if target != 'dot':
+            if sys.platform == 'win32':
+                use_shell = True
+            else:
+                use_shell = False
             if mapfile:
                 subprocess.call([self.renderer,  '-Tcmapx', '-o', mapfile, '-T', target, dot_sourcepath, '-o', outputfile],
-                                shell=True)
+                                shell=use_shell)
             else:
                 subprocess.call([self.renderer, '-T',  target,
                                  dot_sourcepath, '-o',  outputfile],
-                                shell=True)
+                                shell=use_shell)
             os.unlink(dot_sourcepath)
         return outputfile
 
