@@ -98,13 +98,15 @@ class Debugger(Pdb):
             while tcbk.tb_next is not None:
                 tcbk = tcbk.tb_next
         self._tcbk = tcbk
-        self._histfile = osp.join(os.environ["HOME"], ".pdbhist")
+        self._histfile = os.path.expanduser("~/.pdbhist")
 
     def setup_history_file(self):
         """if readline is available, read pdb history file
         """
         if readline is not None:
             try:
+                # XXX try..except shouldn't be necessary
+                # read_history_file() can accept None
                 readline.read_history_file(self._histfile)
             except IOError:
                 pass
