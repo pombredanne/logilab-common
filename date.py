@@ -288,3 +288,9 @@ def ustrftime(somedate, fmt='%Y-%m-%d'):
                            'S': somedate.second})
         fmt = re.sub('%([YmdHMS])', r'%(\1)02d', fmt)
         return unicode(fmt) % fields
+
+def utcdatetime(dt):
+    return datetime(*dt.utctimetuple()[:7])
+
+def utctime(dt):
+    return (dt + dt.utcoffset() + dt.dst()).replace(tzinfo=None)
