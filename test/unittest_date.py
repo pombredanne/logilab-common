@@ -18,11 +18,11 @@
 """
 Unittests for date helpers
 """
-from logilab.common.testlib import TestCase, unittest_main
+from logilab.common.testlib import TestCase, unittest_main, tag
 
 from logilab.common.date import date_range, endOfMonth
 from logilab.common.date import add_days_worked, nb_open_days, \
-         get_national_holidays, ustrftime
+         get_national_holidays, ustrftime, ticks2datetime
 
 from datetime import date, datetime, timedelta
 
@@ -127,9 +127,16 @@ class DateTC(TestCase):
     def test_open_days_afternoon(self):
         self.assertOpenDays(self.datetimecls(2008, 5, 6, 14), self.datetimecls(2008, 5, 7, 14), 1)
 
+    @tag('posix', '1900')
     def test_ustrftime_before_1900(self):
         date = self.datetimecls(1328, 3, 12, 6, 30)
         self.assertEqual(ustrftime(date, '%Y-%m-%d %H:%M:%S'), u'1328-03-12 06:30:00')
+
+    @tag('posix', '1900')
+    def test_ticks2datetime_before_1900(self):
+        ticks = -2209075200000
+        date = ticks2datetime(ticks)
+        self.assertEqual(ustrftime(date, '%Y-%m-%d'), u'1899-12-31')
 
 
 class MxDateTC(DateTC):
