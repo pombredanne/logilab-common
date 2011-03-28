@@ -1,4 +1,4 @@
-# copyright 2003-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2011 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -296,7 +296,7 @@ class ListCommandsCommand(Command):
 _COMMANDS = CommandLine()
 
 DEFAULT_COPYRIGHT = '''\
-Copyright (c) 2004-2010 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+Copyright (c) 2004-2011 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 http://www.logilab.fr/ -- mailto:contact@logilab.fr'''
 
 @deprecated('use cls.register(cli)')
