@@ -834,7 +834,6 @@ class OptionsProviderMixIn(object):
         if default is REQUIRED:
             defaultstr = '(required): '
         elif optdict.get('level', 0) > inputlevel:
-            self.set_option(option, default, optdict=optdict)
             return
         elif optdict['type'] == 'password' or default is None:
             defaultstr = ': '
