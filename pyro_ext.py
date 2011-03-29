@@ -82,30 +82,36 @@ def locate_ns(nshost):
 
 
 def register_object(object, nsid, defaultnsgroup=_MARKER,
-                    daemonhost=None, nshost=None):
+                    daemonhost=None, nshost=None, use_pyrons=True):
     """expose the object as a pyro object and register it in the name-server
+
+    if use_pyrons is False, then the object is exposed, but no
+    attempt to register it to a pyro nameserver is made.
 
     return the pyro daemon object
     """
     nsgroup, nsid = ns_group_and_id(nsid, defaultnsgroup)
     daemon = _get_daemon(daemonhost)
-    nsd = locate_ns(nshost)
-    # make sure our namespace group exists
-    try:
-        nsd.createGroup(nsgroup)
-    except errors.NamingError:
-        pass
-    daemon.useNameServer(nsd)
+    if use_pyrons:
+        nsd = locate_ns(nshost)
+        # make sure our namespace group exists
+        try:
+            nsd.createGroup(nsgroup)
+        except errors.NamingError:
+            pass
+        daemon.useNameServer(nsd)
     # use Delegation approach
     impl = core.ObjBase()
     impl.delegateTo(object)
     qnsid = '%s.%s' % (nsgroup, nsid)
     uri = daemon.connect(impl, qnsid)
-    _PYRO_OBJS[qnsid] = uri
+    _PYRO_OBJS[qnsid] = str(uri)
     _LOGGER.info('registered %s a pyro object using group %s and id %s',
                  object, nsgroup, nsid)
     return daemon
 
+def get_object_uri(qnsid):
+    return _PYRO_OBJS[qnsid]
 
 def ns_unregister(nsid, defaultnsgroup=_MARKER, nshost=None):
     """unregister the object with the given nsid from the pyro name server"""
@@ -121,6 +127,7 @@ def ns_unregister(nsid, defaultnsgroup=_MARKER, nshost=None):
             _LOGGER.info('%s unregistered from pyro name server', nsid)
         except errors.NamingError:
             _LOGGER.warning('%s not registered in pyro name server', nsid)
+
 
 def ns_reregister(nsid, defaultnsgroup=_MARKER, nshost=None):
     """reregister a pyro object into the name server. You only have to specify
@@ -144,8 +151,11 @@ def ns_reregister(nsid, defaultnsgroup=_MARKER, nshost=None):
     nsd.register(qnsid, _PYRO_OBJS[qnsid])
 
 def ns_get_proxy(nsid, defaultnsgroup=_MARKER, nshost=None):
-    nsgroup, nsid = ns_group_and_id(nsid, defaultnsgroup)
+    """
+    if nshost is None, the nameserver is found by a broadcast.
+    """
     # resolve the Pyro object
+    nsgroup, nsid = ns_group_and_id(nsid, defaultnsgroup)
     try:
         nsd = locate_ns(nshost)
         pyrouri = nsd.resolve('%s.%s' % (nsgroup, nsid))
@@ -158,6 +168,10 @@ def ns_get_proxy(nsid, defaultnsgroup=_MARKER, nshost=None):
             'you may have to restart your server-side application' % nsid)
     return core.getProxyForURI(pyrouri)
 
+def get_proxy(pyro_uri):
+    """get a proxy for the passed pyro uri without using a nameserver
+    """
+    return core.getProxyForURI(pyro_uri)
 
 def set_pyro_log_threshold(level):
     pyrologger = logging.getLogger('Pyro.%s' % str(id(util.Log)))
