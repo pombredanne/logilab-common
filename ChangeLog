@@ -1,5 +1,9 @@
 ChangeLog for logilab.common
 ============================
+
+	--
+* date: new datetime/delta <-> seconds/days conversion function
+	
 2011-04-01  --  0.55.2
     * new function for password generation in shellutils
 

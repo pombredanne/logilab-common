@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Date manipulation helper functions."""
+from __future__ import division
 
 __docformat__ = "restructuredtext en"
 
@@ -307,3 +308,16 @@ def utcdatetime(dt):
 
 def utctime(dt):
     return (dt + dt.utcoffset() + dt.dst()).replace(tzinfo=None)
+
+def datetime_to_seconds(date):
+    """return the number of seconds since the begining of the day for that date
+    """
+    return date.second+60*date.minute + 3600*date.hour
+
+def timedelta_to_days(delta):
+    """return the time delta as a number of seconds"""
+    return delta.days + delta.seconds / (3600*24)
+
+def timedelta_to_seconds(delta):
+    """return the time delta as a fraction of days"""
+    return delta.days*(3600*24) + delta.seconds
