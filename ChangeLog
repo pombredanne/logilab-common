@@ -2,8 +2,11 @@ ChangeLog for logilab.common
 ============================
 
 	--
-* date: new datetime/delta <-> seconds/days conversion function
-	
+    * date: new datetime/delta <-> seconds/days conversion function
+
+    * decorators: refactored @cached to allow usages such as
+      @cached(cacheattr='_cachename') while keeping bw compat
+
 2011-04-01  --  0.55.2
     * new function for password generation in shellutils
 

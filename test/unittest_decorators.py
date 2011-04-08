@@ -19,7 +19,7 @@
 """
 
 from logilab.common.testlib import TestCase, unittest_main
-from logilab.common.decorators import monkeypatch, cached
+from logilab.common.decorators import monkeypatch, cached, clear_cache
 
 class DecoratorsTC(TestCase):
 
@@ -60,11 +60,47 @@ class DecoratorsTC(TestCase):
             def quux(self, zogzog):
                 """ what's up doc ? """
         self.assertEqual(Foo.foo.__doc__, """ what's up doc ? """)
+        self.assertEqual(Foo.foo.__name__, 'foo')
         self.assertEqual(Foo.foo.func_name, 'foo')
         self.assertEqual(Foo.bar.__doc__, """ what's up doc ? """)
+        self.assertEqual(Foo.bar.__name__, 'bar')
         self.assertEqual(Foo.bar.func_name, 'bar')
         self.assertEqual(Foo.quux.__doc__, """ what's up doc ? """)
+        self.assertEqual(Foo.quux.__name__, 'quux')
         self.assertEqual(Foo.quux.func_name, 'quux')
+
+    def test_cached_single_cache(self):
+        class Foo(object):
+            @cached(cacheattr=u'_foo')
+            def foo(self):
+                """ what's up doc ? """
+        foo = Foo()
+        foo.foo()
+        self.assertTrue(hasattr(foo, '_foo'))
+        clear_cache(foo, 'foo')
+        self.assertFalse(hasattr(foo, '_foo'))
+
+    def test_cached_multi_cache(self):
+        class Foo(object):
+            @cached(cacheattr=u'_foo')
+            def foo(self, args):
+                """ what's up doc ? """
+        foo = Foo()
+        foo.foo(1)
+        self.assertEqual(foo._foo, {(1,): None})
+        clear_cache(foo, 'foo')
+        self.assertFalse(hasattr(foo, '_foo'))
+
+    def test_cached_keyarg_cache(self):
+        class Foo(object):
+            @cached(cacheattr=u'_foo', keyarg=1)
+            def foo(self, other, args):
+                """ what's up doc ? """
+        foo = Foo()
+        foo.foo(2, 1)
+        self.assertEqual(foo._foo, {2: None})
+        clear_cache(foo, 'foo')
+        self.assertFalse(hasattr(foo, '_foo'))
 
 if __name__ == '__main__':
     unittest_main()
