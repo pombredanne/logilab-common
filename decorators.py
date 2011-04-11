@@ -38,7 +38,6 @@ class cached_decorator(object):
             cache = _SingleValueCache(callableobj, self.cacheattr)
         elif self.keyarg:
             cache = _MultiValuesKeyArgCache(callableobj, self.keyarg, self.cacheattr)
-            print 'hop'
         else:
             cache = _MultiValuesCache(callableobj, self.cacheattr)
         return cache.closure()
@@ -119,7 +118,11 @@ def cached(callableobj=None, keyarg=None, **kwargs):
 
 def clear_cache(obj, funcname):
     """Function to clear a cache handled by the cached decorator."""
-    getattr(obj, funcname).clear(obj)
+    cls = obj.__class__
+    member = getattr(cls, funcname)
+    if isinstance(member, property):
+        member = member.fget
+    member.clear(obj)
 
 def copy_cache(obj, funcname, cacheobj):
     """Copy cache for <funcname> from cacheobj to obj."""

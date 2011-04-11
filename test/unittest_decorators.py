@@ -102,5 +102,18 @@ class DecoratorsTC(TestCase):
         clear_cache(foo, 'foo')
         self.assertFalse(hasattr(foo, '_foo'))
 
+    def test_cached_property(self):
+        class Foo(object):
+            @property
+            @cached(cacheattr=u'_foo')
+            def foo(self):
+                """ what's up doc ? """
+        foo = Foo()
+        foo.foo
+        self.assertEqual(foo._foo, None)
+        clear_cache(foo, 'foo')
+        self.assertFalse(hasattr(foo, '_foo'))
+
+
 if __name__ == '__main__':
     unittest_main()
