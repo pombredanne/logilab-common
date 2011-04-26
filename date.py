@@ -304,9 +304,13 @@ def ustrftime(somedate, fmt='%Y-%m-%d'):
         return unicode(fmt) % fields
 
 def utcdatetime(dt):
+    if dt.tzinfo is None:
+        return dt
     return datetime(*dt.utctimetuple()[:7])
 
 def utctime(dt):
+    if dt.tzinfo is None:
+        return dt
     return (dt + dt.utcoffset() + dt.dst()).replace(tzinfo=None)
 
 def datetime_to_seconds(date):
