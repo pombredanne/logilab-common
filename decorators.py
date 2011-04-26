@@ -117,7 +117,13 @@ def cached(callableobj=None, keyarg=None, **kwargs):
         return decorator(callableobj)
 
 def clear_cache(obj, funcname):
-    """Function to clear a cache handled by the cached decorator."""
+    """Clear a cache handled by the :func:`cached` decorator. If 'x' class has
+    @cached on its method `foo`, type
+
+    >>> clear_cache(x, 'foo')
+
+    to purge this method's cache on the instance.
+    """
     cls = obj.__class__
     member = getattr(cls, funcname)
     if isinstance(member, property):
