@@ -19,7 +19,7 @@
 """
 
 from logilab.common.testlib import TestCase, unittest_main
-from logilab.common.decorators import monkeypatch, cached, clear_cache
+from logilab.common.decorators import monkeypatch, cached, clear_cache, copy_cache
 
 class DecoratorsTC(TestCase):
 
@@ -114,6 +114,18 @@ class DecoratorsTC(TestCase):
         clear_cache(foo, 'foo')
         self.assertFalse(hasattr(foo, '_foo'))
 
+    def test_copy_cache(self):
+        class Foo(object):
+            @cached(cacheattr=u'_foo')
+            def foo(self, args):
+                """ what's up doc ? """
+        foo = Foo()
+        foo.foo(1)
+        self.assertEqual(foo._foo, {(1,): None})
+        foo2 = Foo()
+        self.assertFalse(hasattr(foo2, '_foo'))
+        copy_cache(foo2, 'foo', foo)
+        self.assertEqual(foo2._foo, {(1,): None})
 
 if __name__ == '__main__':
     unittest_main()

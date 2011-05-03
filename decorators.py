@@ -62,7 +62,7 @@ class _SingleValueCache(object):
     def closure(self):
         def wrapped(*args, **kwargs):
             return self.__call__(*args, **kwargs)
-        wrapped.clear = self.clear
+        wrapped.cache_obj = self
         try:
             wrapped.__doc__ = self.callable.__doc__
             wrapped.__name__ = self.callable.__name__
@@ -116,6 +116,13 @@ def cached(callableobj=None, keyarg=None, **kwargs):
     else:
         return decorator(callableobj)
 
+def get_cache_impl(obj, funcname):
+    cls = obj.__class__
+    member = getattr(cls, funcname)
+    if isinstance(member, property):
+        member = member.fget
+    return member.cache_obj
+
 def clear_cache(obj, funcname):
     """Clear a cache handled by the :func:`cached` decorator. If 'x' class has
     @cached on its method `foo`, type
@@ -124,17 +131,13 @@ def clear_cache(obj, funcname):
 
     to purge this method's cache on the instance.
     """
-    cls = obj.__class__
-    member = getattr(cls, funcname)
-    if isinstance(member, property):
-        member = member.fget
-    member.clear(obj)
+    get_cache_impl(obj, funcname).clear(obj)
 
 def copy_cache(obj, funcname, cacheobj):
     """Copy cache for <funcname> from cacheobj to obj."""
-    cache = getattr(obj, funcname).cacheattr
+    cacheattr = get_cache_impl(obj, funcname).cacheattr
     try:
-        setattr(obj, cache, cacheobj.__dict__[cache])
+        setattr(obj, cacheattr, cacheobj.__dict__[cacheattr])
     except KeyError:
         pass
 
