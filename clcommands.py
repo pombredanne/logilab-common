@@ -94,6 +94,7 @@ class CommandLine(dict):
         assert not self.check_duplicated_command or force or not cls.name in self, \
                'a command %s is already defined' % cls.name
         self[cls.name] = cls
+        return cls
 
     def run(self, args):
         """main command line access point:
