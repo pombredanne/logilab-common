@@ -1,24 +1,31 @@
 ChangeLog for logilab.common
 ============================
 
-	--
+2011-06-09  --  0.56.0
+    * clcommands: make registration possible by class decoration
+
     * date: new datetime/delta <-> seconds/days conversion function
 
     * decorators: refactored @cached to allow usages such as
       @cached(cacheattr='_cachename') while keeping bw compat
+
+
 
 2011-04-01  --  0.55.2
     * new function for password generation in shellutils
 
     * pyro_ext: allow to create a server without registering with a pyrons
 
-2011-03-28 -- 0.55.1
 
+
+2011-03-28  --  0.55.1
     * fix date.ustrftime break if year <= 1900
 
     * fix graph.py incorrectly builds command lines using %s to call dot
 
     * new functions to get UTC datetime / time
+
+
 
 2011-02-18  --  0.55.0
     * new urllib2ext module providing a GSSAPI authentication handler, based on python-kerberos
