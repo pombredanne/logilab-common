@@ -121,6 +121,7 @@ class CommandLine(dict):
         if rcfile is not None and arg in ('-C', '--rc-file'):
             try:
                 rcfile = args.pop(0)
+                arg = args.pop(0)
             except IndexError:
                 self.usage_and_exit(1)
         try:

@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+2011-08-05  --  0.56.1
+    * clcommands: #72450 --rc-file option doesn't work
+
+
+
 2011-06-09  --  0.56.0
     * clcommands: make registration possible by class decoration
 
