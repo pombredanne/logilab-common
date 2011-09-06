@@ -17,11 +17,45 @@
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """unit tests for the decorators module
 """
+import types
 
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.decorators import monkeypatch, cached, clear_cache, copy_cache
 
 class DecoratorsTC(TestCase):
+
+    def test_monkeypatch_instance_method(self):
+        class MyClass: pass
+        @monkeypatch(MyClass)
+        def meth1(self):
+            return 12
+        class XXX(object):
+            @monkeypatch(MyClass)
+            def meth2(self):
+                return 12
+        self.assertTrue(isinstance(MyClass.meth1, types.MethodType))
+        self.assertTrue(isinstance(MyClass.meth2, types.MethodType))
+
+    def test_monkeypatch_callable_non_callable(self):
+        tester = self
+        class MyClass: pass
+        @monkeypatch(MyClass, methodname='prop1')
+        @property
+        def meth1(self):
+            return 12
+        class XXX(object):
+            def __call__(self, other):
+                tester.assertTrue(isinstance(other, MyClass))
+                return 12
+        try:
+            monkeypatch(MyClass)(XXX())
+        except AttributeError, err:
+            self.assertTrue(str(err).endswith('has no __name__ attribute: you should provide an explicit `methodname`'))
+        monkeypatch(MyClass, 'foo')(XXX())
+        self.assertTrue(isinstance(MyClass.prop1, property))
+        self.assertTrue(callable(MyClass.foo))
+        self.assertEqual(MyClass().prop1, 12)
+        self.assertEqual(MyClass().foo(), 12)
 
     def test_monkeypatch_with_same_name(self):
         class MyClass: pass
