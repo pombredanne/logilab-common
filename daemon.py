@@ -33,13 +33,12 @@ def daemonize(pidfile=None, uid=None, umask=077):
     Return 1 in the original process, 2 in the first fork, and None for the
     second fork (eg daemon process).
     """
-    # See http://www.erlenstar.demon.co.uk/unix/faq_toc.html#TOC16
-    # XXX unix specific
+    # http://www.faqs.org/faqs/unix-faq/programmer/faq/
     #
     # fork so the parent can exit
     if os.fork():   # launch child and...
         return 1
-    # deconnect from tty and create a new session
+    # disconnect from tty and create a new session
     os.setsid()
     # fork again so the parent, (the session group leader), can exit.
     # as a non-session group leader, we can never regain a controlling
