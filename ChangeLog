@@ -1,10 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
-	--
-    * modutils: allow overriding of _getobj by suppressing mangling
+-- <default>
+    * daemon: remove unused(?) DaemonMixin class
 
---
+-- <stable>
+    * modutils: allow overriding of _getobj by suppressing mangling
     * daemon: call initgroups/setgid before setuid
 
 2011-08-05  --  0.56.1
