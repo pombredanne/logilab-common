@@ -1,11 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
-	--
-    * modutils: allow overriding of _getobj by suppressing mangling
-
 --
-    * daemon: call initgroups/setgid before setuid
+    * daemon: call initgroups/setgid before setuid (closes #74173)
+    * decorators: @monkeypatch should produce a method object (closes #73920)
+    * modutils: allow overriding of _getobj by suppressing mangling
 
 2011-08-05  --  0.56.1
     * clcommands: #72450 --rc-file option doesn't work
