@@ -17,6 +17,7 @@
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """logilab.common packaging information"""
 __docformat__ = "restructuredtext en"
+import sys
 
 distname = 'logilab-common'
 modname = 'common'
@@ -39,4 +40,6 @@ from os.path import join
 scripts = [join('bin', 'pytest')]
 include_dirs = [join('test', 'data')]
 
-install_requires = ['unittest2 >= 0.5.1']
+if sys.version_info < (2, 7):
+    install_requires = ['unittest2 >= 0.5.1']
+
