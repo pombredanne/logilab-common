@@ -4,13 +4,14 @@ Priority: optional
 Maintainer: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>
 Uploaders: David Douard <david.douard@logilab.fr>,
 	   Alexandre Fayolle <afayolle@debian.org>,
+	   Alexandre Fayolle <alexandre.fayolle@logilab.fr>,
 	   Sandro Tosi <morph@debian.org>,
 	   Adrien Di Mascio <Adrien.DiMascio@logilab.fr>,
 	   Nicolas Chauvat <nicolas.chauvat@logilab.fr>,
 	   Julien Jehannet <julien.jehannet@debian.org>,
-Build-Depends: debhelper (>= 5.0.38), python (>= 2.4.6-2)
+Build-Depends: debhelper (>= 5.0.38), python (>= 2.5)
 Build-Depends-Indep: python-support, python-epydoc, graphviz, python-egenix-mxdatetime, python-unittest2
-XS-Python-Version: all
+XS-Python-Version: >= 2.5
 Standards-Version: 3.9.1
 Homepage: http://www.logilab.org/project/logilab-common
 Vcs-Svn: svn://svn.debian.org/svn/python-modules/packages/logilab-common/trunk/
