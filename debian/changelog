@@ -1,3 +1,9 @@
+logilab-common (0.56.2-2) unstable; urgency=low
+
+  * depends on python >= 2.5
+
+ -- David Douard <david.douard@logilab.fr>  Wed, 21 Sep 2011 11:55:32 +0200
+
 logilab-common (0.56.2-1) unstable; urgency=low
 
   * new upstream release
