@@ -20,7 +20,7 @@
 2.5, making them available in for earlier versions of python.
 
 See another compatibility snippets from other projects:
-    
+
     :mod:`lib2to3.fixes`
     :mod:`coverage.backward`
     :mod:`unittest2.compatibility`
@@ -51,7 +51,7 @@ else:
     def str_encode(string, encoding):
         return str(string)
 
-# XXX callable builti-in seems back in all python versions
+# XXX callable built-in seems back in all python versions
 try:
     callable = builtins.callable
 except AttributeError:
