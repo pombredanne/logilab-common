@@ -116,6 +116,45 @@ def cached(callableobj=None, keyarg=None, **kwargs):
     else:
         return decorator(callableobj)
 
+
+class cachedproperty(object):
+    """ Provides a cached property equivalent to the stacking of
+    @cached and @property, but more efficient.
+
+    After first usage, the <property_name> becomes part of the object's
+    __dict__. Doing:
+
+      del obj.<property_name> empties the cache.
+
+    Idea taken from the pyramid_ framework and the mercurial_ project.
+
+    .. _pyramid: http://pypi.python.org/pypi/pyramid
+    .. _mercurial: http://pypi.python.org/pypi/Mercurial
+    """
+    __slots__ = ('wrapped',)
+
+    def __init__(self, wrapped):
+        try:
+            wrapped.__name__
+        except AttributeError:
+            raise TypeError('%s must have a __name__ attribute' %
+                            wrapped)
+        self.wrapped = wrapped
+
+    @property
+    def __doc__(self):
+        doc = getattr(self.wrapped, '__doc__', None)
+        return ('<wrapped by the cachedproperty decorator>%s'
+                % ('\n%s' % doc if doc else ''))
+
+    def __get__(self, inst, objtype=None):
+        if inst is None:
+            return self
+        val = self.wrapped(inst)
+        setattr(inst, self.wrapped.__name__, val)
+        return val
+
+
 def get_cache_impl(obj, funcname):
     cls = obj.__class__
     member = getattr(cls, funcname)

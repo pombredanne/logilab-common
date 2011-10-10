@@ -20,7 +20,8 @@
 import types
 
 from logilab.common.testlib import TestCase, unittest_main
-from logilab.common.decorators import monkeypatch, cached, clear_cache, copy_cache
+from logilab.common.decorators import (monkeypatch, cached, clear_cache,
+                                       copy_cache, cachedproperty)
 
 class DecoratorsTC(TestCase):
 
@@ -160,6 +161,41 @@ class DecoratorsTC(TestCase):
         self.assertFalse(hasattr(foo2, '_foo'))
         copy_cache(foo2, 'foo', foo)
         self.assertEqual(foo2._foo, {(1,): None})
+
+
+    def test_cachedproperty(self):
+        class Foo(object):
+            x = 0
+            @cachedproperty
+            def bar(self):
+                self.__class__.x += 1
+                return self.__class__.x
+            @cachedproperty
+            def quux(self):
+                """ some prop """
+                return 42
+
+        foo = Foo()
+        self.assertEqual(Foo.x, 0)
+        self.failIf('bar' in foo.__dict__)
+        self.assertEqual(foo.bar, 1)
+        self.failUnless('bar' in foo.__dict__)
+        self.assertEqual(foo.bar, 1)
+        self.assertEqual(foo.quux, 42)
+        self.assertEqual(Foo.bar.__doc__,
+                         '<wrapped by the cachedproperty decorator>')
+        self.assertEqual(Foo.quux.__doc__,
+                         '<wrapped by the cachedproperty decorator>\n some prop ')
+
+        foo2 = Foo()
+        self.assertEqual(foo2.bar, 2)
+        # make sure foo.foo is cached
+        self.assertEqual(foo.bar, 1)
+
+        class Kallable(object):
+            def __call__(self):
+                return 42
+        self.assertRaises(TypeError, cachedproperty, Kallable())
 
 if __name__ == '__main__':
     unittest_main()
