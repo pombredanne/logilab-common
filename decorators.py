@@ -18,9 +18,9 @@
 """ A few useful function/method decorators. """
 __docformat__ = "restructuredtext en"
 
-import types
-import sys, re
 from time import clock, time
+
+from logilab.common.compat import callable, method_type
 
 # XXX rewrite so we can use the decorator syntax when keyarg has to be specified
 
@@ -175,8 +175,8 @@ class iclassmethod(object):
         self.func = func
     def __get__(self, instance, objtype):
         if instance is None:
-            return types.MethodType(self.func, objtype, objtype.__class__)
-        return types.MethodType(self.func, instance, objtype)
+            return method_type(self.func, objtype, objtype.__class__)
+        return method_type(self.func, instance, objtype)
     def __set__(self, instance, value):
         raise AttributeError("can't set attribute")
 
@@ -234,7 +234,7 @@ def monkeypatch(klass, methodname=None):
                                  'you should provide an explicit `methodname`'
                                  % func)
         if callable(func):
-            setattr(klass, name, types.MethodType(func, None, klass))
+            setattr(klass, name, method_type(func, None, klass))
         else:
             # likely a property
             # this is quite borderline but usage already in the wild ...

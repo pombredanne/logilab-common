@@ -92,6 +92,7 @@ def daemonize(pidfile=None, uid=None, umask=077):
         f = file(pidfile, 'w')
         f.write(str(os.getpid()))
         f.close()
+        os.chmod(pidfile, 0644)
     # change process uid
     if uid:
         setugid(uid)
