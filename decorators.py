@@ -18,6 +18,7 @@
 """ A few useful function/method decorators. """
 __docformat__ = "restructuredtext en"
 
+import sys
 from time import clock, time
 
 from logilab.common.compat import callable, method_type
@@ -272,7 +273,7 @@ def monkeypatch(klass, methodname=None):
             raise AttributeError('%s has no __name__ attribute: '
                                  'you should provide an explicit `methodname`'
                                  % func)
-        if callable(func):
+        if callable(func) and sys.version_info < (3, 0):
             setattr(klass, name, method_type(func, None, klass))
         else:
             # likely a property

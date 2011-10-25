@@ -3,6 +3,8 @@ ChangeLog for logilab.common
 
  --
     * daemon: change $HOME after dropping privileges (closes #81297)
+    * compat: method_type for py3k use instance of the class to have a
+      real instance method (closes: #79268)
 
 2011-10-12  --  0.57.0
     * only install unittest2 when python version < 2.7 (closes: #76068)

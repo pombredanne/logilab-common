@@ -63,7 +63,8 @@ except AttributeError:
 # See also http://bugs.python.org/issue11776
 if sys.version_info[0] == 3:
     def method_type(callable, instance, klass):
-        return types.MethodType(callable, klass)
+        # api change. klass is no more considered
+        return types.MethodType(callable, instance)
 else:
     # alias types otherwise
     method_type = types.MethodType
