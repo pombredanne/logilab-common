@@ -1,4 +1,4 @@
-# copyright 2003-2011 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -43,3 +43,8 @@ include_dirs = [join('test', 'data')]
 if sys.version_info < (2, 7):
     install_requires = ['unittest2 >= 0.5.1']
 
+classifiers = ["Topic :: Utilities",
+               "Programming Language :: Python",
+               "Programming Language :: Python :: 2",
+               "Programming Language :: Python :: 3",
+               ]
