@@ -3,7 +3,7 @@ ChangeLog for logilab.common
 
 	--
     * new `registry` module containing a backport of CubicWeb selectable objects registry (closes #84654)
-
+    * testlib: DocTestCase fix builtins pollution after doctest execution.
 
 2011-10-28  --  0.57.1
     * daemon: change $HOME after dropping privileges (closes #81297)
