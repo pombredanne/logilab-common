@@ -3,6 +3,7 @@ ChangeLog for logilab.common
 
 	-- 
     * texutils: apply_units raise ValueError if string isn'nt valid (closes #88808)
+    * pytest: do not enable extra warning other than DeprecationWarning.
 
 2011-10-28  --  0.57.1
     * daemon: change $HOME after dropping privileges (closes #81297)
