@@ -5,6 +5,7 @@ ChangeLog for logilab.common
     * new `registry` module containing a backport of CubicWeb selectable objects registry (closes #84654)
     * testlib: DocTestCase fix builtins pollution after doctest execution.
     * shellutil: add argument to ``ProgressBar.update`` to tune cursor progression (closes #88981)
+    * deprecated: new DeprecationWrapper class (closes #88942)
 
 	-- #stable
     * texutils: apply_units raise ValueError if string isn'nt valid (closes #88808)
