@@ -62,7 +62,7 @@ if not getattr(unittest_legacy, "__package__", None):
         import unittest2 as unittest
         from unittest2 import SkipTest
     except ImportError:
-        sys.exit("You have to install python-unittest2 to use this module")
+        raise ImportError("You have to install python-unittest2 to use %s" % __name__)
 else:
     import unittest
     from unittest import SkipTest
