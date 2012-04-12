@@ -7,9 +7,22 @@ ChangeLog for logilab.common
     * shellutil: add argument to ``ProgressBar.update`` to tune cursor progression (closes #88981)
     * deprecated: new DeprecationWrapper class (closes #88942)
 
-	-- #stable
+2012-03-22  --  0.57.2
     * texutils: apply_units raise ValueError if string isn'nt valid (closes #88808)
+
+    * daemon: don't call putenv directly
+
     * pytest: do not enable extra warning other than DeprecationWarning.
+
+    * testlib: DocTestCase fix builtins pollution after doctest execution.
+
+    * testlib: replace sys.exit with raise ImportError (closes: #84159)
+
+    * fix license in README
+
+    * add trove classifiers (tell about python 3 support for pypi)
+
+
 
 2011-10-28  --  0.57.1
     * daemon: change $HOME after dropping privileges (closes #81297)
