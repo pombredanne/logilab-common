@@ -79,10 +79,9 @@ import sys
 import types
 import weakref
 from os import listdir, stat
-from os.path import dirname, join, realpath, isdir, exists
+from os.path import join, isdir, exists
 from logging import getLogger
 
-from logilab.common.decorators import classproperty
 from logilab.common.logging_ext import set_log_methods
 
 
@@ -151,6 +150,7 @@ def classid(cls):
     return '%s.%s' % (cls.__module__, cls.__name__)
 
 def class_registries(cls, registryname):
+    """return a tuple of registry names (see __registries__)"""
     if registryname:
         return (registryname,)
     return cls.__registries__
@@ -203,6 +203,8 @@ class Registry(dict):
             raise ObjectNotFound(name), None, sys.exc_info()[-1]
 
     def initialization_completed(self):
+        """call method __registered__() on registered objects when the callback
+        is defined"""
         for objects in self.itervalues():
             for objectcls in objects:
                 registered = getattr(objectcls, '__registered__', None)
@@ -226,6 +228,7 @@ class Registry(dict):
         objects.append(obj)
 
     def register_and_replace(self, obj, replaced):
+        """remove <replaced> and register <obj>"""
         # XXXFIXME this is a duplication of unregister()
         # remove register_and_replace in favor of unregister + register
         # or simplify by calling unregister then register here
@@ -239,11 +242,12 @@ class Registry(dict):
                 del registered_objs[index]
                 break
         else:
-            self.warning('trying to replace an unregistered view %s by %s',
+            self.warning('trying to replace %s that is not registered with %s',
                          replaced, obj)
         self.register(obj)
 
     def unregister(self, obj):
+        """remove object <obj> from this registry"""
         clsid = classid(obj)
         oid = obj.__regid__
         for registered in self.get(oid, ()):
@@ -319,12 +323,12 @@ class Registry(dict):
         (e.g. searching for hooks).
         """
         score, winners = 0, None
-        for object in objects:
-            objectscore = object.__select__(object, *args, **kwargs)
+        for obj in objects:
+            objectscore = obj.__select__(obj, *args, **kwargs)
             if objectscore > score:
-                score, winners = objectscore, [object]
+                score, winners = objectscore, [obj]
             elif objectscore > 0 and objectscore == score:
-                winners.append(object)
+                winners.append(obj)
         if winners is None:
             return None
         if len(winners) > 1:
@@ -339,7 +343,7 @@ class Registry(dict):
 
     # these are overridden by set_log_methods below
     # only defining here to prevent pylint from complaining
-    info = warning = error = critical = exception = debug = lambda msg,*a,**kw: None
+    info = warning = error = critical = exception = debug = lambda msg, *a, **kw: None
 
 
 class RegistryStore(dict):
@@ -465,6 +469,7 @@ class RegistryStore(dict):
         self.debugmode = debugmode
 
     def reset(self):
+        """clear all registries managed by this store"""
         # don't use self.clear, we want to keep existing subdictionaries
         for subdict in self.itervalues():
             subdict.clear()
@@ -485,6 +490,8 @@ class RegistryStore(dict):
     REGISTRY_FACTORY = {None: Registry}
 
     def registry_class(self, regid):
+        """return existing registry named regid or use factory to create one and
+        return it"""
         try:
             return self.REGISTRY_FACTORY[regid]
         except KeyError:
@@ -562,6 +569,9 @@ class RegistryStore(dict):
     # initialization methods ###################################################
 
     def init_registration(self, path, extrapath=None):
+        """reset registry and walk down path to return list of (path, name)
+        file modules to be loaded"""
+        # XXX make this private by renaming it to _init_registration ?
         self.reset()
         # compute list of all modules that have to be loaded
         self._toloadmods, filemods = _toload_info(path, extrapath)
@@ -572,14 +582,17 @@ class RegistryStore(dict):
         return filemods
 
     def register_objects(self, path, extrapath=None):
+        """register all objects found walking down <path>"""
         # load views from each directory in the instance's path
+        # XXX inline init_registration ?
         filemods = self.init_registration(path, extrapath)
         for filepath, modname in filemods:
             self.load_file(filepath, modname)
         self.initialization_completed()
 
     def initialization_completed(self):
-        for regname, reg in self.iteritems():
+        """call initialization_completed() on all known registries"""
+        for reg in self.itervalues():
             reg.initialization_completed()
 
     def _mdate(self, filepath):
@@ -634,6 +647,8 @@ class RegistryStore(dict):
         self.load_module(module)
 
     def load_module(self, module):
+        """load objects from a module using registration_callback() when it exists
+        """
         self.info('loading %s from %s', module.__name__, module.__file__)
         if hasattr(module, 'registration_callback'):
             module.registration_callback(self)
@@ -688,7 +703,7 @@ class RegistryStore(dict):
 
     # these are overridden by set_log_methods below
     # only defining here to prevent pylint from complaining
-    info = warning = error = critical = exception = debug = lambda msg,*a,**kw: None
+    info = warning = error = critical = exception = debug = lambda msg, *a, **kw: None
 
 
 # init logging
@@ -717,7 +732,7 @@ def _lltrace(selector):
     traced.__doc__ = selector.__doc__
     return traced
 
-class traced_selection(object):
+class traced_selection(object): # pylint: disable=C0103
     """
     Typical usage is :
 
@@ -942,7 +957,7 @@ class NotPredicate(Predicate):
         return 'NOT(%s)' % self.selector
 
 
-class yes(Predicate):
+class yes(Predicate): # pylint: disable=C0103
     """Return the score given as parameter, with a default score of 0.5 so any
     other selector take precedence.
 
