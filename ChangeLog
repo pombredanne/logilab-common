@@ -1,6 +1,16 @@
 ChangeLog for logilab.common
 ============================
 
+2012-04-12  -- 0.58.0
+    * new `registry` module containing a backport of CubicWeb selectable objects registry (closes #84654)
+
+    * testlib: DocTestCase fix builtins pollution after doctest execution.
+
+    * shellutil: add argument to ``ProgressBar.update`` to tune cursor progression (closes #88981)
+
+    * deprecated: new DeprecationWrapper class (closes #88942)
+
+
 2012-03-22  --  0.57.2
     * texutils: apply_units raise ValueError if string isn'nt valid (closes #88808)
 
@@ -12,7 +22,7 @@ ChangeLog for logilab.common
 
     * testlib: replace sys.exit with raise ImportError (closes: #84159)
 
-    * fix license in README 
+    * fix license in README
 
     * add trove classifiers (tell about python 3 support for pypi)
 
