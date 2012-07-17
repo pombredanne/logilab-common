@@ -1,10 +1,12 @@
 ChangeLog for logilab.common
 ============================
 
---
+2012-07-17  --  0.58.1
     * modutils, testlib: be more python implementation independant (closes #99493 and #99627)
 
-2012-04-12  -- 0.58.0
+
+
+2012-04-12  --  0.58.0
     * new `registry` module containing a backport of CubicWeb selectable objects registry (closes #84654)
 
     * testlib: DocTestCase fix builtins pollution after doctest execution.
@@ -12,6 +14,7 @@ ChangeLog for logilab.common
     * shellutil: add argument to ``ProgressBar.update`` to tune cursor progression (closes #88981)
 
     * deprecated: new DeprecationWrapper class (closes #88942)
+
 
 
 2012-03-22  --  0.57.2
