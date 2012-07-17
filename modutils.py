@@ -34,6 +34,7 @@ import os
 from os.path import splitext, join, abspath, isdir, dirname, exists, basename
 from imp import find_module, load_module, C_BUILTIN, PY_COMPILED, PKG_DIRECTORY
 from distutils.sysconfig import get_config_var, get_python_lib, get_python_version
+from distutils.errors import DistutilsPlatformError
 
 try:
     import zipimport
@@ -53,12 +54,18 @@ from logilab.common import STD_BLACKLIST, _handle_blacklist
 if sys.platform.startswith('win'):
     PY_SOURCE_EXTS = ('py', 'pyw')
     PY_COMPILED_EXTS = ('dll', 'pyd')
-    STD_LIB_DIR = get_python_lib(standard_lib=1)
 else:
     PY_SOURCE_EXTS = ('py',)
     PY_COMPILED_EXTS = ('so',)
-    # extend lib dir with some arch-dependant paths
-    STD_LIB_DIR = join(get_config_var("LIBDIR"), "python%s" % get_python_version())
+
+try:
+    STD_LIB_DIR = get_python_lib(standard_lib=1)
+# get_python_lib(standard_lib=1) is not available on pypy, set STD_LIB_DIR to
+# non-valid path, see https://bugs.pypy.org/issue1164
+except DistutilsPlatformError:
+    STD_LIB_DIR = '//'
+
+EXT_LIB_DIR = get_python_lib()
 
 BUILTIN_MODULES = dict(zip(sys.builtin_module_names,
                            [1]*len(sys.builtin_module_names)))
@@ -231,8 +238,7 @@ def modpath_from_file(filename, extrapath=None):
     for path in sys.path:
         path = abspath(path)
         if path and base[:len(path)] == path:
-            if filename.find('site-packages') != -1 and \
-                   path.find('site-packages') == -1:
+            if path.startswith(EXT_LIB_DIR):
                 continue
             modpath = [pkg for pkg in base[len(path):].split(os.sep) if pkg]
             if _check_init(path, modpath[:-1]):
@@ -493,13 +499,11 @@ def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
     if filename is None:
         return 1
     filename = abspath(filename)
+    if filename.startswith(EXT_LIB_DIR):
+        return 0
     for path in std_path:
-        path = abspath(path)
-        if filename.startswith(path):
-            pfx_len = len(path)
-            if filename[pfx_len+1:pfx_len+14] != 'site-packages':
-                return 1
-            return 0
+        if filename.startswith(abspath(path)):
+            return 1
     return False
 
 

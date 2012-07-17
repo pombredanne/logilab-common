@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+	--
+* modutils: be more python implementation independant (closes #99493)
+
 2012-04-12  -- 0.58.0
     * new `registry` module containing a backport of CubicWeb selectable objects registry (closes #84654)
 

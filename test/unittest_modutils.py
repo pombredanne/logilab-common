@@ -175,7 +175,7 @@ class is_standard_module_tc(ModutilsTestCase):
     library
     """
 
-    def test_knownValues_is_standard_module_0(self):
+    def test_knownValues_is_standard_module_builtins(self):
         if sys.version_info < (3, 0):
             self.assertEqual(modutils.is_standard_module('__builtin__'), True)
             self.assertEqual(modutils.is_standard_module('builtins'), False)
@@ -183,29 +183,26 @@ class is_standard_module_tc(ModutilsTestCase):
             self.assertEqual(modutils.is_standard_module('__builtin__'), False)
             self.assertEqual(modutils.is_standard_module('builtins'), True)
 
-    def test_knownValues_is_standard_module_1(self):
+    def test_knownValues_is_standard_module_builtin(self):
         self.assertEqual(modutils.is_standard_module('sys'), True)
 
-    def test_knownValues_is_standard_module_2(self):
+    def test_knownValues_is_standard_module_nonstandard(self):
         self.assertEqual(modutils.is_standard_module('logilab'), False)
 
-    def test_knownValues_is_standard_module_3(self):
+    def test_knownValues_is_standard_module_unknown(self):
         self.assertEqual(modutils.is_standard_module('unknown'), False)
 
     def test_knownValues_is_standard_module_4(self):
-        if sys.version_info < (3, 0):
-            self.assertEqual(modutils.is_standard_module('StringIO'), True)
-        else:
-            self.assertEqual(modutils.is_standard_module('StringIO'), False)
-        if sys.version_info < (2, 6):
-            self.assertEqual(modutils.is_standard_module('io'), False)
-        else:
-            self.assertEqual(modutils.is_standard_module('io'), True)
+        self.assertEqual(modutils.is_standard_module('marshal'), True)
+        self.assertEqual(modutils.is_standard_module('hashlib'), True)
+        self.assertEqual(modutils.is_standard_module('pickle'), True)
+        self.assertEqual(modutils.is_standard_module('email'), True)
+        self.assertEqual(modutils.is_standard_module('io'), sys.version_info >= (2, 6))
+        self.assertEqual(modutils.is_standard_module('StringIO'), sys.version_info < (3, 0))
 
-    def test_knownValues_is_standard_module_5(self):
+    def test_knownValues_is_standard_module_custom_path(self):
         self.assertEqual(modutils.is_standard_module('data.module', (DATADIR,)), True)
         self.assertEqual(modutils.is_standard_module('data.module', (path.abspath(DATADIR),)), True)
-
 
 class is_relative_tc(ModutilsTestCase):
 
