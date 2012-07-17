@@ -53,8 +53,10 @@ import warnings
 from shutil import rmtree
 from operator import itemgetter
 from ConfigParser import ConfigParser
-from logilab.common.deprecation import deprecated
 from itertools import dropwhile
+
+from logilab.common.deprecation import deprecated
+from logilab.common.compat import builtins
 
 import unittest as unittest_legacy
 if not getattr(unittest_legacy, "__package__", None):
@@ -950,7 +952,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
     def assertTextEquals(self, text1, text2, junk=None,
             msg_prefix='Text differ', striplines=False):
         """compare two multiline strings (using difflib and splitlines())
-        
+
         :param text1: a Python BaseString
         :param text2: a second Python Basestring
         :param junk: List of Caracters
@@ -1216,12 +1218,12 @@ class DocTest(TestCase):
             suite = SkippedSuite()
         # doctest may gork the builtins dictionnary
         # This happen to the "_" entry used by gettext
-        old_builtins =  __builtins__.copy()
+        old_builtins = builtins.__dict__.copy()
         try:
             return suite.run(result)
         finally:
-            __builtins__.clear()
-            __builtins__.update(old_builtins)
+            builtins.__dict__.clear()
+            builtins.__dict__.update(old_builtins)
     run = __call__
 
     def test(self):
