@@ -235,10 +235,6 @@ class TestlibTC(TestCase):
         # class' custom datadir
         tc = MyTC('test_1')
         self.assertEqual(tc.datapath('bar'), join('foo', 'bar'))
-        # instance's custom datadir
-        self.skipTest('should this really work?')
-        tc.datadir = 'spam'
-        self.assertEqual(tc.datapath('bar'), join('spam', 'bar'))
 
     def test_cached_datadir(self):
         """test datadir is cached on the class"""
