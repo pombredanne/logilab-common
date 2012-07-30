@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+2012-07-30  --  0.58.2
+    * modutils: fixes (closes #100757 and #100935)
+
+
+
 2012-07-17  --  0.58.1
     * modutils, testlib: be more python implementation independant (closes #99493 and #99627)
 
