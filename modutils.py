@@ -237,9 +237,7 @@ def modpath_from_file(filename, extrapath=None):
                     return extrapath[path_].split('.') + submodpath
     for path in sys.path:
         path = abspath(path)
-        if path and base[:len(path)] == path:
-            if path.startswith(EXT_LIB_DIR):
-                continue
+        if path and base.startswith(path):
             modpath = [pkg for pkg in base[len(path):].split(os.sep) if pkg]
             if _check_init(path, modpath[:-1]):
                 return modpath
