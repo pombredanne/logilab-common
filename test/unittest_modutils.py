@@ -128,6 +128,16 @@ class modpath_from_file_tc(ModutilsTestCase):
         self.assertRaises(Exception, modutils.modpath_from_file, '/turlututu')
 
 
+class load_module_from_path_tc(ModutilsTestCase):
+
+    def test_do_not_load_twice(self):
+        sys.path.insert(0, self.datadir)
+        foo = modutils.load_module_from_modpath(['lmfp', 'foo'])
+        lmfp = modutils.load_module_from_modpath(['lmfp'])
+        self.assertEqual(len(sys.just_once), 1)
+        sys.path.pop(0)
+        del sys.just_once
+
 class file_from_modpath_tc(ModutilsTestCase):
     """given a mod path (i.e. splited module / package name), return the
     corresponding file, giving priority to source file over precompiled file

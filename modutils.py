@@ -158,6 +158,9 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
         if len(modpath) != len(parts):
             # even with use_sys=False, should try to get outer packages from sys.modules
             module = sys.modules.get(curname)
+        elif use_sys:
+            # because it may have been indirectly loaded through a parent
+            module = sys.modules.get(curname)
         if module is None:
             mp_file, mp_filename, mp_desc = find_module(part, path)
             module = load_module(curname, mp_file, mp_filename, mp_desc)
