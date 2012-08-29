@@ -1,4 +1,4 @@
-# copyright 2003-2011 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -155,7 +155,7 @@ class ProgressBarTC(TestCase):
             dots /= 5
             expected_stream.write("\r["+('.'*dots)+(' '*(size-dots))+"]")
             self.assertEqual(pgb_stream.getvalue(), expected_stream.getvalue())
-        
+
     def test_update_relative(self):
         pgb_stream = StringIO()
         expected_stream = StringIO()

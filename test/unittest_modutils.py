@@ -1,4 +1,4 @@
-# copyright 2003-2011 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -260,9 +260,9 @@ class get_modules_files_tc(ModutilsTestCase):
         del logilab.common.fileutils
         del sys.modules['logilab.common.fileutils']
         m = modutils.load_module_from_modpath(['logilab', 'common', 'fileutils'])
-        self.assert_( hasattr(logilab, 'common') )
-        self.assert_( hasattr(logilab.common, 'fileutils') )
-        self.assert_( m is logilab.common.fileutils )
+        self.assertTrue( hasattr(logilab, 'common') )
+        self.assertTrue( hasattr(logilab.common, 'fileutils') )
+        self.assertTrue( m is logilab.common.fileutils )
 
 from logilab.common.testlib import DocTest
 class ModuleDocTest(DocTest):

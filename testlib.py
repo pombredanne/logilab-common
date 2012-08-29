@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# copyright 2003-2011 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -1024,7 +1024,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
                 partial_iter = True
 
 
-                self.assert_(ipath_a == ipath_b,
+                self.assertTrue(ipath_a == ipath_b,
                     "unexpected %s in %s while looking %s from %s" %
                     (ipath_a, path_a, ipath_b, path_b))
 
@@ -1082,9 +1082,9 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
                 msg = '%r is not an instance of %s but of %s'
             msg = msg % (obj, klass, type(obj))
         if strict:
-            self.assert_(obj.__class__ is klass, msg)
+            self.assertTrue(obj.__class__ is klass, msg)
         else:
-            self.assert_(isinstance(obj, klass), msg)
+            self.assertTrue(isinstance(obj, klass), msg)
 
     @deprecated('Please use assertIsNone instead.')
     def assertNone(self, obj, msg=None):
@@ -1094,14 +1094,14 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         """
         if msg is None:
             msg = "reference to %r when None expected"%(obj,)
-        self.assert_( obj is None, msg )
+        self.assertTrue( obj is None, msg )
 
     @deprecated('Please use assertIsNotNone instead.')
     def assertNotNone(self, obj, msg=None):
         """assert obj is not None"""
         if msg is None:
             msg = "unexpected reference to None"
-        self.assert_( obj is not None, msg )
+        self.assertTrue( obj is not None, msg )
 
     @deprecated('Non-standard. Please use assertAlmostEqual instead.')
     def assertFloatAlmostEquals(self, obj, other, prec=1e-5,
@@ -1119,7 +1119,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
             msg = "%r != %r" % (obj, other)
         if relative:
             prec = prec*math.fabs(obj)
-        self.assert_(math.fabs(obj - other) < prec, msg)
+        self.assertTrue(math.fabs(obj - other) < prec, msg)
 
     def failUnlessRaises(self, excClass, callableObj=None, *args, **kwargs):
         """override default failUnlessRaises method to return the raised
