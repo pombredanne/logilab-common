@@ -121,43 +121,12 @@ class TestlibTC(TestCase):
         invalid = """<root><h2 </h2> </root>"""
         self.assertRaises(AssertionError, self.tc.assertXMLStringWellFormed, invalid)
 
-    def test_unordered_equality_for_lists(self):
-        l1 = [0, 1, 2]
-        l2 = [1, 2, 3]
-        self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
-        self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
-        self.tc.assertItemsEqual(l1, l1)
-        self.tc.assertItemsEqual(l1, l1)
-        self.tc.assertItemsEqual([], [])
-        self.tc.assertItemsEqual([], [])
-        l1 = [0, 1, 1]
-        l2 = [0, 1]
-        self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
-        self.assertRaises(AssertionError, self.tc.assertItemsEqual, l1, l2)
-        self.tc.assertItemsEqual(l1, l1)
-        self.tc.assertItemsEqual(l1, l1)
-
-    def test_unordered_equality_for_dicts(self):
-        d1 = {'a' : 1, 'b' : 2}
-        d2 = {'a' : 1}
-        self.assertRaises(AssertionError, self.tc.assertItemsEqual, d1, d2)
-        self.tc.assertItemsEqual(d1, d1)
-        self.tc.assertItemsEqual({}, {})
-
     def test_equality_for_sets(self):
         s1 = set('ab')
         s2 = set('a')
         self.assertRaises(AssertionError, self.tc.assertSetEqual, s1, s2)
         self.tc.assertSetEqual(s1, s1)
         self.tc.assertSetEqual(set(), set())
-
-    def test_unordered_equality_for_iterables(self):
-        self.assertRaises(AssertionError, self.tc.assertItemsEqual, xrange(5), xrange(6))
-        self.assertRaises(AssertionError, self.tc.assertItemsEqual, xrange(5), xrange(6))
-        self.tc.assertItemsEqual(xrange(5), range(5))
-        self.tc.assertItemsEqual(xrange(5), range(5))
-        self.tc.assertItemsEqual([], ())
-        self.tc.assertItemsEqual([], ())
 
     def test_file_equality(self):
         foo = join(dirname(__file__), 'data', 'foo.txt')
