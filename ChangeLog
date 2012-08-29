@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+	--
+    * fix logilab.common.date.ustrftime() for python3 (closes #82161,
+      patch by Arfrever Frehtes Taifersar Arahesis)
+
 2012-07-30  --  0.58.2
     * modutils: fixes (closes #100757 and #100935)
 
