@@ -519,6 +519,8 @@ class RegistryStore(dict):
         :meth:`~logilab.common.registry.RegistryStore.register_and_replace`
         for instance)
         """
+        assert isinstance(modname, basestring), \
+            'modname expected to be a module name (ie string), got %r' % modname
         for obj in objects:
             try:
                 if obj.__module__ != modname or obj in butclasses:
