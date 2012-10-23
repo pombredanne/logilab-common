@@ -277,10 +277,11 @@ def monkeypatch(klass, methodname=None):
         if callable(func):
             if sys.version_info < (3, 0):
                 setattr(klass, name, method_type(func, None, klass))
-            elif isinstance(func, types.FunctionType):
-                setattr(klass, name, func)
+            #elif  isinstance(func, types.FunctionType):
             else:
-                setattr(klass, name, UnboundMethod(func))
+                setattr(klass, name, func)
+            #else:
+            #    setattr(klass, name, UnboundMethod(func))
         else:
             # likely a property
             # this is quite borderline but usage already in the wild ...
