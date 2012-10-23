@@ -6,6 +6,8 @@ ChangeLog for logilab.common
       Frehtes Taifersar Arahesis) and encoding detection for python2 (closes
       #109740)
 
+    * other python3 code and test fixes (closes #104047)
+
 2012-07-30  --  0.58.2
     * modutils: fixes (closes #100757 and #100935)
 

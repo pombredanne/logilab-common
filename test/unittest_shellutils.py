@@ -152,7 +152,7 @@ class ProgressBarTC(TestCase):
         last = 0
         for dots in xrange(10, 105, 15):
             pgb.update(dots, exact=True)
-            dots /= 5
+            dots //= 5
             expected_stream.write("\r["+('='*dots)+(' '*(size-dots))+"]")
             self.assertEqual(pgb_stream.getvalue(), expected_stream.getvalue())
 
@@ -164,7 +164,7 @@ class ProgressBarTC(TestCase):
         last = 0
         for dots in xrange(5, 105, 5):
             pgb.update(5, exact=False)
-            dots /= 5
+            dots //= 5
             expected_stream.write("\r["+('='*dots)+(' '*(size-dots))+"]")
             self.assertEqual(pgb_stream.getvalue(), expected_stream.getvalue())
 

@@ -1168,6 +1168,10 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
 
     assertRaises = failUnlessRaises
 
+    if not hasattr(unittest.TestCase, 'assertItemsEqual'):
+        # python 3.2 has deprecated assertSameElements and is missing
+        # assertItemsEqual
+        assertItemsEqual = unittest.TestCase.assertSameElements
 
 import doctest
 
