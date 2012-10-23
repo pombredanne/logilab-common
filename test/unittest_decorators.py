@@ -46,14 +46,14 @@ class DecoratorsTC(TestCase):
             return 12
         class XXX(object):
             def __call__(self, other):
-                tester.assertTrue(isinstance(other, MyClass))
+                tester.assertIsInstance(other, MyClass)
                 return 12
         try:
             monkeypatch(MyClass)(XXX())
         except AttributeError, err:
             self.assertTrue(str(err).endswith('has no __name__ attribute: you should provide an explicit `methodname`'))
         monkeypatch(MyClass, 'foo')(XXX())
-        self.assertTrue(isinstance(MyClass.prop1, property))
+        self.assertIsInstance(MyClass.prop1, property)
         self.assertTrue(callable(MyClass.foo))
         self.assertEqual(MyClass().prop1, 12)
         self.assertEqual(MyClass().foo(), 12)
