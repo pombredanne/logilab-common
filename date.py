@@ -23,7 +23,7 @@ __docformat__ = "restructuredtext en"
 import math
 import re
 import sys
-from locale import getpreferredencoding
+from locale import getlocale, LC_TIME
 from datetime import date, time, datetime, timedelta
 from time import strptime as time_strptime
 from calendar import monthrange, timegm
@@ -281,8 +281,6 @@ def last_day(somedate):
 def ustrftime(somedate, fmt='%Y-%m-%d'):
     """like strftime, but returns a unicode string instead of an encoded
     string which may be problematic with localized date.
-
-    When using Python 2, encoding is guessed by locale.getpreferredencoding().
     """
     if sys.version_info >= (3, 3):
         # datetime.date.strftime() supports dates since year 1 in Python >=3.3.
@@ -290,7 +288,7 @@ def ustrftime(somedate, fmt='%Y-%m-%d'):
     else:
         try:
             if sys.version_info < (3, 0):
-                encoding = getpreferredencoding(do_setlocale=False) or 'UTF-8'
+                encoding = getlocale(LC_TIME)[1] or 'ascii'
                 return unicode(somedate.strftime(str(fmt)), encoding)
             else:
                 return somedate.strftime(fmt)
