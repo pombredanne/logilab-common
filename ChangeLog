@@ -8,6 +8,9 @@ ChangeLog for logilab.common
 
     * other python3 code and test fixes (closes #104047)
 
+    * registry: setdefault shouldn't raise RegistryNotFound (closes #111010)
+
+
 2012-07-30  --  0.58.2
     * modutils: fixes (closes #100757 and #100935)
 

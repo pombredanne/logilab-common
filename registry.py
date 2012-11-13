@@ -501,7 +501,7 @@ class RegistryStore(dict):
     def setdefault(self, regid):
         try:
             return self[regid]
-        except KeyError:
+        except RegistryNotFound:
             self[regid] = self.registry_class(regid)(self.debugmode)
             return self[regid]
 
