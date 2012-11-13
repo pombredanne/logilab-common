@@ -218,7 +218,8 @@ class Registry(dict):
         assert not '__abstract__' in obj.__dict__
         assert obj.__select__
         oid = oid or obj.__regid__
-        assert oid
+        assert oid, ('no explicit name supplied to register object %s, '
+                     'which has no __regid__ set' % obj)
         if clear:
             objects = self[oid] =  []
         else:
