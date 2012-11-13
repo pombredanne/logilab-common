@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+--
+    * loggin_ext: on windows, use colorama to display colored logs, if available (closes #107436)
+
 2012-11-14  --  0.58.3
     * date: fix ustrftime() impl. for python3 (closes #82161, patch by Arfrever
       Frehtes Taifersar Arahesis) and encoding detection for python2 (closes

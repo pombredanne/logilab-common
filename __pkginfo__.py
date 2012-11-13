@@ -18,6 +18,7 @@
 """logilab.common packaging information"""
 __docformat__ = "restructuredtext en"
 import sys
+import os
 
 distname = 'logilab-common'
 modname = 'common'
@@ -40,8 +41,11 @@ from os.path import join
 scripts = [join('bin', 'pytest')]
 include_dirs = [join('test', 'data')]
 
+install_requires = []
 if sys.version_info < (2, 7):
-    install_requires = ['unittest2 >= 0.5.1']
+    install_requires.append('unittest2 >= 0.5.1')
+if os.name == 'nt':
+    install_requires.append('colorama')
 
 classifiers = ["Topic :: Utilities",
                "Programming Language :: Python",
