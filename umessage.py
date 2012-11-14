@@ -75,6 +75,9 @@ class UMessage:
             return decode_QP(value)
         return value
 
+    def __getitem__(self, header):
+        return self.get(header)
+
     def get_all(self, header, default=()):
         return [decode_QP(val) for val in self.message.get_all(header, default)
                 if val is not None]
