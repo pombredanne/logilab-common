@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
 
---
+2012-11-14  --  0.58.3
     * date: fix ustrftime() impl. for python3 (closes #82161, patch by Arfrever
       Frehtes Taifersar Arahesis) and encoding detection for python2 (closes
       #109740)
@@ -9,6 +9,11 @@ ChangeLog for logilab.common
     * other python3 code and test fixes (closes #104047)
 
     * registry: setdefault shouldn't raise RegistryNotFound (closes #111010)
+
+    * table: stop encoding to iso-8859-1, use unicode (closes #105847)
+
+    * setup: properly install additional files during build instead of install (closes #104045)
+
 
 
 2012-07-30  --  0.58.2
