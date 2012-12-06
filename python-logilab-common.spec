@@ -1,8 +1,17 @@
+# for el5, force use of python2.6
+%if 0%{?el5}
+%define python python26
+%define __python /usr/bin/python2.6
+%{!?python_scriptarch: %define python_scriptarch %(%{__python} -c "from distutils.sysconfig import get_python_lib; from os.path import join; print join(get_python_lib(1, 1), 'scripts')")}
+%else
+%define python python
+%define __python /usr/bin/python
+%endif
 %{!?_python_sitelib: %define _python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-Name:           python-logilab-common
+Name:           %{python}-logilab-common
 Version:        0.58.2
-Release:        1%{?dist}
+Release:        logilab.1%{?dist}
 Summary:        Common libraries for Logilab projects
 
 Group:          Development/Libraries
@@ -27,11 +36,15 @@ shared among some python projects developed by logilab.
 
 %build
 %{__python} setup.py build
+%if 0%{?el5}
+# change the python version in shebangs
+find . -name '*.py' -type f -print0 |  xargs -0 sed -i '1,3s;^#!.*python.*$;#! /usr/bin/python2.6;'
+%endif
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+NO_SETUPTOOLS=1 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT %{?python_scriptarch: --install-scripts=%{python_scriptarch}}
 rm -rf $RPM_BUILD_ROOT%{_python_sitelib}/logilab/common/test
 
 %check
@@ -49,6 +62,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Nov 16 2012 Julien Cristau <julien.cristau@logilab.fr> 0.58.2-logilab.1
+- Force python26 on el5
+
 * Fri Aug 03 2012 Brian C. Lane <bcl@redhat.com> 0.58.2-1
 - Upstream 0.58.2
 
