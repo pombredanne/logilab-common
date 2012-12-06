@@ -16,8 +16,8 @@ Summary:        Common libraries for Logilab projects
 
 Group:          Development/Libraries
 License:        GPLv2+
-URL:            http://www.logilab.org/projects/common
-Source0:        ftp://ftp.logilab.org/pub/common/logilab-common-%{version}.tar.gz
+URL:            http://www.logilab.org/projects/logilab-common
+Source0:        http://download.logilab.org/pub/common/logilab-common-%{version}.tar.gz
 BuildArch:      noarch
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
