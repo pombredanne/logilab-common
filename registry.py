@@ -221,8 +221,8 @@ class Registry(dict):
 
     def register(self, obj, oid=None, clear=False):
         """base method to add an object in the registry"""
-        assert not '__abstract__' in obj.__dict__
-        assert obj.__select__
+        assert not '__abstract__' in obj.__dict__, obj
+        assert obj.__select__, obj
         oid = oid or obj.__regid__
         assert oid, ('no explicit name supplied to register object %s, '
                      'which has no __regid__ set' % obj)
@@ -230,8 +230,7 @@ class Registry(dict):
             objects = self[oid] =  []
         else:
             objects = self.setdefault(oid, [])
-        assert not obj in objects, \
-               'object %s is already registered' % obj
+        assert not obj in objects, 'object %s is already registered' % obj
         objects.append(obj)
 
     def register_and_replace(self, obj, replaced):
@@ -546,7 +545,7 @@ class RegistryStore(dict):
         If `clear` is true, all objects with the same identifier will be
         previously unregistered.
         """
-        assert not obj.__dict__.get('__abstract__')
+        assert not obj.__dict__.get('__abstract__'), obj
         try:
             vname = obj.__name__
         except AttributeError:
@@ -555,7 +554,7 @@ class RegistryStore(dict):
         for registryname in class_registries(obj, registryname):
             registry = self.setdefault(registryname)
             registry.register(obj, oid=oid, clear=clear)
-            self.debug('register %s in %s[\'%s\']',
+            self.debug("register %s in %s['%s']",
                        registry.objname(obj), registryname, oid or obj.__regid__)
             self._loadedmods.setdefault(obj.__module__, {})[registry.objid(obj)] = obj
 
@@ -564,7 +563,10 @@ class RegistryStore(dict):
         `registryname` or `obj.__registry__` if not specified.
         """
         for registryname in class_registries(obj, registryname):
-            self[registryname].unregister(obj)
+            registry = self[registryname]
+            registry.unregister(obj)
+            self.debug("unregister %s from %s['%s']",
+                       registry.objname(obj), registryname, obj.__regid__)
 
     def register_and_replace(self, obj, replaced, registryname=None):
         """register `obj` implementation object into `registryname` or
@@ -572,8 +574,12 @@ class RegistryStore(dict):
         will be unregistered first (else a warning will be issued as it's
         generally unexpected).
         """
-        for registryname in class_registries(obj, registryname):
-            self[registryname].register_and_replace(obj, replaced)
+        for registryname in obj_registries(obj, registryname):
+            registry = self[registryname]
+            registry.register_and_replace(obj, replaced)
+            self.debug("register %s in %s['%s'] instead of %s",
+                       registry.objname(obj), registryname, obj.__regid__,
+                       registry.objname(replaced))
 
     # initialization methods ###################################################
 
