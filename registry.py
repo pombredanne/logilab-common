@@ -597,9 +597,10 @@ class RegistryStore(dict):
             'modname expected to be a module name (ie string), got %r' % modname
         for obj in objects:
             if self.is_registrable(obj) and obj.__module__ == modname and not obj in butclasses:
-                oid = obj.__regid__
-                if oid and not obj.__dict__.get('__abstract__'):
-                    self.register(obj, oid=oid)
+                if isinstance(obj, type):
+                    self._load_ancestors_then_object(modname, obj, butclasses)
+                else:
+                    self.register(obj)
 
     def register(self, obj, registryname=None, oid=None, clear=False):
         """register `obj` implementation into `registryname` or
@@ -744,17 +745,17 @@ class RegistryStore(dict):
         if hasattr(module, 'registration_callback'):
             module.registration_callback(self)
         else:
-            for obj in vars(module).values():
-                if self.is_registrable(obj) and obj.__module__ == module.__name__:
-                    if isinstance(obj, type):
-                        self._load_ancestors_then_object(module.__name__, obj)
-                    else:
-                        self.register(obj)
+            self.register_all(vars(module).itervalues(), module.__name__)
 
-    def _load_ancestors_then_object(self, modname, objectcls):
+    def _load_ancestors_then_object(self, modname, objectcls, butclasses=()):
         """handle class registration according to rules defined in
         :meth:`load_module`
         """
+        # backward compat, we used to allow whatever else than classes
+        if not isinstance(objectcls, type):
+            if self.is_registrable(objectcls) and objectcls.__module__ == modname:
+                self.register(objectcls)
+            return
         # imported classes
         objmodname = objectcls.__module__
         if objmodname != modname:
@@ -767,15 +768,15 @@ class RegistryStore(dict):
                 self.load_file(self._toloadmods[objmodname], objmodname)
             return
         # ensure object hasn't been already processed
-        clsid = '%s.%s' % (objmodname, objectcls.__name__)
+        clsid = '%s.%s' % (modname, objectcls.__name__)
         if clsid in self._loadedmods[modname]:
             return
         self._loadedmods[modname][clsid] = objectcls
         # ensure ancestors are registered
         for parent in objectcls.__bases__:
-            self._load_ancestors_then_object(modname, parent)
+            self._load_ancestors_then_object(modname, parent, butclasses)
         # ensure object is registrable
-        if not self.is_registrable(objectcls):
+        if objectcls in butclasses or not self.is_registrable(objectcls):
             return
         # backward compat
         reg = self.setdefault(obj_registries(objectcls)[0])

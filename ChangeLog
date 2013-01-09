@@ -17,6 +17,8 @@ ChangeLog for logilab.common
         __abstract__ explicitly is better and notion of registered object 'name'
         is now somewhat fuzzy
 
+      - use register_all when no registration callback defined (closes #111011)
+
     * loggin_ext: on windows, use colorama to display colored logs, if available (closes #107436)
 
 2012-11-14  --  0.58.3
