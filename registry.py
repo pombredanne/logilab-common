@@ -145,10 +145,6 @@ def _toload_info(path, extrapath, _toload=None):
     return _toload
 
 
-def classid(cls):
-    """returns a unique identifier for an object class"""
-    return '%s.%s' % (cls.__module__, cls.__name__)
-
 def class_registries(cls, registryname):
     """return a tuple of registry names (see __registries__)"""
     if registryname:
@@ -202,6 +198,16 @@ class Registry(dict):
         except KeyError:
             raise ObjectNotFound(name), None, sys.exc_info()[-1]
 
+    @classmethod
+    def objid(cls, obj):
+        """returns a unique identifier for an object stored in the registry"""
+        return '%s.%s' % (obj.__module__, cls.objname(obj))
+
+    @classmethod
+    def objname(cls, obj):
+        """returns a readable name for an object stored in the registry"""
+        return getattr(obj, '__name__', id(obj))
+
     def initialization_completed(self):
         """call method __registered__() on registered objects when the callback
         is defined"""
@@ -234,12 +240,12 @@ class Registry(dict):
         # remove register_and_replace in favor of unregister + register
         # or simplify by calling unregister then register here
         if not isinstance(replaced, basestring):
-            replaced = classid(replaced)
+            replaced = self.objid(replaced)
         # prevent from misspelling
         assert obj is not replaced, 'replacing an object by itself: %s' % obj
         registered_objs = self.get(obj.__regid__, ())
         for index, registered in enumerate(registered_objs):
-            if classid(registered) == replaced:
+            if self.objid(registered) == replaced:
                 del registered_objs[index]
                 break
         else:
@@ -249,17 +255,17 @@ class Registry(dict):
 
     def unregister(self, obj):
         """remove object <obj> from this registry"""
-        clsid = classid(obj)
+        objid = self.objid(obj)
         oid = obj.__regid__
         for registered in self.get(oid, ()):
-            # use classid() to compare classes because vreg will probably
-            # have its own version of the class, loaded through execfile
-            if classid(registered) == clsid:
+            # use self.objid() to compare objects because vreg will probably
+            # have its own version of the object, loaded through execfile
+            if self.objid(registered) == objid:
                 self[oid].remove(registered)
                 break
         else:
             self.warning('can\'t remove %s, no id %s in the registry',
-                         clsid, oid)
+                         objid, oid)
 
     def all_objects(self):
         """return a list containing all objects in this registry.
@@ -550,8 +556,8 @@ class RegistryStore(dict):
             registry = self.setdefault(registryname)
             registry.register(obj, oid=oid, clear=clear)
             self.debug('register %s in %s[\'%s\']',
-                       vname, registryname, oid or obj.__regid__)
-        self._loadedmods.setdefault(obj.__module__, {})[classid(obj)] = obj
+                       registry.objname(obj), registryname, oid or obj.__regid__)
+            self._loadedmods.setdefault(obj.__module__, {})[registry.objid(obj)] = obj
 
     def unregister(self, obj, registryname=None):
         """unregister `obj` implementation object from the registry
@@ -656,9 +662,7 @@ class RegistryStore(dict):
         if hasattr(module, 'registration_callback'):
             module.registration_callback(self)
         else:
-            for objname, obj in vars(module).items():
-                if objname.startswith('_'):
-                    continue
+            for obj in vars(module).values():
                 self._load_ancestors_then_object(module.__name__, obj)
 
     def _load_ancestors_then_object(self, modname, objectcls):
@@ -685,7 +689,8 @@ class RegistryStore(dict):
                 return
         except TypeError:
             return
-        clsid = classid(objectcls)
+        reg = self.setdefault(class_registries(obj)[0])
+        clsid = reg.objid(obj)
         if clsid in self._loadedmods[modname]:
             return
         self._loadedmods[modname][clsid] = objectcls
@@ -974,3 +979,14 @@ class yes(Predicate): # pylint: disable=C0103
 
     def __call__(self, *args, **kwargs):
         return self.score
+
+
+# deprecated stuff #############################################################
+
+from logilab.common.deprecation import deprecated
+
+@deprecated('[lgc 0.59] use Registry.objid class method instead')
+def classid(cls):
+    """returns a unique identifier for an object class"""
+    return '%s.%s' % (cls.__module__, cls.__name__)
+

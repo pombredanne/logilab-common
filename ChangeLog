@@ -2,6 +2,10 @@ ChangeLog for logilab.common
 ============================
 
 --
+    * registry:
+      - introduce objid and objname methods on Registry instead of classid
+        function and inlined code (closes #98742)
+
     * loggin_ext: on windows, use colorama to display colored logs, if available (closes #107436)
 
 2012-11-14  --  0.58.3
