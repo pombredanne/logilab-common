@@ -670,8 +670,7 @@ class RegistryStore(dict):
 
         - first ensure parent classes are already registered
 
-        - class with __abstract__ == True in their local dictionary or
-          with a name starting with an underscore are not registered
+        - class with __abstract__ == True in their local dictionary are skipped
 
         - object class needs to have __registry__ and __regid__ attributes
           set to a non empty string to be registered.
@@ -696,8 +695,13 @@ class RegistryStore(dict):
         self._loadedmods[modname][clsid] = objectcls
         for parent in objectcls.__bases__:
             self._load_ancestors_then_object(modname, parent)
+        if reg.objname(obj)[0] == '_':
+            warn("[lgc 0.59] object whose name start with '_' won't be "
+                 "skipped anymore at some point, use __abstract__ = True "
+                 "instead (%s)" % obj, DeprecationWarning)
+            return
+
         if (objectcls.__dict__.get('__abstract__')
-            or objectcls.__name__[0] == '_'
             or not objectcls.__registries__
             or not objectcls.__regid__):
             return
