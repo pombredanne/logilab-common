@@ -18,7 +18,7 @@ ChangeLog for logilab.common
 
     * other python3 code and test fixes (closes #104047)
 
-    * registry: setdefault shouldn't raise RegistryNotFound (closes #111010)
+    * registry: Store.setdefault shouldn't raise RegistryNotFound (closes #111010)
 
     * table: stop encoding to iso-8859-1, use unicode (closes #105847)
 
