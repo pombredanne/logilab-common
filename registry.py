@@ -353,13 +353,14 @@ class Registry(dict):
 
 
 class RegistryStore(dict):
-    """This class is responsible for loading implementations and storing them
-    in their registry which are created on the fly as needed.
+    """This class is responsible for loading objects and storing them
+    in their registry which is created on the fly as needed.
 
-    It handles dynamic registration of objects and provides a convenient api to
-    access them. To be recognized as an object that should be stored into one of
-    the store's registry (:class:`Registry`), an object (usually a class) has
-    the following attributes, used control how they interact with the registry:
+    It handles dynamic registration of objects and provides a
+    convenient api to access them. To be recognized as an object that
+    should be stored into one of the store's registry
+    (:class:`Registry`), an object must provide the following
+    attributes, used control how they interact with the registry:
 
     :attr:`__registry__` or `__registries__`
       name of the registry for this object (string like 'views', 'templates'...)
@@ -367,28 +368,29 @@ class RegistryStore(dict):
       registries
 
     :attr:`__regid__`
-      implementation's identifier in the registry (string like 'main',
+      object identifier in the registry (string like 'main',
       'primary', 'folder_box')
 
     :attr:`__select__`
-      the implementation's selector
+      the object predicate selectors
 
-    Moreover, the :attr:`__abstract__` attribute may be set to `True` to
-    indicate that a class is abstract and should not be registered (inherited
-    attributes not considered).
+    Moreover, the :attr:`__abstract__` attribute may be set to `True`
+    to indicate that an object is abstract and should not be registered
+    (such inherited attributes not considered).
 
     .. Note::
 
       When using the store to load objects dynamically, you *always* have
       to use **super()** to get the methods and attributes of the
-      superclasses, and not use the class identifier. Else, you'll get into
-      trouble when reloading comes into the place.
+      superclasses, and not use the class identifier. If not, you'll get into
+      trouble at reload time.
 
       For example, instead of writing::
 
           class Thing(Parent):
               __regid__ = 'athing'
               __select__ = yes()
+
               def f(self, arg1):
                   Parent.f(self, arg1)
 
@@ -397,22 +399,25 @@ class RegistryStore(dict):
           class Thing(Parent):
               __regid__ = 'athing'
               __select__ = yes()
+
               def f(self, arg1):
-                  super(Parent, self).f(arg1)
+                  super(Thing, self).f(arg1)
 
-    Controlling objects registration
-    --------------------------------
+    Controlling object registration
+    -------------------------------
 
-    Dynamic loading is triggered by calling the :meth:`register_objects` method,
-    given a list of directory to inspect for python modules.
+    Dynamic loading is triggered by calling the
+    :meth:`register_objects` method, given a list of directories to
+    inspect for python modules.
 
     .. automethod: register_objects
 
     For each module, by default, all compatible objects are registered
-    automatically, though if some objects have to replace other objects, or have
-    to be included only if some condition is met, you'll have to define a
-    `registration_callback(vreg)` function in your module and explicitly
-    register **all objects** in this module, using the api defined below.
+    automatically. However if some objects come as replacement of
+    other objects, or have to be included only if some condition is
+    met, you'll have to define a `registration_callback(vreg)`
+    function in the module and explicitly register **all objects** in
+    this module, using the api defined below.
 
 
     .. automethod:: RegistryStore.register_all
@@ -423,51 +428,48 @@ class RegistryStore(dict):
     .. Note::
         Once the function `registration_callback(vreg)` is implemented in a
         module, all the objects from this module have to be explicitly
-        registered as it disables the automatic objects registration.
+        registered as it disables the automatic object registration.
 
 
     Examples:
 
     .. sourcecode:: python
 
-       # cubicweb/web/views/basecomponents.py
        def registration_callback(store):
-          # register everything in the module except SeeAlsoComponent
-          store.register_all(globals().values(), __name__, (SeeAlsoVComponent,))
-          # conditionally register SeeAlsoVComponent
-          if 'see_also' in store.schema:
-              store.register(SeeAlsoVComponent)
+          # register everything in the module except BabarClass
+          store.register_all(globals().values(), __name__, (BabarClass,))
+
+          # conditionally register BabarClass
+          if 'babar_relation' in store.schema:
+              store.register(BabarClass)
 
     In this example, we register all application object classes defined in the module
-    except `SeeAlsoVComponent`. This class is then registered only if the 'see_also'
-    relation type is defined in the instance'schema.
+    except `BabarClass`. This class is then registered only if the 'babar_relation'
+    relation type is defined in the instance schema.
 
     .. sourcecode:: python
 
-       # goa/appobjects/sessions.py
        def registration_callback(store):
-          store.register(SessionsCleaner)
-          # replace AuthenticationManager by GAEAuthenticationManager
-          store.register_and_replace(GAEAuthenticationManager, AuthenticationManager)
-          # replace PersistentSessionManager by GAEPersistentSessionManager
-          store.register_and_replace(GAEPersistentSessionManager, PersistentSessionManager)
+          store.register(Elephant)
+          # replace Babar by Celeste
+          store.register_and_replace(Celeste, Babar)
 
     In this example, we explicitly register classes one by one:
 
-    * the `SessionCleaner` class
-    * the `GAEAuthenticationManager` to replace the `AuthenticationManager`
-    * the `GAEPersistentSessionManager` to replace the `PersistentSessionManager`
+    * the `Elephant` class
+    * the `Celeste` to replace `Babar`
 
     If at some point we register a new appobject class in this module, it won't be
     registered at all without modification to the `registration_callback`
-    implementation. The previous example will register it though, thanks to the call
+    implementation. The first example will register it though, thanks to the call
     to the `register_all` method.
 
-    Controlling registry instantation
-    ---------------------------------
+    Controlling registry instantiation
+    ----------------------------------
+
     The `REGISTRY_FACTORY` class dictionary allows to specify which class should
-    be instantiated for a given registry name. The class associated to `None` in
-    it will be the class used when there is no specific class for a name.
+    be instantiated for a given registry name. The class associated to `None`
+    key will be the class used when there is no specific class for a name.
     """
 
     def __init__(self, debugmode=False):
@@ -511,7 +513,7 @@ class RegistryStore(dict):
             return self[regid]
 
     def register_all(self, objects, modname, butclasses=()):
-        """register all `objects` given. Objects which are not from the module
+        """register all given `objects`. Objects which are not from the module
         `modname` or which are in `butclasses` won't be registered.
 
         Typical usage is:
@@ -559,8 +561,8 @@ class RegistryStore(dict):
             self._loadedmods.setdefault(obj.__module__, {})[registry.objid(obj)] = obj
 
     def unregister(self, obj, registryname=None):
-        """unregister `obj` implementation object from the registry
-        `registryname` or `obj.__registry__` if not specified.
+        """unregister `obj` object from the registry `registryname` or
+        `obj.__registry__` if not specified.
         """
         for registryname in class_registries(obj, registryname):
             registry = self[registryname]
@@ -569,9 +571,9 @@ class RegistryStore(dict):
                        registry.objname(obj), registryname, obj.__regid__)
 
     def register_and_replace(self, obj, replaced, registryname=None):
-        """register `obj` implementation object into `registryname` or
+        """register `obj` object into `registryname` or
         `obj.__registry__` if not specified. If found, the `replaced` object
-        will be unregistered first (else a warning will be issued as it's
+        will be unregistered first (else a warning will be issued as it is
         generally unexpected).
         """
         for registryname in obj_registries(obj, registryname):
@@ -611,6 +613,7 @@ class RegistryStore(dict):
             reg.initialization_completed()
 
     def _mdate(self, filepath):
+        """ return the modification date of a file path """
         try:
             return stat(filepath)[-2]
         except OSError:
@@ -642,7 +645,7 @@ class RegistryStore(dict):
         return False
 
     def load_file(self, filepath, modname):
-        """load app objects from a python file"""
+        """ load registrable objects (if any) from a python file """
         from logilab.common.modutils import load_module_from_name
         if modname in self._loadedmods:
             return
@@ -684,7 +687,12 @@ class RegistryStore(dict):
         # imported classes
         objmodname = getattr(objectcls, '__module__', None)
         if objmodname != modname:
+            # The module of the object is not the same as the currently
+            # worked on module, or this is actually an instance, which
+            # has no module at all
             if objmodname in self._toloadmods:
+                # if this is still scheduled for loading, let's proceed immediately,
+                # but using the object module
                 self.load_file(self._toloadmods[objmodname], objmodname)
             return
         # skip non registerable object
@@ -711,6 +719,7 @@ class RegistryStore(dict):
             or not objectcls.__registries__
             or not objectcls.__regid__):
             return
+
         try:
             self.register(objectcls)
         except Exception, ex:
@@ -766,7 +775,7 @@ class traced_selection(object): # pylint: disable=C0103
 
     This will yield lines like this in the logs::
 
-        selector one_line_rset returned 0 for <class 'cubicweb.web.views.basecomponents.WFHistoryVComponent'>
+        selector one_line_rset returned 0 for <class 'elephant.Babar'>
 
     You can also give to :class:`traced_selection` the identifiers of objects on
     which you want to debug selection ('oid1' and 'oid2' in the example above).
