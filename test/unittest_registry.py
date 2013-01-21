@@ -1,4 +1,4 @@
-# copyright 2003-2011 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of Logilab-Common.
@@ -19,10 +19,17 @@
 from __future__ import with_statement
 
 import gc
+import logging
+import os.path as osp
+import sys
 from operator import eq, lt, le, gt
+from contextlib import contextmanager
+
+logging.basicConfig(level=logging.ERROR)
+
 from logilab.common.testlib import TestCase, unittest_main
 
-from logilab.common.registry import Predicate, AndPredicate, OrPredicate, wrap_predicates
+from logilab.common.registry import *
 
 
 class _1_(Predicate):
@@ -158,6 +165,39 @@ class SelectorsTC(TestCase):
         self.assertEqual(s2(None), 0)
         self.assertEqual(s3(None), 0)
         self.assertEqual(self.count, 8)
+
+@contextmanager
+def prepended_syspath(path):
+    sys.path.insert(0, path)
+    yield
+    sys.path = sys.path[1:]
+
+class RegistryStoreTC(TestCase):
+
+    def test_autoload(self):
+        store = RegistryStore()
+        store.setdefault('zereg')
+        with prepended_syspath(self.datadir):
+            store.register_objects([self.datapath('regobjects.py'),
+                                    self.datapath('regobjects2.py')])
+        self.assertEqual(['zereg'], store.keys())
+        self.assertEqual(set(('appobject1', 'appobject2', 'appobject3')),
+                         set(store['zereg']))
+
+
+class RegistrableInstanceTC(TestCase):
+
+    def test_instance_modulename(self):
+        # no inheritance
+        obj = RegistrableInstance()
+        self.assertEqual(obj.__module__, 'unittest_registry')
+        # with inheritance from another python file
+        with prepended_syspath(self.datadir):
+            from regobjects2 import instance, MyRegistrableInstance
+            instance2 = MyRegistrableInstance()
+            self.assertEqual(instance.__module__, 'regobjects2')
+            self.assertEqual(instance2.__module__, 'unittest_registry')
+
 
 if __name__ == '__main__':
     unittest_main()
