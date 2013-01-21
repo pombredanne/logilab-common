@@ -1,7 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
---
+
+2013-01-21  -- 0.59.0
+
     * registry:
 
       - introduce RegistrableObject base class, mandatory to make
@@ -20,6 +22,20 @@ ChangeLog for logilab.common
       - use register_all when no registration callback defined (closes #111011)
 
     * loggin_ext: on windows, use colorama to display colored logs, if available (closes #107436)
+
+    * packaging: remove references to ftp at logilab
+
+    * deprecations: really check them
+
+    * packaging: steal spec file from fedora (closes #113099)
+
+    * packaging force python2.6 on rhel5 (closes #113099)
+
+    * packaging Update download and project urls (closes #113099)
+
+    * configuration: enhance merge_options function (closes #113458)
+
+
 
 2012-11-14  --  0.58.3
     * date: fix ustrftime() impl. for python3 (closes #82161, patch by Arfrever
