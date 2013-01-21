@@ -1,4 +1,4 @@
-# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2013 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -250,7 +250,9 @@ def locked(acquire, release):
 
 
 def monkeypatch(klass, methodname=None):
-    """Decorator extending class with the decorated callable
+    """Decorator extending class with the decorated callable. This is basically
+    a syntactic sugar vs class assignment.
+
     >>> class A:
     ...     pass
     >>> @monkeypatch(A)
@@ -274,34 +276,6 @@ def monkeypatch(klass, methodname=None):
             raise AttributeError('%s has no __name__ attribute: '
                                  'you should provide an explicit `methodname`'
                                  % func)
-        if callable(func):
-            if sys.version_info < (3, 0):
-                setattr(klass, name, method_type(func, None, klass))
-            #elif  isinstance(func, types.FunctionType):
-            else:
-                setattr(klass, name, func)
-            #else:
-            #    setattr(klass, name, UnboundMethod(func))
-        else:
-            # likely a property
-            # this is quite borderline but usage already in the wild ...
-            setattr(klass, name, func)
+        setattr(klass, name, func)
         return func
     return decorator
-
-if sys.version_info >= (3, 0):
-    class UnboundMethod(object):
-        """unbound method wrapper necessary for python3 where we can't turn
-        arbitrary object (eg class implementing __call__) into a method, as
-        there is no more unbound method and only function are turned
-        automatically to method when accessed through an instance.
-        """
-        __slots__ = ('_callable',)
-
-        def __init__(self, callable):
-            self._callable = callable
-
-        def __get__(self, instance, objtype):
-            if instance is None:
-                return self._callable
-            return types.MethodType(self._callable, instance)

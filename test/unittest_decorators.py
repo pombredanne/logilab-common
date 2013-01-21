@@ -1,4 +1,4 @@
-# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2013 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -45,26 +45,28 @@ class DecoratorsTC(TestCase):
         self.assertEqual(MyClass().meth1(), 12)
         self.assertEqual(MyClass().meth2(), 12)
 
-    def test_monkeypatch_callable_non_callable(self):
-        tester = self
+    def test_monkeypatch_property(self):
         class MyClass: pass
         @monkeypatch(MyClass, methodname='prop1')
         @property
         def meth1(self):
             return 12
-        # class XXX(object):
-        #     def __call__(self, other):
-        #         tester.assertIsInstance(other, MyClass)
-        #         return 12
-        # try:
-        #     monkeypatch(MyClass)(XXX())
-        # except AttributeError, err:
-        #     self.assertTrue(str(err).endswith('has no __name__ attribute: you should provide an explicit `methodname`'))
-        # monkeypatch(MyClass, 'foo')(XXX())
-        # self.assertIsInstance(MyClass.prop1, property)
-        # self.assertTrue(callable(MyClass.foo))
+        self.assertIsInstance(MyClass.prop1, property)
         self.assertEqual(MyClass().prop1, 12)
-        # self.assertEqual(MyClass().foo(), 12)
+
+    def test_monkeypatch_arbitrary_callable(self):
+        class MyClass: pass
+        class ArbitraryCallable(object):
+            def __call__(self):
+                return 12
+        # ensure it complains about missing __name__
+        with self.assertRaises(AttributeError) as cm:
+            monkeypatch(MyClass)(ArbitraryCallable())
+        self.assertTrue(str(cm.exception).endswith('has no __name__ attribute: you should provide an explicit `methodname`'))
+        # ensure no black magic under the hood
+        monkeypatch(MyClass, 'foo')(ArbitraryCallable())
+        self.assertTrue(callable(MyClass.foo))
+        self.assertEqual(MyClass().foo(), 12)
 
     def test_monkeypatch_with_same_name(self):
         class MyClass: pass

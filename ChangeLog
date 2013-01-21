@@ -21,7 +21,7 @@ ChangeLog for logilab.common
 
       - use register_all when no registration callback defined (closes #111011)
 
-    * loggin_ext: on windows, use colorama to display colored logs, if available (closes #107436)
+    * logging_ext: on windows, use colorama to display colored logs, if available (closes #107436)
 
     * packaging: remove references to ftp at logilab
 
@@ -35,7 +35,10 @@ ChangeLog for logilab.common
 
     * configuration: enhance merge_options function (closes #113458)
 
-
+    * decorators: fix @monkeypatch decorator contract for dark corner
+      cases such as monkeypatching of a callable instance: no more
+      turned into an unbound method, which was broken in python 3 and
+      probably not used anywhere (actually closes #104047).
 
 2012-11-14  --  0.58.3
     * date: fix ustrftime() impl. for python3 (closes #82161, patch by Arfrever
