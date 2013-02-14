@@ -805,7 +805,7 @@ class RegistryStore(dict):
                         and getattr(obj, '__select__', None)):
                     return False
             elif issubclass(obj, RegistrableInstance):
- 		return False
+                return False
         elif not isinstance(obj, RegistrableInstance):
             return False
         if not obj.__regid__:

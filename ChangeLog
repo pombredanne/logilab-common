@@ -4,6 +4,10 @@ ChangeLog for logilab.common
 --
     * testlib: check for generators in with_tempdir (closes #117533)
 
+    * registry:
+      * remove 2 accidentally introduced tabs breaking python 3 compat (closes #117580)
+
+
 2013-01-21  -- 0.59.0
 
     * registry:
