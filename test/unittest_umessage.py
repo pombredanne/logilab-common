@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
+import sys
 import email
 from os.path import join, dirname, abspath
 
@@ -27,9 +28,14 @@ DATA = join(dirname(abspath(__file__)), 'data')
 class UMessageTC(TestCase):
 
     def setUp(self):
-        msg1 = email.message_from_file(open(join(DATA, 'test1.msg')))
+        if sys.version_info >= (3, 2):
+            import io
+            msg1 = email.message_from_file(io.open(join(DATA, 'test1.msg'), encoding='utf8'))
+            msg2 = email.message_from_file(io.open(join(DATA, 'test2.msg'), encoding='utf8'))
+        else:
+            msg1 = email.message_from_file(open(join(DATA, 'test1.msg')))
+            msg2 = email.message_from_file(open(join(DATA, 'test2.msg')))
         self.umessage1 = UMessage(msg1)
-        msg2 = email.message_from_file(open(join(DATA, 'test2.msg')))
         self.umessage2 = UMessage(msg2)
 
     def test_get_subject(self):

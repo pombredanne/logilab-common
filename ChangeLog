@@ -5,7 +5,13 @@ ChangeLog for logilab.common
     * testlib: check for generators in with_tempdir (closes #117533)
 
     * registry:
-      * remove 2 accidentally introduced tabs breaking python 3 compat (closes #117580)
+      * select_or_none should not silent ObjectNotFound exception
+	(closes #119819)
+      * remove 2 accidentally introduced tabs breaking python 3 compat
+        (closes #117580)
+
+    * fix umessages test w/ python 3 and LC_ALL=C (closes #119967, report and
+      patch by Ian Delaney)
 
 
 2013-01-21  -- 0.59.0
