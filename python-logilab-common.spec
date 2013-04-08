@@ -15,7 +15,7 @@ Release:        logilab.1%{?dist}
 Summary:        Common libraries for Logilab projects
 
 Group:          Development/Libraries
-License:        GPLv2+
+License:        LGPLv2.1+
 URL:            http://www.logilab.org/projects/logilab-common
 Source0:        http://download.logilab.org/pub/common/logilab-common-%{version}.tar.gz
 BuildArch:      noarch
