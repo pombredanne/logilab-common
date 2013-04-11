@@ -22,15 +22,7 @@ __docformat__ = "restructuredtext en"
 import sys
 from warnings import warn
 
-class class_deprecated(type):
-    """metaclass to print a warning on instantiation of a deprecated class"""
-
-    def __call__(cls, *args, **kwargs):
-        msg = getattr(cls, "__deprecation_warning__",
-                      "%(cls)s is deprecated") % {'cls': cls.__name__}
-        warn(msg, DeprecationWarning, stacklevel=2)
-        return type.__call__(cls, *args, **kwargs)
-
+from logilab.common.changelog import Version
 
 def class_renamed(old_name, new_class, message=None):
     """automatically creates a class which fires a DeprecationWarning
@@ -71,24 +63,6 @@ def class_moved(new_class, old_name=None, message=None):
             old_name, new_class.__module__, new_class.__name__)
     return class_renamed(old_name, new_class, message)
 
-def deprecated(reason=None, stacklevel=2, name=None, doc=None):
-    """Decorator that raises a DeprecationWarning to print a message
-    when the decorated function is called.
-    """
-    def deprecated_decorator(func):
-        message = reason or 'The function "%s" is deprecated'
-        if '%s' in message:
-            message = message % func.func_name
-        def wrapped(*args, **kwargs):
-            warn(message, DeprecationWarning, stacklevel=stacklevel)
-            return func(*args, **kwargs)
-        try:
-            wrapped.__name__ = name or func.__name__
-        except TypeError: # readonly attribute in 2.3
-            pass
-        wrapped.__doc__ = doc or func.__doc__
-        return wrapped
-    return deprecated_decorator
 
 def moved(modpath, objname):
     """use to tell that a callable has been moved to a new module.
@@ -128,3 +102,78 @@ class DeprecationWrapper(object):
         else:
             warn(self._msg, DeprecationWarning, stacklevel=2)
             setattr(self._proxied, attr, value)
+
+
+class DeprecationManager(object):
+    """Manage the deprecation message handling. Messages are dropped for
+    versions more recent than the 'compatible' version. Example::
+
+        deprecator = deprecation.DeprecationManager("module_name")
+        deprecator.compatibility('1.3')
+
+        deprecator.warn('1.2', "message.")
+
+        @deprecator.deprecated('1.2', 'Message')
+        def any_func():
+            pass
+
+        class AnyClass(object):
+            __metaclass__ = deprecator.class_deprecated('1.2')
+    """
+    def __init__(self, module_name=None):
+        """
+        """
+        self.module_name = module_name
+        self.compatible_version = None
+
+    def compatibility(self, compatible_version):
+        """Set the compatible version.
+        """
+        self.compatible_version = Version(compatible_version)
+
+    def deprecated(self, version=None, reason=None, stacklevel=2, name=None, doc=None):
+        """Display a deprecation message only if the version is older than the
+        compatible version.
+        """
+        def decorator(func):
+            message = reason or 'The function "%s" is deprecated'
+            if '%s' in message:
+                message %= func.func_name
+            def wrapped(*args, **kwargs):
+                self.warn(version, message, stacklevel)
+                return func(*args, **kwargs)
+            return wrapped
+        return decorator
+
+    def class_deprecated(self, version=None):
+        class metaclass(type):
+            """metaclass to print a warning on instantiation of a deprecated class"""
+
+            def __call__(cls, *args, **kwargs):
+                msg = getattr(cls, "__deprecation_warning__",
+                              "%(cls)s is deprecated") % {'cls': cls.__name__}
+                self.warn(version, msg)
+                return type.__call__(cls, *args, **kwargs)
+        return metaclass
+
+    def warn(self, version=None, reason="", stacklevel=2):
+        """Display a deprecation message only if the version is older than the
+        compatible version.
+        """
+        if (self.compatible_version is None
+            or version is None
+            or Version(version) < self.compatible_version):
+            if self.module_name and version:
+                reason = '[%s %s] %s' % (self.module_name, version, reason)
+            elif self.module_name:
+                reason = '[%s] %s' % (self.module_name, reason)
+            elif version:
+                reason = '[%s] %s' % (version, reason)
+            warn(reason, DeprecationWarning, stacklevel=stacklevel)
+
+_defaultdeprecator = DeprecationManager()
+
+def deprecated(reason=None, stacklevel=2, name=None, doc=None):
+    return _defaultdeprecator.deprecated(None, reason, stacklevel, name, doc)
+
+class_deprecated = _defaultdeprecator.class_deprecated()

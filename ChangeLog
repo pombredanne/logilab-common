@@ -13,6 +13,8 @@ ChangeLog for logilab.common
     * fix umessages test w/ python 3 and LC_ALL=C (closes #119967, report and
       patch by Ian Delaney)
 
+--
+    * deprecation: new DeprecationManager class (closes #108205)
 
 2013-01-21  -- 0.59.0
 
