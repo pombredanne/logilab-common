@@ -1,4 +1,4 @@
-# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2013 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of Logilab-common.
@@ -360,8 +360,8 @@ class Registry(dict):
         according to the given context, or None if no object applies.
         """
         try:
-            return self.select(__oid, *args, **kwargs)
-        except (NoSelectableObject, ObjectNotFound):
+            return self._select_best(self[__oid], *args, **kwargs)
+        except ObjectNotFound:
             return None
 
     def possible_objects(self, *args, **kwargs):
