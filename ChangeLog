@@ -2,6 +2,9 @@ ChangeLog for logilab.common
 ============================
 
 --
+    * graph: added pruning of the recursive search tree for detecting cycles in
+      graphs (closes #2469)
+
     * testlib: check for generators in with_tempdir (closes #117533)
 
     * registry:
