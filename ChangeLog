@@ -1,40 +1,39 @@
 ChangeLog for logilab.common
 ============================
 
---
+2013-04-16  --  0.59.1
     * graph: added pruning of the recursive search tree for detecting cycles in
       graphs (closes #2469)
 
     * testlib: check for generators in with_tempdir (closes #117533)
 
     * registry:
-      * select_or_none should not silent ObjectNotFound exception
-	(closes #119819)
-      * remove 2 accidentally introduced tabs breaking python 3 compat
-        (closes #117580)
+
+        * select_or_none should not silent ObjectNotFound exception
+	  (closes #119819)
+
+        * remove 2 accidentally introduced tabs breaking python 3 compat
+          (closes #117580)
 
     * fix umessages test w/ python 3 and LC_ALL=C (closes #119967, report and
       patch by Ian Delaney)
 
 
-2013-01-21  -- 0.59.0
 
+2013-01-21  --  0.59.0
     * registry:
 
-      - introduce RegistrableObject base class, mandatory to make
+        - introduce RegistrableObject base class, mandatory to make
         classes automatically registrable, and cleanup code
         accordingly
-
-      - introduce objid and objname methods on Registry instead of
+        - introduce objid and objname methods on Registry instead of
         classid function and inlined code plus other refactorings to allow
         arbitrary objects to be registered, provided they inherit from new
         RegistrableInstance class (closes #98742)
-
-      - deprecate usage of leading underscore to skip object registration, using
+        - deprecate usage of leading underscore to skip object registration, using
         __abstract__ explicitly is better and notion of registered object 'name'
         is now somewhat fuzzy
-
-      - use register_all when no registration callback defined (closes #111011)
+        - use register_all when no registration callback defined (closes #111011)
 
     * logging_ext: on windows, use colorama to display colored logs, if available (closes #107436)
 
@@ -54,6 +53,8 @@ ChangeLog for logilab.common
       cases such as monkeypatching of a callable instance: no more
       turned into an unbound method, which was broken in python 3 and
       probably not used anywhere (actually closes #104047).
+
+
 
 2012-11-14  --  0.58.3
     * date: fix ustrftime() impl. for python3 (closes #82161, patch by Arfrever
