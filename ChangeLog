@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+--
+    * modutils: fix typo causing name error in python3 / bad message in python2
+      (#136037)
+
+
 2013-04-16  --  0.59.1
     * graph: added pruning of the recursive search tree for detecting cycles in
       graphs (closes #2469)

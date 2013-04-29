@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2013 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -570,7 +570,7 @@ def _search_zip(modpath, pic):
             if importer.find_module(modpath[0]):
                 if not importer.find_module('/'.join(modpath)):
                     raise ImportError('No module named %s in %s/%s' % (
-                        '.'.join(modpath[1:]), file, modpath))
+                        '.'.join(modpath[1:]), filepath, modpath))
                 return ZIPFILE, abspath(filepath) + '/' + '/'.join(modpath), filepath
     raise ImportError('No module named %s' % '.'.join(modpath))
 
