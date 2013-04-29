@@ -185,7 +185,7 @@ class is_standard_module_tc(ModutilsTestCase):
     library
     """
 
-    def test_knownValues_is_standard_module_builtins(self):
+    def test_builtins(self):
         if sys.version_info < (3, 0):
             self.assertEqual(modutils.is_standard_module('__builtin__'), True)
             self.assertEqual(modutils.is_standard_module('builtins'), False)
@@ -193,16 +193,16 @@ class is_standard_module_tc(ModutilsTestCase):
             self.assertEqual(modutils.is_standard_module('__builtin__'), False)
             self.assertEqual(modutils.is_standard_module('builtins'), True)
 
-    def test_knownValues_is_standard_module_builtin(self):
+    def test_builtin(self):
         self.assertEqual(modutils.is_standard_module('sys'), True)
 
-    def test_knownValues_is_standard_module_nonstandard(self):
+    def test_nonstandard(self):
         self.assertEqual(modutils.is_standard_module('logilab'), False)
 
-    def test_knownValues_is_standard_module_unknown(self):
+    def test_unknown(self):
         self.assertEqual(modutils.is_standard_module('unknown'), False)
 
-    def test_knownValues_is_standard_module_4(self):
+    def test_4(self):
         self.assertEqual(modutils.is_standard_module('marshal'), True)
         self.assertEqual(modutils.is_standard_module('hashlib'), True)
         self.assertEqual(modutils.is_standard_module('pickle'), True)
@@ -210,9 +210,19 @@ class is_standard_module_tc(ModutilsTestCase):
         self.assertEqual(modutils.is_standard_module('io'), sys.version_info >= (2, 6))
         self.assertEqual(modutils.is_standard_module('StringIO'), sys.version_info < (3, 0))
 
-    def test_knownValues_is_standard_module_custom_path(self):
+    def test_custom_path(self):
         self.assertEqual(modutils.is_standard_module('data.module', (DATADIR,)), True)
         self.assertEqual(modutils.is_standard_module('data.module', (path.abspath(DATADIR),)), True)
+
+    def test_failing_border_cases(self):
+        # using a subpackage/submodule path as std_path argument
+        self.assertEqual(modutils.is_standard_module('logilab.common', common.__path__), False)
+        # using a module + object name as modname argument
+        self.assertEqual(modutils.is_standard_module('sys.path'), True)
+        # this is because only the first package/module is considered
+        self.assertEqual(modutils.is_standard_module('sys.whatever'), True)
+        self.assertEqual(modutils.is_standard_module('logilab.whatever', common.__path__), False)
+
 
 class is_relative_tc(ModutilsTestCase):
 
