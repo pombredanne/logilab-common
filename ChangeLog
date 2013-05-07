@@ -2,8 +2,13 @@ ChangeLog for logilab.common
 ============================
 
 --
-    * modutils: fix typo causing name error in python3 / bad message in python2
-      (#136037)
+    * modutils:
+
+      * fix typo causing name error in python3 / bad message in python2
+        (#136037)
+
+      * fix python3.3 crash in file_from_modpath due to implementation
+        change of imp.find_module wrt builtin modules (#137244)
 
 
 2013-04-16  --  0.59.1

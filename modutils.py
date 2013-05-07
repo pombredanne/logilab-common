@@ -606,6 +606,15 @@ def _module_file(modpath, path=None):
         checkeggs = False
     imported = []
     while modpath:
+        # take care to changes in find_module implementation wrt builtin modules
+        #
+        # Python 2.6.6 (r266:84292, Sep 11 2012, 08:34:23)
+        # >>> imp.find_module('posix')
+        # (None, 'posix', ('', '', 6))
+        #
+        # Python 3.3.1 (default, Apr 26 2013, 12:08:46)
+        # >>> imp.find_module('posix')
+        # (None, None, ('', '', 6))
         try:
             _, mp_filename, mp_desc = find_module(modpath[0], path)
         except ImportError:
@@ -613,7 +622,7 @@ def _module_file(modpath, path=None):
                 return _search_zip(modpath, pic)[:2]
             raise
         else:
-            if checkeggs:
+            if checkeggs and mp_filename:
                 fullabspath = [abspath(x) for x in _path]
                 try:
                     pathindex = fullabspath.index(dirname(abspath(mp_filename)))
