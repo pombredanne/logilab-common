@@ -2,6 +2,7 @@ ChangeLog for logilab.common
 ============================
 
 --
+    * configuration: rename option_name method into option_attrname (#140667)
     * deprecation: new DeprecationManager class (closes #108205)
 
 

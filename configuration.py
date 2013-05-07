@@ -114,7 +114,7 @@ from ConfigParser import ConfigParser, NoOptionError, NoSectionError, \
 from warnings import warn
 
 from logilab.common.compat import callable, raw_input, str_encode as _encode
-
+from logilab.common.deprecation import deprecated
 from logilab.common.textutils import normalize_text, unquote
 from logilab.common import optik_ext as optparse
 
@@ -278,7 +278,7 @@ def expand_default(self, option):
         value = None
     else:
         optdict = provider.get_option_def(optname)
-        optname = provider.option_name(optname, optdict)
+        optname = provider.option_attrname(optname, optdict)
         value = getattr(provider.config, optname, optdict)
         value = format_option_value(optdict, value)
     if value is optparse.NO_DEFAULT or not value:
@@ -777,16 +777,17 @@ class OptionsProviderMixIn(object):
             default = default()
         return default
 
-    def option_name(self, opt, optdict=None):
+    def option_attrname(self, opt, optdict=None):
         """get the config attribute corresponding to opt
         """
         if optdict is None:
             optdict = self.get_option_def(opt)
         return optdict.get('dest', opt.replace('-', '_'))
+    option_name = deprecated('[0.60] OptionsProviderMixIn.option_name() was renamed to option_attrname()')(option_attrname)
 
     def option_value(self, opt):
         """get the current value for the given option"""
-        return getattr(self.config, self.option_name(opt), None)
+        return getattr(self.config, self.option_attrname(opt), None)
 
     def set_option(self, opt, value, action=None, optdict=None):
         """method called to set an option (registered in the options list)
@@ -799,19 +800,19 @@ class OptionsProviderMixIn(object):
         if action is None:
             action = optdict.get('action', 'store')
         if optdict.get('type') == 'named': # XXX need specific handling
-            optname = self.option_name(opt, optdict)
+            optname = self.option_attrname(opt, optdict)
             currentvalue = getattr(self.config, optname, None)
             if currentvalue:
                 currentvalue.update(value)
                 value = currentvalue
         if action == 'store':
-            setattr(self.config, self.option_name(opt, optdict), value)
+            setattr(self.config, self.option_attrname(opt, optdict), value)
         elif action in ('store_true', 'count'):
-            setattr(self.config, self.option_name(opt, optdict), 0)
+            setattr(self.config, self.option_attrname(opt, optdict), 0)
         elif action == 'store_false':
-            setattr(self.config, self.option_name(opt, optdict), 1)
+            setattr(self.config, self.option_attrname(opt, optdict), 1)
         elif action == 'append':
-            opt = self.option_name(opt, optdict)
+            opt = self.option_attrname(opt, optdict)
             _list = getattr(self.config, opt, None)
             if _list is None:
                 if isinstance(value, (list, tuple)):
@@ -932,7 +933,7 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
 
     def __getitem__(self, key):
         try:
-            return getattr(self.config, self.option_name(key))
+            return getattr(self.config, self.option_attrname(key))
         except (optparse.OptionValueError, AttributeError):
             raise KeyError(key)
 
@@ -941,7 +942,7 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
 
     def get(self, key, default=None):
         try:
-            return getattr(self.config, self.option_name(key))
+            return getattr(self.config, self.option_attrname(key))
         except (OptionError, AttributeError):
             return default
 
@@ -977,17 +978,17 @@ class OptionsManager2ConfigurationAdapter(object):
     def __getitem__(self, key):
         provider = self.config._all_options[key]
         try:
-            return getattr(provider.config, provider.option_name(key))
+            return getattr(provider.config, provider.option_attrname(key))
         except AttributeError:
             raise KeyError(key)
 
     def __setitem__(self, key, value):
-        self.config.global_set_option(self.config.option_name(key), value)
+        self.config.global_set_option(self.config.option_attrname(key), value)
 
     def get(self, key, default=None):
         provider = self.config._all_options[key]
         try:
-            return getattr(provider.config, provider.option_name(key))
+            return getattr(provider.config, provider.option_attrname(key))
         except AttributeError:
             return default
 
