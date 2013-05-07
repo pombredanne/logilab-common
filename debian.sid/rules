@@ -1,0 +1,76 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+#
+# Copyright (c) 2003-2011 LOGILAB S.A. (Paris, FRANCE).
+# http://www.logilab.fr/ -- mailto:contact@logilab.fr
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+include /usr/share/python/python.mk
+
+PYLIB:=$(call py_libdir,$(shell pyversions -d))
+PACKAGE:=$(call py_pkgname,python-logilab-common,python)
+PYLIB3:=$(call py_libdir,python3.)
+PACKAGE3:=$(call py_pkgname,python-logilab-common,python3.)
+
+%:
+	dh $@ --with python2,python3
+
+override_dh_auto_build:
+ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
+	$(MAKE) -C doc
+endif
+
+override_dh_auto_install:
+	NO_SETUPTOOLS=1 python setup.py -q install --no-compile \
+	                --root=$(CURDIR)/debian/$(PACKAGE)/ \
+	                ${py_setup_install_args}
+	# remove test directory
+	rm -rf debian/$(PACKAGE)/$(PYLIB)/logilab/common/test
+	
+	NO_SETUPTOOLS=1 python3 setup.py -q install --no-compile \
+	                --root=$(CURDIR)/debian/$(PACKAGE3)/ \
+	                ${py_setup_install_args}
+	# remove test directory
+	rm -rf debian/$(PACKAGE3)/$(PYLIB3)/logilab/common/test
+	
+	# rename pytest and its man page for python3k
+	mv debian/$(PACKAGE3)/usr/bin/pytest debian/$(PACKAGE3)/usr/bin/pytest3
+	sed -i 's/python -u/python3 -u/' debian/$(PACKAGE3)/usr/bin/pytest3
+	install -D doc/pytest.1 debian/$(PACKAGE3)/usr/share/man/man1/pytest3.1
+	sed -i 's/pytest/pytest3/' debian/$(PACKAGE3)/usr/share/man/man1/pytest3.1
+	gzip debian/$(PACKAGE3)/usr/share/man/man1/pytest3.1
+
+override_dh_installdocs:
+	dh_installchangelogs -i ChangeLog
+	dh_installdocs -i README*
+ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
+	dh_installdocs -i doc/apidoc/
+endif
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	# PYTHON 2.X
+	# IMPORTANT: Install command was overriden by Logilab to install data test files.
+	NO_SETUPTOOLS=1 python setup.py -q install --no-compile \
+	                --root=$(CURDIR)/testing/ ${py_setup_install_args}
+	# since "logilab.common" is a namespace package, we need to "simulate" it
+	touch $(CURDIR)/testing/$(PYLIB)/logilab/__init__.py
+	# use the default python version to select the script dir to run the tests
+	PYTHONPATH=$(CURDIR)/testing/$(PYLIB) python $(CURDIR)/testing/usr/bin/pytest -t $(CURDIR)/testing/$(PYLIB)/logilab/common/test
+	rm -rf $(CURDIR)/testing
+	
+	# PYTHON 3.2
+	# IMPORTANT: Install command was overriden by Logilab to install data test files.
+	NO_SETUPTOOLS=1 python3 setup.py -q install --no-compile \
+	                --root=$(CURDIR)/testing/ ${py_setup_install_args}
+	# since "logilab.common" is a namespace package, we need to "simulate" it
+	touch $(CURDIR)/testing/$(PYLIB3)/logilab/__init__.py
+	# use python3 version to run pytest
+	-PYTHONPATH=$(CURDIR)/testing/$(PYLIB3) python3 $(CURDIR)/testing/usr/bin/pytest -t $(CURDIR)/testing/$(PYLIB3)/logilab/common/test
+	rm -rf $(CURDIR)/testing
+endif
+
+override_dh_compress:
+	dh_compress -X.py -X.ini -X.xml -Xtest/ -Xapidoc/
