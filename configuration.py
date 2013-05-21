@@ -913,7 +913,7 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
                     continue
                 if not gdef in self.option_groups:
                     self.option_groups.append(gdef)
-        self.register_options_provider(self, own_group=0)
+        self.register_options_provider(self, own_group=False)
 
     def register_options(self, options):
         """add some options to the configuration"""
