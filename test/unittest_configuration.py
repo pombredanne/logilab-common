@@ -25,7 +25,8 @@ from sys import version_info
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.optik_ext import OptionValueError
 from logilab.common.configuration import Configuration, \
-     OptionsManagerMixIn, OptionsProviderMixIn, Method, read_old_config
+     OptionsManagerMixIn, OptionsProviderMixIn, Method, read_old_config, \
+     merge_options
 
 DATA = join(dirname(abspath(__file__)), 'data')
 
@@ -329,6 +330,25 @@ class RegrTC(TestCase):
         self.linter.load_command_line_configuration([])
         self.assertEqual(self.linter.config.profile, False)
 
+class MergeTC(TestCase):
+
+    def test_merge1(self):
+        merged = merge_options([('dothis', {'type':'yn', 'action': 'store', 'default': True,  'metavar': '<y or n>'}),
+                                ('dothis', {'type':'yn', 'action': 'store', 'default': False, 'metavar': '<y or n>'}),
+                                ])
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(merged[0][0], 'dothis')
+        self.assertEqual(merged[0][1]['default'], True)
+
+    def test_merge2(self):
+        merged = merge_options([('dothis', {'type':'yn', 'action': 'store', 'default': True,  'metavar': '<y or n>'}),
+                                ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
+                                ('dothis', {'type':'yn', 'action': 'store', 'default': False, 'metavar': '<y or n>'}),
+                                ])
+        self.assertEqual(len(merged), 2)
+        self.assertEqual(merged[0][0], 'value')
+        self.assertEqual(merged[1][0], 'dothis')
+        self.assertEqual(merged[1][1]['default'], True)
 
 if __name__ == '__main__':
     unittest_main()
