@@ -201,7 +201,7 @@ named=key:val
 diffgroup=pouet""")
 
 
-    def test_loopback(self):
+    def test_roundtrip(self):
         cfg = self.cfg
         f = tempfile.mktemp()
         stream = open(f, 'w')
