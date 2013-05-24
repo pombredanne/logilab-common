@@ -30,7 +30,7 @@ from logilab.common.configuration import Configuration, \
 
 DATA = join(dirname(abspath(__file__)), 'data')
 
-options = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar': '<y or n>'}),
+OPTIONS = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar': '<y or n>'}),
            ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
            ('multiple', {'type': 'csv', 'default': ('yop', 'yep'),
                          'metavar': '<comma separated values>',
@@ -57,7 +57,7 @@ class MyConfiguration(Configuration):
 class ConfigurationTC(TestCase):
 
     def setUp(self):
-        self.cfg = MyConfiguration(name='test', options=options, usage='Just do it ! (tm)')
+        self.cfg = MyConfiguration(name='test', options=OPTIONS, usage='Just do it ! (tm)')
 
     def test_default(self):
         cfg = self.cfg
@@ -209,7 +209,7 @@ diffgroup=pouet""")
         try:
             cfg.generate_config(stream)
             stream.close()
-            new_cfg = MyConfiguration(name='testloop', options=options)
+            new_cfg = MyConfiguration(name='testloop', options=OPTIONS)
             new_cfg.load_file_configuration(f)
             self.assertEqual(cfg['dothis'], new_cfg['dothis'])
             self.assertEqual(cfg['multiple'], new_cfg['multiple'])
