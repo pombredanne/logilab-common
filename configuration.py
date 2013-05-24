@@ -498,9 +498,9 @@ class OptionsManagerMixIn(object):
         # default is handled here and *must not* be given to optik if you
         # want the whole machinery to work
         if 'default' in optdict:
-            if (optparse.OPTPARSE_FORMAT_DEFAULT and 'help' in optdict and
-                optdict.get('default') is not None and
-                not optdict['action'] in ('store_true', 'store_false')):
+            if ('help' in optdict
+                and optdict.get('default') is not None
+                and not optdict['action'] in ('store_true', 'store_false')):
                 optdict['help'] += ' [current: %default]'
             del optdict['default']
         args = ['--' + str(opt)]
