@@ -286,7 +286,7 @@ def expand_default(self, option):
     return option.help.replace(self.default_tag, str(value))
 
 
-def convert(value, optdict, name=''):
+def _validate(value, optdict, name=''):
     """return a validated value for an option according to its type
 
     optional argument name is only used for error message formatting
@@ -297,6 +297,7 @@ def convert(value, optdict, name=''):
         # FIXME
         return value
     return _call_validator(_type, optdict, name, value)
+convert = deprecated('[0.60] convert() was renamed _validate()')(_validate)
 
 def comment(string):
     """return string as a comment"""
@@ -796,7 +797,7 @@ class OptionsProviderMixIn(object):
         if optdict is None:
             optdict = self.get_option_def(opt)
         if value is not None:
-            value = convert(value, optdict, opt)
+            value = _validate(value, optdict, opt)
         if action is None:
             action = optdict.get('action', 'store')
         if optdict.get('type') == 'named': # XXX need specific handling
