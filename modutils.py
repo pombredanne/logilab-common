@@ -574,6 +574,11 @@ def _search_zip(modpath, pic):
                 return ZIPFILE, abspath(filepath) + '/' + '/'.join(modpath), filepath
     raise ImportError('No module named %s' % '.'.join(modpath))
 
+try:
+    import pkg_resources
+except ImportError:
+    pkg_resources = None
+
 def _module_file(modpath, path=None):
     """get a module type / file path
 
@@ -604,6 +609,12 @@ def _module_file(modpath, path=None):
         checkeggs = True
     except AttributeError:
         checkeggs = False
+    # pkg_resources support (aka setuptools namespace packages)
+    if pkg_resources is not None and modpath[0] in pkg_resources._namespace_packages and len(modpath) > 1:
+        # setuptools has added into sys.modules a module object with proper
+        # __path__, get back information from there
+        module = sys.modules[modpath.pop(0)]
+        path = module.__path__
     imported = []
     while modpath:
         # take care to changes in find_module implementation wrt builtin modules
