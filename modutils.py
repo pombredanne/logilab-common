@@ -617,6 +617,7 @@ def _module_file(modpath, path=None):
         path = module.__path__
     imported = []
     while modpath:
+        modname = modpath[0]
         # take care to changes in find_module implementation wrt builtin modules
         #
         # Python 2.6.6 (r266:84292, Sep 11 2012, 08:34:23)
@@ -627,7 +628,7 @@ def _module_file(modpath, path=None):
         # >>> imp.find_module('posix')
         # (None, None, ('', '', 6))
         try:
-            _, mp_filename, mp_desc = find_module(modpath[0], path)
+            _, mp_filename, mp_desc = find_module(modname, path)
         except ImportError:
             if checkeggs:
                 return _search_zip(modpath, pic)[:2]
@@ -653,7 +654,16 @@ def _module_file(modpath, path=None):
             if mtype != PKG_DIRECTORY:
                 raise ImportError('No module %s in %s' % ('.'.join(modpath),
                                                           '.'.join(imported)))
-            path = [mp_filename]
+            # XXX guess if package is using pkgutil.extend_path by looking for
+            # those keywords in the first four Kbytes
+            data = open(join(mp_filename, '__init__.py')).read(4096)
+            if 'pkgutil' in data and 'extend_path' in data:
+                # extend_path is called, search sys.path for module/packages of this name
+                # see pkgutil.extend_path documentation
+                path = [join(p, modname) for p in sys.path
+                        if isdir(join(p, modname))]
+            else:
+                path = [mp_filename]
     return mtype, mp_filename
 
 def _is_python_file(filename):
