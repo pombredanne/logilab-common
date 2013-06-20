@@ -136,6 +136,9 @@ def _get_encoding(encoding, stream):
 
 # validation functions ########################################################
 
+# validators will return the validated value or raise optparse.OptionValueError
+# XXX add to documentation
+
 def choice_validator(optdict, name, value):
     """validate and return a converted value for option of type 'choice'
     """
@@ -230,6 +233,10 @@ def _call_validator(opttype, optdict, option, value):
 
 # user input functions ########################################################
 
+# user input functions will ask the user for input on stdin then validate
+# the result and return the validated value or raise optparse.OptionValueError
+# XXX add to documentation
+
 def input_password(optdict, question='password:'):
     from getpass import getpass
     while True:
@@ -263,6 +270,8 @@ INPUT_FUNCTIONS = {
 
 for opttype in VALIDATORS.keys():
     INPUT_FUNCTIONS.setdefault(opttype, _make_input_function(opttype))
+
+# utility functions ############################################################
 
 def expand_default(self, option):
     """monkey patch OptionParser.expand_default since we have a particular
@@ -298,6 +307,8 @@ def _validate(value, optdict, name=''):
         return value
     return _call_validator(_type, optdict, name, value)
 convert = deprecated('[0.60] convert() was renamed _validate()')(_validate)
+
+# format and output functions ##################################################
 
 def comment(string):
     """return string as a comment"""
@@ -402,6 +413,7 @@ def rest_format_section(stream, section, options, encoding=None, doc=None):
             print >> stream, ''
             print >> stream, '  Default: ``%s``' % value.replace("`` ", "```` ``")
 
+# Options Manager ##############################################################
 
 class OptionsManagerMixIn(object):
     """MixIn to handle a configuration from both a configuration file and
@@ -735,6 +747,7 @@ class Method(object):
         assert self._inst, 'unbound method'
         return getattr(self._inst, self.method)(*args, **kwargs)
 
+# Options Provider #############################################################
 
 class OptionsProviderMixIn(object):
     """Mixin to provide options to an OptionsManager"""
@@ -793,7 +806,6 @@ class OptionsProviderMixIn(object):
     def set_option(self, opt, value, action=None, optdict=None):
         """method called to set an option (registered in the options list)
         """
-        # print "************ setting option", opt," to value", value
         if optdict is None:
             optdict = self.get_option_def(opt)
         if value is not None:
@@ -895,6 +907,7 @@ class OptionsProviderMixIn(object):
         for optname, optdict in options:
             yield (optname, optdict, self.option_value(optname))
 
+# configuration ################################################################
 
 class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
     """basic mixin for simple configurations which don't need the
@@ -993,6 +1006,7 @@ class OptionsManager2ConfigurationAdapter(object):
         except AttributeError:
             return default
 
+# other functions ##############################################################
 
 def read_old_config(newconfig, changes, configfile):
     """initialize newconfig from a deprecated configuration file
