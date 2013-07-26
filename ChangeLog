@@ -1,24 +1,25 @@
 ChangeLog for logilab.common
 ============================
 
---
+2013-07-26  --  0.60.0
     * configuration: rename option_name method into option_attrname (#140667)
 
     * deprecation: new DeprecationManager class (closes #108205)
 
     * modutils:
 
-      * fix typo causing name error in python3 / bad message in python2
-        (#136037)
+      - fix typo causing name error in python3 / bad message in python2
+       (#136037)
 
-      * fix python3.3 crash in file_from_modpath due to implementation
+      - fix python3.3 crash in file_from_modpath due to implementation
         change of imp.find_module wrt builtin modules (#137244)
 
-    * testlib: use assertCountEqual instead of assertSameElements/assertItemsEqual 
+    * testlib: use assertCountEqual instead of assertSameElements/assertItemsEqual
       (deprecated), fixing crash with python 3.3 (#144526)
 
     * graph: use codecs.open avoid crash when writing utf-8 data under python3
       (#155138)
+
 
 
 2013-04-16  --  0.59.1
@@ -29,28 +30,30 @@ ChangeLog for logilab.common
 
     * registry:
 
-        * select_or_none should not silent ObjectNotFound exception
-	  (closes #119819)
+      - select_or_none should not silent ObjectNotFound exception
+        (closes #119819)
 
-        * remove 2 accidentally introduced tabs breaking python 3 compat
-          (closes #117580)
+      - remove 2 accidentally introduced tabs breaking python 3 compat
+        (closes #117580)
 
     * fix umessages test w/ python 3 and LC_ALL=C (closes #119967, report and
       patch by Ian Delaney)
+
+
 
 2013-01-21  --  0.59.0
     * registry:
 
         - introduce RegistrableObject base class, mandatory to make
-        classes automatically registrable, and cleanup code
-        accordingly
+          classes automatically registrable, and cleanup code
+          accordingly
         - introduce objid and objname methods on Registry instead of
-        classid function and inlined code plus other refactorings to allow
-        arbitrary objects to be registered, provided they inherit from new
-        RegistrableInstance class (closes #98742)
+          classid function and inlined code plus other refactorings to allow
+          arbitrary objects to be registered, provided they inherit from new
+          RegistrableInstance class (closes #98742)
         - deprecate usage of leading underscore to skip object registration, using
-        __abstract__ explicitly is better and notion of registered object 'name'
-        is now somewhat fuzzy
+          __abstract__ explicitly is better and notion of registered object 'name'
+          is now somewhat fuzzy
         - use register_all when no registration callback defined (closes #111011)
 
     * logging_ext: on windows, use colorama to display colored logs, if available (closes #107436)
