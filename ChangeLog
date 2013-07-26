@@ -10,6 +10,11 @@ ChangeLog for logilab.common
       * fix python3.3 crash in file_from_modpath due to implementation
         change of imp.find_module wrt builtin modules (#137244)
 
+    * testlib: use assertCountEqual instead of assertSameElements/assertItemsEqual 
+      (deprecated), fixing crash with python 3.3 (#144526)
+
+    * graph: use codecs.open avoid crash when writing utf-8 data under python3
+      (#155138)
 
 2013-04-16  --  0.59.1
     * graph: added pruning of the recursive search tree for detecting cycles in
