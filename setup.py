@@ -143,7 +143,7 @@ class MyBuildPy(build_py):
                     # brackets are NOT optional here for py3k compat
                     print('running 2to3 on', dest)
                     # Needs `shell=True` to run on Windows.
-                    check_call(['2to3', '-wn', dest], shell=True)
+                    check_call(['2to3', '-wn', dest], shell=sys.platform=='win32')
 
 
 def install(**kwargs):
