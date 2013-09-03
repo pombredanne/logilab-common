@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+--
+   * modutils: don't propagate IOError when package's __init__.py file doesn't
+     exist (#174606)
+
 2013-07-26  --  0.60.0
     * configuration: rename option_name method into option_attrname (#140667)
 

@@ -656,14 +656,18 @@ def _module_file(modpath, path=None):
                                                           '.'.join(imported)))
             # XXX guess if package is using pkgutil.extend_path by looking for
             # those keywords in the first four Kbytes
-            data = open(join(mp_filename, '__init__.py')).read(4096)
-            if 'pkgutil' in data and 'extend_path' in data:
-                # extend_path is called, search sys.path for module/packages of this name
-                # see pkgutil.extend_path documentation
-                path = [join(p, modname) for p in sys.path
-                        if isdir(join(p, modname))]
-            else:
+            try:
+                data = open(join(mp_filename, '__init__.py')).read(4096)
+            except IOError:
                 path = [mp_filename]
+            else:
+                if 'pkgutil' in data and 'extend_path' in data:
+                    # extend_path is called, search sys.path for module/packages
+                    # of this name see pkgutil.extend_path documentation
+                    path = [join(p, modname) for p in sys.path
+                            if isdir(join(p, modname))]
+                else:
+                    path = [mp_filename]
     return mtype, mp_filename
 
 def _is_python_file(filename):
