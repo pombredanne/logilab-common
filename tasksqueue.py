@@ -94,5 +94,7 @@ class Task(object):
     def __eq__(self, other):
         return self.id == other.id
 
+    __hash__ = object.__hash__
+
     def merge(self, other):
         pass

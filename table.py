@@ -48,6 +48,8 @@ class Table(object):
         else:
             return list(self) == list(other)
 
+    __hash__ = object.__hash__
+
     def __ne__(self, other):
         return not self == other
 
