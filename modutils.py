@@ -27,6 +27,8 @@
 :type BUILTIN_MODULES: dict
 :var BUILTIN_MODULES: dictionary with builtin module names has key
 """
+from __future__ import with_statement
+
 __docformat__ = "restructuredtext en"
 
 import sys
@@ -657,7 +659,8 @@ def _module_file(modpath, path=None):
             # XXX guess if package is using pkgutil.extend_path by looking for
             # those keywords in the first four Kbytes
             try:
-                data = open(join(mp_filename, '__init__.py')).read(4096)
+                with open(join(mp_filename, '__init__.py')) as stream:
+                    data = stream.read(4096)
             except IOError:
                 path = [mp_filename]
             else:
