@@ -139,11 +139,12 @@ class MyBuildPy(build_py):
                 shutil.copytree(directory, dest)
                 if sys.version_info >= (3, 0):
                     # process manually python file in include_dirs (test data)
-                    from subprocess import check_call
+                    from distutils.util import run_2to3
                     # brackets are NOT optional here for py3k compat
                     print('running 2to3 on', dest)
-                    # Needs `shell=True` to run on Windows.
-                    check_call(['2to3', '-wn', dest], shell=sys.platform=='win32')
+                    run_2to3([dest])
+
+
 
 
 def install(**kwargs):

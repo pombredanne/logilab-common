@@ -5,6 +5,9 @@ ChangeLog for logilab.common
    * modutils: don't propagate IOError when package's __init__.py file doesn't
      exist (#174606)
 
+   * fix some cases of failing python3 install on windows platform / cross
+     compilation (#180836)
+
 2013-07-26  --  0.60.0
     * configuration: rename option_name method into option_attrname (#140667)
 
