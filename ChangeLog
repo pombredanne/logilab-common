@@ -2,11 +2,13 @@ ChangeLog for logilab.common
 ============================
 
 --
-   * modutils: 
+   * modutils:
      * don't propagate IOError when package's __init__.py file doesn't
        exist (#174606)
      * ensure file is closed, may cause pb depending on the interpreter, eg
        pypy) (#180876)
+     * fix support for `extend_path` based nested namespace packages ;
+       Report and patch by John Johnson (#177651)
 
    * fix some cases of failing python3 install on windows platform / cross
      compilation (#180836)

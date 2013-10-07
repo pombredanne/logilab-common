@@ -667,8 +667,8 @@ def _module_file(modpath, path=None):
                 if 'pkgutil' in data and 'extend_path' in data:
                     # extend_path is called, search sys.path for module/packages
                     # of this name see pkgutil.extend_path documentation
-                    path = [join(p, modname) for p in sys.path
-                            if isdir(join(p, modname))]
+                    path = [join(p, *imported) for p in sys.path
+                            if isdir(join(p, *imported))]
                 else:
                     path = [mp_filename]
     return mtype, mp_filename
