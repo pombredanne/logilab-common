@@ -18,6 +18,7 @@
 import tempfile
 import os
 from os.path import join, dirname, abspath
+import re
 
 from cStringIO import StringIO
 from sys import version_info
@@ -32,13 +33,13 @@ DATA = join(dirname(abspath(__file__)), 'data')
 
 OPTIONS = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar': '<y or n>'}),
            ('value', {'type': 'string', 'metavar': '<string>', 'short': 'v'}),
-           ('multiple', {'type': 'csv', 'default': ('yop', 'yep'),
+           ('multiple', {'type': 'csv', 'default': ['yop', 'yep'],
                          'metavar': '<comma separated values>',
                          'help': 'you can also document the option'}),
            ('number', {'type': 'int', 'default':2, 'metavar':'<int>', 'help': 'boom'}),
            ('choice', {'type': 'choice', 'default':'yo', 'choices': ('yo', 'ye'),
                        'metavar':'<yo|ye>'}),
-           ('multiple-choice', {'type': 'multiple_choice', 'default':('yo', 'ye'),
+           ('multiple-choice', {'type': 'multiple_choice', 'default':['yo', 'ye'],
                                 'choices': ('yo', 'ye', 'yu', 'yi', 'ya'),
                                 'metavar':'<yo|ye>'}),
            ('named', {'type':'named', 'default':Method('get_named'),
@@ -63,10 +64,10 @@ class ConfigurationTC(TestCase):
         cfg = self.cfg
         self.assertEqual(cfg['dothis'], True)
         self.assertEqual(cfg['value'], None)
-        self.assertEqual(cfg['multiple'], ('yop', 'yep'))
+        self.assertEqual(cfg['multiple'], ['yop', 'yep'])
         self.assertEqual(cfg['number'], 2)
         self.assertEqual(cfg['choice'], 'yo')
-        self.assertEqual(cfg['multiple-choice'], ('yo', 'ye'))
+        self.assertEqual(cfg['multiple-choice'], ['yo', 'ye'])
         self.assertEqual(cfg['named'], {'key': 'val'})
 
     def test_base(self):
@@ -207,9 +208,12 @@ diffgroup=pouet""")
         f = tempfile.mktemp()
         stream = open(f, 'w')
         try:
+            self.cfg['dothis'] = False
+            self.cfg['multiple'] = ["toto", "tata"]
+            self.cfg['number'] = 3
             cfg.generate_config(stream)
             stream.close()
-            new_cfg = MyConfiguration(name='testloop', options=OPTIONS)
+            new_cfg = MyConfiguration(name='test', options=OPTIONS)
             new_cfg.load_file_configuration(f)
             self.assertEqual(cfg['dothis'], new_cfg['dothis'])
             self.assertEqual(cfg['multiple'], new_cfg['multiple'])
@@ -234,18 +238,19 @@ diffgroup=pouet""")
         # it is not unlikely some optik/optparse versions do print -v<string>
         # so accept both
         help = help.replace(' -v <string>, ', ' -v<string>, ')
+        help = re.sub('[ ]*(\r?\n)', '\\1', help)
         USAGE = """Usage: Just do it ! (tm)
 
 Options:
   -h, --help            show this help message and exit
-  --dothis=<y or n>     
+  --dothis=<y or n>
   -v<string>, --value=<string>
   --multiple=<comma separated values>
                         you can also document the option [current: yop,yep]
   --number=<int>        boom [current: 2]
-  --choice=<yo|ye>      
+  --choice=<yo|ye>
   --multiple-choice=<yo|ye>
-  --named=<key=val>     
+  --named=<key=val>
 
   Agroup:
     --diffgroup=<key=val>
