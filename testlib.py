@@ -1187,6 +1187,9 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         assertItemsEqual = unittest.TestCase.assertCountEqual
     else:
         assertCountEqual = unittest.TestCase.assertItemsEqual
+        if sys.version_info < (2,7):
+            def assertIsNotNone(self, value, *args, **kwargs):
+                self.assertNotEqual(None, value, *args, **kwargs)
 
 TestCase.assertItemsEqual = deprecated('assertItemsEqual is deprecated, use assertCountEqual')(
     TestCase.assertItemsEqual)
