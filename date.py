@@ -188,8 +188,8 @@ def date_range(begin, end, incday=None, incmonth=None):
     end = todate(end)
     if incmonth:
         while begin < end:
-            begin = next_month(begin, incmonth)
             yield begin
+            begin = next_month(begin, incmonth)
     else:
         incr = get_step(begin, incday or 1)
         while begin < end:

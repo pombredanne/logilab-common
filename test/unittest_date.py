@@ -138,6 +138,13 @@ class DateTC(TestCase):
         date = ticks2datetime(ticks)
         self.assertEqual(ustrftime(date, '%Y-%m-%d'), u'1899-12-31')
 
+    def test_month(self):
+        """enumerate months"""
+        r = list(date_range(self.datecls(2006, 5, 6), self.datecls(2006, 8, 27),
+                            incmonth=True))
+        expected = [self.datecls(2006, 5, 6), self.datecls(2006, 6, 1), self.datecls(2006, 7, 1), self.datecls(2006, 8, 1)]
+        self.assertListEqual(expected, r)
+
 
 class MxDateTC(DateTC):
     datecls = mxDate
