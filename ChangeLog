@@ -2,7 +2,9 @@ ChangeLog for logilab.common
 ============================
 
 --
-   * graph: ensure output is orderd on node and graph ids (#202314)
+   * pytest: use 'env' to run the python interpreter
+
+   * graph: ensure output is ordered on node and graph ids (#202314)
 
 
 2013-16-12  --  0.60.1
