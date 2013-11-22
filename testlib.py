@@ -550,6 +550,9 @@ class TestCase(unittest.TestCase):
             func(*args, **kwargs)
         except (KeyboardInterrupt, SystemExit):
             raise
+        except unittest.SkipTest, e:
+            self._addSkip(result, str(e))
+            return False
         except:
             result.addError(self, self.__exc_info())
             return False
