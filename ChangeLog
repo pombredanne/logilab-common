@@ -1,17 +1,22 @@
 ChangeLog for logilab.common
 ============================
 
---
-   * modutils:
-     * don't propagate IOError when package's __init__.py file doesn't
+2013-16-12  --  0.60.1
+    * modutils:
+
+    * don't propagate IOError when package's __init__.py file doesn't
        exist (#174606)
-     * ensure file is closed, may cause pb depending on the interpreter, eg
+
+    * ensure file is closed, may cause pb depending on the interpreter, eg
        pypy) (#180876)
-     * fix support for `extend_path` based nested namespace packages ;
+
+    * fix support for `extend_path` based nested namespace packages ;
        Report and patch by John Johnson (#177651)
 
-   * fix some cases of failing python3 install on windows platform / cross
+    * fix some cases of failing python3 install on windows platform / cross
      compilation (#180836)
+
+
 
 2013-07-26  --  0.60.0
     * configuration: rename option_name method into option_attrname (#140667)
@@ -20,10 +25,9 @@ ChangeLog for logilab.common
 
     * modutils:
 
-      - fix typo causing name error in python3 / bad message in python2
+        - fix typo causing name error in python3 / bad message in python2
        (#136037)
-
-      - fix python3.3 crash in file_from_modpath due to implementation
+        - fix python3.3 crash in file_from_modpath due to implementation
         change of imp.find_module wrt builtin modules (#137244)
 
     * testlib: use assertCountEqual instead of assertSameElements/assertItemsEqual
@@ -42,10 +46,9 @@ ChangeLog for logilab.common
 
     * registry:
 
-      - select_or_none should not silent ObjectNotFound exception
+        - select_or_none should not silent ObjectNotFound exception
         (closes #119819)
-
-      - remove 2 accidentally introduced tabs breaking python 3 compat
+        - remove 2 accidentally introduced tabs breaking python 3 compat
         (closes #117580)
 
     * fix umessages test w/ python 3 and LC_ALL=C (closes #119967, report and
