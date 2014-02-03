@@ -123,8 +123,6 @@ Modules extending some external modules
 
 * `hg`, some Mercurial_ utility functions.
 
-* `pdf_ext`, pdf and fdf file manipulations, with pdftk.
-
 * `pyro_ext`, some Pyro_ utility functions.
 
 * `sphinx_ext`, Sphinx_ plugin defining a `autodocstring` directive.

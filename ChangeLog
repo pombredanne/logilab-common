@@ -2,6 +2,8 @@ ChangeLog for logilab.common
 ============================
 
 --
+   * pdf_ext: removed, it had no known users (CVE-2014-1838)
+
    * pytest: use 'env' to run the python interpreter
 
    * graph: ensure output is ordered on node and graph ids (#202314)
