@@ -31,11 +31,13 @@ import fnmatch
 import errno
 import string
 import random
+import subprocess
 from os.path import exists, isdir, islink, basename, join
 
 from logilab.common import STD_BLACKLIST, _handle_blacklist
 from logilab.common.compat import raw_input
 from logilab.common.compat import str_to_bytes
+from logilab.common.deprecation import deprecated
 
 try:
     from logilab.common.proc import ProcInfo, NoSuchProcess
@@ -224,20 +226,17 @@ def unzip(archive, destdir):
             outfile.write(zfobj.read(name))
             outfile.close()
 
+@deprecated('Use subprocess.Popen instead')
 class Execute:
     """This is a deadlock safe version of popen2 (no stdin), that returns
     an object with errorlevel, out and err.
     """
 
     def __init__(self, command):
-        outfile = tempfile.mktemp()
-        errfile = tempfile.mktemp()
-        self.status = os.system("( %s ) >%s 2>%s" %
-                                (command, outfile, errfile)) >> 8
-        self.out = open(outfile, "r").read()
-        self.err = open(errfile, "r").read()
-        os.remove(outfile)
-        os.remove(errfile)
+        cmd = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.out, self.err = cmd.communicate()
+        self.status = os.WEXITSTATUS(cmd.returncode)
+
 
 def acquire_lock(lock_file, max_try=10, delay=10, max_delay=3600):
     """Acquire a lock represented by a file on the file system
