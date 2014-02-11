@@ -1,7 +1,7 @@
 ChangeLog for logilab.common
 ============================
 
---
+2014-02-11  --  0.61.0
    * pdf_ext: removed, it had no known users (CVE-2014-1838)
 
    * shellutils: fix tempfile issue in Execute, and deprecate it
