@@ -105,9 +105,6 @@ pytest path/to/mytests.py -m '(not long and database) or regr'
 
 pytest one (will run both test_thisone and test_thatone)
 pytest path/to/mytests.py -s not (will skip test_notthisone)
-
-pytest --coverage test_foo.py
-  (only if logilab.devtools is available)
 """
 
 ENABLE_DBC = False
@@ -604,7 +601,7 @@ def make_parser():
                       action="callback", help="Verbose output")
     parser.add_option('-i', '--pdb', callback=rebuild_and_store,
                       dest="pdb", action="callback",
-                      help="Enable test failure inspection (conflicts with --coverage)")
+                      help="Enable test failure inspection")
     parser.add_option('-x', '--exitfirst', callback=rebuild_and_store,
                       dest="exitfirst", default=False,
                       action="callback", help="Exit on first failure "
@@ -631,14 +628,6 @@ def make_parser():
     parser.add_option('-m', '--match', default=None, dest='tags_pattern',
                       help="only execute test whose tag match the current pattern")
 
-    try:
-        from logilab.devtools.lib.coverage import Coverage
-        parser.add_option('--coverage', dest="coverage", default=False,
-                          action="store_true",
-                          help="run tests with pycoverage (conflicts with --pdb)")
-    except ImportError:
-        pass
-
     if DJANGO_FOUND:
         parser.add_option('-J', '--django', dest='django', default=False,
                           action="store_true",
@@ -652,8 +641,6 @@ def parseargs(parser):
     """
     # parse the command line
     options, args = parser.parse_args()
-    if options.pdb and getattr(options, 'coverage', False):
-        parser.error("'pdb' and 'coverage' options are exclusive")
     filenames = [arg for arg in args if arg.endswith('.py')]
     if filenames:
         if len(filenames) > 1:
@@ -683,16 +670,9 @@ def run():
     options, explicitfile = parseargs(parser)
     # mock a new command line
     sys.argv[1:] = parser.newargs
-    covermode = getattr(options, 'coverage', None)
     cvg = None
     if not '' in sys.path:
         sys.path.insert(0, '')
-    if covermode:
-        # control_import_coverage(rootdir)
-        from logilab.devtools.lib.coverage import Coverage
-        cvg = Coverage([rootdir])
-        cvg.erase()
-        cvg.start()
     if DJANGO_FOUND and options.django:
         tester = DjangoTester(cvg, options)
     else:
@@ -719,12 +699,7 @@ def run():
             import traceback
             traceback.print_exc()
     finally:
-        if covermode:
-            cvg.stop()
-            cvg.save()
         tester.show_report()
-        if covermode:
-            print 'coverage information stored, use it with pycoverage -ra'
         sys.exit(tester.errcode)
 
 class SkipAwareTestProgram(unittest.TestProgram):

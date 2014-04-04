@@ -3,6 +3,7 @@ ChangeLog for logilab.common
 
 --
    * shellutils: restore py 2.5 compat by removing usage of class decorator
+   * pytest: drop broken --coverage option
 
 2014-03-07  --  0.62.0
    * modutils: cleanup_sys_modules returns the list of cleaned modules
