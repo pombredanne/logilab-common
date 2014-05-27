@@ -455,13 +455,16 @@ def get_source_file(filename, include_no_ext=False):
 
 def cleanup_sys_modules(directories):
     """remove submodules of `directories` from `sys.modules`"""
+    cleaned = []
     for modname, module in sys.modules.items():
         modfile = getattr(module, '__file__', None)
         if modfile:
             for directory in directories:
                 if modfile.startswith(directory):
+                    cleaned.append(modname)
                     del sys.modules[modname]
                     break
+    return cleaned
 
 
 def is_python_source(filename):
