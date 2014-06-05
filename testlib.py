@@ -579,6 +579,16 @@ class TestCase(unittest.TestCase):
         # if result.cvg:
         #     result.cvg.start()
         testMethod = self._get_test_method()
+        if (getattr(self.__class__, "__unittest_skip__", False) or
+            getattr(testMethod, "__unittest_skip__", False)):
+            # If the class or method was skipped.
+            try:
+                skip_why = (getattr(self.__class__, '__unittest_skip_why__', '')
+                            or getattr(testMethod, '__unittest_skip_why__', ''))
+                self._addSkip(result, skip_why)
+            finally:
+                result.stopTest(self)
+            return
         if runcondition and not runcondition(testMethod):
             return # test is skipped
         result.startTest(self)
