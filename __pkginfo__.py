@@ -1,4 +1,4 @@
-# copyright 2003-2013 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2014 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -25,7 +25,7 @@ modname = 'common'
 subpackage_of = 'logilab'
 subpackage_master = True
 
-numversion = (0, 61, 0)
+numversion = (0, 62, 0)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'LGPL' # 2.1 or later
