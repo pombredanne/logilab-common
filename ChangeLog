@@ -1,6 +1,10 @@
 ChangeLog for logilab.common
 ============================
 
+2014-03-07  --  0.62.0
+   * modutils: cleanup_sys_modules returns the list of cleaned modules
+
+
 2014-02-11  --  0.61.0
    * pdf_ext: removed, it had no known users (CVE-2014-1838)
 
@@ -20,7 +24,7 @@ ChangeLog for logilab.common
 
       * ensure file is closed, may cause pb depending on the interpreter, eg
        pypy) (#180876)
-  
+
       * fix support for `extend_path` based nested namespace packages ;
        Report and patch by John Johnson (#177651)
 
