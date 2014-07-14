@@ -248,7 +248,9 @@ class Registry(dict):
         try:
             return super(Registry, self).__getitem__(name)
         except KeyError:
-            raise ObjectNotFound(name), None, sys.exc_info()[-1]
+            exc = ObjectNotFound(name)
+            exc.__traceback__ = sys.exc_info()[-1]
+            raise exc
 
     @classmethod
     def objid(cls, obj):
@@ -555,7 +557,9 @@ class RegistryStore(dict):
         try:
             return super(RegistryStore, self).__getitem__(name)
         except KeyError:
-            raise RegistryNotFound(name), None, sys.exc_info()[-1]
+            exc = RegistryNotFound(name)
+            exc.__traceback__ = sys.exc_info()[-1]
+            raise exc
 
     # methods for explicit (un)registration ###################################
 
