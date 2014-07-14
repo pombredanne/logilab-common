@@ -34,7 +34,8 @@ import sys
 import types
 from warnings import warn
 
-import __builtin__ as builtins # 2to3 will tranform '__builtin__' to 'builtins'
+# not used here, but imported to preserve API
+from six.moves import builtins
 
 if sys.version_info < (3, 0):
     str_to_bytes = str

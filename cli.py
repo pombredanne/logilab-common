@@ -44,7 +44,9 @@ Example::
 
 __docformat__ = "restructuredtext en"
 
-from logilab.common.compat import raw_input, builtins
+from six.moves import builtins
+
+from logilab.common.compat import raw_input
 if not hasattr(builtins, '_'):
     builtins._ = str
 

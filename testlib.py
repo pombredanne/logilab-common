@@ -59,8 +59,9 @@ from ConfigParser import ConfigParser
 from itertools import dropwhile
 from inspect import isgeneratorfunction
 
+from six.moves import builtins
+
 from logilab.common.deprecation import deprecated
-from logilab.common.compat import builtins
 
 import unittest as unittest_legacy
 if not getattr(unittest_legacy, "__package__", None):
