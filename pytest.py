@@ -115,7 +115,7 @@ import os.path as osp
 from time import time, clock
 import warnings
 import types
-from inspect import isgeneratorfunction
+from inspect import isgeneratorfunction, isclass
 
 from logilab.common.fileutils import abspath_listdir
 from logilab.common import textutils
@@ -997,8 +997,7 @@ class NonStrictTestLoader(unittest.TestLoader):
     def _collect_tests(self, module):
         tests = {}
         for obj in vars(module).values():
-            if (issubclass(type(obj), (types.ClassType, type)) and
-                 issubclass(obj, unittest.TestCase)):
+            if isclass(obj) and issubclass(obj, unittest.TestCase):
                 classname = obj.__name__
                 if classname[0] == '_' or self._this_is_skipped(classname):
                     continue
