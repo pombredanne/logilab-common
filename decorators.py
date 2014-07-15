@@ -21,7 +21,7 @@ __docformat__ = "restructuredtext en"
 import sys
 import types
 from time import clock, time
-from inspect import isgeneratorfunction
+from inspect import isgeneratorfunction, getargspec
 
 from logilab.common.compat import callable, method_type
 
@@ -34,7 +34,7 @@ class cached_decorator(object):
     def __call__(self, callableobj=None):
         assert not isgeneratorfunction(callableobj), \
                'cannot cache generator function: %s' % callableobj
-        if callableobj.func_code.co_argcount == 1 or self.keyarg == 0:
+        if len(getargspec(callableobj).args) == 1 or self.keyarg == 0:
             cache = _SingleValueCache(callableobj, self.cacheattr)
         elif self.keyarg:
             cache = _MultiValuesKeyArgCache(callableobj, self.keyarg, self.cacheattr)
