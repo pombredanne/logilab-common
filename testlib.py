@@ -55,12 +55,11 @@ import math
 import warnings
 from shutil import rmtree
 from operator import itemgetter
-from ConfigParser import ConfigParser
 from itertools import dropwhile
 from inspect import isgeneratorfunction
 
 from six import string_types
-from six.moves import builtins, range
+from six.moves import builtins, range, configparser
 
 from logilab.common.deprecation import deprecated
 
@@ -1263,11 +1262,11 @@ class MockSMTP:
         """ignore quit"""
 
 
-class MockConfigParser(ConfigParser):
+class MockConfigParser(configparser.ConfigParser):
     """fake ConfigParser.ConfigParser"""
 
     def __init__(self, options):
-        ConfigParser.__init__(self)
+        configparser.ConfigParser.__init__(self)
         for section, pairs in options.iteritems():
             self.add_section(section)
             for key, value in pairs.iteritems():

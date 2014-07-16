@@ -120,11 +120,10 @@ import sys
 import re
 from os.path import exists, expanduser
 from copy import copy
-from ConfigParser import ConfigParser
 from warnings import warn
 
 from six import string_types
-from six.moves import range
+from six.moves import range, configparser as cp
 
 from logilab.common.compat import raw_input, str_encode as _encode
 from logilab.common.deprecation import deprecated
@@ -449,7 +448,7 @@ class OptionsManagerMixIn(object):
 
     def reset_parsers(self, usage='', version=None):
         # configuration file parser
-        self.cfgfile_parser = ConfigParser()
+        self.cfgfile_parser = cp.ConfigParser()
         # command line parser
         self.cmdline_parser = optik_ext.OptionParser(usage=usage, version=version)
         self.cmdline_parser.options_manager = self
