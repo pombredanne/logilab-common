@@ -32,7 +32,6 @@ from os.path import isabs, isdir, islink, split, exists, normpath, join
 from os.path import abspath
 from os import sep, mkdir, remove, listdir, stat, chmod, walk
 from stat import ST_MODE, S_IWRITE
-from cStringIO import StringIO
 
 from logilab.common import STD_BLACKLIST as BASE_BLACKLIST, IGNORED_EXTENSIONS
 from logilab.common.shellutils import find

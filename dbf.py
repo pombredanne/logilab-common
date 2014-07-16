@@ -36,7 +36,6 @@ import os, os.path
 import sys
 import csv
 import tempfile
-import ConfigParser
 
 class Dbase:
     def __init__(self):
