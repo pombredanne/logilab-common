@@ -1025,9 +1025,9 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
         ipath_a, idirs_a, ifiles_a = data_a = None, None, None
         while True:
             try:
-                ipath_a, idirs_a, ifiles_a = datas_a = iter_a.next()
+                ipath_a, idirs_a, ifiles_a = datas_a = next(iter_a)
                 partial_iter = False
-                ipath_b, idirs_b, ifiles_b = datas_b = iter_b.next()
+                ipath_b, idirs_b, ifiles_b = datas_b = next(iter_b)
                 partial_iter = True
 
 

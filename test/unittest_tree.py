@@ -189,11 +189,11 @@ class PostfixedDepthFirstIterator_ClassTest(TestCase):
     def test_known_values_next(self):
         L = ['child_2_1', 'child_3_1', 'child_2_2', 'child_1_1', 'child_2_3', 'child_1_2', 'root']
         iter = PostfixedDepthFirstIterator(self.o)
-        o = iter.next()
+        o = next(iter)
         i = 0
         while o:
             self.assertEqual(o.id, L[i])
-            o = iter.next()
+            o = next(iter)
             i += 1
 
 
@@ -235,11 +235,11 @@ class PrefixedDepthFirstIterator_ClassTest(TestCase):
     def test_known_values_next(self):
         L = ['root', 'child_1_1', 'child_2_1', 'child_2_2', 'child_3_1', 'child_1_2', 'child_2_3']
         iter = PrefixedDepthFirstIterator(self.o)
-        o = iter.next()
+        o = next(iter)
         i = 0
         while o:
             self.assertEqual(o.id, L[i])
-            o = iter.next()
+            o = next(iter)
             i += 1
 
 

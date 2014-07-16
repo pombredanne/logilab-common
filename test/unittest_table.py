@@ -70,8 +70,8 @@ class TableTC(TestCase):
     def test_iterable(self):
         """test iter(table)"""
         it = iter(self.table)
-        self.assertTrue(it.next() == self.table.data[0])
-        self.assertTrue(it.next() == self.table.data[1])
+        self.assertTrue(next(it) == self.table.data[0])
+        self.assertTrue(next(it) == self.table.data[1])
 
     def test_get_rows(self):
         """tests Table.get_rows()"""
