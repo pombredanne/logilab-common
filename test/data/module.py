@@ -29,7 +29,7 @@ class YO:
     def __init__(self):
         try:
             self.yo = 1
-        except ValueError, ex:
+        except ValueError as ex:
             pass
         except (NameError, TypeError):
             raise XXXError()

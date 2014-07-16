@@ -265,7 +265,7 @@ def _make_input_function(opttype):
                 return None
             try:
                 return _call_validator(opttype, optdict, None, value)
-            except optik_ext.OptionValueError, ex:
+            except optik_ext.OptionValueError as ex:
                 msg = str(ex).split(':', 1)[-1].strip()
                 print 'bad value: %s' % msg
     return input_validator

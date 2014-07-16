@@ -76,7 +76,7 @@ class Version(tuple):
         versionstr = versionstr.strip(' :')
         try:
             return [int(i) for i in versionstr.split('.')]
-        except ValueError, ex:
+        except ValueError as ex:
             raise ValueError("invalid literal for version '%s' (%s)"%(versionstr, ex))
 
     def __str__(self):

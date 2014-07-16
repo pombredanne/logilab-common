@@ -292,7 +292,7 @@ def ustrftime(somedate, fmt='%Y-%m-%d'):
                 return unicode(somedate.strftime(str(fmt)), encoding)
             else:
                 return somedate.strftime(fmt)
-        except ValueError, exc:
+        except ValueError:
             if somedate.year >= 1900:
                 raise
             # datetime is not happy with dates before 1900

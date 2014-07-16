@@ -382,10 +382,10 @@ class PyTester(object):
                     try:
                         restartfile = open(FILE_RESTART, "w")
                         restartfile.close()
-                    except Exception, e:
+                    except Exception:
                         print >> sys.__stderr__, "Error while overwriting \
 succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
-                        raise e
+                        raise
                 # run test and collect information
                 prog = self.testfile(filename, batchmode=True)
                 if exitfirst and (prog is None or not prog.result.wasSuccessful()):
@@ -409,10 +409,10 @@ succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
             try:
                 restartfile = open(FILE_RESTART, "w")
                 restartfile.close()
-            except Exception, e:
+            except Exception:
                 print >> sys.__stderr__, "Error while overwriting \
 succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
-                raise e
+                raise
         modname = osp.basename(filename)[:-3]
         print >> sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
         try:
@@ -422,7 +422,7 @@ succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
                                                  options=self.options, outstream=sys.stderr)
             except KeyboardInterrupt:
                 raise
-            except SystemExit, exc:
+            except SystemExit as exc:
                 self.errcode = exc.code
                 raise
             except testlib.SkipTest:
@@ -553,7 +553,7 @@ class DjangoTester(PyTester):
                 return testprog
             except SystemExit:
                 raise
-            except Exception, exc:
+            except Exception as exc:
                 import traceback
                 traceback.print_exc()
                 self.report.failed_to_test_module(filename)
@@ -788,7 +788,7 @@ Examples:
             else:
                 self.testNames = (self.defaultTest, )
             self.createTests()
-        except getopt.error, msg:
+        except getopt.error as msg:
             self.usageExit(msg)
 
     def runTests(self):
@@ -837,7 +837,7 @@ Examples:
                     removeSucceededTests(self.test, succeededtests)
                 finally:
                     restartfile.close()
-            except Exception, ex:
+            except Exception as ex:
                 raise Exception("Error while reading succeeded tests into %s: %s"
                                 % (osp.join(os.getcwd(), FILE_RESTART), ex))
 

@@ -92,7 +92,7 @@ class LazyObject(object):
     def __getattribute__(self, attr):
         try:
             return super(LazyObject, self).__getattribute__(attr)
-        except AttributeError, ex:
+        except AttributeError as ex:
             return getattr(self._getobj(), attr)
 
     def __call__(self, *args, **kwargs):
@@ -495,7 +495,7 @@ def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
     modname = modname.split('.')[0]
     try:
         filename = file_from_modpath([modname])
-    except ImportError, ex:
+    except ImportError as ex:
         # import failed, i'm probably not so wrong by supposing it's
         # not standard...
         return 0

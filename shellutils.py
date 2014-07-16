@@ -115,7 +115,7 @@ def mv(source, destination, _action=shutil.move):
             destination = join(destination, basename(source))
         try:
             _action(source, destination)
-        except OSError, ex:
+        except OSError as ex:
             raise OSError('Unable to move %r to %r (%s)' % (
                 source, destination, ex))
 
@@ -254,7 +254,7 @@ def acquire_lock(lock_file, max_try=10, delay=10, max_delay=3600):
             os.write(fd, str_to_bytes(str(os.getpid())) )
             os.close(fd)
             return True
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.EEXIST:
                 try:
                     fd = open(lock_file, "r")

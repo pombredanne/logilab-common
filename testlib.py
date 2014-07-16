@@ -366,7 +366,7 @@ def _handleModuleTearDown(self, result):
     if tearDownModule is not None:
         try:
             tearDownModule()
-        except Exception, e:
+        except Exception as e:
             if isinstance(result, _DebugResult):
                 raise
             errorName = 'tearDownModule (%s)' % previousModule
@@ -394,7 +394,7 @@ def _handleModuleFixture(self, test, result):
     if setUpModule is not None:
         try:
             setUpModule()
-        except Exception, e:
+        except Exception as e:
             if isinstance(result, _DebugResult):
                 raise
             result._moduleSetUpFailed = True
@@ -529,7 +529,7 @@ class TestCase(unittest.TestCase):
             func(*args, **kwargs)
         except (KeyboardInterrupt, SystemExit):
             raise
-        except unittest.SkipTest, e:
+        except unittest.SkipTest as e:
             self._addSkip(result, str(e))
             return False
         except:
@@ -596,10 +596,10 @@ class TestCase(unittest.TestCase):
                             restartfile.write(descr+os.linesep)
                         finally:
                             restartfile.close()
-                    except Exception, ex:
+                    except Exception:
                         print >> sys.__stderr__, "Error while saving \
 succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
-                        raise ex
+                        raise
                 result.addSuccess(self)
         finally:
             # if result.cvg:
@@ -656,10 +656,10 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
             return 1
         except KeyboardInterrupt:
             raise
-        except InnerTestSkipped, e:
+        except InnerTestSkipped as e:
             result.addSkip(self, e)
             return 1
-        except SkipTest, e:
+        except SkipTest as e:
             result.addSkip(self, e)
             return 0
         except:
@@ -835,7 +835,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
             parser = make_parser()
             try:
                 parser.parse(stream)
-            except SAXParseException, ex:
+            except SAXParseException as ex:
                 if msg is None:
                     stream.seek(0)
                     for _ in xrange(ex.getLineNumber()):
@@ -876,7 +876,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
             ParseError = ExpatError
         try:
             parse(data)
-        except (ExpatError, ParseError), ex:
+        except (ExpatError, ParseError) as ex:
             if msg is None:
                 if hasattr(data, 'readlines'): #file like object
                     data.seek(0)
@@ -1155,7 +1155,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
             return _assert(excClass, callableObj, *args, **kwargs)
         try:
             callableObj(*args, **kwargs)
-        except excClass, exc:
+        except excClass as exc:
             class ProxyException:
                 def __init__(self, obj):
                     self._obj = obj

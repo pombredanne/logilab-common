@@ -132,13 +132,13 @@ class CommandLine(dict):
             self.usage_and_exit(1)
         try:
             sys.exit(command.main_run(args, rcfile))
-        except KeyboardInterrupt, exc:
+        except KeyboardInterrupt as exc:
             print 'Interrupted',
             if str(exc):
                 print ': %s' % exc,
             print
             sys.exit(4)
-        except BadCommandUsage, err:
+        except BadCommandUsage as err:
             print 'ERROR:', err
             print
             print command.help()
@@ -261,7 +261,7 @@ class Command(Configuration):
         try:
             self.check_args(args)
             self.run(args)
-        except CommandError, err:
+        except CommandError as err:
             self.logger.error(err)
             return 2
         return 0
