@@ -44,7 +44,7 @@ def decode_QP(string):
     for decoded, charset in decode_header(string):
         if not charset :
             charset = 'iso-8859-15'
-        parts.append(unicode(decoded, charset, 'replace'))
+        parts.append(decoded.decode(charset, 'replace'))
 
     if sys.version_info < (3, 3):
         # decoding was non-RFC compliant wrt to whitespace handling
