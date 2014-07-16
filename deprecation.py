@@ -78,7 +78,7 @@ class DeprecationManager(object):
         def decorator(func):
             message = reason or 'The function "%s" is deprecated'
             if '%s' in message:
-                message %= func.func_name
+                message %= func.__name__
             def wrapped(*args, **kwargs):
                 self.warn(version, message, stacklevel+1)
                 return func(*args, **kwargs)

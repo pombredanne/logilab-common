@@ -196,7 +196,7 @@ class CLIHelper:
                     import traceback
                     traceback.print_exc()
                     print 'ERROR in help method %s'% (
-                        command_help_method.func_name)
+                        command_help_method.__name__)
 
     help_do_help = ("help", "help [topic|command]",
                     _("print help message for the given topic/command or \

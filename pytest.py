@@ -886,14 +886,13 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
         else:
             if isinstance(test, testlib.TestCase):
                 meth = test._get_test_method()
-                func = meth.im_func
-                testname = '%s.%s' % (meth.im_class.__name__, func.__name__)
+                testname = '%s.%s' % (test.__name__, meth.__name__)
             elif isinstance(test, types.FunctionType):
                 func = test
                 testname = func.__name__
             elif isinstance(test, types.MethodType):
-                func = test.im_func
-                testname = '%s.%s' % (test.im_class.__name__, func.__name__)
+                cls = test.__self__.__class__
+                testname = '%s.%s' % (cls.__name__, test.__name__)
             else:
                 return True # Not sure when this happens
             if isgeneratorfunction(test) and skipgenerator:

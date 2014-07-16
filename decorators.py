@@ -69,7 +69,6 @@ class _SingleValueCache(object):
         try:
             wrapped.__doc__ = self.callable.__doc__
             wrapped.__name__ = self.callable.__name__
-            wrapped.func_name = self.callable.func_name
         except:
             pass
         return wrapped
