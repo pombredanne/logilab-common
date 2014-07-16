@@ -59,6 +59,7 @@ from ConfigParser import ConfigParser
 from itertools import dropwhile
 from inspect import isgeneratorfunction
 
+from six import string_types
 from six.moves import builtins
 
 from logilab.common.deprecation import deprecated
@@ -459,7 +460,7 @@ class Tags(set):
         if kwargs:
            raise TypeError("%s are an invalid keyword argument for this function" % kwargs.keys())
 
-        if len(tags) == 1 and not isinstance(tags[0], basestring):
+        if len(tags) == 1 and not isinstance(tags[0], string_types):
             tags = tags[0]
         super(Tags, self).__init__(tags, **kwargs)
 
@@ -969,9 +970,9 @@ class TestCase(unittest.TestCase):
         :param striplines: Boolean to trigger line stripping before comparing
         """
         msg = []
-        if not isinstance(text1, basestring):
+        if not isinstance(text1, string_types):
             msg.append('text1 is not a string (%s)'%(type(text1)))
-        if not isinstance(text2, basestring):
+        if not isinstance(text2, string_types):
             msg.append('text2 is not a string (%s)'%(type(text2)))
         if msg:
             self.fail('\n'.join(msg))

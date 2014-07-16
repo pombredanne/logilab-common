@@ -49,6 +49,8 @@ __docformat__ = "restructuredtext en"
 import sys
 from stat import S_IWRITE
 
+from six import string_types
+
 BULLET = '*'
 SUBBULLET = '-'
 INDENT = ' ' * 4
@@ -64,7 +66,7 @@ class Version(tuple):
     correctly printing it as X.Y.Z
     """
     def __new__(cls, versionstr):
-        if isinstance(versionstr, basestring):
+        if isinstance(versionstr, string_types):
             versionstr = versionstr.strip(' :') # XXX (syt) duh?
             parsed = cls.parse(versionstr)
         else:

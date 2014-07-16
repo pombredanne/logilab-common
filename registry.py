@@ -86,6 +86,8 @@ from os.path import join, isdir, exists
 from logging import getLogger
 from warnings import warn
 
+from six import string_types
+
 from logilab.common.modutils import modpath_from_file
 from logilab.common.logging_ext import set_log_methods
 from logilab.common.decorators import classproperty
@@ -294,7 +296,7 @@ class Registry(dict):
         # XXXFIXME this is a duplication of unregister()
         # remove register_and_replace in favor of unregister + register
         # or simplify by calling unregister then register here
-        if not isinstance(replaced, basestring):
+        if not isinstance(replaced, string_types):
             replaced = self.objid(replaced)
         # prevent from misspelling
         assert obj is not replaced, 'replacing an object by itself: %s' % obj
@@ -601,7 +603,7 @@ class RegistryStore(dict):
         :meth:`~logilab.common.registry.RegistryStore.register_and_replace` for
         instance).
         """
-        assert isinstance(modname, basestring), \
+        assert isinstance(modname, string_types), \
             'modname expected to be a module name (ie string), got %r' % modname
         for obj in objects:
             if self.is_registrable(obj) and obj.__module__ == modname and not obj in butclasses:

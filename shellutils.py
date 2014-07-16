@@ -37,6 +37,8 @@ import random
 import subprocess
 from os.path import exists, isdir, islink, basename, join
 
+from six import string_types
+
 from logilab.common import STD_BLACKLIST, _handle_blacklist
 from logilab.common.compat import raw_input
 from logilab.common.compat import str_to_bytes
@@ -164,7 +166,7 @@ def find(directory, exts, exclude=False, blacklist=STD_BLACKLIST):
     :return:
       the list of all matching files
     """
-    if isinstance(exts, basestring):
+    if isinstance(exts, string_types):
         exts = (exts,)
     if exclude:
         def match(filename, exts):

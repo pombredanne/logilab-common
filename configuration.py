@@ -123,6 +123,8 @@ from copy import copy
 from ConfigParser import ConfigParser
 from warnings import warn
 
+from six import string_types
+
 from logilab.common.compat import raw_input, str_encode as _encode
 from logilab.common.deprecation import deprecated
 from logilab.common.textutils import normalize_text, unquote
@@ -368,7 +370,7 @@ def format_option_value(optdict, value):
         value = value.pattern
     elif optdict.get('type') == 'yn':
         value = value and 'yes' or 'no'
-    elif isinstance(value, (str, unicode)) and value.isspace():
+    elif isinstance(value, string_types) and value.isspace():
         value = "'%s'" % value
     elif optdict.get('type') == 'time' and isinstance(value, (float, int, long)):
         value = format_time(value)
