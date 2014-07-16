@@ -22,6 +22,8 @@ from os.path import join, dirname, abspath
 import datetime, time
 from StringIO import StringIO
 
+from six.moves import range
+
 from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.shellutils import (globfind, find, ProgressBar,
@@ -121,7 +123,7 @@ class ProgressBarTC(TestCase):
             self.assertEqual(pgb_stream.getvalue(), expected_stream.getvalue())
 
     def test_default(self):
-        self._update_test(20, xrange(1, 21))
+        self._update_test(20, range(1, 21))
 
     def test_nbops_gt_size(self):
         """Test the progress bar for nbops > size"""
@@ -150,7 +152,7 @@ class ProgressBarTC(TestCase):
         size=20
         pgb = ProgressBar(100, size, stream=pgb_stream)
         last = 0
-        for dots in xrange(10, 105, 15):
+        for dots in range(10, 105, 15):
             pgb.update(dots, exact=True)
             dots //= 5
             expected_stream.write("\r["+('='*dots)+(' '*(size-dots))+"]")
@@ -162,7 +164,7 @@ class ProgressBarTC(TestCase):
         size=20
         pgb = ProgressBar(100, size, stream=pgb_stream)
         last = 0
-        for dots in xrange(5, 105, 5):
+        for dots in range(5, 105, 5):
             pgb.update(5, exact=False)
             dots //= 5
             expected_stream.write("\r["+('='*dots)+(' '*(size-dots))+"]")

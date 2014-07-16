@@ -31,6 +31,8 @@ try:
 except NameError:
     __file__ = sys.argv[0]
 
+from six.moves import range
+
 from logilab.common.testlib import (unittest, TestSuite, unittest_main, Tags,
     TestCase, mock_object, create_files, InnerTest, with_tempdir, tag,
     require_version, require_module)
@@ -103,9 +105,9 @@ class TestlibTC(TestCase):
 
     def test_list_equals(self):
         """tests TestCase.assertListEqual"""
-        l1 = range(10)
-        l2 = range(5)
-        l3 = range(10)
+        l1 = list(range(10))
+        l2 = list(range(5))
+        l3 = list(range(10))
         self.assertRaises(AssertionError, self.tc.assertListEqual, l1, l2)
         self.tc.assertListEqual(l1, l1)
         self.tc.assertListEqual(l1, l3)
@@ -261,7 +263,7 @@ class GenerativeTestsTC(TestCase):
     def test_generative_ok(self):
         class FooTC(TestCase):
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     yield self.assertEqual, i, i
         result = self.runner.run(FooTC('test_generative'))
         self.assertEqual(result.testsRun, 10)
@@ -271,7 +273,7 @@ class GenerativeTestsTC(TestCase):
     def test_generative_half_bad(self):
         class FooTC(TestCase):
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     yield self.assertEqual, i%2, 0
         result = self.runner.run(FooTC('test_generative'))
         self.assertEqual(result.testsRun, 10)
@@ -281,7 +283,7 @@ class GenerativeTestsTC(TestCase):
     def test_generative_error(self):
         class FooTC(TestCase):
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     if i == 5:
                         raise ValueError('STOP !')
                     yield self.assertEqual, i, i
@@ -294,7 +296,7 @@ class GenerativeTestsTC(TestCase):
     def test_generative_error2(self):
         class FooTC(TestCase):
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     if i == 5:
                         yield self.ouch
                     yield self.assertEqual, i, i
@@ -309,7 +311,7 @@ class GenerativeTestsTC(TestCase):
             def setUp(self):
                 raise ValueError('STOP !')
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     yield self.assertEqual, i, i
 
         result = self.runner.run(FooTC('test_generative'))
@@ -326,7 +328,7 @@ class GenerativeTestsTC(TestCase):
                     self.assertEqual(val, val)
 
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
@@ -344,7 +346,7 @@ class GenerativeTestsTC(TestCase):
                     self.assertEqual(val, val)
 
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
@@ -362,7 +364,7 @@ class GenerativeTestsTC(TestCase):
                     self.assertEqual(val, val)
 
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
@@ -380,7 +382,7 @@ class GenerativeTestsTC(TestCase):
                     self.assertEqual(val, val)
 
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     yield InnerTest("check_%s"%i, self.check, i)
 
         result = self.runner.run(FooTC('test_generative'))
@@ -420,7 +422,7 @@ class ExitFirstTC(TestCase):
     def test_generative_exit_first(self):
         class FooTC(TestCase):
             def test_generative(self):
-                for i in xrange(10):
+                for i in range(10):
                     yield self.assert_, False
         result = self.runner.run(FooTC('test_generative'))
         self.assertEqual(result.testsRun, 1)
@@ -533,7 +535,7 @@ class TestLoaderTC(TestCase):
             class MyTestCase(TestCase):
                 def test_foo(self): pass
                 def test_foobar(self):
-                    for i in xrange(5):
+                    for i in range(5):
                         if i%2 == 0:
                             yield InnerTest('even', lambda: None)
                         else:

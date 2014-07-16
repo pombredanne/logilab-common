@@ -28,6 +28,8 @@ from datetime import date, time, datetime, timedelta
 from time import strptime as time_strptime
 from calendar import monthrange, timegm
 
+from six.moves import range
+
 try:
     from mx.DateTime import RelativeDateTime, Date, DateTimeType
 except ImportError:
@@ -131,7 +133,7 @@ def get_national_holidays(begin, end):
     end = datefactory(end.year, end.month, end.day, end)
     holidays = [str2date(datestr, begin)
                 for datestr in FRENCH_MOBILE_HOLIDAYS.values()]
-    for year in xrange(begin.year, end.year+1):
+    for year in range(begin.year, end.year+1):
         for datestr in FRENCH_FIXED_HOLIDAYS.values():
             date = str2date(datestr % year, begin)
             if date not in holidays:

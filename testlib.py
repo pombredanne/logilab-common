@@ -60,7 +60,7 @@ from itertools import dropwhile
 from inspect import isgeneratorfunction
 
 from six import string_types
-from six.moves import builtins
+from six.moves import builtins, range
 
 from logilab.common.deprecation import deprecated
 
@@ -841,7 +841,7 @@ class TestCase(unittest.TestCase):
             except SAXParseException as ex:
                 if msg is None:
                     stream.seek(0)
-                    for _ in xrange(ex.getLineNumber()):
+                    for _ in range(ex.getLineNumber()):
                         line = stream.readline()
                     pointer = ('' * (ex.getLineNumber() - 1)) + '^'
                     msg = 'XML stream not well formed: %s\n%s%s' % (ex, line, pointer)
@@ -900,11 +900,11 @@ class TestCase(unittest.TestCase):
                     line_number_length = len('%i' % end)
                     line_pattern = " %%%ii: %%s" % line_number_length
 
-                    for line_no in xrange(start, ex.lineno):
+                    for line_no in range(start, ex.lineno):
                         context_lines.append(line_pattern % (line_no, lines[line_no-1]))
                     context_lines.append(line_pattern % (ex.lineno, lines[ex.lineno-1]))
                     context_lines.append('%s^\n' % (' ' * (1 + line_number_length + 2 +ex.offset)))
-                    for line_no in xrange(ex.lineno+1, end+1):
+                    for line_no in range(ex.lineno+1, end+1):
                         context_lines.append(line_pattern % (line_no, lines[line_no-1]))
 
                 rich_context = ''.join(context_lines)
@@ -932,7 +932,7 @@ class TestCase(unittest.TestCase):
                 self.fail( "tuple %s has %i children%s (%i expected)"%(tup,
                     len(tup[2]),
                         ('', 's')[len(tup[2])>1], len(element)))
-            for index in xrange(len(tup[2])):
+            for index in range(len(tup[2])):
                 self.assertXMLEqualsTuple(element[index], tup[2][index])
         #check text
         if element.text or len(tup)>3:

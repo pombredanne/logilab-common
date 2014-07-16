@@ -38,6 +38,7 @@ import subprocess
 from os.path import exists, isdir, islink, basename, join
 
 from six import string_types
+from six.moves import range
 
 from logilab.common import STD_BLACKLIST, _handle_blacklist
 from logilab.common.compat import raw_input
@@ -457,6 +458,6 @@ def getlogin():
 def generate_password(length=8, vocab=string.ascii_letters + string.digits):
     """dumb password generation function"""
     pwd = ''
-    for i in xrange(length):
+    for i in range(length):
         pwd += random.choice(vocab)
     return pwd
