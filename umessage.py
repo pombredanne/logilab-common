@@ -46,7 +46,11 @@ def decode_QP(string):
             charset = 'iso-8859-15'
         parts.append(unicode(decoded, charset, 'replace'))
 
-    return u' '.join(parts)
+    if sys.version_info < (3, 3):
+        # decoding was non-RFC compliant wrt to whitespace handling
+        # see http://bugs.python.org/issue1079
+        return u' '.join(parts)
+    return u''.join(parts)
 
 def message_from_file(fd):
     try:
