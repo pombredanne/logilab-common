@@ -20,7 +20,8 @@
 __docformat__ = "restructuredtext en"
 
 from bisect import insort_left
-from Queue import Queue
+
+from six.moves import queue
 
 LOW = 0
 MEDIUM = 10
@@ -35,7 +36,7 @@ REVERSE_PRIORITY = dict((values, key) for key, values in PRIORITY.iteritems())
 
 
 
-class PrioritizedTasksQueue(Queue):
+class PrioritizedTasksQueue(queue.Queue):
 
     def _init(self, maxsize):
         """Initialize the queue representation"""
