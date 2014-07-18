@@ -115,6 +115,7 @@ import os.path as osp
 from time import time, clock
 import warnings
 import types
+from inspect import isgeneratorfunction
 
 from logilab.common.fileutils import abspath_listdir
 from logilab.common import textutils
@@ -888,7 +889,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
                 testname = '%s.%s' % (test.im_class.__name__, func.__name__)
             else:
                 return True # Not sure when this happens
-            if testlib.is_generator(test) and skipgenerator:
+            if isgeneratorfunction(test) and skipgenerator:
                 return self.does_match_tags(test) # Let inner tests decide at run time
         if self._this_is_skipped(testname):
             return False # this was explicitly skipped

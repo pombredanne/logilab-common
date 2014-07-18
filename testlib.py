@@ -54,6 +54,7 @@ from shutil import rmtree
 from operator import itemgetter
 from ConfigParser import ConfigParser
 from itertools import dropwhile
+from inspect import isgeneratorfunction
 
 from logilab.common.deprecation import deprecated
 from logilab.common.compat import builtins
@@ -99,23 +100,7 @@ __all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
 DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
                     'func', 'validation')
 
-
-if sys.version_info >= (2, 6):
-    # FIXME : this does not work as expected / breaks tests on testlib
-    # however testlib does not work on py3k for many reasons ...
-    from inspect import CO_GENERATOR
-else:
-    from compiler.consts import CO_GENERATOR
-
-if sys.version_info >= (3, 0):
-    def is_generator(function):
-        flags = function.__code__.co_flags
-        return flags & CO_GENERATOR
-
-else:
-    def is_generator(function):
-        flags = function.func_code.co_flags
-        return flags & CO_GENERATOR
+is_generator = deprecated('[lgc 0.63] use inspect.isgeneratorfunction')(isgeneratorfunction)
 
 # used by unittest to count the number of relevant levels in the traceback
 __unittest = 1
@@ -124,7 +109,7 @@ __unittest = 1
 def with_tempdir(callable):
     """A decorator ensuring no temporary file left when the function return
     Work only for temporary file create with the tempfile module"""
-    if is_generator(callable):
+    if isgeneratorfunction(callable):
         def proxy(*args, **kwargs):
             old_tmpdir = tempfile.gettempdir()
             new_tmpdir = tempfile.mkdtemp(prefix="temp-lgc-")
@@ -589,7 +574,7 @@ class TestCase(unittest.TestCase):
         try:
             if not self.quiet_run(result, self.setUp):
                 return
-            generative = is_generator(testMethod.im_func)
+            generative = isgeneratorfunction(testMethod)
             # generative tests
             if generative:
                 self._proceed_generative(result, testMethod,
