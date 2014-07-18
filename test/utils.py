@@ -20,7 +20,7 @@
 
 from __future__ import print_function
 
-from cStringIO import StringIO
+from logilab.common.compat import StringIO
 from logilab.common.ureports.nodes import *
 
 class WriterTC:

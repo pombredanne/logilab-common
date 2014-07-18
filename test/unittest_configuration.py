@@ -20,9 +20,9 @@ import os
 from os.path import join, dirname, abspath
 import re
 
-from cStringIO import StringIO
 from sys import version_info
 
+from logilab.common.compat import StringIO
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.optik_ext import OptionValueError
 from logilab.common.configuration import Configuration, OptionError, \

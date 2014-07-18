@@ -39,8 +39,9 @@ import os
 import os.path as osp
 import sys
 from pdb import Pdb
-from cStringIO import StringIO
 import inspect
+
+from logilab.common.compat import StringIO
 
 try:
     from IPython import PyColorize

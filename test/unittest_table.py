@@ -22,10 +22,10 @@ Unittests for table management
 
 import sys
 import os
-from cStringIO import StringIO
 
 from six.moves import range
 
+from logilab.common.compat import StringIO
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.table import Table, TableStyleSheet, DocbookTableWriter, \
      DocbookRenderer, TableStyle, TableWriter, TableCellRenderer

@@ -17,8 +17,8 @@
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 
 from os.path import join, dirname
-from cStringIO import StringIO
 
+from logilab.common.compat import StringIO
 from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.changelog import ChangeLog

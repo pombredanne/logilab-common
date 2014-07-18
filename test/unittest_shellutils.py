@@ -20,7 +20,6 @@
 import sys, os, tempfile, shutil
 from os.path import join, dirname, abspath
 import datetime, time
-from StringIO import StringIO
 
 from six.moves import range
 
@@ -29,7 +28,7 @@ from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.shellutils import (globfind, find, ProgressBar,
                                        acquire_lock, release_lock,
                                        RawInput)
-from logilab.common.compat import str_to_bytes
+from logilab.common.compat import str_to_bytes, StringIO
 from logilab.common.proc import NoSuchProcess
 
 DATA_DIR = join(dirname(abspath(__file__)), 'data', 'find_test')

@@ -22,7 +22,6 @@ from __future__ import print_function
 import os
 import sys
 from os.path import join, dirname, isdir, isfile, abspath, exists
-from cStringIO import StringIO
 import tempfile
 import shutil
 
@@ -33,6 +32,7 @@ except NameError:
 
 from six.moves import range
 
+from logilab.common.compat import StringIO
 from logilab.common.testlib import (unittest, TestSuite, unittest_main, Tags,
     TestCase, mock_object, create_files, InnerTest, with_tempdir, tag,
     require_version, require_module)
