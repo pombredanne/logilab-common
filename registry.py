@@ -86,7 +86,7 @@ from os.path import join, isdir, exists
 from logging import getLogger
 from warnings import warn
 
-from six import string_types
+from six import string_types, add_metaclass
 
 from logilab.common.modutils import modpath_from_file
 from logilab.common.logging_ext import set_log_methods
@@ -945,6 +945,8 @@ class PredicateMetaClass(type):
         _PREDICATES[id(proxy)] = proxy
         return inst
 
+
+@add_metaclass(PredicateMetaClass)
 class Predicate(object):
     """base class for selector classes providing implementation
     for operators ``&``, ``|`` and  ``~``
@@ -960,7 +962,6 @@ class Predicate(object):
 
     0 score means that the class doesn't apply.
     """
-    __metaclass__ = PredicateMetaClass
 
     @property
     def func_name(self):
