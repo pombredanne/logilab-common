@@ -1,4 +1,4 @@
-# copyright 2003-2011 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2014 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -226,7 +226,7 @@ def unzip(archive, destdir):
             outfile.write(zfobj.read(name))
             outfile.close()
 
-@deprecated('Use subprocess.Popen instead')
+
 class Execute:
     """This is a deadlock safe version of popen2 (no stdin), that returns
     an object with errorlevel, out and err.
@@ -236,6 +236,8 @@ class Execute:
         cmd = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.out, self.err = cmd.communicate()
         self.status = os.WEXITSTATUS(cmd.returncode)
+
+Execute = deprecated('Use subprocess.Popen instead')(Execute)
 
 
 def acquire_lock(lock_file, max_try=10, delay=10, max_delay=3600):
