@@ -1,4 +1,4 @@
-# copyright 2003-2011 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2014 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -25,7 +25,7 @@ from sys import version_info
 
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.optik_ext import OptionValueError
-from logilab.common.configuration import Configuration, \
+from logilab.common.configuration import Configuration, OptionError, \
      OptionsManagerMixIn, OptionsProviderMixIn, Method, read_old_config, \
      merge_options
 
@@ -47,6 +47,8 @@ OPTIONS = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar
 
            ('diffgroup', {'type':'string', 'default':'pouet', 'metavar': '<key=val>',
                           'group': 'agroup'}),
+           ('reset-value', {'type': 'string', 'metavar': '<string>', 'short': 'r',
+                            'dest':'value'}),
 
            ]
 
@@ -149,6 +151,38 @@ diffgroup=zou
         finally:
             os.remove(file)
 
+    def test_option_order(self):
+        """ Check that options are taken into account in the command line order
+            and not in the order they are defined in the Configuration object.
+        """
+        file = tempfile.mktemp()
+        stream = open(file, 'w')
+        try:
+            stream.write("""[Test]
+reset-value=toto
+value=tata
+""")
+            stream.close()
+            self.cfg.load_file_configuration(file)
+        finally:
+            os.remove(file)
+        self.assertEqual(self.cfg['value'], 'tata')
+
+    def test_unsupported_options(self):
+        file = tempfile.mktemp()
+        stream = open(file, 'w')
+        try:
+            stream.write("""[Test]
+whatever=toto
+value=tata
+""")
+            stream.close()
+            self.cfg.load_file_configuration(file)
+        finally:
+            os.remove(file)
+        self.assertEqual(self.cfg['value'], 'tata')
+        self.assertRaises(OptionError, self.cfg.__getitem__, 'whatever')
+
     def test_generate_config(self):
         stream = StringIO()
         self.cfg.generate_config(stream)
@@ -169,6 +203,8 @@ choice=yo
 multiple-choice=yo,ye
 
 named=key:val
+
+#reset-value=
 
 
 [AGROUP]
@@ -196,6 +232,8 @@ choice=yo
 multiple-choice=yo,ye
 
 named=key:val
+
+reset-value='    '
 
 
 [AGROUP]
@@ -251,6 +289,7 @@ Options:
   --choice=<yo|ye>
   --multiple-choice=<yo|ye>
   --named=<key=val>
+  -r <string>, --reset-value=<string>
 
   Agroup:
     --diffgroup=<key=val>
@@ -308,6 +347,8 @@ choice=yo
 multiple-choice=yo,ye
 
 named=key:val
+
+reset-value='    '
 
 
 [AGROUP]

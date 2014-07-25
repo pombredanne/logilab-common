@@ -96,7 +96,15 @@ Quick start: simplest usage
   multiple=4,5,6
 
   number=3
-  >>>
+
+  Note : starting with Python 2.7 ConfigParser is able to take into
+  account the order of occurrences of the options into a file (by
+  using an OrderedDict). If you have two options changing some common
+  state, like a 'disable-all-stuff' and a 'enable-some-stuff-a', their
+  order of appearance will be significant : the last specified in the
+  file wins. For earlier version of python and logilab.common newer
+  than 0.61 the behaviour is unspecified.
+
 """
 __docformat__ = "restructuredtext en"
 
@@ -655,13 +663,13 @@ class OptionsManagerMixIn(object):
         options provider)
         """
         parser = self.cfgfile_parser
-        for provider in self.options_providers:
-            for section, option, optdict in provider.all_options():
-                try:
-                    value = parser.get(section, option)
-                    provider.set_option(option, value, optdict=optdict)
-                except (NoSectionError, NoOptionError), ex:
-                    continue
+        for section in parser.sections():
+             for option, value in parser.items(section):
+                  try:
+                       self.global_set_option(option, value)
+                  except (KeyError, OptionError):
+                       # TODO handle here undeclared options appearing in the config file
+                       continue
 
     def load_configuration(self, **kwargs):
         """override configuration according to given parameters
