@@ -309,7 +309,7 @@ def remove_local_modules_from_sys(testdir):
     we **have** to clean sys.modules to make sure the correct test_utils
     module is ran in B
     """
-    for modname, mod in sys.modules.items():
+    for modname, mod in list(sys.modules.items()):
         if mod is None:
             continue
         if not hasattr(mod, '__file__'):

@@ -533,7 +533,7 @@ class OptionsManagerMixIn(object):
             args.append('-' + optdict['short'])
             del optdict['short']
         # cleanup option definition dict before giving it to optik
-        for key in optdict.keys():
+        for key in list(optdict.keys()):
             if not key in self._optik_option_attrs:
                 optdict.pop(key)
         return args, optdict

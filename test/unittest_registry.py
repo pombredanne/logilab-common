@@ -179,7 +179,7 @@ class RegistryStoreTC(TestCase):
         with prepended_syspath(self.datadir):
             store.register_objects([self.datapath('regobjects.py'),
                                     self.datapath('regobjects2.py')])
-        self.assertEqual(['zereg'], store.keys())
+        self.assertEqual(['zereg'], list(store.keys()))
         self.assertEqual(set(('appobject1', 'appobject2', 'appobject3')),
                          set(store['zereg']))
 
