@@ -60,8 +60,9 @@ class dictattr(dict):
 class nullobject(object):
     def __repr__(self):
         return '<nullobject>'
-    def __nonzero__(self):
+    def __bool__(self):
         return False
+    __nonzero__ = __bool__
 
 class tempattr(object):
     def __init__(self, obj, attr, value):
