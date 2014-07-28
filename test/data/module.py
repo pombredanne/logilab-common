@@ -2,7 +2,6 @@
 """test module for astng
 """
 
-__revision__ = '$Id: module.py,v 1.9 2003-11-24 13:40:26 syt Exp $'
 
 from logilab.common import modutils, Execute as spawn
 from logilab.common.astutils import *

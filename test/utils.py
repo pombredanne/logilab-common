@@ -18,7 +18,6 @@
 '''unit tests utilities for ureports
 '''
 
-__revision__ = "$Id: utils.py,v 1.3 2005-05-27 12:27:08 syt Exp $"
 
 from cStringIO import StringIO
 from logilab.common.ureports.nodes import *
