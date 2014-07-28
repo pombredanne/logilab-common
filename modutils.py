@@ -27,7 +27,6 @@
 :type BUILTIN_MODULES: dict
 :var BUILTIN_MODULES: dictionary with builtin module names has key
 """
-from __future__ import with_statement
 
 __docformat__ = "restructuredtext en"
 

@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """HTML formatting drivers for ureports"""
-from __future__ import generators
 __docformat__ = "restructuredtext en"
 
 from logilab.common.ureports import HTMLWriter

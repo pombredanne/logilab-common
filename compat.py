@@ -26,7 +26,6 @@ See another compatibility snippets from other projects:
     :mod:`unittest2.compatibility`
 """
 
-from __future__ import generators
 
 __docformat__ = "restructuredtext en"
 

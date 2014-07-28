@@ -20,7 +20,6 @@
 A way to create simple reports using python objects, primarily designed to be
 formatted as text and html.
 """
-from __future__ import generators
 __docformat__ = "restructuredtext en"
 
 import sys

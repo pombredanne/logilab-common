@@ -869,9 +869,6 @@ class traced_selection(object): # pylint: disable=C0103
         ...     # some code in which you want to debug selectors
         ...     # for all objects
 
-    Don't forget the 'from __future__ import with_statement' at the module top-level
-    if you're using python prior to 2.6.
-
     This will yield lines like this in the logs::
 
         selector one_line_rset returned 0 for <class 'elephant.Babar'>
