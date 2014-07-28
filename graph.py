@@ -64,7 +64,7 @@ class DotBackend:
             assert charset.lower() in ('utf-8', 'iso-8859-1', 'latin1'), \
                    'unsupported charset %s' % charset
             self.emit('charset="%s"' % charset)
-        for param in sorted(additionnal_param.iteritems()):
+        for param in sorted(additionnal_param.items()):
             self.emit('='.join(param))
 
     def get_source(self):

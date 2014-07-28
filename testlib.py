@@ -1051,7 +1051,7 @@ class TestCase(unittest.TestCase):
 
 
                 msgs = [ "%s: %s"% (name, items)
-                    for name, items in errors.iteritems() if items]
+                    for name, items in errors.items() if items]
 
                 if msgs:
                     msgs.insert(0, "%s and %s differ :" % (

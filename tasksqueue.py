@@ -32,7 +32,7 @@ PRIORITY = {
     'MEDIUM': MEDIUM,
     'HIGH': HIGH,
     }
-REVERSE_PRIORITY = dict((values, key) for key, values in PRIORITY.iteritems())
+REVERSE_PRIORITY = dict((values, key) for key, values in PRIORITY.items())
 
 
 

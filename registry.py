@@ -269,7 +269,7 @@ class Registry(dict):
     def initialization_completed(self):
         """call method __registered__() on registered objects when the callback
         is defined"""
-        for objects in self.itervalues():
+        for objects in self.values():
             for objectcls in objects:
                 registered = getattr(objectcls, '__registered__', None)
                 if registered:
@@ -374,7 +374,7 @@ class Registry(dict):
         """return an iterator on possible objects in this registry for the given
         context
         """
-        for objects in self.itervalues():
+        for objects in self.values():
             obj = self._select_best(objects,  *args, **kwargs)
             if obj is None:
                 continue
@@ -550,7 +550,7 @@ class RegistryStore(dict):
     def reset(self):
         """clear all registries managed by this store"""
         # don't use self.clear, we want to keep existing subdictionaries
-        for subdict in self.itervalues():
+        for subdict in self.values():
             subdict.clear()
         self._lastmodifs = {}
 
@@ -677,7 +677,7 @@ class RegistryStore(dict):
 
     def initialization_completed(self):
         """call initialization_completed() on all known registries"""
-        for reg in self.itervalues():
+        for reg in self.values():
             reg.initialization_completed()
 
     def _mdate(self, filepath):
@@ -755,7 +755,7 @@ class RegistryStore(dict):
         if hasattr(module, 'registration_callback'):
             module.registration_callback(self)
         else:
-            self.register_all(vars(module).itervalues(), module.__name__)
+            self.register_all(vars(module).values(), module.__name__)
 
     def _load_ancestors_then_object(self, modname, objectcls, butclasses=()):
         """handle class registration according to rules defined in
@@ -929,7 +929,7 @@ def objectify_predicate(selector_func):
 _PREDICATES = {}
 
 def wrap_predicates(decorator):
-    for predicate in _PREDICATES.itervalues():
+    for predicate in _PREDICATES.values():
         if not '_decorators' in predicate.__dict__:
             predicate._decorators = set()
         if decorator in predicate._decorators:
