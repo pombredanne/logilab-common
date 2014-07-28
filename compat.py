@@ -91,20 +91,6 @@ except ImportError:
 
 from logilab.common.deprecation import deprecated
 
-from itertools import izip, chain, imap
-if sys.version_info < (3, 0):# 2to3 will remove the imports
-    izip = deprecated('izip exists in itertools since py2.3')(izip)
-    imap = deprecated('imap exists in itertools since py2.3')(imap)
-chain = deprecated('chain exists in itertools since py2.3')(chain)
-
-sum = deprecated('sum exists in builtins since py2.3')(sum)
-enumerate = deprecated('enumerate exists in builtins since py2.3')(enumerate)
-frozenset = deprecated('frozenset exists in builtins since py2.4')(frozenset)
-reversed = deprecated('reversed exists in builtins since py2.4')(reversed)
-sorted = deprecated('sorted exists in builtins since py2.4')(sorted)
-max = deprecated('max exists in builtins since py2.4')(max)
-
-
 # Python2.5 builtins
 try:
     any = any
