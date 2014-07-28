@@ -36,7 +36,7 @@ from stat import ST_MODE, S_IWRITE
 from logilab.common import STD_BLACKLIST as BASE_BLACKLIST, IGNORED_EXTENSIONS
 from logilab.common.shellutils import find
 from logilab.common.deprecation import deprecated
-from logilab.common.compat import FileIO, any
+from logilab.common.compat import FileIO
 
 def first_level_directory(path):
     """Return the first level directory of a path.

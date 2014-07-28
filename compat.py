@@ -91,31 +91,10 @@ except ImportError:
 
 from logilab.common.deprecation import deprecated
 
-# Python2.5 builtins
-try:
-    any = any
-    all = all
-except NameError:
-    def any(iterable):
-        """any(iterable) -> bool
-
-        Return True if bool(x) is True for any x in the iterable.
-        """
-        for elt in iterable:
-            if elt:
-                return True
-        return False
-
-    def all(iterable):
-        """all(iterable) -> bool
-
-        Return True if bool(x) is True for all values x in the iterable.
-        """
-        for elt in iterable:
-            if not elt:
-                return False
-        return True
-
+# Other projects import these from here, keep providing them for
+# backwards compat
+any = deprecated('use builtin "any"')(any)
+all = deprecated('use builtin "all"')(all)
 
 # Python2.5 subprocess added functions and exceptions
 try:

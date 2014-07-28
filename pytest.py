@@ -121,7 +121,6 @@ from logilab.common import textutils
 from logilab.common import testlib, STD_BLACKLIST
 # use the same unittest module as testlib
 from logilab.common.testlib import unittest, start_interactive_mode
-from logilab.common.compat import any
 import doctest
 
 import unittest as unittest_legacy
