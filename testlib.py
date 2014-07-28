@@ -87,7 +87,7 @@ except ImportError:
     test_support = TestSupport()
 
 # pylint: disable=W0622
-from logilab.common.compat import InheritableSet, callable
+from logilab.common.compat import callable
 # pylint: enable=W0622
 from logilab.common.debugger import Debugger, colorize_source
 from logilab.common.decorators import cached, classproperty
@@ -465,7 +465,7 @@ class InnerTest(tuple):
         instance.name = name
         return instance
 
-class Tags(InheritableSet): # 2.4 compat
+class Tags(set):
     """A set of tag able validate an expression"""
 
     def __init__(self, *tags, **kwargs):

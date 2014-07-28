@@ -169,22 +169,6 @@ except ImportError: # python < 2.6
         return join(*rel_list)
 
 
-# XXX don't know why tests don't pass if I don't do that :
-_real_set, set = set, deprecated('set exists in builtins since py2.4')(set)
-if (2, 5) <= sys.version_info[:2]:
-    InheritableSet = _real_set
-else:
-    class InheritableSet(_real_set):
-        """hacked resolving inheritancy issue from old style class in 2.4"""
-        def __new__(cls, *args, **kwargs):
-            if args:
-                new_args = (args[0], )
-            else:
-                new_args = ()
-            obj = _real_set.__new__(cls, *new_args)
-            obj.__init__(*args, **kwargs)
-            return obj
-
 # XXX shouldn't we remove this and just let 2to3 do his job ?
 # range or xrange?
 try:
