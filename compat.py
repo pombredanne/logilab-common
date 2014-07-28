@@ -96,28 +96,6 @@ from logilab.common.deprecation import deprecated
 any = deprecated('use builtin "any"')(any)
 all = deprecated('use builtin "all"')(all)
 
-try:
-    from os.path import relpath
-except ImportError: # python < 2.6
-    from os.path import curdir, abspath, sep, commonprefix, pardir, join
-    def relpath(path, start=curdir):
-        """Return a relative version of a path"""
-
-        if not path:
-            raise ValueError("no path specified")
-
-        start_list = abspath(start).split(sep)
-        path_list = abspath(path).split(sep)
-
-        # Work out how much of the filepath is shared by start and path.
-        i = len(commonprefix([start_list, path_list]))
-
-        rel_list = [pardir] * (len(start_list)-i) + path_list[i:]
-        if not rel_list:
-            return curdir
-        return join(*rel_list)
-
-
 # XXX shouldn't we remove this and just let 2to3 do his job ?
 # range or xrange?
 try:
