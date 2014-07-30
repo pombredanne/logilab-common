@@ -1,38 +1,45 @@
 ChangeLog for logilab.common
 ============================
 
---
-   * shellutils: restore py 2.5 compat by removing usage of class decorator
-   * pytest: drop broken --coverage option
-   * testlib: support for skipping whole test class and conditional skip, don't
+2014-07-30  --  0.62.1
+    * shellutils: restore py 2.5 compat by removing usage of class decorator
+
+    * pytest: drop broken --coverage option
+
+    * testlib: support for skipping whole test class and conditional skip, don't
      run setUp for skipped tests
-   * configuration: load options in config file order (#185648)
+
+    * configuration: load options in config file order (#185648)
+
+
 
 2014-03-07  --  0.62.0
-   * modutils: cleanup_sys_modules returns the list of cleaned modules
+    * modutils: cleanup_sys_modules returns the list of cleaned modules
+
 
 
 2014-02-11  --  0.61.0
-   * pdf_ext: removed, it had no known users (CVE-2014-1838)
+    * pdf_ext: removed, it had no known users (CVE-2014-1838)
 
-   * shellutils: fix tempfile issue in Execute, and deprecate it
+    * shellutils: fix tempfile issue in Execute, and deprecate it
      (CVE-2014-1839)
 
-   * pytest: use 'env' to run the python interpreter
+    * pytest: use 'env' to run the python interpreter
 
-   * graph: ensure output is ordered on node and graph ids (#202314)
+    * graph: ensure output is ordered on node and graph ids (#202314)
+
 
 
 2013-16-12  --  0.60.1
     * modutils:
 
-      * don't propagate IOError when package's __init__.py file doesn't
+    * don't propagate IOError when package's __init__.py file doesn't
          exist (#174606)
 
-      * ensure file is closed, may cause pb depending on the interpreter, eg
+    * ensure file is closed, may cause pb depending on the interpreter, eg
        pypy) (#180876)
 
-      * fix support for `extend_path` based nested namespace packages ;
+    * fix support for `extend_path` based nested namespace packages ;
        Report and patch by John Johnson (#177651)
 
     * fix some cases of failing python3 install on windows platform / cross
