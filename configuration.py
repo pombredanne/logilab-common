@@ -117,7 +117,7 @@ import sys
 import re
 from os.path import exists, expanduser
 from copy import copy
-from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+from ConfigParser import ConfigParser
 from warnings import warn
 
 from logilab.common.compat import callable, raw_input, str_encode as _encode
