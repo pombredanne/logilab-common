@@ -501,14 +501,8 @@ class TestCase(unittest.TestCase):
 
     def __init__(self, methodName='runTest'):
         super(TestCase, self).__init__(methodName)
-        # internal API changed in python2.4 and needed by DocTestCase
-        if sys.version_info >= (2, 4):
-            self.__exc_info = sys.exc_info
-            self.__testMethodName = self._testMethodName
-        else:
-            # let's give easier access to _testMethodName to every subclasses
-            if hasattr(self, "__testMethodName"):
-                self._testMethodName = self.__testMethodName
+        self.__exc_info = sys.exc_info
+        self.__testMethodName = self._testMethodName
         self._current_test_descr = None
         self._options_ = None
 
@@ -1224,10 +1218,6 @@ class DocTestFinder(doctest.DocTestFinder):
     def _get_test(self, obj, name, module, globs, source_lines):
         """override default _get_test method to be able to skip tests
         according to skipped attribute's value
-
-        Note: Python (<=2.4) use a _name_filter which could be used for that
-              purpose but it's no longer available in 2.5
-              Python 2.5 seems to have a [SKIP] flag
         """
         if getattr(obj, '__name__', '') in self.skipped:
             return None
@@ -1245,13 +1235,9 @@ class DocTest(TestCase):
         # pylint: disable=W0613
         try:
             finder = DocTestFinder(skipped=self.skipped)
-            if sys.version_info >= (2, 4):
-                suite = doctest.DocTestSuite(self.module, test_finder=finder)
-                if sys.version_info >= (2, 5):
-                    # XXX iirk
-                    doctest.DocTestCase._TestCase__exc_info = sys.exc_info
-            else:
-                suite = doctest.DocTestSuite(self.module)
+            suite = doctest.DocTestSuite(self.module, test_finder=finder)
+            # XXX iirk
+            doctest.DocTestCase._TestCase__exc_info = sys.exc_info
         except AttributeError:
             suite = SkippedSuite()
         # doctest may gork the builtins dictionnary

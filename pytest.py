@@ -414,10 +414,7 @@ succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
 succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
                 raise e
         modname = osp.basename(filename)[:-3]
-        try:
-            print >> sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
-        except TypeError: # < py 2.4 bw compat
-            print >> sys.stderr, ('  %s  ' % osp.basename(filename)).center(70)
+        print >> sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
         try:
             tstart, cstart = time(), clock()
             try:
