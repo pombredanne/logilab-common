@@ -206,7 +206,7 @@ def load_pytest_conf(path, parser):
     and / or tester.
     """
     namespace = {}
-    execfile(path, namespace)
+    exec(open(path, 'rb').read(), namespace)
     if 'update_parser' in namespace:
         namespace['update_parser'](parser)
     return namespace.get('CustomPyTester', PyTester)
