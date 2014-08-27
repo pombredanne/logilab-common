@@ -176,7 +176,6 @@ def check_bytes(option, opt, value):
         return value
     return apply_units(value, BYTE_UNITS)
 
-import types
 
 class Option(BaseOption):
     """override optik.Option to add some new option types
@@ -211,7 +210,7 @@ class Option(BaseOption):
             if self.choices is None:
                 raise OptionError(
                     "must supply a list of choices for type 'choice'", self)
-            elif type(self.choices) not in (types.TupleType, types.ListType):
+            elif not isinstance(self.choices, (tuple, list)):
                 raise OptionError(
                     "choices must be a list of strings ('%s' supplied)"
                     % str(type(self.choices)).split("'")[1], self)
