@@ -75,8 +75,7 @@ install: build
 binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_install -i
-	dh_pysupport -i
+	dh_python2 -i
 	dh_installchangelogs -i ChangeLog
 	dh_installexamples -i
 	dh_installdocs -i 	README doc/apidoc/
