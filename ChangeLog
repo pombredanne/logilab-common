@@ -1,6 +1,22 @@
 ChangeLog for logilab.common
 ============================
 
+2014-11-05  --  0.63.0
+    * drop compatibility with python <= 2.5 (#264017)
+
+    * fix textutils.py doctests for py3k
+
+    * produce a clearer exception when dot is not installed (#253516)
+ 
+    * make source python3-compatible (3.3+), without using 2to3.  This
+     introduces a dependency on six (#265740)
+
+    * fix umessage header decoding on python 3.3 and newer (#149345)
+
+    * WARNING: the compat module no longer exports 'callable', 'izip', 'imap',
+     'chain', 'sum', 'enumerate', 'frozenset', 'reversed', 'sorted', 'max',
+     'relpath', 'InheritableSet', or any subprocess-related names.
+
 2014-07-30  --  0.62.1
     * shellutils: restore py 2.5 compat by removing usage of class decorator
 

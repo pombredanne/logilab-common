@@ -10,7 +10,7 @@
 %{!?_python_sitelib: %define _python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           %{python}-logilab-common
-Version:        0.62.1
+Version:        0.63.0
 Release:        logilab.1%{?dist}
 Summary:        Common libraries for Logilab projects
 
