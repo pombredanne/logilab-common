@@ -23,7 +23,7 @@ import types
 from time import clock, time
 from inspect import isgeneratorfunction, getargspec
 
-from logilab.common.compat import callable, method_type
+from logilab.common.compat import method_type
 
 # XXX rewrite so we can use the decorator syntax when keyarg has to be specified
 

@@ -87,9 +87,6 @@ except ImportError:
             pass
     test_support = TestSupport()
 
-# pylint: disable=W0622
-from logilab.common.compat import callable
-# pylint: enable=W0622
 from logilab.common.debugger import Debugger, colorize_source
 from logilab.common.decorators import cached, classproperty
 from logilab.common import textutils

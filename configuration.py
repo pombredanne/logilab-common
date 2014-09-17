@@ -120,7 +120,7 @@ from copy import copy
 from ConfigParser import ConfigParser
 from warnings import warn
 
-from logilab.common.compat import callable, raw_input, str_encode as _encode
+from logilab.common.compat import raw_input, str_encode as _encode
 from logilab.common.deprecation import deprecated
 from logilab.common.textutils import normalize_text, unquote
 from logilab.common import optik_ext

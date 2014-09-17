@@ -50,15 +50,6 @@ else:
     def str_encode(string, encoding):
         return str(string)
 
-# XXX callable built-in seems back in all python versions
-try:
-    callable = builtins.callable
-except AttributeError:
-    from collections import Callable
-    def callable(something):
-        return isinstance(something, Callable)
-    del Callable
-
 # See also http://bugs.python.org/issue11776
 if sys.version_info[0] == 3:
     def method_type(callable, instance, klass):
