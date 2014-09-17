@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """ A few useful function/method decorators. """
+
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 import sys
@@ -225,8 +228,8 @@ def timed(f):
         t = time()
         c = clock()
         res = f(*args, **kwargs)
-        print '%s clock: %.9f / time: %.9f' % (f.__name__,
-                                               clock() - c, time() - t)
+        print('%s clock: %.9f / time: %.9f' % (f.__name__,
+                                               clock() - c, time() - t))
         return res
     return wrap
 

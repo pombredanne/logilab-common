@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Text formatting drivers for ureports"""
+
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 from logilab.common.textutils import linesep
@@ -54,7 +57,7 @@ class TextWriter(BaseWriter):
         try:
             self.writeln(TITLE_UNDERLINES[self.section] * len(title))
         except IndexError:
-            print "FIXME TITLE TOO DEEP. TURNING TITLE INTO TEXT"
+            print("FIXME TITLE TOO DEEP. TURNING TITLE INTO TEXT")
 
     def visit_paragraph(self, layout):
         """enter a paragraph"""

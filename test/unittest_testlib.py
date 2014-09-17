@@ -17,6 +17,8 @@
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """unittest module for logilab.comon.testlib"""
 
+from __future__ import print_function
+
 import os
 import sys
 from os.path import join, dirname, isdir, isfile, abspath, exists
@@ -709,8 +711,8 @@ class DecoratorTC(TestCase):
                     not exist : function return by the decorator should \
                     NOT be the same.' % module)
                 return
-        print 'all modules in %s exist. Could not test %s' % (', '.join(modules),
-            sys._getframe().f_code.co_name)
+        print('all modules in %s exist. Could not test %s' % (', '.join(modules),
+              sys._getframe().f_code.co_name))
 
 class TagTC(TestCase):
 

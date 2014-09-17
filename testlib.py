@@ -36,6 +36,9 @@ If no non-option arguments are present, prefixes used are 'test',
 'regrtest', 'smoketest' and 'unittest'.
 
 """
+
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 # modified copy of some functions from test/regrtest.py from PyXml
 # disable camel case warning
@@ -189,27 +192,27 @@ def start_interactive_mode(result):
     else:
         while True:
             testindex = 0
-            print "Choose a test to debug:"
+            print("Choose a test to debug:")
             # order debuggers in the same way than errors were printed
-            print "\n".join(['\t%s : %s' % (i, descr) for i, (_, descr)
-                in enumerate(descrs)])
-            print "Type 'exit' (or ^D) to quit"
-            print
+            print("\n".join(['\t%s : %s' % (i, descr) for i, (_, descr)
+                  in enumerate(descrs)]))
+            print("Type 'exit' (or ^D) to quit")
+            print()
             try:
                 todebug = raw_input('Enter a test name: ')
                 if todebug.strip().lower() == 'exit':
-                    print
+                    print()
                     break
                 else:
                     try:
                         testindex = int(todebug)
                         debugger = debuggers[descrs[testindex][0]]
                     except (ValueError, IndexError):
-                        print "ERROR: invalid test number %r" % (todebug, )
+                        print("ERROR: invalid test number %r" % (todebug, ))
                     else:
                         debugger.start()
             except (EOFError, KeyboardInterrupt):
-                print
+                print()
                 break
 
 
@@ -594,8 +597,9 @@ class TestCase(unittest.TestCase):
                         finally:
                             restartfile.close()
                     except Exception:
-                        print >> sys.__stderr__, "Error while saving \
-succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
+                        print("Error while saving succeeded test into",
+                              osp.join(os.getcwd(), FILE_RESTART),
+                              file=sys.__stderr__)
                         raise
                 result.addSuccess(self)
         finally:

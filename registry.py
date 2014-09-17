@@ -73,6 +73,8 @@ Exceptions
 .. autoclass:: NoSelectableObject
 """
 
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 import sys
@@ -847,7 +849,7 @@ TRACED_OIDS = None
 def _trace_selector(cls, selector, args, ret):
     vobj = args[0]
     if TRACED_OIDS == 'all' or vobj.__regid__ in TRACED_OIDS:
-        print '%s -> %s for %s(%s)' % (cls, ret, vobj, vobj.__regid__)
+        print('%s -> %s for %s(%s)' % (cls, ret, vobj, vobj.__regid__))
 
 def _lltrace(selector):
     """use this decorator on your predicates so they become traceable with

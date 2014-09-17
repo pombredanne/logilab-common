@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Table management module."""
+
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 
@@ -650,7 +653,7 @@ class TableStyleSheet:
                 'table.py', 'exec'))
             self.rules.append(rule)
         except SyntaxError:
-            print "Bad Stylesheet Rule : %s [skipped]"%rule
+            print("Bad Stylesheet Rule : %s [skipped]" % rule)
 
 
     def add_rowsum_rule(self, dest_cell, row_index, start_col, end_col):

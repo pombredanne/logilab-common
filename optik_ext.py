@@ -46,6 +46,8 @@ It also defines three new types for optik/optparse command line parser :
     argument of this type will be converted to a float value in bytes
     according to byte units (b, kb, mb, gb, tb)
 """
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 import re
@@ -381,9 +383,9 @@ def generate_manpage(optparser, pkginfo, section=1, stream=sys.stdout, level=0):
     formatter = ManHelpFormatter()
     formatter.output_level = level
     formatter.parser = optparser
-    print >> stream, formatter.format_head(optparser, pkginfo, section)
-    print >> stream, optparser.format_option_help(formatter)
-    print >> stream, formatter.format_tail(pkginfo)
+    print(formatter.format_head(optparser, pkginfo, section), file=stream)
+    print(optparser.format_option_help(formatter), file=stream)
+    print(formatter.format_tail(pkginfo), file=stream)
 
 
 __all__ = ('OptionParser', 'Option', 'OptionGroup', 'OptionValueError',

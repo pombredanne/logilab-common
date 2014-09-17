@@ -18,6 +18,9 @@
 """shell/term utilities, useful to write some python scripts instead of shell
 scripts.
 """
+
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 import os
@@ -426,7 +429,7 @@ class RawInput(object):
             if self._print:
                 self._print(msg)
             else:
-                print msg
+                print(msg)
             tries -= 1
         raise Exception('unable to get a sensible answer')
 

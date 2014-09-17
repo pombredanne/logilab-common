@@ -18,6 +18,7 @@
 '''unit tests utilities for ureports
 '''
 
+from __future__ import print_function
 
 from cStringIO import StringIO
 from logilab.common.ureports.nodes import *
@@ -31,11 +32,11 @@ class WriterTC:
         try:
             self.assertMultiLineEqual(got, expected)
         except:
-            print '**** got for %s' % test_id
-            print got
-            print '**** while expected'
-            print expected
-            print '****'
+            print('**** got for %s' % test_id)
+            print(got)
+            print('**** while expected')
+            print(expected)
+            print('****')
             raise
 
     def test_section(self):

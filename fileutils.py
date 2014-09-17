@@ -23,6 +23,9 @@ get_by_ext, remove_dead_links
 write_open_mode, ensure_fs_mode, export
 :sort: path manipulation, file manipulation
 """
+
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 import sys
@@ -374,7 +377,7 @@ def export(from_dir, to_dir,
             src = join(directory, filename)
             dest = to_dir + src[len(from_dir):]
             if verbose:
-                print >> sys.stderr, src, '->', dest
+                print(src, '->', dest, file=sys.stderr)
             if exists(dest):
                 remove(dest)
             shutil.copy2(src, dest)
@@ -396,6 +399,6 @@ def remove_dead_links(directory, verbose=0):
             src = join(dirpath, filename)
             if islink(src) and not exists(src):
                 if verbose:
-                    print 'remove dead link', src
+                    print('remove dead link', src)
                 remove(src)
 

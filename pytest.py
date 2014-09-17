@@ -92,6 +92,9 @@ you can filter the function with a simple python expression
  * ``tata`` and ``titi`` match``rouge ^ carre``
  * ``titi`` match ``rouge and not carre``
 """
+
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 PYTEST_DOC = """%prog [OPTIONS] [testfile [testpattern]]
@@ -333,8 +336,8 @@ class PyTester(object):
     def show_report(self):
         """prints the report and returns appropriate exitcode"""
         # everything has been ran, print report
-        print "*" * 79
-        print self.report
+        print("*" * 79)
+        print(self.report)
 
     def get_errcode(self):
         # errcode set explicitly
@@ -357,13 +360,13 @@ class PyTester(object):
                     dirs.remove(skipped)
             basename = osp.basename(dirname)
             if this_is_a_testdir(basename):
-                print "going into", dirname
+                print("going into", dirname)
                 # we found a testdir, let's explore it !
                 if not self.testonedir(dirname, exitfirst):
                     break
                 dirs[:] = []
         if self.report.ran == 0:
-            print "no test dir found testing here:", here
+            print("no test dir found testing here:", here)
             # if no test was found during the visit, consider
             # the local directory as a test directory even if
             # it doesn't have a traditional test directory name
@@ -383,8 +386,9 @@ class PyTester(object):
                         restartfile = open(FILE_RESTART, "w")
                         restartfile.close()
                     except Exception:
-                        print >> sys.__stderr__, "Error while overwriting \
-succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
+                        print("Error while overwriting succeeded test file :",
+                              osp.join(os.getcwd(), FILE_RESTART),
+                              file=sys.__stderr__)
                         raise
                 # run test and collect information
                 prog = self.testfile(filename, batchmode=True)
@@ -410,11 +414,12 @@ succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
                 restartfile = open(FILE_RESTART, "w")
                 restartfile.close()
             except Exception:
-                print >> sys.__stderr__, "Error while overwriting \
-succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
+                print("Error while overwriting succeeded test file :",
+                      osp.join(os.getcwd(), FILE_RESTART), file=sys.__stderr__)
                 raise
         modname = osp.basename(filename)[:-3]
-        print >> sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
+        print(('  %s  ' % osp.basename(filename)).center(70, '='),
+              file=sys.__stderr__)
         try:
             tstart, cstart = time(), clock()
             try:
@@ -426,12 +431,13 @@ succeeded test file :", osp.join(os.getcwd(), FILE_RESTART)
                 self.errcode = exc.code
                 raise
             except testlib.SkipTest:
-                print "Module skipped:", filename
+                print("Module skipped:", filename)
                 self.report.skip_module(filename)
                 return None
             except Exception:
                 self.report.failed_to_test_module(filename)
-                print >> sys.stderr, 'unhandled exception occurred while testing', modname
+                print('unhandled exception occurred while testing', modname,
+                      file=sys.stderr)
                 import traceback
                 traceback.print_exc(file=sys.stderr)
                 return None
@@ -482,7 +488,7 @@ class DjangoTester(PyTester):
         from django.test.utils import teardown_test_environment
         from django.test.utils import destroy_test_db
         teardown_test_environment()
-        print 'destroying', self.dbname
+        print('destroying', self.dbname)
         destroy_test_db(self.dbname, verbosity=0)
 
     def testall(self, exitfirst=False):
@@ -500,7 +506,7 @@ class DjangoTester(PyTester):
             else:
                 basename = osp.basename(dirname)
                 if basename in ('test', 'tests'):
-                    print "going into", dirname
+                    print("going into", dirname)
                     # we found a testdir, let's explore it !
                     if not self.testonedir(dirname, exitfirst):
                         break
@@ -541,7 +547,8 @@ class DjangoTester(PyTester):
             os.chdir(dirname)
         self.load_django_settings(dirname)
         modname = osp.basename(filename)[:-3]
-        print >>sys.stderr, ('  %s  ' % osp.basename(filename)).center(70, '=')
+        print(('  %s  ' % osp.basename(filename)).center(70, '='),
+              file=sys.stderr)
         try:
             try:
                 tstart, cstart = time(), clock()
@@ -557,8 +564,8 @@ class DjangoTester(PyTester):
                 import traceback
                 traceback.print_exc()
                 self.report.failed_to_test_module(filename)
-                print 'unhandled exception occurred while testing', modname
-                print 'error: %s' % exc
+                print('unhandled exception occurred while testing', modname)
+                print('error: %s' % exc)
                 return None
         finally:
             self.after_testfile()
@@ -687,7 +694,7 @@ def run():
                 prof = hotshot.Profile(options.profile)
                 prof.runcall(cmd, *args)
                 prof.close()
-                print 'profile data saved in', options.profile
+                print('profile data saved in', options.profile)
             else:
                 cmd(*args)
         except SystemExit:

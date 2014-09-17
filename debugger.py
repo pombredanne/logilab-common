@@ -26,6 +26,9 @@
 
 
 """
+
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 try:
@@ -182,8 +185,8 @@ class Debugger(Pdb):
         if not arg:
             try:
                 source, start_lineno = getsource(self.curframe)
-                print colorize(''.join(source), start_lineno,
-                               self.curframe.f_lineno)
+                print(colorize(''.join(source), start_lineno,
+                               self.curframe.f_lineno))
             except KeyboardInterrupt:
                 pass
             except IOError:

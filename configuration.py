@@ -106,6 +106,9 @@ Quick start: simplest usage
   than 0.61 the behaviour is unspecified.
 
 """
+
+from __future__ import print_function
+
 __docformat__ = "restructuredtext en"
 
 __all__ = ('OptionsManagerMixIn', 'OptionsProviderMixIn',
@@ -251,7 +254,7 @@ def input_password(optdict, question='password:'):
         value2 = getpass('confirm: ')
         if value == value2:
             return value
-        print 'password mismatch, try again'
+        print('password mismatch, try again')
 
 def input_string(optdict, question):
     value = raw_input(question).strip()
@@ -267,7 +270,7 @@ def _make_input_function(opttype):
                 return _call_validator(opttype, optdict, None, value)
             except optik_ext.OptionValueError as ex:
                 msg = str(ex).split(':', 1)[-1].strip()
-                print 'bad value: %s' % msg
+                print('bad value: %s' % msg)
     return input_validator
 
 INPUT_FUNCTIONS = {
@@ -377,8 +380,8 @@ def ini_format_section(stream, section, options, encoding=None, doc=None):
     """format an options section using the INI format"""
     encoding = _get_encoding(encoding, stream)
     if doc:
-        print >> stream, _encode(comment(doc), encoding)
-    print >> stream, '[%s]' % section
+        print(_encode(comment(doc), encoding), file=stream)
+    print('[%s]' % section, file=stream)
     ini_format(stream, options, encoding)
 
 def ini_format(stream, options, encoding):
@@ -388,15 +391,15 @@ def ini_format(stream, options, encoding):
         help = optdict.get('help')
         if help:
             help = normalize_text(help, line_len=79, indent='# ')
-            print >> stream
-            print >> stream, _encode(help, encoding)
+            print(file=stream)
+            print(_encode(help, encoding), file=stream)
         else:
-            print >> stream
+            print(file=stream)
         if value is None:
-            print >> stream, '#%s=' % optname
+            print('#%s=' % optname, file=stream)
         else:
             value = _encode(value, encoding).strip()
-            print >> stream, '%s=%s' % (optname, value)
+            print('%s=%s' % (optname, value), file=stream)
 
 format_section = ini_format_section
 
@@ -575,7 +578,7 @@ class OptionsManagerMixIn(object):
         printed = False
         for section in sections:
             if printed:
-                print >> stream, '\n'
+                print('\n', file=stream)
             format_section(stream, section.upper(), options_by_section[section],
                            encoding)
             printed = True
@@ -614,7 +617,7 @@ class OptionsManagerMixIn(object):
             if opt in self._all_options:
                 break # already processed
             def helpfunc(option, opt, val, p, level=helplevel):
-                print self.help(level)
+                print(self.help(level))
                 sys.exit(0)
             helpmsg = '%s verbose help.' % ' '.join(['more'] * helplevel)
             optdict = {'action' : 'callback', 'callback' : helpfunc,
@@ -636,7 +639,7 @@ class OptionsManagerMixIn(object):
                     parser._sections[sect.upper()] = values
         elif not self.quiet:
             msg = 'No config file found, using default configuration'
-            print >> sys.stderr, msg
+            print(msg, file=sys.stderr)
             return
 
     def input_config(self, onlysection=None, inputlevel=0, stream=None):
@@ -860,12 +863,12 @@ class OptionsProviderMixIn(object):
             defaultstr = ': '
         else:
             defaultstr = '(default: %s): ' % format_option_value(optdict, default)
-        print ':%s:' % option
-        print optdict.get('help') or option
+        print(':%s:' % option)
+        print(optdict.get('help') or option)
         inputfunc = INPUT_FUNCTIONS[optdict['type']]
         value = inputfunc(optdict, defaultstr)
         while default is REQUIRED and not value:
-            print 'please specify a value'
+            print('please specify a value')
             value = inputfunc(optdict, '%s: ' % option)
         if value is None and default is not None:
             value = default
