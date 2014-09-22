@@ -531,7 +531,12 @@ class TestCase(unittest.TestCase):
         except (KeyboardInterrupt, SystemExit):
             raise
         except unittest.SkipTest as e:
-            self._addSkip(result, str(e))
+            if hasattr(result, 'addSkip'):
+                result.addSkip(self, str(e))
+            else:
+                warnings.warn("TestResult has no addSkip method, skips not reported",
+                              RuntimeWarning, 2)
+                result.addSuccess(self)
             return False
         except:
             result.addError(self, self.__exc_info())
