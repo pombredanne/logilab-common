@@ -11,12 +11,13 @@ Uploaders: David Douard <david.douard@logilab.fr>,
 	   Julien Jehannet <julien.jehannet@debian.org>,
 Build-Depends:
  debhelper (>= 7),
- python (>= 2.5),
+ python (>= 2.6),
  python-unittest2 | python (>= 2.7),
  python-epydoc,
+ python-six (>= 1.4.0),
  graphviz,
  python-egenix-mxdatetime,
-XS-Python-Version: >= 2.5
+XS-Python-Version: >= 2.6
 Standards-Version: 3.9.1
 Homepage: http://www.logilab.org/project/logilab-common
 Vcs-Svn: svn://svn.debian.org/svn/python-modules/packages/logilab-common/trunk/
@@ -25,7 +26,10 @@ Vcs-Browser: http://svn.debian.org/viewsvn/python-modules/packages/logilab-commo
 Package: python-logilab-common
 Architecture: all
 Provides: ${python:Provides}
-Depends: ${python:Depends}, ${misc:Depends}
+Depends:
+ python-six (>= 1.4.0),
+ ${python:Depends},
+ ${misc:Depends},
 Suggests: pyro, python-unittest2, python-kerberos
 Recommends: python-egenix-mxdatetime
 Conflicts:

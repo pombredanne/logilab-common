@@ -23,6 +23,7 @@ BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 BuildRequires:  python-devel python-setuptools python-unittest2
 Requires:       mx
+Requires:       %{python}-six >= 1.4.0
 
 
 %description

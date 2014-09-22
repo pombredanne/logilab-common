@@ -40,7 +40,9 @@ from os.path import join
 scripts = [join('bin', 'pytest')]
 include_dirs = [join('test', 'data')]
 
-install_requires = []
+install_requires = [
+        'six >= 1.4.0',
+        ]
 if sys.version_info < (2, 7):
     install_requires.append('unittest2 >= 0.5.1')
 if os.name == 'nt':
