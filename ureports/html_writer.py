@@ -20,6 +20,8 @@ __docformat__ = "restructuredtext en"
 
 from cgi import escape
 
+from six.moves import range
+
 from logilab.common.ureports import BaseWriter
 
 

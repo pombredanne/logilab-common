@@ -21,6 +21,8 @@ from __future__ import print_function
 
 __docformat__ = "restructuredtext en"
 
+from six.moves import range
+
 from logilab.common.textutils import linesep
 from logilab.common.ureports import BaseWriter
 

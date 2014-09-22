@@ -37,6 +37,8 @@ import sys
 import csv
 import tempfile
 
+from six.moves import range
+
 class Dbase:
     def __init__(self):
         self.fdb = None

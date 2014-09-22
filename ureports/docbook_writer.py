@@ -18,6 +18,8 @@
 """HTML formatting drivers for ureports"""
 __docformat__ = "restructuredtext en"
 
+from six.moves import range
+
 from logilab.common.ureports import HTMLWriter
 
 class DocbookWriter(HTMLWriter):

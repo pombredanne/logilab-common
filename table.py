@@ -21,6 +21,7 @@ from __future__ import print_function
 
 __docformat__ = "restructuredtext en"
 
+from six.moves import range
 
 class Table(object):
     """Table defines a data table with column and row names.

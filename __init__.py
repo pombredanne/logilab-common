@@ -25,6 +25,9 @@
 :var IGNORED_EXTENSIONS: file extensions that may usually be ignored
 """
 __docformat__ = "restructuredtext en"
+
+from six.moves import range
+
 from logilab.common.__pkginfo__ import version as __version__
 
 STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')

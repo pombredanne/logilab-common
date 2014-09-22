@@ -124,6 +124,7 @@ from ConfigParser import ConfigParser
 from warnings import warn
 
 from six import string_types
+from six.moves import range
 
 from logilab.common.compat import raw_input, str_encode as _encode
 from logilab.common.deprecation import deprecated

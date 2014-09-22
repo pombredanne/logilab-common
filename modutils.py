@@ -37,6 +37,8 @@ from imp import find_module, load_module, C_BUILTIN, PY_COMPILED, PKG_DIRECTORY
 from distutils.sysconfig import get_config_var, get_python_lib, get_python_version
 from distutils.errors import DistutilsPlatformError
 
+from six.moves import range
+
 try:
     import zipimport
 except ImportError:

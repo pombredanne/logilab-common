@@ -26,6 +26,8 @@ import sys
 import time
 import warnings
 
+from six.moves import range
+
 def setugid(user):
     """Change process user and group ID
 
