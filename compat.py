@@ -70,12 +70,6 @@ else:
     from io import FileIO, BytesIO, StringIO
     from imp import reload
 
-# Where do pickles come from?
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 from logilab.common.deprecation import deprecated
 
 # Other projects import these from here, keep providing them for
