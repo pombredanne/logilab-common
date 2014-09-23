@@ -38,10 +38,9 @@ import subprocess
 from os.path import exists, isdir, islink, basename, join
 
 from six import string_types
-from six.moves import range
+from six.moves import range, input as raw_input
 
 from logilab.common import STD_BLACKLIST, _handle_blacklist
-from logilab.common.compat import raw_input
 from logilab.common.compat import str_to_bytes
 from logilab.common.deprecation import deprecated
 

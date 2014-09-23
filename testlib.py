@@ -59,7 +59,7 @@ from itertools import dropwhile
 from inspect import isgeneratorfunction
 
 from six import string_types
-from six.moves import builtins, range, configparser
+from six.moves import builtins, range, configparser, input
 
 from logilab.common.deprecation import deprecated
 
@@ -200,7 +200,7 @@ def start_interactive_mode(result):
             print("Type 'exit' (or ^D) to quit")
             print()
             try:
-                todebug = raw_input('Enter a test name: ')
+                todebug = input('Enter a test name: ')
                 if todebug.strip().lower() == 'exit':
                     print()
                     break

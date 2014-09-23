@@ -44,9 +44,8 @@ Example::
 
 __docformat__ = "restructuredtext en"
 
-from six.moves import builtins
+from six.moves import builtins, input
 
-from logilab.common.compat import raw_input
 if not hasattr(builtins, '_'):
     builtins._ = str
 
@@ -109,7 +108,7 @@ class CLIHelper:
         """loop on user input, exit on EOF"""
         while True:
             try:
-                line = raw_input('>>> ')
+                line = input('>>> ')
             except EOFError:
                 print
                 break

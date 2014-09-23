@@ -123,9 +123,9 @@ from copy import copy
 from warnings import warn
 
 from six import string_types
-from six.moves import range, configparser as cp
+from six.moves import range, configparser as cp, input
 
-from logilab.common.compat import raw_input, str_encode as _encode
+from logilab.common.compat import str_encode as _encode
 from logilab.common.deprecation import deprecated
 from logilab.common.textutils import normalize_text, unquote
 from logilab.common import optik_ext
@@ -259,13 +259,13 @@ def input_password(optdict, question='password:'):
         print('password mismatch, try again')
 
 def input_string(optdict, question):
-    value = raw_input(question).strip()
+    value = input(question).strip()
     return value or None
 
 def _make_input_function(opttype):
     def input_validator(optdict, question):
         while True:
-            value = raw_input(question)
+            value = input(question)
             if not value.strip():
                 return None
             try:
