@@ -1,9 +1,5 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
-#
-# adapted by Logilab for automatic generation by debianize
-# (part of the devtools project, http://www.logilab.org/projects/devtools)
+# -*- makefile -*-
 #
 # Copyright (c) 2003-2011 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
@@ -11,84 +7,86 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# Python default version number
-PYDEF := $(shell pyversions -d -v)
+include /usr/share/python/python.mk
 
--include /usr/share/python/python.mk
-ifeq (,$(py_sitename))
-	py_sitename = site-packages
-	py_libdir = /usr/lib/python$(subst python,,$(1))/site-packages
-	py_sitename_sh = $(py_sitename)
-	py_libdir_sh = $(py_libdir)
+# don't build the python3 package if python3 is < 3.3
+py3k = $(subst python3.,,$(shell py3versions -d))
+build_py3k = $(shell test "$(py3k)" -gt 2 && echo 1)
+
+PYLIB:=$(call py_libdir,$(shell pyversions -d))
+PACKAGE:=$(call py_pkgname,python-logilab-common,python)
+PYLIB3:=$(call py_libdir,python3.)
+PACKAGE3:=$(call py_pkgname,python-logilab-common,python3.)
+
+ifeq (,$(build_py3k))
+    DH_OPTIONS += -N$(PACKAGE3)
+    export DH_OPTIONS
 endif
 
-build: build-stamp
-build-stamp:
-	dh_testdir
+build: build-indep
+.PHONY: build
 
-	# python module build
-	NO_SETUPTOOLS=1 python setup.py -q build --build-purelib build/lib
+%:
+	dh $@ --with python2,python3
 
-	# run tests
-ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
-	# we need this hack because we have to import "logilab.common.pytest"
-	# but since it's a namespace package, we need to "simulate" it
-	touch $(CURDIR)/build/lib/logilab/__init__.py
-	# use the default python version to select the script dir to run the tests
-	PYTHONPATH=$(CURDIR)/build/lib/ $(CURDIR)/build/scripts-$(PYDEF)/pytest -t test
-endif
-
-	# build doc
+override_dh_auto_build:
+ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
 	$(MAKE) -C doc
+endif
 
-	rm -f $(CURDIR)/build/lib/logilab/__init__.py
-	touch build-stamp
-
-clean:
-	dh_testdir
-	dh_testroot
-
-	# clean doc
-	$(MAKE) -C doc clean
-
-	NO_SETUPTOOLS=1 python setup.py clean
-
-	[ ! -d build ] || rm -rf build
-
-	find . -name "*.pyc" -delete
-
-	dh_clean build-stamp
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-
+override_dh_auto_install:
 	NO_SETUPTOOLS=1 python setup.py -q install --no-compile \
-		--root=$(CURDIR)/debian/python-logilab-common/ \
-		${py_setup_install_args}
+	                --root=$(CURDIR)/debian/$(PACKAGE)/ \
+	                ${py_setup_install_args}
 	# remove test directory
-	rm -rf debian/python-logilab-common/usr/lib/python*/*-packages/logilab/common/test
+	rm -rf debian/$(PACKAGE)/$(PYLIB)/logilab/common/test
+	
+ifneq (,$(build_py3k))
+	NO_SETUPTOOLS=1 python3 setup.py -q install --no-compile \
+	                --root=$(CURDIR)/debian/$(PACKAGE3)/ \
+	                ${py_setup_install_args}
+	# remove test directory
+	rm -rf debian/$(PACKAGE3)/$(PYLIB3)/logilab/common/test
+	
+	# rename pytest and its man page for python3k
+	mv debian/$(PACKAGE3)/usr/bin/pytest debian/$(PACKAGE3)/usr/bin/pytest3
+	sed -i 's/python -u/python3 -u/' debian/$(PACKAGE3)/usr/bin/pytest3
+	install -D doc/pytest.1 debian/$(PACKAGE3)/usr/share/man/man1/pytest3.1
+	sed -i 's/pytest/pytest3/' debian/$(PACKAGE3)/usr/share/man/man1/pytest3.1
+	gzip debian/$(PACKAGE3)/usr/share/man/man1/pytest3.1
+endif
 
-# Build architecture-independent files here.
-binary-indep: build install
-	dh_testdir
-	dh_testroot
-	dh_python2 -i
+override_dh_installdocs:
 	dh_installchangelogs -i ChangeLog
-	dh_installexamples -i
-	dh_installdocs -i 	README doc/apidoc/
-	dh_installman -i
-	dh_link -i
-	dh_compress -i		-X.py -X.ini -X.xml -Xtest/ -Xapidoc/
-	dh_fixperms -i
-	dh_installdeb -i
-	dh_gencontrol -i
-	dh_md5sums -i
-	dh_builddeb -i
+	dh_installdocs -i README*
+ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
+	dh_installdocs -i doc/apidoc/
+endif
 
-binary-arch:
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	# PYTHON 2.X
+	# IMPORTANT: Install command was overriden by Logilab to install data test files.
+	NO_SETUPTOOLS=1 python setup.py -q install --no-compile \
+	                --root=$(CURDIR)/testing/ ${py_setup_install_args}
+	# since "logilab.common" is a namespace package, we need to "simulate" it
+	touch $(CURDIR)/testing/$(PYLIB)/logilab/__init__.py
+	# use the default python version to select the script dir to run the tests
+	PYTHONPATH=$(CURDIR)/testing/$(PYLIB) python $(CURDIR)/testing/usr/bin/pytest -t $(CURDIR)/testing/$(PYLIB)/logilab/common/test
+	rm -rf $(CURDIR)/testing
+	
+ifneq (,$(build_py3k))
+	# PYTHON 3.x
+	# IMPORTANT: Install command was overriden by Logilab to install data test files.
+	NO_SETUPTOOLS=1 python3 setup.py -q install --no-compile \
+	                --root=$(CURDIR)/testing/ ${py_setup_install_args}
+	# since "logilab.common" is a namespace package, we need to "simulate" it
+	touch $(CURDIR)/testing/$(PYLIB3)/logilab/__init__.py
+	# use python3 version to run pytest
+	-PYTHONPATH=$(CURDIR)/testing/$(PYLIB3) python3 $(CURDIR)/testing/usr/bin/pytest -t $(CURDIR)/testing/$(PYLIB3)/logilab/common/test
+	rm -rf $(CURDIR)/testing
+endif
+endif
 
-binary: binary-indep
-.PHONY: build clean binary binary-indep binary-arch
+override_dh_compress:
+	dh_compress -X.py -X.ini -X.xml -Xtest/ -Xapidoc/

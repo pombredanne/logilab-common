@@ -1,25 +1,27 @@
 Source: logilab-common
 Section: python
 Priority: optional
-Maintainer: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>
+Maintainer: Logilab S.A. <contact@logilab.fr>
 Uploaders: David Douard <david.douard@logilab.fr>,
 	   Alexandre Fayolle <afayolle@debian.org>,
 	   Sandro Tosi <morph@debian.org>,
 	   Adrien Di Mascio <Adrien.DiMascio@logilab.fr>,
 	   Nicolas Chauvat <nicolas.chauvat@logilab.fr>,
 Build-Depends:
- debhelper (>= 7),
- python (>= 2.6),
- python-unittest2 | python (>= 2.7),
+ debhelper (>= 7.0.50~),
+ python-all,
+ python3-all,
+Build-Depends-Indep:
  python-epydoc,
- python-six (>= 1.4.0),
  graphviz,
+ python-unittest2,
  python-egenix-mxdatetime,
-XS-Python-Version: >= 2.6
+X-Python3-Version: >= 3.3
+X-Python-Version: >= 2.6
 Standards-Version: 3.9.1
 Homepage: http://www.logilab.org/project/logilab-common
-Vcs-Svn: svn://svn.debian.org/svn/python-modules/packages/logilab-common/trunk/
-Vcs-Browser: http://svn.debian.org/viewsvn/python-modules/packages/logilab-common/trunk/
+Vcs-Hg: http://hg.logilab.org/logilab/common
+Vcs-Browser: http://hg.logilab.org/logilab/common
 
 Package: python-logilab-common
 Architecture: all
@@ -28,11 +30,15 @@ Depends:
  python-six (>= 1.4.0),
  ${python:Depends},
  ${misc:Depends},
-Suggests: pyro, python-unittest2, python-kerberos
-Recommends: python-egenix-mxdatetime
+Recommends:
+ python-egenix-mxdatetime
+Suggests:
+ pyro,
+ python-unittest2,
+ python-kerberos,
 Conflicts:
- python-constraint (<= 0.3.0-4),
- python-logilab-astng (<= 0.16.0-1),
+ python-constraint (<< 0.4.0-4),
+ python-logilab-astng (<< 0.19.1-1),
  pylint (<< 1),
  devtools (<= 0.9.0-1),
  logilab-doctools (<= 0.1.6-4),
@@ -48,9 +54,35 @@ Description: useful miscellaneous modules used by Logilab projects
   * writing interactive command line tools
   * manipulation files and character strings
   * interfacing to OmniORB
-  * generating of SQL queries
   * running unit tests
   * manipulating tree structures
-  * accessing RDBMS (currently postgreSQL, MySQL and sqlite)
   * generating text and HTML reports
   * logging
+  * parsing XML processing instructions
+ .
+ This package contains the Python 2.x version of this library.
+
+Package: python3-logilab-common
+Architecture: all
+Depends:
+ python3-six (>= 1.4.0),
+ ${python3:Depends},
+ ${misc:Depends},
+#Recommends:
+# python3-egenix-mxdatetime,
+Suggests:
+ python3-kerberos,
+Description: useful miscellaneous modules used by Logilab projects
+ logilab-common is a collection of low-level Python packages and modules,
+ designed to ease:
+ .
+  * handling command line options and configuration files
+  * writing interactive command line tools
+  * manipulation files and character strings
+  * interfacing to OmniORB
+  * running unit tests
+  * manipulating tree structures
+  * generating text and HTML reports
+  * logging
+ .
+ This package contains the Python 3.x version of this library.
