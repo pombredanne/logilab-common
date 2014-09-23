@@ -60,11 +60,6 @@ else:
     # alias types otherwise
     method_type = types.MethodType
 
-if sys.version_info < (3, 0):
-    raw_input = raw_input
-else:
-    raw_input = input
-
 # Pythons 2 and 3 differ on where to get StringIO
 if sys.version_info < (3, 0):
     from cStringIO import StringIO
