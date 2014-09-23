@@ -89,9 +89,3 @@ try:
     range = xrange
 except NameError:
     range = range
-
-# ConfigParser was renamed to the more-standard configparser
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
