@@ -76,10 +76,3 @@ from logilab.common.deprecation import deprecated
 # backwards compat
 any = deprecated('use builtin "any"')(any)
 all = deprecated('use builtin "all"')(all)
-
-# XXX shouldn't we remove this and just let 2to3 do his job ?
-# range or xrange?
-try:
-    range = xrange
-except NameError:
-    range = range
