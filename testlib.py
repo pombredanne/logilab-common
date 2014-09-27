@@ -82,14 +82,6 @@ except ImportError:
             callable.__name__ = wrapped.__name__
             return callable
         return proxy
-try:
-    from test import test_support
-except ImportError:
-    # not always available
-    class TestSupport:
-        def unload(self, test):
-            pass
-    test_support = TestSupport()
 
 from logilab.common.debugger import Debugger, colorize_source
 from logilab.common.decorators import cached, classproperty
