@@ -74,14 +74,7 @@ else:
     import unittest
     from unittest import SkipTest
 
-try:
-    from functools import wraps
-except ImportError:
-    def wraps(wrapped):
-        def proxy(callable):
-            callable.__name__ = wrapped.__name__
-            return callable
-        return proxy
+from functools import wraps
 
 from logilab.common.debugger import Debugger, colorize_source
 from logilab.common.decorators import cached, classproperty
