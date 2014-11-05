@@ -30,7 +30,9 @@ build: build-indep
 	dh $@ --with python2,python3
 
 override_dh_auto_build:
+	dh_auto_build
 ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
+	NO_SETUPTOOLS=1 python setup.py -q build --build-purelib build/lib
 	$(MAKE) -C doc
 endif
 
@@ -57,10 +59,9 @@ ifneq (,$(build_py3k))
 endif
 
 override_dh_installdocs:
-	dh_installchangelogs -i ChangeLog
-	dh_installdocs -i README*
+	dh_installdocs README*
 ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
-	dh_installdocs -i doc/apidoc/
+	dh_installdocs doc/apidoc/
 endif
 
 override_dh_auto_test:
@@ -90,3 +91,8 @@ endif
 
 override_dh_compress:
 	dh_compress -X.py -X.ini -X.xml -Xtest/ -Xapidoc/
+
+override_dh_clean:
+	dh_clean
+	rm -rf doc/apidoc
+	rm -rf logilab_common.egg-info
