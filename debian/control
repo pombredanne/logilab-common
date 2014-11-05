@@ -8,7 +8,7 @@ Uploaders: David Douard <david.douard@logilab.fr>,
 	   Adrien Di Mascio <Adrien.DiMascio@logilab.fr>,
 	   Nicolas Chauvat <nicolas.chauvat@logilab.fr>,
 Build-Depends:
- debhelper (>= 7.0.50~),
+ debhelper (>= 8),
  python-all,
  python3-all,
 Build-Depends-Indep:
