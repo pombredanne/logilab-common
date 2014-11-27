@@ -1082,8 +1082,14 @@ class NonStrictTestLoader(unittest.TestLoader):
                 testCaseClass)
         return [testname for testname in testnames if not is_skipped(testname)]
 
+
+# The 2 functions below are modified versions of the TestSuite.run method
+# that is provided with unittest2 for python 2.6, in unittest2/suite.py
+# It is used to monkeypatch the original implementation to support
+# extra runcondition and options arguments (see in testlib.py)
+
 def _ts_run(self, result, runcondition=None, options=None):
-    self._wrapped_run(result,runcondition=runcondition, options=options)
+    self._wrapped_run(result, runcondition=runcondition, options=options)
     self._tearDownPreviousClass(None, result)
     self._handleModuleTearDown(result)
     return result
@@ -1097,10 +1103,17 @@ def _ts_wrapped_run(self, result, debug=False, runcondition=None, options=None):
             self._handleModuleFixture(test, result)
             self._handleClassSetUp(test, result)
             result._previousTestClass = test.__class__
-            if (getattr(test.__class__, '_classSetupFailed', False) or 
+            if (getattr(test.__class__, '_classSetupFailed', False) or
                 getattr(result, '_moduleSetUpFailed', False)):
                 continue
 
+        # --- modifications to deal with _wrapped_run ---
+        # original code is:
+        #
+        # if not debug:
+        #     test(result)
+        # else:
+        #     test.debug()
         if hasattr(test, '_wrapped_run'):
             try:
                 test._wrapped_run(result, debug, runcondition=runcondition, options=options)
@@ -1113,6 +1126,25 @@ def _ts_wrapped_run(self, result, debug=False, runcondition=None, options=None):
                 test(result)
         else:
             test.debug()
+        # --- end of modifications to deal with _wrapped_run ---
+    return result
+
+if sys.version_info >= (2, 7):
+    # The function below implements a modified version of the
+    # TestSuite.run method that is provided with python 2.7, in
+    # unittest/suite.py
+    def _ts_run(self, result, debug=False, runcondition=None, options=None):
+        topLevel = False
+        if getattr(result, '_testRunEntered', False) is False:
+            result._testRunEntered = topLevel = True
+
+        self._wrapped_run(result, debug, runcondition, options)
+
+        if topLevel:
+            self._tearDownPreviousClass(None, result)
+            self._handleModuleTearDown(result)
+            result._testRunEntered = False
+        return result
 
 
 def enable_dbc(*args):
