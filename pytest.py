@@ -119,12 +119,14 @@ from time import time, clock
 import warnings
 import types
 from inspect import isgeneratorfunction, isclass
+from contextlib import contextmanager
 
 from logilab.common.fileutils import abspath_listdir
 from logilab.common import textutils
 from logilab.common import testlib, STD_BLACKLIST
 # use the same unittest module as testlib
 from logilab.common.testlib import unittest, start_interactive_mode
+from logilab.common.deprecation import deprecated
 import doctest
 
 import unittest as unittest_legacy
@@ -145,28 +147,36 @@ except ImportError:
 
 CONF_FILE = 'pytestconf.py'
 
-## coverage hacks, do not read this, do not read this, do not read this
+## coverage pausing tools
 
-# hey, but this is an aspect, right ?!!!
+@contextmanager
+def replace_trace(trace=None):
+    """A context manager that temporary replaces the trace function"""
+    oldtrace = sys.gettrace()
+    sys.settrace(trace)
+    try:
+        yield
+    finally:
+        sys.settrace(oldtrace)
+
+
+def pause_trace():
+    """A context manager that temporary pauses any tracing"""
+    return replace_trace()
+
 class TraceController(object):
-    nesting = 0
+    ctx_stack = []
 
+    @classmethod
+    @deprecated('[lgc 0.63.1] Use the pause_trace() context manager')
     def pause_tracing(cls):
-        if not cls.nesting:
-            cls.tracefunc = staticmethod(getattr(sys, '__settrace__', sys.settrace))
-            cls.oldtracer = getattr(sys, '__tracer__', None)
-            sys.__notrace__ = True
-            cls.tracefunc(None)
-        cls.nesting += 1
-    pause_tracing = classmethod(pause_tracing)
+        cls.ctx_stack.append(pause_trace())
+        cls.ctx_stack[-1].__enter__()
 
+    @classmethod
+    @deprecated('[lgc 0.63.1] Use the pause_trace() context manager')
     def resume_tracing(cls):
-        cls.nesting -= 1
-        assert cls.nesting >= 0
-        if not cls.nesting:
-            cls.tracefunc(cls.oldtracer)
-            delattr(sys, '__notrace__')
-    resume_tracing = classmethod(resume_tracing)
+        cls.ctx_stack.pop().__exit__(None, None, None)
 
 
 pause_tracing = TraceController.pause_tracing
@@ -174,20 +184,18 @@ resume_tracing = TraceController.resume_tracing
 
 
 def nocoverage(func):
+    """Function decorator that pauses tracing functions"""
     if hasattr(func, 'uncovered'):
         return func
     func.uncovered = True
+
     def not_covered(*args, **kwargs):
-        pause_tracing()
-        try:
+        with pause_trace():
             return func(*args, **kwargs)
-        finally:
-            resume_tracing()
     not_covered.uncovered = True
     return not_covered
 
-
-## end of coverage hacks
+## end of coverage pausing tools
 
 
 TESTFILE_RE = re.compile("^((unit)?test.*|smoketest)\.py$")
