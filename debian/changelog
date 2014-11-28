@@ -1,3 +1,9 @@
+logilab-common (0.63.1-1) unstable; urgency=low
+
+  * new upstream release 
+
+ -- David Douard <david.douard@logilab.fr>  Fri, 28 Nov 2014 11:48:37 +0100
+
 logilab-common (0.63.0-1) unstable; urgency=low
 
   * new upstream release

@@ -25,7 +25,7 @@ modname = 'common'
 subpackage_of = 'logilab'
 subpackage_master = True
 
-numversion = (0, 63, 0)
+numversion = (0, 63, 1)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'LGPL' # 2.1 or later
@@ -42,6 +42,7 @@ include_dirs = [join('test', 'data')]
 
 install_requires = [
         'six >= 1.4.0',
+	'pytz',
         ]
 if sys.version_info < (2, 7):
     install_requires.append('unittest2 >= 0.5.1')

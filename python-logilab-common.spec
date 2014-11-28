@@ -10,7 +10,7 @@
 %{!?_python_sitelib: %define _python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           %{python}-logilab-common
-Version:        0.63.0
+Version:        0.63.1
 Release:        logilab.1%{?dist}
 Summary:        Common libraries for Logilab projects
 
@@ -21,7 +21,7 @@ Source0:        http://download.logilab.org/pub/common/logilab-common-%{version}
 BuildArch:      noarch
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
-BuildRequires:  python-devel python-setuptools python-unittest2
+BuildRequires:  python-devel python-setuptools python-unittest2 pytz
 Requires:       mx
 Requires:       %{python}-six >= 1.4.0
 

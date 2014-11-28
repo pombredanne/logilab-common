@@ -16,6 +16,7 @@ Build-Depends-Indep:
  graphviz,
  python-unittest2,
  python-egenix-mxdatetime,
+ python-tz,
  python-six (>= 1.4.0),
  python3-six (>= 1.4.0) | python3 (<< 3.3),
 X-Python3-Version: >= 3.3
