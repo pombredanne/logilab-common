@@ -71,9 +71,6 @@ def daemonize(pidfile=None, uid=None, umask=077):
         return 2
     # move to the root to avoit mount pb
     os.chdir('/')
-    # set umask if specified
-    if umask is not None:
-        os.umask(umask)
     # redirect standard descriptors
     null = os.open('/dev/null', os.O_RDWR)
     for i in range(3):
@@ -95,7 +92,9 @@ def daemonize(pidfile=None, uid=None, umask=077):
         f = file(pidfile, 'w')
         f.write(str(os.getpid()))
         f.close()
-        os.chmod(pidfile, 0644)
+    # set umask if specified
+    if umask is not None:
+        os.umask(umask)
     # change process uid
     if uid:
         setugid(uid)
