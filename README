@@ -121,8 +121,6 @@ Modules extending some external modules
 
 * `corbautils`, useful functions for use with the OmniORB_ CORBA library.
 
-* `hg`, some Mercurial_ utility functions.
-
 * `pyro_ext`, some Pyro_ utility functions.
 
 * `sphinx_ext`, Sphinx_ plugin defining a `autodocstring` directive.
