@@ -1,7 +1,7 @@
 # -*- coding: Latin-1 -*-
 """test module for astng
 """
-
+from __future__ import print_function
 
 from logilab.common import modutils, Execute as spawn
 from logilab.common.astutils import *
@@ -21,7 +21,7 @@ def global_access(key, val):
         else:
             break
     else:
-        print '!!!'
+        print('!!!')
 
 class YO:
     """hehe"""
@@ -36,7 +36,7 @@ class YO:
         except:
             raise
 
-#print '*****>',YO.__dict__
+#print('*****>',YO.__dict__)
 class YOUPI(YO):
     class_attr = None
 
@@ -51,9 +51,9 @@ class YOUPI(YO):
             local = None
             autre = [a for a, b in MY_DICT if b]
             if b in autre:
-                print 'yo',
+                print('yo', end=' ')
             elif a in autre:
-                print 'hehe'
+                print('hehe')
             global_access(local, val=autre)
         finally:
             return local
@@ -65,23 +65,5 @@ class YOUPI(YO):
 
     def class_method(cls):
         """class method test"""
-        exec a in b
+        exec(a, b)
     class_method = classmethod(class_method)
-
-
-def nested_args(a, (b, c, d)):
-    """nested arguments test"""
-    print a, b, c, d
-    while 1:
-        if a:
-            break
-        a += +1
-    else:
-        b += -2
-    if c:
-        d = a and b or c
-    else:
-        c = a and b or d
-    map(lambda x, y: (y, x), a)
-
-redirect = nested_args

@@ -51,7 +51,7 @@ def setugid(user):
     os.environ['HOME'] = passwd.pw_dir
 
 
-def daemonize(pidfile=None, uid=None, umask=077):
+def daemonize(pidfile=None, uid=None, umask=0o77):
     """daemonize a Unix process. Set paranoid umask by default.
 
     Return 1 in the original process, 2 in the first fork, and None for the
