@@ -42,8 +42,9 @@ include_dirs = [join('test', 'data')]
 
 install_requires = [
         'six >= 1.4.0',
-	'pytz',
         ]
+test_require = ['pytz']
+
 if sys.version_info < (2, 7):
     install_requires.append('unittest2 >= 0.5.1')
 if os.name == 'nt':

@@ -54,6 +54,7 @@ subpackage_of = getattr(__pkginfo__, 'subpackage_of', None)
 include_dirs = getattr(__pkginfo__, 'include_dirs', [])
 ext_modules = getattr(__pkginfo__, 'ext_modules', None)
 install_requires = getattr(__pkginfo__, 'install_requires', None)
+test_require = getattr(__pkginfo__, 'test_require', None)
 dependency_links = getattr(__pkginfo__, 'dependency_links', [])
 classifiers = getattr(__pkginfo__, 'classifiers', [])
 
@@ -153,6 +154,7 @@ def install(**kwargs):
         packages = [modname] + get_packages(os.getcwd(), modname)
     if USE_SETUPTOOLS and install_requires:
         kwargs['install_requires'] = install_requires
+        kwargs['test_require'] = test_require
         kwargs['dependency_links'] = dependency_links
     kwargs['packages'] = packages
     return setup(name = distname,
