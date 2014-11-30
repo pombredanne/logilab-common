@@ -157,6 +157,11 @@ def replace_trace(trace=None):
     try:
         yield
     finally:
+        # specific hack to work around a bug in pycoverage, see
+        # https://bitbucket.org/ned/coveragepy/issue/123
+        if (oldtrace is not None and not callable(oldtrace) and
+            hasattr(oldtrace, 'pytrace')):
+            oldtrace = oldtrace.pytrace
         sys.settrace(oldtrace)
 
 
