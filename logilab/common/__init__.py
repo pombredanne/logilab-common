@@ -26,7 +26,6 @@
 """
 __docformat__ = "restructuredtext en"
 
-from six.moves import range
 
 from logilab.common.__pkginfo__ import version as __version__
 
@@ -142,6 +141,7 @@ def make_domains(lists):
     >>> make_domains(['a', 'b'], ['c','d', 'e'])
     [['a', 'b', 'a', 'b', 'a', 'b'], ['c', 'c', 'd', 'd', 'e', 'e']]
     """
+    from six.moves import range
     domains = []
     for iterable in lists:
         new_domain = iterable[:]

@@ -40,12 +40,18 @@ except ImportError:
 
 from distutils.command.build_py import build_py
 
-sys.modules.pop('__pkginfo__', None)
 # import optional features
-__pkginfo__ = __import__("__pkginfo__")
+__pkginfo__ = __import__("logilab.common.__pkginfo__").common.__pkginfo__
+
+
 # import required features
-from __pkginfo__ import modname, version, license, description, \
-     web, author, author_email
+modname = __pkginfo__.modname
+version = __pkginfo__.version
+license = __pkginfo__.license
+description = __pkginfo__.description
+web = __pkginfo__.web
+author = __pkginfo__.author
+author_email = __pkginfo__.author_email
 
 distname = getattr(__pkginfo__, 'distname', modname)
 scripts = getattr(__pkginfo__, 'scripts', [])
@@ -143,16 +149,10 @@ def install(**kwargs):
     # install-layout option was introduced in 2.5.3-1~exp1
     elif sys.version_info < (2, 5, 4) and '--install-layout=deb' in sys.argv:
         sys.argv.remove('--install-layout=deb')
-    if subpackage_of:
-        package = subpackage_of + '.' + modname
-        kwargs['package_dir'] = {package : '.'}
-        packages = [package] + get_packages(os.getcwd(), package)
-        if USE_SETUPTOOLS:
-            kwargs['namespace_packages'] = [subpackage_of]
-    else:
-        kwargs['package_dir'] = {modname : '.'}
-        packages = [modname] + get_packages(os.getcwd(), modname)
-    if USE_SETUPTOOLS and install_requires:
+    package = subpackage_of + '.' + modname
+    packages = get_packages(os.getcwd(), '')
+    if USE_SETUPTOOLS:
+        kwargs['namespace_packages'] = [subpackage_of]
         kwargs['install_requires'] = install_requires
         kwargs['test_require'] = test_require
         kwargs['dependency_links'] = dependency_links
