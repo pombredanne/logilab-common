@@ -170,10 +170,12 @@ def load_module_from_modpath(parts, path=None, use_sys=True):
         if prevmodule:
             setattr(prevmodule, part, module)
         _file = getattr(module, '__file__', '')
+        prevmodule = module
+        if not _file and _is_namespace(curname):
+            continue
         if not _file and len(modpath) != len(parts):
             raise ImportError('no module in %s' % '.'.join(parts[len(modpath):]) )
         path = [dirname( _file )]
-        prevmodule = module
     return module
 
 
@@ -205,9 +207,11 @@ def load_module_from_file(filepath, path=None, use_sys=True, extrapath=None):
 
 def _check_init(path, mod_path):
     """check there are some __init__.py all along the way"""
+    modpath = []
     for part in mod_path:
+        modpath.append(part)
         path = join(path, part)
-        if not _has_init(path):
+        if not _is_namespace('.'.join(modpath)) and not _has_init(path):
             return False
     return True
 
@@ -476,7 +480,6 @@ def is_python_source(filename):
     return splitext(filename)[1][1:] in PY_SOURCE_EXTS
 
 
-
 def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
     """try to guess if a module is a standard python module (by default,
     see `std_path` parameter's description)
@@ -504,7 +507,8 @@ def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
     # modules which are not living in a file are considered standard
     # (sys and __builtin__ for instance)
     if filename is None:
-        return True
+        # we assume there are no namespaces in stdlib
+        return not _is_namespace(modname)
     filename = abspath(filename)
     if filename.startswith(EXT_LIB_DIR):
         return False
@@ -585,6 +589,12 @@ try:
 except ImportError:
     pkg_resources = None
 
+
+def _is_namespace(modname):
+    return (pkg_resources is not None
+            and modname in pkg_resources._namespace_packages)
+
+
 def _module_file(modpath, path=None):
     """get a module type / file path
 
@@ -616,14 +626,13 @@ def _module_file(modpath, path=None):
     except AttributeError:
         checkeggs = False
     # pkg_resources support (aka setuptools namespace packages)
-    if (pkg_resources is not None
-            and modpath[0] in pkg_resources._namespace_packages
-            and modpath[0] in sys.modules
-            and len(modpath) > 1):
+    if (_is_namespace(modpath[0]) and modpath[0] in sys.modules):
         # setuptools has added into sys.modules a module object with proper
         # __path__, get back information from there
         module = sys.modules[modpath.pop(0)]
         path = module.__path__
+        if not modpath:
+            return C_BUILTIN, None
     imported = []
     while modpath:
         modname = modpath[0]
