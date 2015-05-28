@@ -23,6 +23,7 @@ BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 BuildRequires:  python-devel python-setuptools python-unittest2 pytz
 Requires:       mx
+Requires:       python-setuptools
 Requires:       %{python}-six >= 1.4.0
 
 
@@ -45,7 +46,7 @@ find . -name '*.py' -type f -print0 |  xargs -0 sed -i '1,3s;^#!.*python.*$;#! /
 
 %install
 rm -rf $RPM_BUILD_ROOT
-NO_SETUPTOOLS=1 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT %{?python_scriptarch: --install-scripts=%{python_scriptarch}}
+%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT %{?python_scriptarch: --install-scripts=%{python_scriptarch}}
 rm -rf $RPM_BUILD_ROOT%{_python_sitelib}/logilab/common/test
 
 %check

@@ -10,7 +10,9 @@ Uploaders: David Douard <david.douard@logilab.fr>,
 Build-Depends:
  debhelper (>= 8),
  python-all,
+ python-setuptools,
  python3-all,
+ python3-setuptools,
 Build-Depends-Indep:
  python-epydoc,
  graphviz,
