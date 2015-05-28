@@ -25,7 +25,7 @@
 :var STD_LIB_DIR: directory where standard modules are located
 
 :type BUILTIN_MODULES: dict
-:var BUILTIN_MODULES: dictionary with builtin module names has key
+:var BUILTIN_MODULES: dictionary with builtin module names as key
 """
 
 __docformat__ = "restructuredtext en"
@@ -485,7 +485,7 @@ def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
     :param modname: name of the module we are interested in
 
     :type std_path: list(str) or tuple(str)
-    :param std_path: list of path considered has standard
+    :param std_path: list of path considered as standard
 
 
     :rtype: bool

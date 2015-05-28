@@ -94,7 +94,7 @@ __unittest = 1
 
 def with_tempdir(callable):
     """A decorator ensuring no temporary file left when the function return
-    Work only for temporary file create with the tempfile module"""
+    Work only for temporary file created with the tempfile module"""
     if isgeneratorfunction(callable):
         def proxy(*args, **kwargs):
             old_tmpdir = tempfile.gettempdir()
