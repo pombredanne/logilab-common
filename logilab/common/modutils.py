@@ -62,7 +62,7 @@ else:
     PY_COMPILED_EXTS = ('so',)
 
 try:
-    STD_LIB_DIR = get_python_lib(standard_lib=1)
+    STD_LIB_DIR = get_python_lib(standard_lib=True)
 # get_python_lib(standard_lib=1) is not available on pypy, set STD_LIB_DIR to
 # non-valid path, see https://bugs.pypy.org/issue1164
 except DistutilsPlatformError:
@@ -101,7 +101,7 @@ class LazyObject(object):
         return self._getobj()(*args, **kwargs)
 
 
-def load_module_from_name(dotted_name, path=None, use_sys=1):
+def load_module_from_name(dotted_name, path=None, use_sys=True):
     """Load a Python module from its name.
 
     :type dotted_name: str
@@ -126,7 +126,7 @@ def load_module_from_name(dotted_name, path=None, use_sys=1):
     return load_module_from_modpath(dotted_name.split('.'), path, use_sys)
 
 
-def load_module_from_modpath(parts, path=None, use_sys=1):
+def load_module_from_modpath(parts, path=None, use_sys=True):
     """Load a python module from its splitted name.
 
     :type parts: list(str) or tuple(str)
@@ -177,7 +177,7 @@ def load_module_from_modpath(parts, path=None, use_sys=1):
     return module
 
 
-def load_module_from_file(filepath, path=None, use_sys=1, extrapath=None):
+def load_module_from_file(filepath, path=None, use_sys=True, extrapath=None):
     """Load a Python module from it's path.
 
     :type filepath: str
@@ -500,17 +500,17 @@ def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
     except ImportError as ex:
         # import failed, i'm probably not so wrong by supposing it's
         # not standard...
-        return 0
+        return False
     # modules which are not living in a file are considered standard
     # (sys and __builtin__ for instance)
     if filename is None:
-        return 1
+        return True
     filename = abspath(filename)
     if filename.startswith(EXT_LIB_DIR):
-        return 0
+        return False
     for path in std_path:
         if filename.startswith(abspath(path)):
-            return 1
+            return True
     return False
 
 
