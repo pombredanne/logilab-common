@@ -70,8 +70,7 @@ except DistutilsPlatformError:
 
 EXT_LIB_DIR = get_python_lib()
 
-BUILTIN_MODULES = dict(zip(sys.builtin_module_names,
-                           [1]*len(sys.builtin_module_names)))
+BUILTIN_MODULES = dict.fromkeys(sys.builtin_module_names, True)
 
 
 class NoSourceFile(Exception):
