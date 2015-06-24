@@ -22,6 +22,7 @@ import re
 
 from sys import version_info
 
+from logilab.common import attrdict
 from logilab.common.compat import StringIO
 from logilab.common.testlib import TestCase, unittest_main
 from logilab.common.optik_ext import OptionValueError
@@ -320,8 +321,10 @@ options:
 
 
     def test_manpage(self):
-        from logilab.common import __pkginfo__
-        self.cfg.generate_manpage(__pkginfo__, stream=StringIO())
+        pkginfo = {}
+        with open(join(DATA, '__pkginfo__.py')) as fobj:
+            exec(fobj.read(), pkginfo)
+        self.cfg.generate_manpage(attrdict(pkginfo), stream=StringIO())
 
     def test_rewrite_config(self):
         changes = [('renamed', 'renamed', 'choice'),
