@@ -26,8 +26,9 @@
 """
 __docformat__ = "restructuredtext en"
 
+import pkg_resources
 
-from logilab.common.__pkginfo__ import version as __version__
+__version__ = pkg_resources.get_distribution('logilab-common').version
 
 STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 
