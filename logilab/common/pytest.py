@@ -930,7 +930,7 @@ class SkipAwareTextTestRunner(unittest.TextTestRunner):
             if tags_pattern is not None:
                 tags = getattr(test, 'tags', testlib.Tags())
                 if tags.inherit and isinstance(test, types.MethodType):
-                    tags = tags | getattr(test.im_class, 'tags', testlib.Tags())
+                    tags = tags | getattr(test.__self__.__class__, 'tags', testlib.Tags())
                 return tags.match(tags_pattern)
         return True # no pattern
 
