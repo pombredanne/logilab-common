@@ -454,6 +454,9 @@ class Tags(set):
     def match(self, exp):
         return eval(exp, {}, self)
 
+    def __or__(self, other):
+        return Tags(*super(Tags, self).__or__(other))
+
 
 # duplicate definition from unittest2 of the _deprecate decorator
 def _deprecate(original_func):
