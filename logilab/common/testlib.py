@@ -484,7 +484,7 @@ class TestCase(unittest.TestCase):
 
         NOTE: this is a logilab's standard
         """
-        mod = __import__(cls.__module__)
+        mod = sys.modules[cls.__module__]
         return osp.join(osp.dirname(osp.abspath(mod.__file__)), 'data')
     # cache it (use a class method to cache on class since TestCase is
     # instantiated for each test run)
