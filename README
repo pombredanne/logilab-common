@@ -4,7 +4,7 @@ Logilab's common library
 What's this ?
 -------------
 
-This package contains some modules used by differents Logilab's projects.
+This package contains some modules used by different Logilab projects.
 
 It is released under the GNU Lesser General Public License.
 
@@ -18,7 +18,6 @@ Designed to ease:
 * manipulation of files and character strings
 * manipulation of common structures such as graph, tree, and pattern such as visitor
 * generating text and HTML reports
-* accessing some external libraries such as OmniORB_, Pyro_...
 * more...
 
 
@@ -50,12 +49,8 @@ Modules providing high-level features
   different subcommands. It is based on `configuration` to get easy command line
   / configuration file handling.
 
-* `cli`, a base class for interactive programs using the command line.
-
 * `configuration`, some classes to handle unified configuration from both
   command line (using optparse) and configuration file (using ConfigParser).
-
-* `dbf`, read Visual Fox Pro DBF files.
 
 * `proc`, interface to Linux /proc.
 
@@ -113,15 +108,9 @@ Modules extending some standard modules
 * `optik_ext`, defines some new option types (regexp, csv, color, date, etc.)
   for `optik` / `optparse`
 
-* `xmlrpcutils`, auth support for XML-RPC
-
 
 Modules extending some external modules
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* `corbautils`, useful functions for use with the OmniORB_ CORBA library.
-
-* `pyro_ext`, some Pyro_ utility functions.
 
 * `sphinx_ext`, Sphinx_ plugin defining a `autodocstring` directive.
 
@@ -142,42 +131,21 @@ versions:
 * `sphinxutils`: we won't go that way imo (i == syt)
 
 
-Deprecated modules
-~~~~~~~~~~~~~~~~~~
-
-Those `logilab.common` modules are only there for backward compatibility. They
-can go away at anytime.
-
-* `optparser`: use `clcommands` instead
-
-* `adbh`, `db`, `sqlgen`: see `logilab.database`_ instead
-
-* `contexts`: content move to `shellutils`
-
-* `html`: deprecated without replacement
-
-
 Comments, support, bug reports
 ------------------------------
 
-Project page http://www.logilab.org/project/logilab-common
+Project page https://www.logilab.org/project/logilab-common
 
-Use the python-projects@lists.logilab.org mailing list. Since we do not have
-publicly available bug tracker yet, bug reports should be emailed
-there too.
+Use the python-projects@lists.logilab.org mailing list.
 
 You can subscribe to this mailing list at
-http://lists.logilab.org/mailman/listinfo/python-projects
+https://lists.logilab.org/mailman/listinfo/python-projects
 
 Archives are available at
-http://lists.logilab.org/pipermail/python-projects/
+https://lists.logilab.org/pipermail/python-projects/
 
 
-.. _Pyro: http://pyro.sourceforge.net/
-.. _OmniORB: http://omniorb.sourceforge.net/
-.. _Mercurial: http://mercurial.selenic.com
 .. _Sphinx: http://sphinx.pocoo.org/
-.. _`logilab.database`: http://www.logilab.org/project/logilab-database/
 .. _`unittest2`: http://pypi.python.org/pypi/unittest2
 .. _`discover`: http://pypi.python.org/pypi/discover
 .. _`zope.interface`: http://pypi.python.org/pypi/zope.interface
