@@ -1,6 +1,34 @@
 ChangeLog for logilab.common
 ============================
 
+2015-06-26  --  1.0.0
+    * remove unused/deprecated modules: cli, contexts, corbautils, dbf,
+      pyro_ext, xmlrpcutils. __pkginfo__ is no longer installed.
+
+    * major layout change
+
+    * use setuptools exclusively
+
+    * 'logilab' is now a proper namespace package
+
+    * modutils: basic support for namespace packages
+
+    * registry: ambiguous selects now raise a specific exception
+
+    * testlib: better support for non-pytest launchers
+
+    * testlib: Tags() now work with py3k
+
+2014-11-30  --  0.63.2
+    * fix 2 minor regressions from 0.63.1
+
+2014-11-28  --  0.63.1
+    * fix fallout from py3k conversion
+
+    * pytest: fix TestSuite.run wrapper (#280806)
+
+    * daemon: change umask after creating pid file
+
 2014-11-05  --  0.63.0
     * drop compatibility with python <= 2.5 (#264017)
 
