@@ -39,7 +39,6 @@ Depends:
 Recommends:
  python-egenix-mxdatetime
 Suggests:
- pyro,
  python-unittest2,
  python-kerberos,
 Conflicts:
@@ -59,7 +58,6 @@ Description: useful miscellaneous modules used by Logilab projects
   * handling command line options and configuration files
   * writing interactive command line tools
   * manipulation files and character strings
-  * interfacing to OmniORB
   * running unit tests
   * manipulating tree structures
   * generating text and HTML reports
@@ -85,7 +83,6 @@ Description: useful miscellaneous modules used by Logilab projects
   * handling command line options and configuration files
   * writing interactive command line tools
   * manipulation files and character strings
-  * interfacing to OmniORB
   * running unit tests
   * manipulating tree structures
   * generating text and HTML reports
