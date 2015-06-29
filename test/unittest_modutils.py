@@ -209,7 +209,7 @@ class is_standard_module_tc(ModutilsTestCase):
         self.assertEqual(modutils.is_standard_module('hashlib'), True)
         self.assertEqual(modutils.is_standard_module('pickle'), True)
         self.assertEqual(modutils.is_standard_module('email'), True)
-        self.assertEqual(modutils.is_standard_module('io'), sys.version_info >= (2, 6))
+        self.assertEqual(modutils.is_standard_module('io'), True)
         self.assertEqual(modutils.is_standard_module('StringIO'), sys.version_info < (3, 0))
 
     def test_custom_path(self):
