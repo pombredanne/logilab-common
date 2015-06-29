@@ -495,6 +495,9 @@ def is_standard_module(modname, std_path=(STD_LIB_DIR,)):
       true if the module:
       - is located on the path listed in one of the directory in `std_path`
       - is a built-in module
+
+    Note: this function is known to return wrong values when inside virtualenv.
+    See https://www.logilab.org/ticket/294756.
     """
     modname = modname.split('.')[0]
     try:

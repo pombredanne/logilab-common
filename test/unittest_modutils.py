@@ -206,11 +206,14 @@ class is_standard_module_tc(ModutilsTestCase):
 
     def test_4(self):
         self.assertEqual(modutils.is_standard_module('marshal'), True)
-        self.assertEqual(modutils.is_standard_module('hashlib'), True)
         self.assertEqual(modutils.is_standard_module('pickle'), True)
         self.assertEqual(modutils.is_standard_module('email'), True)
-        self.assertEqual(modutils.is_standard_module('io'), True)
         self.assertEqual(modutils.is_standard_module('StringIO'), sys.version_info < (3, 0))
+        venv_py3 = sys.version_info[0] >= 3 and hasattr(sys, 'real_prefix')
+        if not venv_py3:
+            # those modules are symlinked by virtualenv (but not by python's venv)
+            self.assertEqual(modutils.is_standard_module('hashlib'), True)
+            self.assertEqual(modutils.is_standard_module('io'), True)
 
     def test_custom_path(self):
         self.assertEqual(modutils.is_standard_module('data.module', (DATADIR,)), True)
