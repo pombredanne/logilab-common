@@ -26,9 +26,17 @@
 """
 __docformat__ = "restructuredtext en"
 
+import sys
+import types
 import pkg_resources
 
 __version__ = pkg_resources.get_distribution('logilab-common').version
+
+# deprecated, but keep compatibility with pylint < 1.4.4
+__pkginfo__ = types.ModuleType('__pkginfo__')
+__pkginfo__.__package__ = __name__
+__pkginfo__.version = __version__
+sys.modules['logilab.common.__pkginfo__'] = __pkginfo__
 
 STD_BLACKLIST = ('CVS', '.svn', '.hg', 'debian', 'dist', 'build')
 
