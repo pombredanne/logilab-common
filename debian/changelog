@@ -1,3 +1,9 @@
+logilab-common (1.0.1-1) unstable; urgency=medium
+
+  * new upstream release
+
+ -- Julien Cristau <julien.cristau@logilab.fr>  Wed, 01 Jul 2015 09:08:34 +0200
+
 logilab-common (1.0.0-1) unstable; urgency=medium
 
   * new upstream release

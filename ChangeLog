@@ -1,6 +1,9 @@
 ChangeLog for logilab.common
 ============================
 
+2015-07-01  --  1.0.1
+    * restore __pkginfo__.version, which pylint < 1.4.4 uses
+
 2015-06-30  --  1.0.0
     * remove unused/deprecated modules: cli, contexts, corbautils, dbf,
       pyro_ext, xmlrpcutils. __pkginfo__ is no longer installed.
