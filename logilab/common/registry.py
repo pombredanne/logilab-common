@@ -58,8 +58,11 @@ You'll eventually find one concrete predicate: :class:`yes`
 Predicates
 ----------
 .. autoclass:: Predicate
-.. autofunc:: objectify_predicate
+.. autofunction:: objectify_predicate
 .. autoclass:: yes
+.. autoclass:: AndPredicate
+.. autoclass:: OrPredicate
+.. autoclass:: NotPredicate
 
 Debugging
 ---------
@@ -237,15 +240,15 @@ class Registry(dict):
 
     Registration methods:
 
-    .. automethod: register
-    .. automethod: unregister
+    .. automethod:: register
+    .. automethod:: unregister
 
     Selection methods:
 
-    .. automethod: select
-    .. automethod: select_or_none
-    .. automethod: possible_objects
-    .. automethod: object_by_id
+    .. automethod:: select
+    .. automethod:: select_or_none
+    .. automethod:: possible_objects
+    .. automethod:: object_by_id
     """
     def __init__(self, debugmode):
         super(Registry, self).__init__()
@@ -487,7 +490,7 @@ class RegistryStore(dict):
     :meth:`register_objects` method, given a list of directories to
     inspect for python modules.
 
-    .. automethod: register_objects
+    .. automethod:: register_objects
 
     For each module, by default, all compatible objects are registered
     automatically. However if some objects come as replacement of
