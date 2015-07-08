@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+2015-07-08  --  1.0.2
+    * declare setuptools requirement in __pkginfo__/setup.py
+
+    * randomize order of test modules in pytest -t
+
 2015-07-01  --  1.0.1
     * restore __pkginfo__.version, which pylint < 1.4.4 uses
 

@@ -25,7 +25,7 @@ modname = 'common'
 subpackage_of = 'logilab'
 subpackage_master = True
 
-numversion = (1, 0, 1)
+numversion = (1, 0, 2)
 version = '.'.join([str(num) for num in numversion])
 
 license = 'LGPL' # 2.1 or later
