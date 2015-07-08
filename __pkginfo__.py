@@ -41,6 +41,7 @@ scripts = [join('bin', 'pytest')]
 include_dirs = [join('test', 'data')]
 
 install_requires = [
+        'setuptools',
         'six >= 1.4.0',
         ]
 tests_require = ['pytz']
