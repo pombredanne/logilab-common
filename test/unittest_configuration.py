@@ -51,6 +51,8 @@ OPTIONS = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar
            ('reset-value', {'type': 'string', 'metavar': '<string>', 'short': 'r',
                             'dest':'value'}),
 
+           ('opt-b-1', {'type': 'string', 'metavar': '<string>', 'group': 'bgroup'}),
+           ('opt-b-2', {'type': 'string', 'metavar': '<string>', 'group': 'bgroup'}),
            ]
 
 class MyConfiguration(Configuration):
@@ -210,7 +212,14 @@ named=key:val
 
 [AGROUP]
 
-diffgroup=pouet""")
+diffgroup=pouet
+
+
+[BGROUP]
+
+#opt-b-1=
+
+#opt-b-2=""")
 
     def test_generate_config_with_space_string(self):
         self.cfg['value'] = '    '
@@ -239,7 +248,14 @@ reset-value='    '
 
 [AGROUP]
 
-diffgroup=pouet""")
+diffgroup=pouet
+
+
+[BGROUP]
+
+#opt-b-1=
+
+#opt-b-2=""")
 
 
     def test_roundtrip(self):
@@ -294,6 +310,10 @@ Options:
 
   Agroup:
     --diffgroup=<key=val>
+
+  Bgroup:
+    --opt-b-1=<string>
+    --opt-b-2=<string>
 
   Bonus:
     a nice additional help"""
@@ -356,7 +376,14 @@ reset-value='    '
 
 [AGROUP]
 
-diffgroup=pouet""")
+diffgroup=pouet
+
+
+[BGROUP]
+
+#opt-b-1=
+
+#opt-b-2=""")
 
 class Linter(OptionsManagerMixIn, OptionsProviderMixIn):
     options = (
