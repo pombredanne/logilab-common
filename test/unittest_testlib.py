@@ -135,10 +135,12 @@ class TestlibTC(TestCase):
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, 'toto\ntiti', 'toto\n titi\n')
         foo = join(dirname(__file__), 'data', 'foo.txt')
         spam = join(dirname(__file__), 'data', 'spam.txt')
-        text1 = open(foo).read()
+        with open(foo) as fobj:
+            text1 = fobj.read()
         self.tc.assertMultiLineEqual(text1, text1)
         self.tc.assertMultiLineEqual(text1, text1)
-        text2 = open(spam).read()
+        with open(spam) as fobj:
+            text2 = fobj.read()
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, text1, text2)
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, text1, text2)
 
