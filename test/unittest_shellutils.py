@@ -26,12 +26,12 @@ from six.moves import range
 from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.shellutils import (globfind, find, ProgressBar,
-                                       acquire_lock, release_lock,
                                        RawInput)
-from logilab.common.compat import str_to_bytes, StringIO
-from logilab.common.proc import NoSuchProcess
+from logilab.common.compat import StringIO
+
 
 DATA_DIR = join(dirname(abspath(__file__)), 'data', 'find_test')
+
 
 class FindTC(TestCase):
     def test_include(self):
@@ -169,44 +169,6 @@ class ProgressBarTC(TestCase):
             expected_stream.write("\r["+('='*dots)+(' '*(size-dots))+"]")
             self.assertEqual(pgb_stream.getvalue(), expected_stream.getvalue())
 
-
-class AcquireLockTC(TestCase):
-
-    def setUp(self):
-        self.tmpdir = tempfile.mkdtemp()
-        self.lock = join(self.tmpdir, 'LOCK')
-
-    def tearDown(self):
-        shutil.rmtree(self.tmpdir)
-
-    def test_acquire_normal(self):
-        self.assertTrue(acquire_lock(self.lock, 1, 1))
-        self.assertTrue(os.path.exists(self.lock))
-        release_lock(self.lock)
-        self.assertFalse(os.path.exists(self.lock))
-
-    def test_no_possible_acquire(self):
-        self.assertRaises(Exception, acquire_lock, self.lock, 0)
-
-    def test_wrong_process(self):
-        fd = os.open(self.lock, os.O_EXCL | os.O_RDWR | os.O_CREAT)
-        os.write(fd, str_to_bytes('1111111111'))
-        os.close(fd)
-        self.assertTrue(os.path.exists(self.lock))
-        self.assertRaises(Exception, acquire_lock, self.lock, 1, 1)
-
-    def test_wrong_process_and_continue(self):
-        fd = os.open(self.lock, os.O_EXCL | os.O_RDWR | os.O_CREAT)
-        os.write(fd, str_to_bytes('1111111111'))
-        os.close(fd)
-        self.assertTrue(os.path.exists(self.lock))
-        self.assertTrue(acquire_lock(self.lock))
-
-    def test_locked_for_one_hour(self):
-        self.assertTrue(acquire_lock(self.lock))
-        touch = datetime.datetime.fromtimestamp(time.time() - 3601).strftime("%m%d%H%M")
-        os.system("touch -t %s %s" % (touch, self.lock))
-        self.assertRaises(UserWarning, acquire_lock, self.lock, max_try=2, delay=1)
 
 class RawInputTC(TestCase):
 
