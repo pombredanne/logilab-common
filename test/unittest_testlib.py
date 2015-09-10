@@ -400,7 +400,7 @@ class ExitFirstTC(TestCase):
         class FooTC(TestCase):
             def test_generative(self):
                 for i in range(10):
-                    yield self.assert_, False
+                    yield self.assertTrue, False
         result = self.runner.run(FooTC('test_generative'))
         self.assertEqual(result.testsRun, 1)
         self.assertEqual(len(result.failures), 1)
