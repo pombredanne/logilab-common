@@ -81,7 +81,7 @@ from logilab.common.decorators import cached, classproperty
 from logilab.common import textutils
 
 
-__all__ = ['main', 'unittest_main', 'find_tests', 'run_test', 'spawn']
+__all__ = ['unittest_main', 'find_tests']
 
 DEFAULT_PREFIXES = ('test', 'regrtest', 'smoketest', 'unittest',
                     'func', 'validation')
