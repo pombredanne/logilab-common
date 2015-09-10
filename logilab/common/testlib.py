@@ -1066,53 +1066,6 @@ class TestCase(unittest.TestCase):
             prec = prec*math.fabs(obj)
         self.assertTrue(math.fabs(obj - other) < prec, msg)
 
-    def failUnlessRaises(self, excClass, callableObj=None, *args, **kwargs):
-        """override default failUnlessRaises method to return the raised
-        exception instance.
-
-        Fail unless an exception of class excClass is thrown
-        by callableObj when invoked with arguments args and keyword
-        arguments kwargs. If a different type of exception is
-        thrown, it will not be caught, and the test case will be
-        deemed to have suffered an error, exactly as for an
-        unexpected exception.
-
-        CAUTION! There are subtle differences between Logilab and unittest2
-        - exc is not returned in standard version
-        - context capabilities in standard version
-        - try/except/else construction (minor)
-
-        :param excClass: the Exception to be raised
-        :param callableObj: a callable Object which should raise <excClass>
-        :param args: a List of arguments for <callableObj>
-        :param kwargs: a List of keyword arguments  for <callableObj>
-        """
-        # XXX cube vcslib : test_branches_from_app
-        if callableObj is None:
-            _assert = super(TestCase, self).assertRaises
-            return _assert(excClass, callableObj, *args, **kwargs)
-        try:
-            callableObj(*args, **kwargs)
-        except excClass as exc:
-            class ProxyException:
-                def __init__(self, obj):
-                    self._obj = obj
-                def __getattr__(self, attr):
-                    warn_msg = ("This exception was retrieved with the old testlib way "
-                                "`exc = self.assertRaises(Exc, callable)`, please use "
-                                "the context manager instead'")
-                    warnings.warn(warn_msg, DeprecationWarning, 2)
-                    return self._obj.__getattribute__(attr)
-            return ProxyException(exc)
-        else:
-            if hasattr(excClass, '__name__'):
-                excName = excClass.__name__
-            else:
-                excName = str(excClass)
-            raise self.failureException("%s not raised" % excName)
-
-    assertRaises = failUnlessRaises
-
     if sys.version_info >= (3,2):
         assertItemsEqual = unittest.TestCase.assertCountEqual
     else:
