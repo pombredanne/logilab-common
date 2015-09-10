@@ -113,60 +113,12 @@ class TestlibTC(TestCase):
         self.tc.assertListEqual(l1, l3)
         self.tc.assertListEqual(l3, l1)
 
-    def test_xml_valid(self):
-        """tests xml is valid"""
-        valid = """<root>
-        <hello />
-        <world>Logilab</world>
-        </root>"""
-        invalid = """<root><h2> </root>"""
-        self.tc.assertXMLStringWellFormed(valid)
-        self.assertRaises(AssertionError, self.tc.assertXMLStringWellFormed, invalid)
-        invalid = """<root><h2 </h2> </root>"""
-        self.assertRaises(AssertionError, self.tc.assertXMLStringWellFormed, invalid)
-
     def test_equality_for_sets(self):
         s1 = set('ab')
         s2 = set('a')
         self.assertRaises(AssertionError, self.tc.assertSetEqual, s1, s2)
         self.tc.assertSetEqual(s1, s1)
         self.tc.assertSetEqual(set(), set())
-
-    def test_file_equality(self):
-        foo = join(dirname(__file__), 'data', 'foo.txt')
-        spam = join(dirname(__file__), 'data', 'spam.txt')
-        self.assertRaises(AssertionError, self.tc.assertFileEqual, foo, spam)
-        self.tc.assertFileEqual(foo, foo)
-
-    def test_dir_equality(self):
-        ref = join(dirname(__file__), 'data', 'reference_dir')
-        same = join(dirname(__file__), 'data', 'same_dir')
-        subdir_differ = join(dirname(__file__), 'data', 'subdir_differ_dir')
-        file_differ = join(dirname(__file__), 'data', 'file_differ_dir')
-        content_differ = join(dirname(__file__), 'data', 'content_differ_dir')
-        ed1 = join(dirname(__file__), 'data', 'empty_dir_1')
-        ed2 = join(dirname(__file__), 'data', 'empty_dir_2')
-
-        for path in (ed1, ed2, join(subdir_differ, 'unexpected')):
-            self.mkdir(path)
-
-        self.assertDirEqual(ed1, ed2)
-        self.assertDirEqual(ref, ref)
-        self.assertDirEqual( ref, same)
-        self.assertRaises(AssertionError, self.assertDirEqual, ed1, ref)
-        self.assertRaises(AssertionError, self.assertDirEqual, ref, ed2)
-        self.assertRaises(AssertionError, self.assertDirEqual, subdir_differ, ref)
-        self.assertRaises(AssertionError, self.assertDirEqual, file_differ, ref)
-        self.assertRaises(AssertionError, self.assertDirEqual, ref, content_differ)
-
-    def test_stream_equality(self):
-        foo = join(dirname(__file__), 'data', 'foo.txt')
-        spam = join(dirname(__file__), 'data', 'spam.txt')
-        stream1 = open(foo)
-        self.tc.assertStreamEqual(stream1, stream1)
-        stream1 = open(foo)
-        stream2 = open(spam)
-        self.assertRaises(AssertionError, self.tc.assertStreamEqual, stream1, stream2)
 
     def test_text_equality(self):
         self.assertRaises(AssertionError, self.tc.assertMultiLineEqual, "toto", 12)
