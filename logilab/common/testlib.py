@@ -572,6 +572,11 @@ class TestCase(unittest.TestCase):
                     #    result.shouldStop = True
                 if result.shouldStop: # either on error or on exitfirst + error
                     break
+        except self.failureException:
+            result.addFailure(self, self.__exc_info())
+            success = False
+        except SkipTest as e:
+            result.addSkip(self, e)
         except:
             # if an error occurs between two yield
             result.addError(self, self.__exc_info())

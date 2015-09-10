@@ -344,6 +344,31 @@ class GenerativeTestsTC(TestCase):
         self.assertEqual(len(result.skipped), 0)
 
 
+    def test_generative_outer_failure(self):
+        class FooTC(TestCase):
+            def test_generative(self):
+                self.fail()
+                yield
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEqual(result.testsRun, 0)
+        self.assertEqual(len(result.failures), 1)
+        self.assertEqual(len(result.errors), 0)
+        self.assertEqual(len(result.skipped), 0)
+
+    def test_generative_outer_skip(self):
+        class FooTC(TestCase):
+            def test_generative(self):
+                self.skipTest('blah')
+                yield
+
+        result = self.runner.run(FooTC('test_generative'))
+        self.assertEqual(result.testsRun, 0)
+        self.assertEqual(len(result.failures), 0)
+        self.assertEqual(len(result.errors), 0)
+        self.assertEqual(len(result.skipped), 1)
+
+
 class ExitFirstTC(TestCase):
     def setUp(self):
         output = StringIO()
