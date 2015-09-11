@@ -47,15 +47,12 @@ __docformat__ = "restructuredtext en"
 import sys
 import os, os.path as osp
 import re
-import traceback
-import inspect
 import difflib
 import tempfile
 import math
 import warnings
 from shutil import rmtree
 from operator import itemgetter
-from itertools import dropwhile
 from inspect import isgeneratorfunction
 
 from six import string_types
@@ -71,12 +68,12 @@ if not getattr(unittest_legacy, "__package__", None):
     except ImportError:
         raise ImportError("You have to install python-unittest2 to use %s" % __name__)
 else:
-    import unittest
+    import unittest as unittest
     from unittest import SkipTest
 
 from functools import wraps
 
-from logilab.common.debugger import Debugger, colorize_source
+from logilab.common.debugger import Debugger
 from logilab.common.decorators import cached, classproperty
 from logilab.common import textutils
 
@@ -204,123 +201,6 @@ def start_interactive_mode(result):
 
 # test utils ##################################################################
 
-class SkipAwareTestResult(unittest._TextTestResult):
-
-    def __init__(self, stream, descriptions, verbosity,
-                 exitfirst=False, pdbmode=False, cvg=None, colorize=False):
-        super(SkipAwareTestResult, self).__init__(stream,
-                                                  descriptions, verbosity)
-        self.skipped = []
-        self.debuggers = []
-        self.fail_descrs = []
-        self.error_descrs = []
-        self.exitfirst = exitfirst
-        self.pdbmode = pdbmode
-        self.cvg = cvg
-        self.colorize = colorize
-        self.pdbclass = Debugger
-        self.verbose = verbosity > 1
-
-    def descrs_for(self, flavour):
-        return getattr(self, '%s_descrs' % flavour.lower())
-
-    def _create_pdb(self, test_descr, flavour):
-        self.descrs_for(flavour).append( (len(self.debuggers), test_descr) )
-        if self.pdbmode:
-            self.debuggers.append(self.pdbclass(sys.exc_info()[2]))
-
-    def _iter_valid_frames(self, frames):
-        """only consider non-testlib frames when formatting  traceback"""
-        lgc_testlib = osp.abspath(__file__)
-        std_testlib = osp.abspath(unittest.__file__)
-        invalid = lambda fi: osp.abspath(fi[1]) in (lgc_testlib, std_testlib)
-        for frameinfo in dropwhile(invalid, frames):
-            yield frameinfo
-
-    def _exc_info_to_string(self, err, test):
-        """Converts a sys.exc_info()-style tuple of values into a string.
-
-        This method is overridden here because we want to colorize
-        lines if --color is passed, and display local variables if
-        --verbose is passed
-        """
-        exctype, exc, tb = err
-        output = ['Traceback (most recent call last)']
-        frames = inspect.getinnerframes(tb)
-        colorize = self.colorize
-        frames = enumerate(self._iter_valid_frames(frames))
-        for index, (frame, filename, lineno, funcname, ctx, ctxindex) in frames:
-            filename = osp.abspath(filename)
-            if ctx is None: # pyc files or C extensions for instance
-                source = '<no source available>'
-            else:
-                source = ''.join(ctx)
-            if colorize:
-                filename = textutils.colorize_ansi(filename, 'magenta')
-                source = colorize_source(source)
-            output.append('  File "%s", line %s, in %s' % (filename, lineno, funcname))
-            output.append('    %s' % source.strip())
-            if self.verbose:
-                output.append('%r == %r' % (dir(frame), test.__module__))
-                output.append('')
-                output.append('    ' + ' local variables '.center(66, '-'))
-                for varname, value in sorted(frame.f_locals.items()):
-                    output.append('    %s: %r' % (varname, value))
-                    if varname == 'self': # special handy processing for self
-                        for varname, value in sorted(vars(value).items()):
-                            output.append('      self.%s: %r' % (varname, value))
-                output.append('    ' + '-' * 66)
-                output.append('')
-        output.append(''.join(traceback.format_exception_only(exctype, exc)))
-        return '\n'.join(output)
-
-    def addError(self, test, err):
-        """err ->  (exc_type, exc, tcbk)"""
-        exc_type, exc, _ = err
-        if isinstance(exc, SkipTest):
-            assert exc_type == SkipTest
-            self.addSkip(test, exc)
-        else:
-            if self.exitfirst:
-                self.shouldStop = True
-            descr = self.getDescription(test)
-            super(SkipAwareTestResult, self).addError(test, err)
-            self._create_pdb(descr, 'error')
-
-    def addFailure(self, test, err):
-        if self.exitfirst:
-            self.shouldStop = True
-        descr = self.getDescription(test)
-        super(SkipAwareTestResult, self).addFailure(test, err)
-        self._create_pdb(descr, 'fail')
-
-    def addSkip(self, test, reason):
-        self.skipped.append((test, reason))
-        if self.showAll:
-            self.stream.writeln("SKIPPED")
-        elif self.dots:
-            self.stream.write('S')
-
-    def printErrors(self):
-        super(SkipAwareTestResult, self).printErrors()
-        self.printSkippedList()
-
-    def printSkippedList(self):
-        # format (test, err) compatible with unittest2
-        for test, err in self.skipped:
-            descr = self.getDescription(test)
-            self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % ('SKIPPED', descr))
-            self.stream.writeln("\t%s" % err)
-
-    def printErrorList(self, flavour, errors):
-        for (_, descr), (test, err) in zip(self.descrs_for(flavour), errors):
-            self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % (flavour, descr))
-            self.stream.writeln(self.separator2)
-            self.stream.writeln(err)
-            self.stream.writeln('no stdout'.center(len(self.separator2)))
-            self.stream.writeln('no stderr'.center(len(self.separator2)))
 
 # Add deprecation warnings about new api used by module level fixtures in unittest2
 # http://www.voidspace.org.uk/python/articles/unittest2.shtml#setupmodule-and-teardownmodule
@@ -487,10 +367,8 @@ class TestCase(unittest.TestCase):
         This is mostly a copy/paste from unittest.py (i.e same
         variable names, same logic, except for the generative tests part)
         """
-        from logilab.common.pytest import FILE_RESTART
         if result is None:
             result = self.defaultTestResult()
-        result.pdbclass = self.pdbclass
         self._options_ = options
         # if result.cvg:
         #     result.cvg.start()
@@ -522,22 +400,6 @@ class TestCase(unittest.TestCase):
             if not self.quiet_run(result, self.tearDown):
                 return
             if not generative and success:
-                if hasattr(options, "exitfirst") and options.exitfirst:
-                    # add this test to restart file
-                    try:
-                        restartfile = open(FILE_RESTART, 'a')
-                        try:
-                            descr = '.'.join((self.__class__.__module__,
-                                              self.__class__.__name__,
-                                              self._testMethodName))
-                            restartfile.write(descr+os.linesep)
-                        finally:
-                            restartfile.close()
-                    except Exception:
-                        print("Error while saving succeeded test into",
-                              osp.join(os.getcwd(), FILE_RESTART),
-                              file=sys.__stderr__)
-                        raise
                 result.addSuccess(self)
         finally:
             # if result.cvg:
@@ -609,10 +471,6 @@ class TestCase(unittest.TestCase):
             result.addError(self, self.__exc_info())
             return 2
         return 0
-
-    def defaultTestResult(self):
-        """return a new instance of the defaultTestResult"""
-        return SkipAwareTestResult()
 
     def innerSkip(self, msg=None):
         """mark a generative test as skipped for the <msg> reason"""
