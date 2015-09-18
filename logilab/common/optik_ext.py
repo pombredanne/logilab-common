@@ -56,6 +56,8 @@ import time
 from copy import copy
 from os.path import exists
 
+from six import integer_types
+
 # python >= 2.3
 from optparse import OptionParser as BaseParser, Option as BaseOption, \
      OptionGroup, OptionContainer, OptionValueError, OptionError, \
@@ -169,7 +171,7 @@ def check_color(option, opt, value):
     raise OptionValueError(msg % (opt, value))
 
 def check_time(option, opt, value):
-    if isinstance(value, (int, long, float)):
+    if isinstance(value, integer_types + (float,)):
         return value
     return apply_units(value, TIME_UNITS)
 
