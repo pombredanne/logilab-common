@@ -27,6 +27,8 @@ from email.header import decode_header
 
 from datetime import datetime
 
+from six import text_type, binary_type
+
 try:
     from mx.DateTime import DateTime
 except ImportError:
@@ -40,7 +42,14 @@ def decode_QP(string):
     for decoded, charset in decode_header(string):
         if not charset :
             charset = 'iso-8859-15'
-        parts.append(decoded.decode(charset, 'replace'))
+        # python 3 sometimes returns str and sometimes bytes.
+        # the 'official' fix is to use the new 'policy' APIs
+        # https://bugs.python.org/issue24797
+        # let's just handle this bug ourselves for now
+        if isinstance(decoded, binary_type):
+            decoded = decoded.decode(charset, 'replace')
+        assert isinstance(decoded, text_type)
+        parts.append(decoded)
 
     if sys.version_info < (3, 3):
         # decoding was non-RFC compliant wrt to whitespace handling

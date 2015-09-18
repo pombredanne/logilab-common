@@ -60,6 +60,18 @@ class UMessageTC(TestCase):
         self.assertEqual(type(test), text_type)
         self.assertEqual(test, u'Raphaël DUPONT<raphael.dupont@societe.fr>')
 
+    def test_decode_QP_utf8(self):
+        test_line = '=?utf-8?q?o=C3=AEm?= <oim@logilab.fr>'
+        test = decode_QP(test_line)
+        self.assertEqual(type(test), text_type)
+        self.assertEqual(test, u'oîm <oim@logilab.fr>')
+
+    def test_decode_QP_ascii(self):
+        test_line = 'test <test@logilab.fr>'
+        test = decode_QP(test_line)
+        self.assertEqual(type(test), text_type)
+        self.assertEqual(test, u'test <test@logilab.fr>')
+
 
 if __name__ == '__main__':
     unittest_main()
