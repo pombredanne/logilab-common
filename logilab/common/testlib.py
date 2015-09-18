@@ -537,40 +537,6 @@ class DocTest(TestCase):
     def test(self):
         """just there to trigger test execution"""
 
-MAILBOX = None
-
-class MockSMTP:
-    """fake smtplib.SMTP"""
-
-    def __init__(self, host, port):
-        self.host = host
-        self.port = port
-        global MAILBOX
-        self.reveived = MAILBOX = []
-
-    def set_debuglevel(self, debuglevel):
-        """ignore debug level"""
-
-    def sendmail(self, fromaddr, toaddres, body):
-        """push sent mail in the mailbox"""
-        self.reveived.append((fromaddr, toaddres, body))
-
-    def quit(self):
-        """ignore quit"""
-
-
-class MockConfigParser(configparser.ConfigParser):
-    """fake ConfigParser.ConfigParser"""
-
-    def __init__(self, options):
-        configparser.ConfigParser.__init__(self)
-        for section, pairs in options.iteritems():
-            self.add_section(section)
-            for key, value in pairs.iteritems():
-                self.set(section, key, value)
-    def write(self, _):
-        raise NotImplementedError()
-
 
 class MockConnection:
     """fake DB-API 2.0 connexion AND cursor (i.e. cursor() return self)"""
