@@ -954,7 +954,7 @@ class ConfigurationMixIn(OptionsManagerMixIn, OptionsProviderMixIn):
         OptionsProviderMixIn.load_defaults(self)
 
     def __iter__(self):
-        return iter(self.config.__dict__.iteritems())
+        return iter(self.config.__dict__.items())
 
     def __getitem__(self, key):
         try:
