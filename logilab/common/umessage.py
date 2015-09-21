@@ -60,13 +60,13 @@ def decode_QP(string):
 def message_from_file(fd):
     try:
         return UMessage(email.message_from_file(fd))
-    except email.Errors.MessageParseError:
+    except email.errors.MessageParseError:
         return ''
 
 def message_from_string(string):
     try:
         return UMessage(email.message_from_string(string))
-    except email.Errors.MessageParseError:
+    except email.errors.MessageParseError:
         return ''
 
 class UMessage:
