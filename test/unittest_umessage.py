@@ -23,7 +23,7 @@ from os.path import join, dirname, abspath
 from six import text_type
 
 from logilab.common.testlib import TestCase, unittest_main
-from logilab.common.umessage import UMessage, decode_QP
+from logilab.common.umessage import UMessage, decode_QP, message_from_string
 
 DATA = join(dirname(abspath(__file__)), 'data')
 
@@ -53,6 +53,23 @@ class UMessageTC(TestCase):
     def test_get_payload_no_multi(self):
         payload = self.umessage1.get_payload()
         self.assertEqual(type(payload), text_type)
+    
+    def test_get_payload_decode(self):
+        msg = """\
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: =?utf-8?q?b=C3=AFjour?=
+From: =?utf-8?q?oim?= <oim@logilab.fr>
+Reply-to: =?utf-8?q?oim?= <oim@logilab.fr>, =?utf-8?q?BimBam?= <bim@boum.fr>
+X-CW: data
+To: test@logilab.fr
+Date: now
+
+dW4gcGV0aXQgY8O2dWNvdQ==
+"""
+        msg = message_from_string(msg)
+        self.assertEqual(msg.get_payload(decode=True), u'un petit cöucou')
 
     def test_decode_QP(self):
         test_line =  '=??b?UmFwaGHrbA==?= DUPONT<raphael.dupont@societe.fr>'
