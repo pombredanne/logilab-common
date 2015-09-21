@@ -379,7 +379,12 @@ class TestCase(unittest.TestCase):
             try:
                 skip_why = (getattr(self.__class__, '__unittest_skip_why__', '')
                             or getattr(testMethod, '__unittest_skip_why__', ''))
-                self._addSkip(result, skip_why)
+                if hasattr(result, 'addSkip'):
+                    result.addSkip(self, skip_why)
+                else:
+                    warnings.warn("TestResult has no addSkip method, skips not reported",
+                                  RuntimeWarning, 2)
+                    result.addSuccess(self)
             finally:
                 result.stopTest(self)
             return
