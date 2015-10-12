@@ -1,6 +1,18 @@
 ChangeLog for logilab.common
 ============================
 
+2015-10-12  --  1.1.0
+    * configuration: have a stable order for sections (#298658)
+
+    * testlib: clean out deprecated TestCase methods (#1716063), move pytest
+      specifics to pytest.py (#1716053)
+
+    * fix a few python3 bugs in umessage, configuration and optik_ext modules
+
+    * testlib: report failures and skips in generative tests properly
+
+    * optik_ext: return bytes as ints and not floats (#2086835)
+
 2015-07-08  --  1.0.2
     * declare setuptools requirement in __pkginfo__/setup.py
 
