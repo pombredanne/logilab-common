@@ -178,7 +178,7 @@ def check_time(option, opt, value):
 def check_bytes(option, opt, value):
     if hasattr(value, '__int__'):
         return value
-    return apply_units(value, BYTE_UNITS)
+    return apply_units(value, BYTE_UNITS, final=int)
 
 
 class Option(BaseOption):

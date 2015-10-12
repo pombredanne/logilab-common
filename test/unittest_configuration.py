@@ -22,6 +22,8 @@ import re
 
 from sys import version_info
 
+from six import integer_types
+
 from logilab.common import attrdict
 from logilab.common.compat import StringIO
 from logilab.common.testlib import TestCase, unittest_main
@@ -38,6 +40,7 @@ OPTIONS = [('dothis', {'type':'yn', 'action': 'store', 'default': True, 'metavar
                          'metavar': '<comma separated values>',
                          'help': 'you can also document the option'}),
            ('number', {'type': 'int', 'default':2, 'metavar':'<int>', 'help': 'boom'}),
+           ('bytes', {'type': 'bytes', 'default':'1KB', 'metavar':'<bytes>'}),
            ('choice', {'type': 'choice', 'default':'yo', 'choices': ('yo', 'ye'),
                        'metavar':'<yo|ye>'}),
            ('multiple-choice', {'type': 'multiple_choice', 'default':['yo', 'ye'],
@@ -71,6 +74,8 @@ class ConfigurationTC(TestCase):
         self.assertEqual(cfg['value'], None)
         self.assertEqual(cfg['multiple'], ['yop', 'yep'])
         self.assertEqual(cfg['number'], 2)
+        self.assertEqual(cfg['bytes'], 1024)
+        self.assertIsInstance(cfg['bytes'], integer_types)
         self.assertEqual(cfg['choice'], 'yo')
         self.assertEqual(cfg['multiple-choice'], ['yo', 'ye'])
         self.assertEqual(cfg['named'], {'key': 'val'})
@@ -91,11 +96,13 @@ class ConfigurationTC(TestCase):
         cfg = self.cfg
         args = cfg.load_command_line_configuration(['--choice', 'ye', '--number', '4',
                                                     '--multiple=1,2,3', '--dothis=n',
+                                                    '--bytes=10KB',
                                                     'other', 'arguments'])
         self.assertEqual(args, ['other', 'arguments'])
         self.assertEqual(cfg['dothis'], False)
         self.assertEqual(cfg['multiple'], ['1', '2', '3'])
         self.assertEqual(cfg['number'], 4)
+        self.assertEqual(cfg['bytes'], 10240)
         self.assertEqual(cfg['choice'], 'ye')
         self.assertEqual(cfg['value'], None)
         args = cfg.load_command_line_configuration(['-v', 'duh'])
@@ -104,6 +111,7 @@ class ConfigurationTC(TestCase):
         self.assertEqual(cfg['dothis'], False)
         self.assertEqual(cfg['multiple'], ['1', '2', '3'])
         self.assertEqual(cfg['number'], 4)
+        self.assertEqual(cfg['bytes'], 10240)
         self.assertEqual(cfg['choice'], 'ye')
 
     def test_load_configuration(self):
@@ -133,6 +141,8 @@ multiple=yop,yepii
 
 # boom
 number=3
+
+bytes=1KB
 
 choice=yo
 
@@ -201,6 +211,8 @@ multiple=yop,yep
 # boom
 number=2
 
+bytes=1KB
+
 choice=yo
 
 multiple-choice=yo,ye
@@ -237,6 +249,8 @@ multiple=yop,yep
 # boom
 number=2
 
+bytes=1KB
+
 choice=yo
 
 multiple-choice=yo,ye
@@ -266,6 +280,7 @@ diffgroup=pouet
             self.cfg['dothis'] = False
             self.cfg['multiple'] = ["toto", "tata"]
             self.cfg['number'] = 3
+            self.cfg['bytes'] = 2048
             cfg.generate_config(stream)
             stream.close()
             new_cfg = MyConfiguration(name='test', options=OPTIONS)
@@ -273,6 +288,7 @@ diffgroup=pouet
             self.assertEqual(cfg['dothis'], new_cfg['dothis'])
             self.assertEqual(cfg['multiple'], new_cfg['multiple'])
             self.assertEqual(cfg['number'], new_cfg['number'])
+            self.assertEqual(cfg['bytes'], new_cfg['bytes'])
             self.assertEqual(cfg['choice'], new_cfg['choice'])
             self.assertEqual(cfg['value'], new_cfg['value'])
             self.assertEqual(cfg['multiple-choice'], new_cfg['multiple-choice'])
@@ -303,6 +319,7 @@ Options:
   --multiple=<comma separated values>
                         you can also document the option [current: yop,yep]
   --number=<int>        boom [current: 2]
+  --bytes=<bytes>
   --choice=<yo|ye>
   --multiple-choice=<yo|ye>
   --named=<key=val>
@@ -364,6 +381,8 @@ multiple=yop
 
 # boom
 number=2
+
+bytes=1KB
 
 choice=yo
 
