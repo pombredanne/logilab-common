@@ -328,7 +328,6 @@ def _deprecate(original_func):
 class TestCase(unittest.TestCase):
     """A unittest.TestCase extension with some additional methods."""
     maxDiff = None
-    pdbclass = Debugger
     tags = Tags()
 
     def __init__(self, methodName='runTest'):
