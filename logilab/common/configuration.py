@@ -401,6 +401,9 @@ def ini_format(stream, options, encoding):
             print('#%s=' % optname, file=stream)
         else:
             value = _encode(value, encoding).strip()
+            if optdict.get('type') == 'string' and '\n' in value:
+                prefix = '\n    '
+                value = prefix + prefix.join(value.split('\n'))
             print('%s=%s' % (optname, value), file=stream)
 
 format_section = ini_format_section

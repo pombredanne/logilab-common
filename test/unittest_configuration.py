@@ -271,6 +271,50 @@ diffgroup=pouet
 
 #opt-b-2=""")
 
+    def test_generate_config_with_multiline_string(self):
+        self.cfg['value'] = 'line1\nline2\nline3'
+        stream = StringIO()
+        self.cfg.generate_config(stream)
+        self.assertMultiLineEqual(stream.getvalue().strip(), """[TEST]
+
+dothis=yes
+
+value=
+    line1
+    line2
+    line3
+
+# you can also document the option
+multiple=yop,yep
+
+# boom
+number=2
+
+bytes=1KB
+
+choice=yo
+
+multiple-choice=yo,ye
+
+named=key:val
+
+reset-value=
+    line1
+    line2
+    line3
+
+
+[AGROUP]
+
+diffgroup=pouet
+
+
+[BGROUP]
+
+#opt-b-1=
+
+#opt-b-2=""")
+
 
     def test_roundtrip(self):
         cfg = self.cfg
