@@ -48,6 +48,7 @@ __docformat__ = "restructuredtext en"
 
 import sys
 from stat import S_IWRITE
+import codecs
 
 from six import string_types
 
@@ -125,28 +126,29 @@ class ChangeLogEntry(object):
 
     def write(self, stream=sys.stdout):
         """write the entry to file """
-        stream.write('%s  --  %s\n' % (self.date or '', self.version or ''))
+        stream.write(u'%s  --  %s\n' % (self.date or '', self.version or ''))
         for msg, sub_msgs in self.messages:
-            stream.write('%s%s %s\n' % (INDENT, BULLET, msg[0]))
-            stream.write(''.join(msg[1:]))
+            stream.write(u'%s%s %s\n' % (INDENT, BULLET, msg[0]))
+            stream.write(u''.join(msg[1:]))
             if sub_msgs:
-                stream.write('\n')
+                stream.write(u'\n')
             for sub_msg in sub_msgs:
-                stream.write('%s%s %s\n' % (INDENT * 2, SUBBULLET, sub_msg[0]))
-                stream.write(''.join(sub_msg[1:]))
-            stream.write('\n')
+                stream.write(u'%s%s %s\n' % (INDENT * 2, SUBBULLET, sub_msg[0]))
+                stream.write(u''.join(sub_msg[1:]))
+            stream.write(u'\n')
 
-        stream.write('\n\n')
+        stream.write(u'\n\n')
 
 class ChangeLog(object):
     """object representation of a whole ChangeLog file"""
 
     entry_class = ChangeLogEntry
 
-    def __init__(self, changelog_file, title=''):
+    def __init__(self, changelog_file, title=u''):
         self.file = changelog_file
+        assert isinstance(title, type(u'')), 'title must be a unicode object'
         self.title = title
-        self.additional_content = ''
+        self.additional_content = u''
         self.entries = []
         self.load()
 
@@ -184,12 +186,12 @@ class ChangeLog(object):
     def load(self):
         """ read a logilab's ChangeLog from file """
         try:
-            stream = open(self.file)
+            stream = codecs.open(self.file, encoding='utf-8')
         except IOError:
             return
         last = None
         expect_sub = False
-        for line in stream.readlines():
+        for line in stream:
             sline = line.strip()
             words = sline.split()
             # if new entry
@@ -221,14 +223,14 @@ class ChangeLog(object):
         stream.close()
 
     def format_title(self):
-        return '%s\n\n' % self.title.strip()
+        return u'%s\n\n' % self.title.strip()
 
     def save(self):
         """write back change log"""
         # filetutils isn't importable in appengine, so import locally
         from logilab.common.fileutils import ensure_fs_mode
         ensure_fs_mode(self.file, S_IWRITE)
-        self.write(open(self.file, 'w'))
+        self.write(codecs.open(self.file, 'w', encoding='utf-8'))
 
     def write(self, stream=sys.stdout):
         """write changelog to stream"""

@@ -18,7 +18,7 @@
 
 from os.path import join, dirname
 
-from logilab.common.compat import StringIO
+from io import StringIO
 from logilab.common.testlib import TestCase, unittest_main
 
 from logilab.common.changelog import ChangeLog
