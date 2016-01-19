@@ -67,13 +67,7 @@ def first_level_directory(path):
     return head
 
 def abspath_listdir(path):
-    """Lists path's content using absolute paths.
-
-    >>> os.listdir('/home')
-    ['adim', 'alf', 'arthur', 'auc']
-    >>> abspath_listdir('/home')
-    ['/home/adim', '/home/alf', '/home/arthur', '/home/auc']
-    """
+    """Lists path's content using absolute paths."""
     path = abspath(path)
     return [join(path, filename) for filename in listdir(path)]
 

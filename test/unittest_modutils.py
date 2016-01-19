@@ -19,6 +19,7 @@
 unit tests for module modutils (module manipulation utilities)
 """
 
+import doctest
 import sys
 try:
     __file__
@@ -279,11 +280,11 @@ class get_modules_files_tc(ModutilsTestCase):
         self.assertTrue( hasattr(logilab.common, 'fileutils') )
         self.assertTrue( m is logilab.common.fileutils )
 
-from logilab.common.testlib import DocTest
-class ModuleDocTest(DocTest):
-    """test doc test in this module"""
-    from logilab.common import modutils as module
-del DocTest # necessary if we don't want it to be executed (we don't...)
+
+def load_tests(loader, tests, ignore):
+    from logilab.common import modutils
+    tests.addTests(doctest.DocTestSuite(modutils))
+    return tests
 
 
 if __name__ == '__main__':

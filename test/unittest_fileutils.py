@@ -17,6 +17,7 @@
 # with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """unit tests for logilab.common.fileutils"""
 
+import doctest
 import sys, os, tempfile, shutil
 from stat import S_IWRITE
 from os.path import join
@@ -132,16 +133,12 @@ class ProtectedFileTC(TestCase):
         self.assertTrue(not os.stat(self.rpath).st_mode & S_IWRITE)
 
 
-from logilab.common.testlib import DocTest
 if sys.version_info < (3, 0):
-    # skip if python3, test fail because of traceback display incompatibility :(
-    class ModuleDocTest(DocTest):
-        """relative_path embed tests in docstring"""
-        from logilab.common import fileutils as module
-        skipped = ('abspath_listdir',)
+    def load_tests(loader, tests, ignore):
+        from logilab.common import fileutils
+        tests.addTests(doctest.DocTestSuite(fileutils))
+        return tests
 
-
-del DocTest # necessary if we don't want it to be executed (we don't...)
 
 if __name__ == '__main__':
     unittest_main()

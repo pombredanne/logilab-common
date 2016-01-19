@@ -56,10 +56,10 @@ from shutil import rmtree
 from operator import itemgetter
 from inspect import isgeneratorfunction
 
-from six import PY2, string_types
+from six import PY2, add_metaclass, string_types
 from six.moves import builtins, range, configparser, input
 
-from logilab.common.deprecation import deprecated
+from logilab.common.deprecation import class_deprecated, deprecated
 
 import unittest as unittest_legacy
 if not getattr(unittest_legacy, "__package__", None):
@@ -550,11 +550,13 @@ class DocTestFinder(doctest.DocTestFinder):
                                                globs, source_lines)
 
 
+@add_metaclass(class_deprecated)
 class DocTest(TestCase):
     """trigger module doctest
     I don't know how to make unittest.main consider the DocTestSuite instance
     without this hack
     """
+    __deprecation_warning__ = 'use stdlib doctest module with unittest API directly'
     skipped = ()
     def __call__(self, result=None, runcondition=None, options=None):\
         # pylint: disable=W0613
