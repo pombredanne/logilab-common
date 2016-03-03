@@ -1,6 +1,11 @@
 ChangeLog for logilab.common
 ============================
 
+UNRELEASED  -- 1.2.0
+
+    * pytest: TraceController class, pause_tracing and resume_tracing
+      functions, deprecated from 0.63.1, got removed
+
 2015-10-12  --  1.1.0
     * configuration: have a stable order for sections (#298658)
 

@@ -81,21 +81,6 @@ class ModuleFunctionTC(TestCase):
         with replace_trace(tracefn):
             myfn()
 
-    def test_legacy_pause_resume_tracing(self):
-        def tracefn(frame, event, arg):
-            pass
-
-        with replace_trace(tracefn):
-            pause_tracing()
-            self.assertIs(sys.gettrace(), None)
-            with replace_trace(tracefn):
-                pause_tracing()
-                self.assertIs(sys.gettrace(), None)
-                resume_tracing()
-                self.assertIs(sys.gettrace(), tracefn)
-            self.assertIs(sys.gettrace(), None)
-            resume_tracing()
-            self.assertIs(sys.gettrace(), tracefn)
 
 if __name__ == '__main__':
     unittest_main()
