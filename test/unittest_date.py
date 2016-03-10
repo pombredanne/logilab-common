@@ -20,11 +20,12 @@ Unittests for date helpers
 """
 from logilab.common.testlib import TestCase, unittest_main, tag
 
-from logilab.common.date import date_range, endOfMonth
-from logilab.common.date import add_days_worked, nb_open_days, \
-         get_national_holidays, ustrftime, ticks2datetime, utcdatetime
+from logilab.common.date import (date_range, endOfMonth, add_days_worked,
+        nb_open_days, get_national_holidays, ustrftime, ticks2datetime,
+        utcdatetime, datetime2ticks)
 
 from datetime import date, datetime, timedelta
+from calendar import timegm
 import pytz
 
 try:
@@ -165,6 +166,13 @@ class DateTC(TestCase):
         d = utcdatetime(d)
         self.assertEqual(d, self.datetimecls(2014, 7, 26, 10, 0, 0, 57))
         self.assertIsNone(d.tzinfo)
+
+    def test_datetime2ticks(self):
+        d = datetime(2014, 11, 26, 12, 0, 0, 57, tzinfo=pytz.utc)
+        timestamp = timegm(d.timetuple())
+        self.assertEqual(datetime2ticks(d), timestamp * 1000)
+        d = d.replace(microsecond=123456)
+        self.assertEqual(datetime2ticks(d), timestamp * 1000 + 123)
 
 
 class MxDateTC(DateTC):
