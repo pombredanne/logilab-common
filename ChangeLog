@@ -1,10 +1,14 @@
 ChangeLog for logilab.common
 ============================
 
-UNRELEASED  -- 1.2.0
+2016-03-15  -- 1.2.0
 
     * pytest: TraceController class, pause_tracing and resume_tracing
-      functions, deprecated from 0.63.1, got removed
+      functions, deprecated from 0.63.1, got removed.  The nocoverage
+      and pause_trace utilities are now available from the testlib
+      module rather than pytest.
+
+    * date: datetime2ticks uses the milliseconds from the datetime objects
 
 2015-10-12  --  1.1.0
     * configuration: have a stable order for sections (#298658)
