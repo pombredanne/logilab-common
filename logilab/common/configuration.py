@@ -635,7 +635,7 @@ class OptionsManagerMixIn(object):
             parser = self.cfgfile_parser
             parser.read([config_file])
             # normalize sections'title
-            for sect, values in parser._sections.items():
+            for sect, values in list(parser._sections.items()):
                 if not sect.isupper() and values:
                     parser._sections[sect.upper()] = values
         elif not self.quiet:
