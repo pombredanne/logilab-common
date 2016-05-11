@@ -22,7 +22,7 @@ BuildArch:      noarch
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 BuildRequires:  python-devel python-setuptools python-unittest2 pytz
-Requires:       python-egenix-mx-base
+%{?el6:Requires:       python-egenix-mx-base}
 Requires:       python-setuptools
 Requires:       %{python}-six >= 1.4.0
 
