@@ -174,6 +174,11 @@ class DateTC(TestCase):
         d = d.replace(microsecond=123456)
         self.assertEqual(datetime2ticks(d), timestamp * 1000 + 123)
 
+    def test_datetime2ticks_date_argument(self):
+        d = date(2014, 11, 26)
+        timestamp = timegm(d.timetuple())
+        self.assertEqual(datetime2ticks(d), timestamp * 1000)
+
 
 class MxDateTC(DateTC):
     datecls = mxDate
