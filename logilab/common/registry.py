@@ -720,7 +720,6 @@ class RegistryStore(dict):
 
     def load_file(self, filepath, modname):
         """ load registrable objects (if any) from a python file """
-        from logilab.common.modutils import load_module_from_name
         if modname in self._loadedmods:
             return
         self._loadedmods[modname] = {}
@@ -735,7 +734,7 @@ class RegistryStore(dict):
         # module
         self._lastmodifs[filepath] = mdate
         # load the module
-        module = load_module_from_name(modname)
+        module = __import__(modname, fromlist=modname.split('.')[:-1])
         self.load_module(module)
 
     def load_module(self, module):
