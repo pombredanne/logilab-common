@@ -41,10 +41,13 @@ scripts = [join('bin', 'pytest')]
 include_dirs = [join('test', 'data')]
 
 install_requires = [
-        'setuptools',
-        'six >= 1.4.0',
-        ]
-tests_require = ['pytz']
+    'setuptools',
+    'six >= 1.4.0',
+]
+tests_require = [
+    'pytz',
+    'egenix-mx-base',
+]
 
 if sys.version_info < (2, 7):
     install_requires.append('unittest2 >= 0.5.1')
