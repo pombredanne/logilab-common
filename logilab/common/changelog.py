@@ -3,18 +3,18 @@
 #
 # This file is part of logilab-common.
 #
-# logilab-common is free software: you can redistribute it and/or modify it under
+# logilab-common is free software: you can redistribute it or modify it under
 # the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 2.1 of the License, or (at your option) any
-# later version.
+# Software Foundation, either version 2.1 of the License, or (at your option)
+# any later version.
 #
 # logilab-common is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Lesser General Public License along
-# with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Lesser General Public License
+# along with logilab-common.  If not, see <http://www.gnu.org/licenses/>.
 """Manipulation of upstream change log files.
 
 The upstream change log files format handled is simpler than the one
@@ -56,11 +56,14 @@ BULLET = '*'
 SUBBULLET = '-'
 INDENT = ' ' * 4
 
+
 class NoEntry(Exception):
     """raised when we are unable to find an entry"""
 
+
 class EntryNotFound(Exception):
     """raised when we are unable to find a given entry"""
+
 
 class Version(tuple):
     """simple class to handle soft version number has a tuple while
@@ -68,7 +71,7 @@ class Version(tuple):
     """
     def __new__(cls, versionstr):
         if isinstance(versionstr, string_types):
-            versionstr = versionstr.strip(' :') # XXX (syt) duh?
+            versionstr = versionstr.strip(' :')  # XXX (syt) duh?
             parsed = cls.parse(versionstr)
         else:
             parsed = versionstr
@@ -80,10 +83,12 @@ class Version(tuple):
         try:
             return [int(i) for i in versionstr.split('.')]
         except ValueError as ex:
-            raise ValueError("invalid literal for version '%s' (%s)"%(versionstr, ex))
+            raise ValueError("invalid literal for version '%s' (%s)" %
+                             (versionstr, ex))
 
     def __str__(self):
         return '.'.join([str(i) for i in self])
+
 
 # upstream change log #########################################################
 
@@ -110,19 +115,22 @@ class ChangeLogEntry(object):
         """complete the latest added message
         """
         if not self.messages:
-            raise ValueError('unable to complete last message as there is no previous message)')
-        if self.messages[-1][1]: # sub messages
+            raise ValueError('unable to complete last message as '
+                             'there is no previous message)')
+        if self.messages[-1][1]:  # sub messages
             self.messages[-1][1][-1].append(msg_suite)
-        else: # message
+        else:  # message
             self.messages[-1][0].append(msg_suite)
 
     def add_sub_message(self, sub_msg, key=None):
         if not self.messages:
-            raise ValueError('unable to complete last message as there is no previous message)')
+            raise ValueError('unable to complete last message as '
+                             'there is no previous message)')
         if key is None:
             self.messages[-1][1].append([sub_msg])
         else:
-            raise NotImplementedError("sub message to specific key are not implemented yet")
+            raise NotImplementedError('sub message to specific key '
+                                      'are not implemented yet')
 
     def write(self, stream=sys.stdout):
         """write the entry to file """
@@ -133,11 +141,13 @@ class ChangeLogEntry(object):
             if sub_msgs:
                 stream.write(u'\n')
             for sub_msg in sub_msgs:
-                stream.write(u'%s%s %s\n' % (INDENT * 2, SUBBULLET, sub_msg[0]))
+                stream.write(u'%s%s %s\n' %
+                             (INDENT * 2, SUBBULLET, sub_msg[0]))
                 stream.write(u''.join(sub_msg[1:]))
             stream.write(u'\n')
 
         stream.write(u'\n\n')
+
 
 class ChangeLog(object):
     """object representation of a whole ChangeLog file"""
@@ -237,4 +247,3 @@ class ChangeLog(object):
         stream.write(self.format_title())
         for entry in self.entries:
             entry.write(stream)
-
