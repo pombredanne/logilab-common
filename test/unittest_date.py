@@ -149,7 +149,7 @@ class DateTC(TestCase):
 
     def test_utcdatetime(self):
         if self.datetimecls is mxDateTime:
-            raise self.skipTest('standard datetime only test')
+            return
         d = self.datetimecls(2014, 11, 26, 12, 0, 0, 57, tzinfo=pytz.utc)
         d = utcdatetime(d)
         self.assertEqual(d, self.datetimecls(2014, 11, 26, 12, 0, 0, 57))
