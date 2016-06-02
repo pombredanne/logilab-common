@@ -734,6 +734,8 @@ class RegistryStore(dict):
         # module
         self._lastmodifs[filepath] = mdate
         # load the module
+        if sys.version_info < (3,) and not isinstance(modname, str):
+            modname = str(modname)
         module = __import__(modname, fromlist=modname.split('.')[:-1])
         self.load_module(module)
 
