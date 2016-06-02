@@ -122,7 +122,7 @@ from os.path import exists, expanduser
 from copy import copy
 from warnings import warn
 
-from six import string_types
+from six import integer_types, string_types
 from six.moves import range, configparser as cp, input
 
 from logilab.common.compat import str_encode as _encode
@@ -372,7 +372,7 @@ def format_option_value(optdict, value):
         value = value and 'yes' or 'no'
     elif isinstance(value, string_types) and value.isspace():
         value = "'%s'" % value
-    elif optdict.get('type') == 'time' and isinstance(value, (float, int, long)):
+    elif optdict.get('type') == 'time' and isinstance(value, (float, ) + integer_types):
         value = format_time(value)
     elif optdict.get('type') == 'bytes' and hasattr(value, '__int__'):
         value = format_bytes(value)
