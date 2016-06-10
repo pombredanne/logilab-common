@@ -1296,3 +1296,7 @@ else:
     unittest.FunctionTestCase.__bases__ = (testlib.TestCase,)
 unittest.TestSuite.run = _ts_run
 unittest.TestSuite._wrapped_run = _ts_wrapped_run
+
+if __name__ == '__main__':
+    run()
+
