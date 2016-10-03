@@ -50,12 +50,12 @@ ifneq (,$(build_py3k))
 	# remove test directory
 	rm -rf debian/$(PACKAGE3)/$(PYLIB3)/logilab/common/test
 	
-	# rename pytest and its man page for python3k
-	mv debian/$(PACKAGE3)/usr/bin/pytest debian/$(PACKAGE3)/usr/bin/pytest3
-	sed -i 's/python -u/python3 -u/' debian/$(PACKAGE3)/usr/bin/pytest3
-	install -D doc/pytest.1 debian/$(PACKAGE3)/usr/share/man/man1/pytest3.1
-	sed -i 's/pytest/pytest3/' debian/$(PACKAGE3)/usr/share/man/man1/pytest3.1
-	gzip debian/$(PACKAGE3)/usr/share/man/man1/pytest3.1
+	# rename logilab-pytest and its man page for python3k
+	mv debian/$(PACKAGE3)/usr/bin/logilab-pytest debian/$(PACKAGE3)/usr/bin/logilab-pytest3
+	sed -i 's/python -u/python3 -u/' debian/$(PACKAGE3)/usr/bin/logilab-pytest3
+	install -D doc/logilab-pytest.1 debian/$(PACKAGE3)/usr/share/man/man1/logilab-pytest3.1
+	sed -i 's/logilab-pytest/logilab-pytest3/' debian/$(PACKAGE3)/usr/share/man/man1/logilab-pytest3.1
+	gzip debian/$(PACKAGE3)/usr/share/man/man1/logilab-pytest3.1
 endif
 
 override_dh_installdocs:
@@ -69,12 +69,12 @@ ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	python setup.py install \
                 --root=$(CURDIR)/testing/ ${py_setup_install_args}
 	echo 'import site, os.path; site.addsitedir(os.path.dirname(__file__))' > testing/$(PYLIB)/sitecustomize.py
-	PYTHONPATH=$(CURDIR)/testing/$(PYLIB) python bin/pytest -t $(CURDIR)/test
+	PYTHONPATH=$(CURDIR)/testing/$(PYLIB) python -m logilab.common.pytest -t $(CURDIR)/test
 ifneq (,$(build_py3k))
 	python3 setup.py install \
 		--root=$(CURDIR)/testing/ ${py_setup_install_args}
 	echo 'import site, os.path; site.addsitedir(os.path.dirname(__file__))' > testing/$(PYLIB3)/sitecustomize.py
-	PYTHONPATH=$(CURDIR)/testing/$(PYLIB3) python3 bin/pytest -t $(CURDIR)/test
+	PYTHONPATH=$(CURDIR)/testing/$(PYLIB3) python3 logilab.common.pytest -t $(CURDIR)/test
 endif
 endif
 

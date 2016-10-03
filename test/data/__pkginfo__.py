@@ -37,7 +37,7 @@ author_email = "contact@logilab.fr"
 
 
 from os.path import join
-scripts = [join('bin', 'pytest')]
+scripts = [join('bin', 'logilab-pytest')]
 include_dirs = [join('test', 'data')]
 
 install_requires = [

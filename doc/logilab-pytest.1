@@ -1,21 +1,21 @@
-.TH pytest "1" "January 2008" pytest
+.TH logilab-pytest "1" "January 2008" logilab-pytest
 .SH NAME
-.B pytest 
+.B logilab-pytest
 \- run python unit tests
 
 .SH SYNOPSIS
-usage: pytest [OPTIONS] [testfile [testpattern]]
+usage: logilab-pytest [OPTIONS] [testfile [testpattern]]
 .PP
 examples:
 .PP
-pytest path/to/mytests.py
-pytest path/to/mytests.py TheseTests
-pytest path/to/mytests.py TheseTests.test_thisone
+logilab-pytest path/to/mytests.py
+logilab-pytest path/to/mytests.py TheseTests
+logilab-pytest path/to/mytests.py TheseTests.test_thisone
 .PP
-pytest one (will run both test_thisone and test_thatone)
-pytest path/to/mytests.py \fB\-s\fR not (will skip test_notthisone)
+logilab-pytest one (will run both test_thisone and test_thatone)
+logilab-pytest path/to/mytests.py \fB\-s\fR not (will skip test_notthisone)
 .PP
-pytest \fB\-\-coverage\fR test_foo.py
+logilab-pytest \fB\-\-coverage\fR test_foo.py
 .IP
 (only if logilab.devtools is available)
 .SS "options:"
@@ -37,7 +37,7 @@ Enable test failure inspection (conflicts with
 \fB\-\-coverage\fR)
 .TP
 \fB\-x\fR, \fB\-\-exitfirst\fR
-Exit on first failure (only make sense when pytest run
+Exit on first failure (only make sense when logilab-pytest run
 one test file)
 .TP
 \fB\-s\fR SKIPPED, \fB\-\-skip\fR=\fISKIPPED\fR
