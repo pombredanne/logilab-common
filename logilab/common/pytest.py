@@ -124,6 +124,7 @@ from inspect import isgeneratorfunction, isclass
 from random import shuffle
 from itertools import dropwhile
 
+from logilab.common.deprecation import deprecated
 from logilab.common.fileutils import abspath_listdir
 from logilab.common import textutils
 from logilab.common import testlib, STD_BLACKLIST
@@ -631,6 +632,7 @@ def parseargs(parser):
 
 
 
+@deprecated('[logilab-common 1.3] logilab-pytest is deprecated, use another test runner')
 def run():
     parser = make_parser()
     rootdir, testercls = project_root(parser)

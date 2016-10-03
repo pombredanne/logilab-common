@@ -125,7 +125,6 @@ Those `logilab.common` modules will much probably be deprecated in future
 versions:
 
 * `testlib`: use `unittest2`_ instead
-* `logilab-pytest`: use `discover`_ instead
 * `interface`: use `zope.interface`_ if you really want this
 * `table`, `xmlutils`: is that used?
 * `sphinxutils`: we won't go that way imo (i == syt)
