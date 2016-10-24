@@ -56,7 +56,7 @@ from shutil import rmtree
 from operator import itemgetter
 from inspect import isgeneratorfunction
 
-from six import string_types
+from six import PY2, string_types
 from six.moves import builtins, range, configparser, input
 
 from logilab.common.deprecation import deprecated
@@ -90,6 +90,8 @@ is_generator = deprecated('[lgc 0.63] use inspect.isgeneratorfunction')(isgenera
 __unittest = 1
 
 
+@deprecated('with_tempdir is deprecated, use {0}.TemporaryDirectory.'.format(
+    'tempfile' if not PY2 else 'backports.tempfile'))
 def with_tempdir(callable):
     """A decorator ensuring no temporary file left when the function return
     Work only for temporary file created with the tempfile module"""
