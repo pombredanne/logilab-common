@@ -32,12 +32,14 @@ __docformat__ = "restructuredtext en"
 
 import sys
 import os
-from os.path import splitext, join, abspath, isdir, dirname, exists, basename
+from os.path import (splitext, join, abspath, isdir, dirname, exists,
+                     basename, expanduser, normcase, realpath)
 from imp import find_module, load_module, C_BUILTIN, PY_COMPILED, PKG_DIRECTORY
 from distutils.sysconfig import get_config_var, get_python_lib, get_python_version
 from distutils.errors import DistutilsPlatformError
 
-from six.moves import range
+from six import PY3
+from six.moves import map, range
 
 try:
     import zipimport
@@ -219,6 +221,19 @@ def _check_init(path, mod_path):
     return True
 
 
+def _canonicalize_path(path):
+    return realpath(expanduser(path))
+
+
+def _path_from_filename(filename):
+    if PY3:
+        return filename
+    else:
+        if filename.endswith(".pyc"):
+            return filename[:-1]
+        return filename
+
+
 def modpath_from_file(filename, extrapath=None):
     """given a file path return the corresponding splitted module's name
     (i.e name of a module or package splitted on '.')
@@ -239,24 +254,27 @@ def modpath_from_file(filename, extrapath=None):
     :rtype: list(str)
     :return: the corresponding splitted module's name
     """
-    base = splitext(abspath(filename))[0]
+    filename = _path_from_filename(filename)
+    filename = _canonicalize_path(filename)
+    base = os.path.splitext(filename)[0]
+
     if extrapath is not None:
-        for path_ in extrapath:
+        for path_ in map(_canonicalize_path, extrapath):
             path = abspath(path_)
-            if path and base[:len(path)] == path:
+            if path and normcase(base[:len(path)]) == normcase(path):
                 submodpath = [pkg for pkg in base[len(path):].split(os.sep)
                               if pkg]
                 if _check_init(path, submodpath[:-1]):
                     return extrapath[path_].split('.') + submodpath
-    for path in sys.path:
-        path = abspath(path)
-        if path and base.startswith(path):
+
+    for path in map(_canonicalize_path, sys.path):
+        if path and normcase(base).startswith(path):
             modpath = [pkg for pkg in base[len(path):].split(os.sep) if pkg]
             if _check_init(path, modpath[:-1]):
                 return modpath
+
     raise ImportError('Unable to find module for %s in %s' % (
         filename, ', \n'.join(sys.path)))
-
 
 
 def file_from_modpath(modpath, path=None, context_file=None):
