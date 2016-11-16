@@ -654,7 +654,9 @@ def _module_file(modpath, path=None):
         # setuptools has added into sys.modules a module object with proper
         # __path__, get back information from there
         module = sys.modules[modpath.pop(0)]
-        path = module.__path__
+        # use list() to protect against _NamespacePath instance we get with python 3, which
+        # find_module later doesn't like
+        path = list(module.__path__)
         if not modpath:
             return C_BUILTIN, None
     imported = []
