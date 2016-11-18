@@ -145,8 +145,9 @@ class file_from_modpath_tc(ModutilsTestCase):
     if it exists"""
 
     def test_site_packages(self):
-        self.assertEqual(path.realpath(modutils.file_from_modpath(['logilab', 'common', 'modutils'])),
-                         path.realpath(modutils.__file__.replace('.pyc', '.py')))
+        from pytz import tzinfo
+        self.assertEqual(path.realpath(modutils.file_from_modpath(['pytz', 'tzinfo'])),
+                         path.realpath(tzinfo.__file__.replace('.pyc', '.py')))
 
     def test_std_lib(self):
         from os import path
