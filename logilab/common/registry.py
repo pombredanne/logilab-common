@@ -81,6 +81,7 @@ from __future__ import print_function
 __docformat__ = "restructuredtext en"
 
 import sys
+import pkgutil
 import types
 import weakref
 import traceback as tb
@@ -492,6 +493,11 @@ class RegistryStore(dict):
 
     .. automethod:: register_objects
 
+    Alternatively loading could be triggered by calling the
+    :meth:`register_modnames` method, given a list of modules names to inspect.
+
+   .. automethod:: register_modnames
+
     For each module, by default, all compatible objects are registered
     automatically. However if some objects come as replacement of
     other objects, or have to be included only if some condition is
@@ -681,6 +687,20 @@ class RegistryStore(dict):
         # XXX inline init_registration ?
         filemods = self.init_registration(path, extrapath)
         for filepath, modname in filemods:
+            self.load_file(filepath, modname)
+        self.initialization_completed()
+
+    def register_modnames(self, modnames):
+        """register all objects found in <modnames>"""
+        self.reset()
+        self._loadedmods = {}
+        self._toloadmods = {}
+        toload = []
+        for modname in modnames:
+            filepath = pkgutil.find_loader(modname).get_filename()
+            self._toloadmods[modname] = filepath
+            toload.append((filepath, modname))
+        for filepath, modname in toload:
             self.load_file(filepath, modname)
         self.initialization_completed()
 

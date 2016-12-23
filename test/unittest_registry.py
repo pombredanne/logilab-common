@@ -183,6 +183,15 @@ class RegistryStoreTC(TestCase):
         self.assertEqual(set(('appobject1', 'appobject2', 'appobject3')),
                          set(store['zereg']))
 
+    def test_autoload_modnames(self):
+        store = RegistryStore()
+        store.setdefault('zereg')
+        with prepended_syspath(self.datadir):
+            store.register_modnames(['regobjects', 'regobjects2'])
+        self.assertEqual(['zereg'], list(store.keys()))
+        self.assertEqual(set(('appobject1', 'appobject2', 'appobject3')),
+                         set(store['zereg']))
+
 
 class RegistrableInstanceTC(TestCase):
 
