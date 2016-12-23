@@ -493,6 +493,18 @@ def cleanup_sys_modules(directories):
     return cleaned
 
 
+def clean_sys_modules(names):
+    """remove submodules starting with name from `names` from `sys.modules`"""
+    cleaned = set()
+    for modname in list(sys.modules):
+        for name in names:
+            if modname.startswith(name):
+                del sys.modules[modname]
+                cleaned.add(modname)
+                break
+    return cleaned
+
+
 def is_python_source(filename):
     """
     rtype: bool
