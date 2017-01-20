@@ -21,6 +21,7 @@ unit tests for module modutils (module manipulation utilities)
 
 import doctest
 import sys
+import warnings
 try:
     __file__
 except NameError:
@@ -117,8 +118,11 @@ class modpath_from_file_tc(ModutilsTestCase):
     """ given an absolute file path return the python module's path as a list """
 
     def test_knownValues_modpath_from_file_1(self):
-        self.assertEqual(modutils.modpath_from_file(modutils.__file__),
-                         ['logilab', 'common', 'modutils'])
+        with warnings.catch_warnings(record=True) as warns:
+            self.assertEqual(modutils.modpath_from_file(modutils.__file__),
+                             ['logilab', 'common', 'modutils'])
+            self.assertIn('you should avoid using modpath_from_file()',
+                          [str(w.message) for w in warns])
 
     def test_knownValues_modpath_from_file_2(self):
         self.assertEqual(modutils.modpath_from_file('unittest_modutils.py',

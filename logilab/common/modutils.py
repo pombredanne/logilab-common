@@ -49,6 +49,7 @@ except ImportError:
 ZIPFILE = object()
 
 from logilab.common import STD_BLACKLIST, _handle_blacklist
+from logilab.common.deprecation import deprecated
 
 # Notes about STD_LIB_DIR
 # Consider arch-specific installation for STD_LIB_DIR definition
@@ -234,8 +235,11 @@ def _path_from_filename(filename):
         return filename
 
 
+@deprecated('you should avoid using modpath_from_file()')
 def modpath_from_file(filename, extrapath=None):
-    """given a file path return the corresponding splitted module's name
+    """DEPRECATED: doens't play well with symlinks and sys.meta_path
+
+    Given a file path return the corresponding splitted module's name
     (i.e name of a module or package splitted on '.')
 
     :type filename: str
