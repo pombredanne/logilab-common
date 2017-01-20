@@ -95,6 +95,7 @@ from six import string_types, add_metaclass
 from logilab.common.modutils import modpath_from_file
 from logilab.common.logging_ext import set_log_methods
 from logilab.common.decorators import classproperty
+from logilab.common.deprecation import deprecated
 
 
 class RegistryException(Exception):
@@ -487,16 +488,10 @@ class RegistryStore(dict):
     Controlling object registration
     -------------------------------
 
-    Dynamic loading is triggered by calling the
-    :meth:`register_objects` method, given a list of directories to
-    inspect for python modules.
+    Dynamic loading is triggered by calling the :meth:`register_modnames`
+    method, given a list of modules names to inspect.
 
-    .. automethod:: register_objects
-
-    Alternatively loading could be triggered by calling the
-    :meth:`register_modnames` method, given a list of modules names to inspect.
-
-   .. automethod:: register_modnames
+    .. automethod:: register_modnames
 
     For each module, by default, all compatible objects are registered
     automatically. However if some objects come as replacement of
@@ -681,6 +676,7 @@ class RegistryStore(dict):
         self._loadedmods = {}
         return filemods
 
+    @deprecated('use register_modnames() instead')
     def register_objects(self, path, extrapath=None):
         """register all objects found walking down <path>"""
         # load views from each directory in the instance's path
@@ -1136,8 +1132,6 @@ class yes(Predicate): # pylint: disable=C0103
 
 
 # deprecated stuff #############################################################
-
-from logilab.common.deprecation import deprecated
 
 @deprecated('[lgc 0.59] use Registry.objid class method instead')
 def classid(cls):

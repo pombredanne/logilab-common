@@ -23,6 +23,7 @@ import os.path as osp
 import sys
 from operator import eq, lt, le, gt
 from contextlib import contextmanager
+import warnings
 
 logging.basicConfig(level=logging.ERROR)
 
@@ -177,8 +178,11 @@ class RegistryStoreTC(TestCase):
         store = RegistryStore()
         store.setdefault('zereg')
         with prepended_syspath(self.datadir):
-            store.register_objects([self.datapath('regobjects.py'),
-                                    self.datapath('regobjects2.py')])
+            with warnings.catch_warnings(record=True) as warns:
+                store.register_objects([self.datapath('regobjects.py'),
+                                        self.datapath('regobjects2.py')])
+                self.assertIn('use register_modnames() instead',
+                              [str(w.message) for w in warns])
         self.assertEqual(['zereg'], list(store.keys()))
         self.assertEqual(set(('appobject1', 'appobject2', 'appobject3')),
                          set(store['zereg']))
