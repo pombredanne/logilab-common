@@ -200,13 +200,18 @@ class RegistryStoreTC(TestCase):
 class RegistrableInstanceTC(TestCase):
 
     def test_instance_modulename(self):
+        with warnings.catch_warnings(record=True) as warns:
+            obj = RegistrableInstance()
+            self.assertEqual(obj.__module__, 'unittest_registry')
+            self.assertIn('instantiate RegistrableInstance with __module__=__name__',
+                          [str(w.message) for w in warns])
         # no inheritance
-        obj = RegistrableInstance()
+        obj = RegistrableInstance(__module__=__name__)
         self.assertEqual(obj.__module__, 'unittest_registry')
         # with inheritance from another python file
         with prepended_syspath(self.datadir):
             from regobjects2 import instance, MyRegistrableInstance
-            instance2 = MyRegistrableInstance()
+            instance2 = MyRegistrableInstance(__module__=__name__)
             self.assertEqual(instance.__module__, 'regobjects2')
             self.assertEqual(instance2.__module__, 'unittest_registry')
 

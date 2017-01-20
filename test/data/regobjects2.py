@@ -5,4 +5,4 @@ class MyRegistrableInstance(RegistrableInstance):
     __select__ = yes()
     __registry__ = 'zereg'
 
-instance = MyRegistrableInstance()
+instance = MyRegistrableInstance(__module__=__name__)

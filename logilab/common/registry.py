@@ -212,11 +212,21 @@ class RegistrableInstance(RegistrableObject):
         """Add a __module__ attribute telling the module where the instance was
         created, for automatic registration.
         """
+        module = kwargs.pop('__module__', None)
         obj = super(RegistrableInstance, cls).__new__(cls)
-        # XXX subclass must no override __new__
-        filepath = tb.extract_stack(limit=2)[0][0]
-        obj.__module__ = _modname_from_path(filepath)
+        if module is None:
+            warn('instantiate {0} with '
+                 '__module__=__name__'.format(cls.__name__),
+                 DeprecationWarning)
+            # XXX subclass must no override __new__
+            filepath = tb.extract_stack(limit=2)[0][0]
+            obj.__module__ = _modname_from_path(filepath)
+        else:
+            obj.__module__ = module
         return obj
+
+    def __init__(self, __module__=None):
+        super(RegistrableInstance, self).__init__()
 
 
 class Registry(dict):
