@@ -244,6 +244,8 @@ class UnormalizeTC(TestCase):
                 (u'ÀÈÙÉÏÎÔÊÇ', u'AEUEIIOEC'),
                 (u'\xa0', u' '), # NO-BREAK SPACE managed by NFKD decomposition
                 (u'\u0154', u'R'),
+                (u'Pointe d\u2019Yves', u"Pointe d'Yves"),
+                (u'Bordeaux\u2013Mérignac', u'Bordeaux-Merignac'),
                ]
         for input, output in data:
             yield self.assertEqual, tu.unormalize(input), output
